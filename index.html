@@ -8,9 +8,9 @@
 <!-- PWA META TAGS -->
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="OlyLife CRM">
-<meta name="theme-color" content="#040E1A">
+<meta name="theme-color" content="#126A3C">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
@@ -18,25 +18,44 @@
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@400;500;600;700&display=swap");
 :root{
-  --navy:#040E1A;--navy2:#0B1D31;--navy3:#12283F;
-  --gold:#C9A574;--goldp:rgba(201,165,116,.16);--goldd:#8A6C3E;
-  --aqua:#3FD8C6;--aquap:rgba(63,216,198,.16);
-  --tx:#EAF0F6;--t2:#9FB0C3;--t3:#5E7086;
-  --bd:#1C3450;--bd2:#25436A;
-  --gr:#33C481;--grp:rgba(51,196,129,.16);
-  --or:#E8935A;--orp:rgba(232,147,90,.16);
-  --rd:#E8636B;--rdp:rgba(232,99,107,.16);
-  --bl:#5AA9D6;--blp:rgba(90,169,214,.16);
-  --pu:#B79AE8;--pup:rgba(183,154,232,.16);
-  --wa:#25D366;--em:#5AA9D6;--ph:#B79AE8;--cloud:#3FD8C6;
-  --sh:0 4px 22px rgba(0,0,0,.35);--r:14px;--rs:10px;
+  /* Charte « Clair OlyLife Green » — les noms de variables sont hérités de la v1 sombre */
+  --navy:#F6FAF6;--navy2:#FFFFFF;--navy3:#E9F6EC;          /* fond de page · cartes · menthe */
+  --gold:#126A3C;--goldp:rgba(18,106,60,.10);--goldd:#0D5530; /* émeraude 349 C = action */
+  --aqua:#218477;--aquap:rgba(33,132,119,.12);              /* sarcelle 329 C = badges, liens */
+  --tx:#20362A;--t2:#5A6E61;--t3:#7F9186;                   /* encre · sauge · sauge claire */
+  --bd:#DCEBDF;--bd2:#C8E0CE;
+  --gr:#3D9C73;--grp:rgba(61,156,115,.14);                  /* jade 7723 C */
+  --or:#C2701F;--orp:rgba(194,112,31,.13);
+  --rd:#C63E47;--rdp:rgba(198,62,71,.11);
+  --bl:#2F7FB8;--blp:rgba(47,127,184,.12);
+  --pu:#7A5BB5;--pup:rgba(122,91,181,.12);
+  --wa:#25D366;--em:#218477;--ph:#7A5BB5;--cloud:#218477;
+  --orw:#C9A84C;--orwbg:#FBF6E9;--orwtx:#8C6D1F;            /* or WLHT — signature, encadrés */
+  --console:#0B2A1E;
+  --sh:0 3px 14px rgba(18,106,60,.06);--r:14px;--rs:10px;
   --safe-bottom:env(safe-area-inset-bottom,0px);--nav-h:64px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{-webkit-text-size-adjust:100%;overscroll-behavior:none;background:var(--navy);}
 
+
+/* ── ONDES ANIMÉES (arrière-plan) ────────────────────────────────── */
+#owaves{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:
+  radial-gradient(60% 40% at 15% 10%,rgba(61,156,115,.14),transparent 70%),
+  radial-gradient(50% 35% at 90% 30%,rgba(33,132,119,.12),transparent 70%),
+  var(--navy);}
+.owave{position:absolute;left:0;bottom:-2px;width:200%;height:38vh;min-height:220px;will-change:transform;}
+.owave svg{width:100%;height:100%;display:block;}
+.owave.w1{opacity:.55;animation:oWave 22s linear infinite;}
+.owave.w2{opacity:.38;animation:oWave 34s linear infinite reverse;height:30vh;}
+.owave.w3{opacity:.28;animation:oWave 48s linear infinite;height:22vh;}
+.owave.w4{top:-8vh;bottom:auto;opacity:.22;height:26vh;animation:oWaveTop 40s linear infinite;}
+@keyframes oWave{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes oWaveTop{from{transform:scaleY(-1) translateX(-50%)}to{transform:scaleY(-1) translateX(0)}}
+@media (prefers-reduced-motion:reduce){.owave{animation:none!important;}}
+
 /* ── PWA INSTALL BANNER ─────────────────────────────────────────── */
-#opwa-banner{display:none;position:fixed;bottom:calc(var(--nav-h) + var(--safe-bottom) + 8px);left:12px;right:12px;z-index:600;background:linear-gradient(135deg,var(--navy3),var(--navy2));border:1px solid var(--bd2);border-radius:var(--r);padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:slideUp .3s ease;}
+#opwa-banner{display:none;position:fixed;bottom:calc(var(--nav-h) + var(--safe-bottom) + 8px);left:12px;right:12px;z-index:600;background:linear-gradient(135deg,var(--navy2),var(--navy3));border:1px solid var(--bd2);border-radius:var(--r);padding:14px 16px;box-shadow:0 8px 32px rgba(18,106,60,.12);animation:slideUp .3s ease;}
 #opwa-banner.show{display:flex;align-items:center;gap:12px;}
 @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 .opwa-icon{font-size:26px;flex-shrink:0;color:var(--gold);}
@@ -44,47 +63,47 @@ html,body{-webkit-text-size-adjust:100%;overscroll-behavior:none;background:var(
 .opwa-ttl{font-size:14px;font-weight:600;color:var(--tx);}
 .opwa-sub{font-size:11px;color:var(--t3);margin-top:2px;}
 .opwa-btns{display:flex;gap:6px;flex-shrink:0;}
-.opwa-yes{background:var(--gold);color:var(--navy);border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;}
-.opwa-no{background:rgba(255,255,255,.08);color:var(--t2);border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;}
+.opwa-yes{background:var(--gold);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;}
+.opwa-no{background:rgba(18,106,60,.09);color:var(--t2);border:none;border-radius:8px;padding:7px 10px;font-size:12px;cursor:pointer;}
 
-/* ── SETUP SCREEN ────────────────────────────────────────────────── */
-#osetup{display:none;position:fixed;inset:0;background:var(--navy);z-index:900;overflow-y:auto;padding:16px;font-family:'Outfit',sans-serif;}
-#osetup.on{display:block;}
-.os-card{max-width:520px;margin:16px auto;background:var(--navy2);border-radius:var(--r);border:1px solid var(--bd);box-shadow:0 8px 40px rgba(0,0,0,.5);overflow:hidden;}
-.os-hd{background:linear-gradient(135deg,#081527,var(--navy3));padding:22px;border-bottom:1px solid var(--bd);}
+/* ── SETUP / LOGIN SCREENS ───────────────────────────────────────── */
+#osetup,#ologin{display:none;position:fixed;inset:0;background:rgba(246,250,246,.95);backdrop-filter:blur(6px);z-index:900;overflow-y:auto;padding:16px;font-family:'Outfit',sans-serif;}
+#osetup.on,#ologin.on{display:block;}
+.os-card{max-width:520px;margin:16px auto;background:var(--navy2);border-radius:var(--r);border:1px solid var(--bd);box-shadow:0 8px 40px rgba(18,106,60,.12);overflow:hidden;}
+.os-hd{background:linear-gradient(135deg,#FFFFFF,var(--navy3));padding:22px;border-bottom:1px solid var(--bd);}
 .os-hd-ttl{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--gold);}
 .os-hd-sub{font-size:11px;color:var(--t3);margin-top:4px;}
 .os-bd{padding:20px 22px;}
 .os-block-ttl{font-size:11px;font-weight:700;color:var(--aqua);text-transform:uppercase;letter-spacing:.8px;margin:18px 0 12px;}
 .os-block-ttl:first-child{margin-top:0;}
 .os-step{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start;}
-.os-num{width:24px;height:24px;border-radius:50%;background:var(--gold);color:var(--navy);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.os-num{width:24px;height:24px;border-radius:50%;background:var(--gold);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
 .os-txt{font-size:13px;color:var(--t2);line-height:1.6;}
 .os-txt b{color:var(--gold);}.os-txt a{color:var(--aqua);font-weight:600;}
 .os-note{background:var(--aquap);border:1px solid var(--aqua);border-radius:var(--rs);padding:10px 13px;font-size:12px;color:var(--aqua);margin-bottom:16px;}
 .os-inp{width:100%;padding:11px 13px;border:1.5px solid var(--bd);border-radius:var(--rs);font-family:'Outfit',sans-serif;font-size:14px;color:var(--tx);background:var(--navy3);outline:none;margin-top:8px;}
 .os-inp:focus{border-color:var(--gold);}
-.os-err{display:none;background:var(--rdp);color:var(--rd);padding:8px 11px;border-radius:var(--rs);font-size:12px;margin-bottom:10px;}
+.os-err{display:none;background:var(--rdp);color:var(--rd);padding:8px 11px;border-radius:var(--rs);font-size:12px;margin-bottom:10px;margin-top:10px;}
 
 /* ── LOADER ──────────────────────────────────────────────────────── */
-#oload{display:none;position:fixed;inset:0;background:rgba(4,14,26,.94);z-index:800;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
+#oload{display:none;position:fixed;inset:0;background:rgba(246,250,246,.92);z-index:800;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
 #oload.on{display:flex;}
 .ospinner{width:36px;height:36px;border:3px solid var(--goldp);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .oload-txt{font-size:13px;color:var(--gold);font-weight:500;font-family:'Outfit',sans-serif;}
 
 /* ── APP SHELL ───────────────────────────────────────────────────── */
-#oapp{font-family:'Outfit',sans-serif;color:var(--tx);background:var(--navy);min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;}
+#oapp{position:relative;z-index:1;font-family:'Outfit',sans-serif;color:var(--tx);background:transparent;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;}
 
 /* ── TOP BAR ─────────────────────────────────────────────────────── */
-#otop{background:linear-gradient(135deg,#081527,var(--navy3));padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--bd);}
+#otop{background:linear-gradient(135deg,#FFFFFF,var(--navy3));padding:0 16px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--bd);}
 .otop-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:var(--gold);}
 .otop-right{display:flex;gap:6px;align-items:center;}
-.otop-btn{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.06);border:none;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.otop-btn:active{background:rgba(255,255,255,.12);}
+.otop-btn{width:32px;height:32px;border-radius:50%;background:rgba(18,106,60,.07);border:none;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.otop-btn:active{background:rgba(18,106,60,.14);}
 
 /* ── SYNC DOT ────────────────────────────────────────────────────── */
-.osync-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2);}
+.osync-dot{width:8px;height:8px;border-radius:50%;background:rgba(18,106,60,.18);}
 .osync-dot.ok{background:var(--gr);}.osync-dot.err{background:var(--rd);}
 .osync-dot.spin{background:var(--gold);animation:pulse .8s infinite;}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
@@ -93,13 +112,14 @@ html,body{-webkit-text-size-adjust:100%;overscroll-behavior:none;background:var(
 #ocont{flex:1;overflow-y:auto;padding:14px 14px calc(var(--nav-h) + var(--safe-bottom) + 16px);}
 
 /* ── BOTTOM NAV ──────────────────────────────────────────────────── */
-#onav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + var(--safe-bottom));padding-bottom:var(--safe-bottom);background:var(--navy2);border-top:1px solid var(--bd);display:flex;align-items:stretch;box-shadow:0 -4px 20px rgba(0,0,0,.3);z-index:100;}
+#onav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + var(--safe-bottom));padding-bottom:var(--safe-bottom);background:rgba(255,255,255,.9);backdrop-filter:blur(8px);border-top:1px solid var(--bd);display:flex;align-items:stretch;box-shadow:0 -4px 20px rgba(18,106,60,.08);z-index:100;}
 .onb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:none;background:none;cursor:pointer;color:var(--t3);font-family:'Outfit',sans-serif;font-size:9px;font-weight:500;padding:8px 2px;transition:color .15s;position:relative;}
-.onb:active{background:rgba(255,255,255,.04);}
+.onb:active{background:rgba(18,106,60,.05);}
 .onb.on{color:var(--gold);}
 .onb.on svg{stroke:var(--gold);}
 .onb svg{width:21px;height:21px;stroke:var(--t3);transition:stroke .15s;}
 .onb.on::after{content:'';position:absolute;top:0;left:22%;right:22%;height:3px;background:var(--gold);border-radius:0 0 3px 3px;}
+.onb.hide{display:none;}
 .onbdg{position:absolute;top:6px;right:calc(50% - 16px);background:var(--rd);color:#fff;font-size:8px;font-weight:700;padding:1px 5px;border-radius:10px;display:none;}
 .onbdg.on{display:block;}
 
@@ -108,17 +128,17 @@ html,body{-webkit-text-size-adjust:100%;overscroll-behavior:none;background:var(
 
 /* ── BUTTONS ────────────────────────────────────────────────────── */
 .ob{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 16px;border-radius:var(--rs);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:none;text-decoration:none;white-space:nowrap;min-height:44px;}
-.bgold{background:var(--gold);color:var(--navy);}.bgold:active{filter:brightness(1.08);}
-.baqua{background:var(--aqua);color:var(--navy);}
+.bgold{background:linear-gradient(120deg,var(--gold),var(--goldd));color:#fff;box-shadow:0 6px 16px rgba(18,106,60,.22);}.bgold:active{filter:brightness(1.08);}
+.baqua{background:linear-gradient(120deg,var(--aqua),#186B60);color:#fff;}
 .bwa{background:var(--wa);color:#fff;}.bwa:active{filter:brightness(1.1);}
-.bem{background:var(--em);color:var(--navy);}
-.bph{background:var(--ph);color:var(--navy);}
+.bem{background:var(--em);color:#fff;}
+.bph{background:var(--ph);color:#fff;}
 .bdone{background:var(--grp);color:var(--gr);border:1.5px solid var(--gr);}
 .bdone:active{background:var(--gr);color:var(--navy);}
-.bgh{background:transparent;color:var(--t2);border:1.5px solid var(--bd);}
+.bgh{background:rgba(255,255,255,.7);color:var(--gold);border:1.5px solid var(--bd2);}
 .bdel{background:var(--rdp);color:var(--rd);}
 .bedit{background:var(--goldp);color:var(--gold);}
-.bcloud{background:var(--cloud);color:var(--navy);}
+.bcloud{background:var(--cloud);color:#fff;}
 .bsm{padding:8px 12px;font-size:12px;min-height:36px;}
 .bfull{width:100%;}
 .brow{display:flex;gap:8px;margin-bottom:8px;}
@@ -133,17 +153,19 @@ html,body{-webkit-text-size-adjust:100%;overscroll-behavior:none;background:var(
 .kpi-v{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;line-height:1;color:var(--gold);}
 .kpi-s{font-size:10px;color:var(--t3);margin-top:3px;}
 .cgr .kpi-v{color:var(--gr);}.caq .kpi-v{color:var(--aqua);}.cor .kpi-v{color:var(--or);}
+.kpi.hide{display:none;}
 
 /* ── CARD ────────────────────────────────────────────────────────── */
 .ocard{background:var(--navy2);border-radius:var(--r);border:1px solid var(--bd);box-shadow:var(--sh);overflow:hidden;margin-bottom:14px;}
 .ocard.oc-open .oc-body{display:block!important;}
+.ocard.hide{display:none;}
 .ochd{padding:13px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;}
 .oct{font-size:13px;font-weight:600;color:var(--gold);}
 
 /* ── CONTACT CARDS ─────────────────────────────────────────────── */
 .ocli-card{background:var(--navy2);border-radius:var(--r);border:1px solid var(--bd);padding:14px 16px;margin-bottom:10px;box-shadow:var(--sh);display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .12s;}
 .ocli-card:active{background:var(--navy3);}
-.ocli-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--goldd),var(--gold));color:var(--navy);font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ocli-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--goldd),var(--gold));color:#fff;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .ocli-info{flex:1;min-width:0;}
 .ocli-name{font-size:14px;font-weight:600;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .ocli-sub{font-size:11px;color:var(--t3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -154,7 +176,7 @@ html,body{-webkit-text-size-adjust:100%;overscroll-behavior:none;background:var(
 .bbl{background:var(--blp);color:var(--bl);}.bgr{background:var(--grp);color:var(--gr);}
 .bgo{background:var(--goldp);color:var(--gold);}.bor{background:var(--orp);color:var(--or);}
 .brd{background:var(--rdp);color:var(--rd);}.baq{background:var(--aquap);color:var(--aqua);}
-.bpu{background:var(--pup);color:var(--pu);}.bgy{background:rgba(255,255,255,.06);color:var(--t3);}
+.bpu{background:var(--pup);color:var(--pu);}.bgy{background:rgba(18,106,60,.07);color:var(--t3);}
 
 /* ── SEARCH ─────────────────────────────────────────────────────── */
 .osearch{display:flex;align-items:center;gap:8px;background:var(--navy2);border:1.5px solid var(--bd);border-radius:var(--rs);padding:10px 14px;margin-bottom:14px;}
@@ -166,7 +188,10 @@ html,body{-webkit-text-size-adjust:100%;overscroll-behavior:none;background:var(
 .ofilters{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:14px;scrollbar-width:none;}
 .ofilters::-webkit-scrollbar{display:none;}
 .ofilter-chip{flex-shrink:0;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;background:var(--navy2);color:var(--t2);border:1.5px solid var(--bd);transition:all .15s;}
-.ofilter-chip.on{background:var(--gold);color:var(--navy);border-color:var(--gold);}
+.ofilter-chip.on{background:var(--gold);color:#fff;border-color:var(--gold);}
+.ofilter-row{display:flex;gap:8px;margin-bottom:12px;}
+.ofilter-row.hide{display:none;}
+.ofilter-row select{flex:1;padding:9px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);font-family:'Outfit',sans-serif;font-size:12px;color:var(--tx);background:var(--navy2);outline:none;-webkit-appearance:none;appearance:none;}
 
 /* ── ACTIONS ACCORDION ─────────────────────────────────────────── */
 .orpg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
@@ -195,12 +220,13 @@ html,body{-webkit-text-size-adjust:100%;overscroll-behavior:none;background:var(
 .osec{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;color:var(--gold);padding:16px 0 8px;border-bottom:2px solid var(--aqua);margin-bottom:4px;}
 .ofc{padding:12px 14px;border:1.5px solid var(--bd);border-radius:var(--rs);font-family:'Outfit',sans-serif;font-size:15px;color:var(--tx);background:var(--navy3);outline:none;width:100%;transition:border-color .15s;-webkit-appearance:none;appearance:none;}
 .ofc::placeholder{color:var(--t3);}
-.ofc:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,165,116,.12);}
+.ofc:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(18,106,60,.12);}
 select.ofc{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235E7086' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;}
 textarea.ofc{resize:vertical;min-height:76px;}
 .ochk-row{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1.5px solid var(--bd);border-radius:var(--rs);cursor:pointer;background:var(--navy3);}
 .ochk-row input{width:16px;height:16px;accent-color:var(--gold);cursor:pointer;}
 .ochk-row span{font-size:13px;color:var(--tx);}
+.fb.hide{display:none;}
 
 /* ── PRODUCTS ────────────────────────────────────────────────────── */
 .opg{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
@@ -209,10 +235,10 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .oprd input[type=checkbox]{width:15px;height:15px;accent-color:var(--gold);cursor:pointer;flex-shrink:0;}
 
 /* ── FULL-SCREEN MODAL ───────────────────────────────────────────── */
-#omo{display:none;position:fixed;inset:0;background:var(--navy);z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-#omo.on{display:block;}
-.omo-hd{background:linear-gradient(135deg,#081527,var(--navy3));padding:16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;border-bottom:1px solid var(--bd);}
-.omo-back{background:rgba(255,255,255,.08);border:none;color:var(--tx);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+#omo,#oimp{display:none;position:fixed;inset:0;background:rgba(246,250,246,.86);backdrop-filter:blur(3px);z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+#omo.on,#oimp.on{display:block;}
+.omo-hd{background:linear-gradient(135deg,#FFFFFF,var(--navy3));padding:16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;border-bottom:1px solid var(--bd);}
+.omo-back{background:rgba(18,106,60,.09);border:none;color:var(--tx);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .omo-ttl{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:var(--gold);flex:1;}
 .omo-body{padding:16px;}
 
@@ -225,6 +251,22 @@ textarea.ofc{resize:vertical;min-height:76px;}
 
 .omo-actions{padding:14px 16px calc(var(--safe-bottom) + 14px);background:var(--navy2);border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:8px;position:sticky;bottom:0;}
 
+/* ── IMPORT PREVIEW ─────────────────────────────────────────────── */
+.oimp-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--bd);font-size:12px;}
+.oimp-row:last-child{border-bottom:none;}
+.oimp-row .nm{font-weight:600;color:var(--tx);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.oimp-row .dt{color:var(--t3);font-size:11px;flex:1.4;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.oimp-row.warn{background:var(--orp);}
+
+/* ── USERS (gestion des accès) ──────────────────────────────────── */
+.ouser-row{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--bd);font-size:12px;flex-wrap:wrap;}
+.ouser-row:last-child{border-bottom:none;}
+.ouser-nm{font-weight:600;color:var(--tx);}
+.ouser-code{font-family:monospace;font-size:11px;background:var(--navy3);border:1px solid var(--bd2);border-radius:6px;padding:2px 7px;color:var(--gold);letter-spacing:1px;}
+.ouser-off{opacity:.45;}
+.otag{display:inline-flex;align-items:center;gap:6px;background:var(--goldp);color:var(--gold);border-radius:20px;padding:5px 11px;font-size:12px;font-weight:600;}
+.otag button{background:none;border:none;color:var(--gold);cursor:pointer;font-size:13px;line-height:1;padding:0;}
+
 /* ── EMPTY ───────────────────────────────────────────────────────── */
 .oemp{text-align:center;padding:40px 20px;color:var(--t3);}
 .oemp-i{font-size:36px;margin-bottom:8px;opacity:.5;}
@@ -232,7 +274,7 @@ textarea.ofc{resize:vertical;min-height:76px;}
 
 /* ── TOAST ───────────────────────────────────────────────────────── */
 #otc{position:fixed;bottom:calc(var(--nav-h) + var(--safe-bottom) + 12px);left:12px;right:12px;z-index:9999;display:flex;flex-direction:column;gap:6px;pointer-events:none;}
-.ott{background:rgba(11,29,49,.96);backdrop-filter:blur(8px);border:1px solid var(--bd2);color:var(--tx);padding:12px 16px;border-radius:var(--r);font-size:13px;font-weight:500;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.4);animation:tIn .2s ease;}
+.ott{background:rgba(32,54,42,.96);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.08);color:#fff;padding:12px 16px;border-radius:var(--r);font-size:13px;font-weight:500;text-align:center;box-shadow:0 8px 32px rgba(18,106,60,.14);animation:tIn .2s ease;}
 .ott.s{background:rgba(51,196,129,.94);color:#04150C;border-color:transparent;}
 .ott.e{background:rgba(232,99,107,.94);color:#2A0709;border-color:transparent;}
 .ott.w{background:rgba(232,147,90,.94);color:#2A1505;border-color:transparent;}
@@ -241,43 +283,52 @@ textarea.ofc{resize:vertical;min-height:76px;}
 </head>
 <body>
 
-<!-- HIDDEN IFRAME for POST without CORS -->
-<iframe name="opost_frame" id="opost_frame" style="display:none"></iframe>
+<!-- ONDES ANIMÉES — arrière-plan -->
+<div id="owaves" aria-hidden="true"><div class="owave w4"><svg viewBox="0 0 2880 320" preserveAspectRatio="none" aria-hidden="true"><path fill="#3D9C73" d="M0,230 C360,170 600,290 1440,230 C2280,170 2520,290 2880,230 L2880,320 L0,320 Z"/></svg></div><div class="owave w3"><svg viewBox="0 0 2880 320" preserveAspectRatio="none" aria-hidden="true"><path fill="#126A3C" d="M0,230 C360,170 600,290 1440,230 C2280,170 2520,290 2880,230 L2880,320 L0,320 Z"/></svg></div><div class="owave w2"><svg viewBox="0 0 2880 320" preserveAspectRatio="none" aria-hidden="true"><path fill="#218477" d="M0,200 C180,140 360,260 720,190 C1080,120 1260,260 1440,200 C1620,140 1800,260 2160,190 C2520,120 2700,260 2880,200 L2880,320 L0,320 Z"/></svg></div><div class="owave w1"><svg viewBox="0 0 2880 320" preserveAspectRatio="none" aria-hidden="true"><path fill="#3D9C73" d="M0,160 C240,80 480,240 720,160 C960,80 1200,240 1440,160 C1680,80 1920,240 2160,160 C2400,80 2640,240 2880,160 L2880,320 L0,320 Z"/></svg></div></div>
 
-<!-- SETUP SCREEN -->
+<!-- ÉCRAN DE CONNEXION -->
+<div id="ologin">
+  <div class="os-card">
+    <div class="os-hd">
+      <div class="os-hd-ttl"><img class="wlht-logo" alt="" style="height:22px;width:auto;vertical-align:-4px;margin-right:6px"> CRM OlyLife — WLHT</div>
+      <div class="os-hd-sub">Connexion — chaque membre de l'équipe a son propre code d'accès</div>
+    </div>
+    <div class="os-bd">
+      <div id="ol-url-wrap">
+        <div class="os-block-ttl">Adresse du serveur</div>
+        <div class="os-txt">L'URL Apps Script fournie par votre administrateur (se termine par <b>/exec</b>).</div>
+        <input type="url" class="os-inp" id="ol-url" placeholder="https://script.google.com/macros/s/.../exec">
+      </div>
+      <div class="os-block-ttl">Votre code d'accès</div>
+      <input type="text" class="os-inp" id="ol-code" placeholder="Ex : A7K2MN" autocomplete="off" autocapitalize="characters">
+      <div class="os-err" id="ol-err">Code ou adresse invalide.</div>
+      <button class="ob bgold bfull" style="margin-top:16px" onclick="oLogin()">Se connecter</button>
+      <div style="font-size:11px;color:var(--t3);margin-top:14px;text-align:center;line-height:1.6">Pas de code ? Demandez-le à votre administrateur WLHT.<br>Vos accès ne montrent que les contacts qui vous concernent.</div>
+    </div>
+  </div>
+</div>
+
+<!-- RÉGLAGES -->
 <div id="osetup">
   <div class="os-card">
     <div class="os-hd">
-      <div class="os-hd-ttl"><img src="data:image/png;base64,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" alt="" style="height:22px;width:auto;vertical-align:-4px;margin-right:6px"> CRM OlyLife — WLHT</div>
-      <div class="os-hd-sub">Configuration initiale — 5 minutes — vos données restent privées</div>
+      <div class="os-hd-ttl"><img class="wlht-logo" alt="" style="height:22px;width:auto;vertical-align:-4px;margin-right:6px"> Réglages</div>
+      <div class="os-hd-sub" id="os-who">—</div>
     </div>
     <div class="os-bd">
+      <div class="os-block-ttl">Votre ID Partenaire OlyLife (optionnel)</div>
+      <div class="os-txt">Utilisé pour repérer vos filleuls directs dans l'onglet Équipe.</div>
+      <input type="text" class="os-inp" id="o-setup-pid" placeholder="Ex : EA525922">
+      <button class="ob bgold bfull" style="margin-top:12px" onclick="oSavePid()">Enregistrer</button>
 
-      <div class="os-block-ttl">1 · Vos informations</div>
-      <div class="os-txt" style="margin-bottom:10px">Ces informations identifient votre activité et pré-remplissent vos fiches et messages.</div>
-      <input type="text" class="os-inp" id="o-setup-pid" placeholder="Votre ID Partenaire OlyLife (ex: EA525922)">
-      <input type="text" class="os-inp" id="o-setup-pnom" placeholder="Votre nom complet" style="margin-top:10px">
+      <div class="os-block-ttl" style="margin-top:24px">Serveur</div>
+      <div class="os-txt" style="word-break:break-all;font-size:11px" id="os-url-txt">—</div>
 
-      <div class="os-block-ttl">2 · Synchronisation cloud (recommandée)</div>
-      <div class="os-note">✅ Prérequis : un compte Gmail. Gratuit, données privées, synchronisées sur tous vos appareils — et accessibles à toute personne à qui vous partagez le lien (conjoint, associé...).</div>
-      <div class="os-step"><div class="os-num">1</div><div class="os-txt">Aller sur <a href="https://script.google.com" target="_blank">script.google.com</a> → <b>Nouveau projet</b></div></div>
-      <div class="os-step"><div class="os-num">2</div><div class="os-txt">Effacer tout le code → Coller le contenu de <b>GAS_Script_OlyLife_WLHT.js</b> → Enregistrer</div></div>
-      <div class="os-step"><div class="os-num">3</div><div class="os-txt"><b>Déployer → Nouveau déploiement</b><br>Type : Application Web · Exécuter en tant que : <b>Moi</b> · Accès : <b>Tout le monde</b><br>→ Déployer → Autoriser → <b>Copier l'URL</b></div></div>
-      <div class="os-step"><div class="os-num">4</div><div class="os-txt">Activer les rappels du matin : dans le script, cliquer <b>▶ Exécuter</b> → choisir <b>installerDeclencheur</b> → Autoriser</div></div>
-      <div class="os-step"><div class="os-num">5</div><div class="os-txt">Coller l'URL ci-dessous :</div></div>
-      <input type="url" class="os-inp" id="o-setup-url" placeholder="https://script.google.com/macros/s/.../exec">
-      <div class="os-err" id="o-setup-err">URL invalide. Elle doit se terminer par /exec</div>
-
-      <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
-        <button class="ob bcloud bfull" onclick="oConnect()">Connecter au cloud</button>
-        <button class="ob bgh bfull" onclick="oOffline()">Utiliser sans synchronisation</button>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:20px">
+        <button class="ob baqua bfull" onclick="oHideSetup();oOpenImport()">⇪ Importer des contacts en masse</button>
+        <button class="ob bgh bfull" onclick="oHideSetup()">Fermer</button>
+        <button class="ob bdel bfull" onclick="oLogout()">Se déconnecter</button>
       </div>
-      <div style="font-size:10px;color:var(--t3);margin-top:12px;text-align:center">Vous pourrez modifier ces réglages à tout moment via l'icône ⚙️.</div>
-
-      <div class="os-block-ttl" style="margin-top:26px">3 · Import en masse</div>
-      <div class="os-txt" style="margin-bottom:10px">Collez ici le bloc de données préparé (par exemple par Claude à partir de vos captures d'écran) pour créer ou mettre à jour plusieurs fiches en un clic — sans ressaisie manuelle.</div>
-      <textarea class="os-inp" id="o-import-ta" rows="5" placeholder='[{"nom":"GUERBAA","prenom":"Abderrazak","tel":"+33616822413","numCommande":"20260726024233976928-1", ...}]' style="font-family:monospace;font-size:11px;resize:vertical"></textarea>
-      <button class="ob bgold bfull" style="margin-top:10px" onclick="oImport()">Importer / mettre à jour les fiches</button>
     </div>
   </div>
 </div>
@@ -287,7 +338,7 @@ textarea.ofc{resize:vertical;min-height:76px;}
 
 <!-- PWA INSTALL BANNER -->
 <div id="opwa-banner">
-  <div class="opwa-icon"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABWCAYAAAAwu5OIAAAQaUlEQVR4nO2ce5RddXXHP3deIcmQxABpQtKAVlNQXgWyUDS+QEGWIrZWxEepYIFQqEoi0ULEPECkilAgS3moEEGtSaBqa9Eq0FLRoCWAQiCS8KgkCOHRZJJJJnNv//j89vqduczkOXfunXT2WrPm3vP4nXP2d7/3Prf0y5tnMkT1o6Z638D/dxoCoM40BECdaQiAOtMQAHWmIQDqTEMA1JmGAKgztdT7BvqRmsgC1Q1U6ngv2027CwAloJz+itsaHoTdBYAK0Aa0o/T/L4OA+bB7+IAmYBjw18C/AV8Hjk7bS+mvYWkwa0DY/C3AGcBMYDJwOLA/cBZwL9CM2lDudZU602DVgBCcLcDHgfOQ+ZtQ4g8Hrkr/uxGEhnzWhrypbVALMr4MvBf4e5R40BQ1IdOPAi4GDgK6EISGM0eDzQQFc5uAY4FLgFemfRuAR4FW4HWoDccD64HPAI8hCN0De8tbp8GkARFWloC3IfNfm/ZV0AF/GJiOzB6Gkv9+YC6wFw3GfBicALwFGXpEYd9S4MvAQ+h4zwdeQm3oBk4BrgCGD9ztbh8NBgBKeJ9ltOuzgdeT4/yHgE8Cv0CGdwI/BD6FIDSn4z4AfKWwXkOY30YHIGL5MnAIMB81gLR9JXAOMr9MNlGbgVuAecCzaVsb8FdpWzM68rYBeo4+qZEBiCSqDLwazc6x6XsT8BQwC7gjHRdMJe3fBFwLXI0ggCboE8C5wJ4IVGhIXajRAegGxmMU815kcAuwBp3wovQ9jo3nKaft64BrgOuwPAGWKz6LfmEkdc6WGxWAJnJ95/3A6cjgFmTkZcBX0/7ICSCbIdL2VmAtJmXfQP8AsDcwAzghHTcEQBVF+eAozHRjWxcwByOapvS9SNXS3EVPjbmJbKamAB/B8LRuhbtGBKBYRj4anW/QtehcK/TMCwAmAKehoy2uFaWIPwAXYZga6x8CvKfwfcA1oREBAJnWDkwkO+LHgIUozW1ksxNMOwgLcmcAY9K2Cj2lew3wXeC5tH1vegI84NSoAFQwYmkmN1r+B3iCHJpWm43hwCQErRheBoAlYA/gN+icS+gjRtbqIbaHGgmAUtXfBrTXUXaenP6K8X6R1qPD7cAQtEjhUzpRU/ZM37uAjX3cw4BQIwAQDxvmoowM6wCeTtuasOj2QXSam3n5vUd2G8wurh/fJwInpzVKwPPA/YXjAtwB8wmNAMDWIpCfo8kIOhNBiDC1mkG9MSwqqOOxjDGV/Nz3A/+ylfuoeXRUTwDCloO2+QDMeMeQQ8WlwNfS525gBGbEZ5GTra1RFOPGY9b8scI5jwLfQocc9zEOOBD7C+EbatpHqEdBKoph3WgKTgDejQCUgd8B/wF8G5nzA6zvT0/njEVmdmL/t4We5is0o4Q2fi8sP5xGds7PAV8C/jWd8xpM+N4G/FFa+yHge+kYqFEvYaABKM7t7IclgWOBPykccxjwBuBQ4ErgwfR/HPAXyLDJ6dwXgSVp3ZFkHxDPNQqZ//H0GXTW8zEcXQ+8EyunUxGsoMPTvRyE5YwO1Kjq5G+XaCABKNZpJqA9Pr2PYyemfSMw830k/d8TAQPN1SUY+dyFpeeohL6AmnAm8LeoNWBk9SVgATLyeOAC4E293EMLAjAl3fsCLIP0KwgDBUCYhG5U8Rnk+k6YitUoZX+M0lpGh1vCpvuDwOfRjLwZmfKnyNBTMKJZjcxvwyz6fGR+BUPT6xFIgGlp/5sQtLZ07jPI5EnYVRuOGXRUVzvI/YldpoEEoBt4BdryGciUZjQjtwI3k6XydDQ5oNnpAv4OuAfr+XOBN6b9R6JP+C1muqC9n56uR7rWLWiOSuho5yOQ3cjwBzDTvjtd+8Pp2s0IxOfSsdfQjyMuAwFARBDDkSmfSd/LyNi5GOl0YfSzFFiBD7w/MucDCNQc4E4E4QvAn6W1TsXstousISPI0dRC7JqBGnYVSn7kHPdhZLWM7Mh/jRr1iXTeGNSYMvYYIhTepVC11gBExFNBCZ6B0hR1/VloFjYUzunECGgYOtrJ6fPH0Gl+GfhJWvdKjGBayXY+qCtt/w6arnVo/q7BaCcSvAfQCS+tOv/3wBfR75yajp2YnmEdcGPaVmwE7TDVKg8Im19BtT0bJXAsua5/CUr+OmRU5AUtCMLNyOwwK+0YzZyDTPkRSuQTaf/mtPaW9LkV+D5wKfA45gKXYsgbzZuHUdPuSmvEPcQg12qcLfonMpP3x1mkd5PrVDstyLUEIFTzFJT08WTbeR0yYz25zh+qH42UddhEuQIjHIB9gL9Bc9EO3IbS/SSanghB24D/QlN1P0ZdM3F+NBi2Cs3YP9Oz9xxCEz5qZTru++Q8YEq67jFkEHaqtVkLAIoRwruQ0ZPID7YI/cC6qmOLhbAtmB13oL1eQAZhIvZ0P4p2/pvAPyCjKmjO7kGz8ivUunD80U9ejUy9hdzSrL4HyA76wXT87WTBOgK4kOxLdsoX1MIHxAMcjdIbFUyw7nIehnuhJXHj1Q8Q7cMNqPKd6EdegSB8Pq1zKzrF1egnVqGdfwR9x9nApwv3sAJ9y5JertkbhWP/NTJ8TwxhK8Bb07YL0v4dfiehvwGIJOUonMGZkrY34QNfiBXOnaF5yIjpKNXj0jWeB36M5uh21J4A7zyMYvZI359B7Vuyg9eO6Yn70no3kCOwd6Rrnovgww4A0Z8AxKj4gegopxb23QBcjk6vWH6O+spkbA3un9aIBC2O6cIxlL3omYWOR+lehZK9Pm0vAcehzd+bHHVVUCjOQb8QEUzR5DRjyLwcQf1D4X5BEE5Ds/cWFLp3YkAwfTv41IP6WwMqmJ0eQe5CdWDV8aF0veKrRAHAFFTjCVtZeyNKe1Qpw+4eg23FlSjpIa3HI7DFAtpojMbGse0K5+9QYJ4lF/paEbBlWKQ7ErP2VtSEdhSCYs96q1QLH/AUho4HkkO349Amr043GwB0F865HtiXnhJZlMx16MyPwQcN7ViDDrobwSZtX47+YyxZa15ExnWQR9mLTAqf1IqR1TOFfdEerWDl9g3puGD0cnbCEfcnAIH6MnSMh6DJaEdb3IU2+wVy9BMAPILx+LboXMxyg/kbMEq6O+0fjfa/E0vJ0zCLbk3nbMT84o4dfLZgchnN5EzgLwv7l+GcUkfV8duk/gYgpOQmVM3ZKGmtCEI3hqXVPdtIfqopakjDsAr6SYyAQFPzXQwPm9DsTUOAF2OVdD4KwTvSMa/CiOp5NIkR+/f1PCHx0b+YkJ7jdLLAPYn+7YdkwdpuTejvPCAyzJdQIi4nS/lIDCPjF6KK8XYkYMW/2NaMzZKFyMBIkpZgiFkBTkITdhmGpDegACzHSuZP0nXKwNvTWlPJ/qL62lsK1wmQRmMuEdcEgZyD+cROVUhrkYiF812LAFxPZuhYNCOfIj9cb1pYHD05CUvOo8mvGi1GZnSis70Ia/etaPLeh7nAKOCXGLHcSZ6wOJgcxWyi7ynpEJI21JwzyU3/9RhWf5td6JTVwgkXW4LPYc1nBNb2W7AgNhNNxY3kbDMcZTBpC3Aixv/jkFHDsEX5OcwnpmGt5mCy1Dal9U5GCb0Y+Cn5PeIjUUiOxshrM2bOxQit2DYtYeJ2Btn5d6V1b0K/stPtylpVQwOEZrSRl5IHbZsw2pmNTmsJPtAwcjGtjLH1bAxrg/l3Ygb8MDLwImwdxrMUn6cV60YbMSP/Udp2WVqzjH5lM7mfENJeJs8knYPJ15i07kYsjSxI979LveJalqOj9tOKDu9STHBOTPtehSpcRgcWjrkJmTsPpTWYvwzNwH9jFvppDEm70xodad2Q5NHpemchk7+CBbXRqEGvTse/C03ZZzGZ25zuYxSOxM+hJ/MXovSvIwcdO00D0ZAJ6V6GDz6a/JbLIRipjETT0ozM/wK+gBfnrkDfcQ8282ehb4jM9XZ0uIel7/eitu2XrncmWRMWYsJ2QdoPdr5KKCQrkPknp+uMJgvT91ADo/+800W4oNIA/mxl2PkDsElyaGHfC2hWtuAIyl7k8sETyMB/R19yHcb2ER4+iY64DX3KGmwn/jmCG63NZ9EfXYPMPAtNWOyvYDa9Kl3/ANSgAPk7CNpK+vGHQAZyMCvs5HKsWsbEWwVV/PXY543Rw2D+LOBn6fyrkbGQnfwsBK8dmTkBI7BvYdIV3bZ90Mx8JJ17I5qSqB+B4zFvRU0aTs5tFqVjV/Ly7HmXaCABiFo8WNCajmYnIqZo74HS/J8ocYtRc67C5k7U759HCb41nTMqrTECzcZG7KjdgH6kggDNxoisA3sJ56PZiZyk2B/oRqDmosD0+4TcQA9mRYhXwvLBepTewzBHaMV6zQPYqfpp2nYhJkBx7lp0qsHcaOJEKNqCYPwec5E9yDNIr0Smb8QI7HqseL4PywztaZ3V+PblLWiW4tr9NhEB9RlNDPVtQ8e8DKfP9kv3sxrbiJuQcceh8w4GvIi95CvTMREGRugLmrByOv9xdOqjsH5TRuc/A/3Fz1HLfob+Zxz5Zw9WpvWK7yn0K9XrZeUKuQxQQfUuTkG3oQS/DmPwGJDdjH3iy8kDUr3Z4wCiM621ChsxozG/iETsVDSH3Qjs3VXrxP3V7CcO6j2eHjF8NUUh7CgcIYn7XILSv5btj8G7EJDHMQN/tLDeNBwO3kzv4+593V+/Ub0B6I3Cng8j/wxNGU3TAixd95Z9FquX1VoRjH0Eazdr0/dJCHLdqBEBABnYjglaMDVidHj5WzCQy94xKV1NAcIvyC9tDyOPL9aFGhUAyI40nO8+bJ1Zneg8o44TVCwObsE+8h5k296v4+Y7Sg3xiyG9UDOGqE+Ts87XYB1pBTK7hVzmJm2/Fp3uS4W1QvLL2KD/IAIZEdVva/cY26ZGBKA4LXEvxvIT0/az8X3hxeTecUj4U1jLqZ7fj65aO2bgx5NBeQBHWvqttLCj1KgmKEzIr1CqQSbtizlBVFSLHbWgIvOjS9UKfAjLCXHOGiyurSDzYcBBaFQAYn7zRazpxHtaFZy2uBBBiPJGbyWCYp/5o9gHiImMTViUuzntr1mcvy1qVAAgd7dWYsHtbrKpOAxBeDsZhOKzRKuzC4tvczAJiw7XlZhPdFJnHjQyAEVz8BvMZJeS6zFTsUg2lSzBkTGXkPknYfFtErmsfC0C8Cy5eVM3amQAIEt3C46bz8XaUfRr34gNkkMLx0ZC9ma0+VPI4ewi7Ak8TT90s/qDGh0AyHH9MJyuvpievwF6Atb5DyQ74IOBf8SuWmTGP8aW5pNk51x3ABoxDO2LNqETXZS+X40TFt3YPlyP4y7jsfV4MNmM3YUmbEX63lu5oi40mACAbOtvQzC+Ri47nIil5DbsaoFm5w502PcX1mkI5sPgA6BMnmRbjMnVFdgFG0vP97/AyGkeNvN7yxnqToPBB1RTRDObsaU4j57vmoVQ3YdN+TvIYWpDMR8GnwYERcQTE9djMNnaFwF6GGP/2+k5addwNFgBCCcaXbL52Nf9EIaY36Dn248NyXwYvAAEhUmJtylvQ4Y/Rg0a6LWgwQ5AUAzMrqza1vA0GJ1wX1Tq43ND0+6iAdB3ebqhaXcCAAYR44N2JxM0KGkIgDrT/wHB34oVnJuJ7gAAAABJRU5ErkJggg==" alt="" style="height:24px;width:auto;display:block"></div>
+  <div class="opwa-icon"><img class="wlht-logo" alt="" style="height:24px;width:auto;display:block"></div>
   <div class="opwa-txt">
     <div class="opwa-ttl">Installer l'application</div>
     <div class="opwa-sub">Accès direct depuis votre écran d'accueil</div>
@@ -307,7 +358,7 @@ textarea.ofc{resize:vertical;min-height:76px;}
       <button class="otop-btn" onclick="oPull()" title="Synchroniser">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
       </button>
-      <button class="otop-btn" onclick="oShowSetup()" title="Paramètres">
+      <button class="otop-btn" onclick="oShowSetup()" title="Réglages">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
     </div>
@@ -317,13 +368,17 @@ textarea.ofc{resize:vertical;min-height:76px;}
 
     <!-- DASHBOARD -->
     <div class="ov on" id="ov-dashboard">
-      <div class="kpig">
-        <div class="kpi"><div class="kpi-l">Contacts</div><div class="kpi-v" id="kv0">0</div><div class="kpi-s">dans le pipeline</div></div>
-        <div class="kpi cgr"><div class="kpi-l">Clients</div><div class="kpi-v" id="kv1">0</div><div class="kpi-s">actifs</div></div>
-        <div class="kpi cor"><div class="kpi-l">Actions dues</div><div class="kpi-v" id="kv2">0</div><div class="kpi-s">à traiter</div></div>
-        <div class="kpi caq"><div class="kpi-l">Équipe</div><div class="kpi-v" id="kv3">0</div><div class="kpi-s">partenaires</div></div>
+      <div class="ocard hide" id="d-refhello" style="padding:16px;background:var(--orwbg);border:1px dashed var(--orw)">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--orwtx);font-weight:700" id="d-refhello-t">Bienvenue</div>
+        <div style="font-size:12px;color:var(--t2);margin-top:4px;line-height:1.6">Voici le suivi des contacts que vous avez référés à l'équipe WLHT. Merci pour votre confiance !</div>
       </div>
-      <div class="ocard">
+      <div class="kpig">
+        <div class="kpi" id="kpi0"><div class="kpi-l">Contacts</div><div class="kpi-v" id="kv0">0</div><div class="kpi-s">dans le pipeline</div></div>
+        <div class="kpi cgr" id="kpi1"><div class="kpi-l">Clients</div><div class="kpi-v" id="kv1">0</div><div class="kpi-s">actifs</div></div>
+        <div class="kpi cor" id="kpi2"><div class="kpi-l">Actions dues</div><div class="kpi-v" id="kv2">0</div><div class="kpi-s">à traiter</div></div>
+        <div class="kpi caq" id="kpi3"><div class="kpi-l">Équipe</div><div class="kpi-v" id="kv3">0</div><div class="kpi-s">partenaires</div></div>
+      </div>
+      <div class="ocard" id="d-card-act">
         <div class="ochd"><span class="oct">Actions imminentes</span><button class="ob bgh bsm" onclick="oSw('actions',2)">Voir tout</button></div>
         <div id="d-al"></div>
       </div>
@@ -338,6 +393,11 @@ textarea.ofc{resize:vertical;min-height:76px;}
       <div class="osearch">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" id="oq" placeholder="Rechercher un contact..." oninput="oFilt()">
+        <button class="ob bedit bsm" id="oimp-btn" onclick="oOpenImport()" style="min-height:32px;padding:5px 10px">⇪ Importer</button>
+      </div>
+      <div class="ofilter-row" id="ofilter-row">
+        <select id="ofil-ref" onchange="oFilt()"><option value="">Tous les référents</option></select>
+        <select id="ofil-suivi" onchange="oFilt()"><option value="">Tous les suiveurs</option></select>
       </div>
       <div class="ofilters" id="ofilter-chips">
         <button class="ofilter-chip on" onclick="oChip(this,'')" data-val="">Tous</button>
@@ -351,7 +411,7 @@ textarea.ofc{resize:vertical;min-height:76px;}
       <div id="c-list"></div>
     </div>
 
-    <!-- ACTIONS (rappels unifiés : relance / logistique / installation / témoignage) -->
+    <!-- ACTIONS -->
     <div class="ov" id="ov-actions">
       <div class="ocard" style="margin-bottom:14px">
         <div class="ochd" style="cursor:pointer" onclick="this.parentElement.classList.toggle('oc-open')"><span class="oct">📇 Contacts utiles</span><span style="font-size:11px;color:var(--t3)">toucher pour ouvrir</span></div>
@@ -388,6 +448,48 @@ textarea.ofc{resize:vertical;min-height:76px;}
 
     <!-- ÉQUIPE -->
     <div class="ov" id="ov-equipe">
+
+      <!-- ADMIN : gestion des accès -->
+      <div class="ocard hide" id="eq-users-card">
+        <div class="ochd"><span class="oct">🔐 Accès &amp; rôles</span><button class="ob bgh bsm" onclick="oUserNew()">＋ Ajouter</button></div>
+        <div id="eq-users-list"></div>
+        <div id="eq-user-form" style="display:none;padding:14px 16px;border-top:1px solid var(--bd);background:var(--navy3)">
+          <input type="hidden" id="u-id">
+          <div class="ofg">
+            <div class="ofg1"><label class="ofl">Nom affiché</label><input type="text" class="ofc" id="u-nom" placeholder="Dr Nassima Bouzeroura"></div>
+            <div class="ofg1"><label class="ofl">Rôle</label>
+              <select class="ofc" id="u-role">
+                <option value="referent">Référent — voit uniquement ses contacts référés</option>
+                <option value="gestionnaire">Gestionnaire — gère les contacts attribués</option>
+                <option value="admin">Admin — accès complet</option>
+              </select>
+            </div>
+            <div class="ofg1"><label class="ofl">Tags référent associés (séparés par des virgules)</label><input type="text" class="ofc" id="u-tags" list="ref-list" placeholder="Dr Nassima"></div>
+            <div class="ofg1"><label class="ofl">Code d'accès</label>
+              <div style="display:flex;gap:8px"><input type="text" class="ofc" id="u-code" placeholder="A7K2MN" style="flex:1;font-family:monospace;letter-spacing:2px"><button class="ob bgh" onclick="oGenCode()" type="button">🎲</button></div>
+            </div>
+            <label class="ochk-row"><input type="checkbox" id="u-actif" checked><span>Accès actif</span></label>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:14px">
+            <button class="ob bgold" style="flex:2" onclick="oUserSave()">Enregistrer l'accès</button>
+            <button class="ob bgh" style="flex:1" onclick="oUserCancel()">Annuler</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADMIN : liste des référents -->
+      <div class="ocard hide" id="eq-refs-card">
+        <div class="ochd"><span class="oct">🏷️ Référents — sources de contacts</span></div>
+        <div style="padding:14px 16px">
+          <div id="eq-refs-chips" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px"></div>
+          <div style="display:flex;gap:8px">
+            <input type="text" class="ofc" id="eq-ref-new" placeholder="Nouveau référent (ex : Elisabeth)" style="flex:1">
+            <button class="ob bgold" onclick="oRefAdd()">Ajouter</button>
+          </div>
+          <div style="font-size:11px;color:var(--t3);margin-top:10px;line-height:1.5">Cette liste alimente le champ « Référé par » des fiches et les filtres. Associez ensuite chaque référent à un accès ci-dessus pour qu'il puisse suivre ses propres contacts.</div>
+        </div>
+      </div>
+
       <div class="kpig">
         <div class="kpi caq"><div class="kpi-l">Partenaires</div><div class="kpi-v" id="ev0">0</div><div class="kpi-s">équipe totale</div></div>
         <div class="kpi cgr"><div class="kpi-l">Filleuls directs</div><div class="kpi-v" id="ev1">0</div><div class="kpi-s">parrainés par vous</div></div>
@@ -400,7 +502,7 @@ textarea.ofc{resize:vertical;min-height:76px;}
 
     <!-- NOUVELLE FICHE -->
     <div class="ov" id="ov-nouvelle">
-      <div style="background:linear-gradient(135deg,#081527,var(--navy3));padding:16px;border-radius:var(--r) var(--r) 0 0;border:1px solid var(--bd);border-bottom:none">
+      <div style="background:linear-gradient(135deg,#FFFFFF,var(--navy3));padding:16px;border-radius:var(--r) var(--r) 0 0;border:1px solid var(--bd);border-bottom:none">
         <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);font-weight:700" id="offttl">Nouveau contact</div>
         <div style="font-size:11px;color:var(--t3);margin-top:3px">Champs obligatoires *</div>
       </div>
@@ -415,58 +517,81 @@ textarea.ofc{resize:vertical;min-height:76px;}
           <div class="ofg1"><label class="ofl">E-mail</label><input type="email" class="ofc" id="fc-em" placeholder="client@email.com"></div>
           <div class="ofg1"><label class="ofl">Pays</label><input type="text" class="ofc" id="fc-pays" placeholder="Côte d'Ivoire"></div>
           <div class="ofg1"><label class="ofl">Ville</label><input type="text" class="ofc" id="fc-vil" placeholder="Abidjan"></div>
-          <div class="ofg1"><label class="ofl">Référé par</label><input type="text" class="ofc" id="fc-ref" placeholder="Nom distributeur / contact"></div>
+          <div class="ofg1" id="fg-ref"><label class="ofl">Référé par</label><input type="text" class="ofc" id="fc-ref" list="ref-list" placeholder="Choisir ou saisir un référent"><datalist id="ref-list"></datalist></div>
+          <div class="ofg1" id="fg-suivi"><label class="ofl">Suivi par</label><select class="ofc" id="fc-suivi"><option value="">— Non attribué —</option></select></div>
 
-          <div class="osec">Pipeline</div>
-          <div class="ofg1"><label class="ofl">Étape</label>
-            <select class="ofc" id="fc-etape">
-              <option>Prospect</option><option>Relance en cours</option><option>Closing / Devis</option>
-              <option>Client - Logistique</option><option>Client - Installation</option><option>Client actif</option>
-              <option>Ambassadeur</option><option>Partenaire équipe</option><option>Inactif</option>
-            </select>
+          <div class="fb" id="fb-pipeline">
+            <div class="osec">Pipeline</div>
+            <div class="ofg">
+              <div class="ofg1"><label class="ofl">Étape</label>
+                <select class="ofc" id="fc-etape">
+                  <option>Prospect</option><option>Relance en cours</option><option>Closing / Devis</option>
+                  <option>Client - Logistique</option><option>Client - Installation</option><option>Client actif</option>
+                  <option>Ambassadeur</option><option>Partenaire équipe</option><option>Inactif</option>
+                </select>
+              </div>
+              <div class="ofg1"><label class="ofl">Qualification</label>
+                <select class="ofc" id="fc-qualif"><option>Chaud</option><option>Tiède</option><option>Froid</option></select>
+              </div>
+              <div class="ofg1"><label class="ofl">Canal préféré</label>
+                <select class="ofc" id="fc-canal"><option>WhatsApp</option><option>Appel téléphonique</option><option>E-mail</option><option>Rendez-vous</option></select>
+              </div>
+              <div class="ofg1"><label class="ofl">Registre relationnel</label>
+                <select class="ofc" id="fc-registre"><option value="pro">💼 Professionnel (vouvoiement)</option><option value="chaleureux">🤝 Chaleureux (tutoiement)</option><option value="equipe">⚡ Équipe / Direct</option></select>
+              </div>
+              <div class="ofg1"><label class="ofl">Objectifs / besoins exprimés</label><textarea class="ofc" id="fc-obj" placeholder="Fatigue, douleurs, immunité..."></textarea></div>
+            </div>
           </div>
-          <div class="ofg1"><label class="ofl">Qualification</label>
-            <select class="ofc" id="fc-qualif"><option>Chaud</option><option>Tiède</option><option>Froid</option></select>
+
+          <div class="fb" id="fb-prod">
+            <div class="osec">Produits d'intérêt / achetés</div>
+            <div class="opg" id="opg"></div>
           </div>
-          <div class="ofg1"><label class="ofl">Canal préféré</label>
-            <select class="ofc" id="fc-canal"><option>WhatsApp</option><option>Appel téléphonique</option><option>E-mail</option><option>Rendez-vous</option></select>
+
+          <div class="fb" id="fb-cmd">
+            <div class="osec">Commande &amp; logistique</div>
+            <div class="ofg">
+              <div class="ofg1"><label class="ofl">N° commande OlyLife</label><input type="text" class="ofc" id="fl-numcmd" placeholder="20260731040733959459"></div>
+              <div class="ofg1"><label class="ofl">Member ID OlyLife du client</label><input type="text" class="ofc" id="fl-memberid" placeholder="EA260498"></div>
+              <div class="ofg1"><label class="ofl">Date de commande</label><input type="date" class="ofc" id="fl-datecmd"></div>
+              <div class="ofg1"><label class="ofl">Transporteur</label><input type="text" class="ofc" id="fl-transp" placeholder="DHL" list="carrier-list">
+                <datalist id="carrier-list"><option value="DHL"><option value="UPS"><option value="FedEx"><option value="Chronopost"><option value="Colissimo / La Poste"><option value="EMS"><option value="By Mail / Autre"></datalist>
+              </div>
+              <div class="ofg1"><label class="ofl">N° de tracking</label><input type="text" class="ofc" id="fl-tracking" placeholder="CA295337286DE"></div>
+              <div class="ofg1"><label class="ofl">Date de livraison</label><input type="date" class="ofc" id="fl-datelivr"></div>
+              <div style="font-size:11px;color:var(--t3);background:var(--navy3);border:1px solid var(--bd);border-radius:var(--rs);padding:8px 12px;line-height:1.5">⚠️ Vérifiez que le téléphone du contact correspond bien au pays de livraison — sinon le facteur local ne peut pas le joindre.</div>
+            </div>
           </div>
-          <div class="ofg1"><label class="ofl">Registre relationnel</label>
-            <select class="ofc" id="fc-registre"><option value="pro">💼 Professionnel (vouvoiement)</option><option value="chaleureux">🤝 Chaleureux (tutoiement)</option><option value="equipe">⚡ Équipe / Direct</option></select>
+
+          <div class="fb" id="fb-install">
+            <div class="osec">Installation &amp; usage</div>
+            <div class="ofg">
+              <label class="ochk-row"><input type="checkbox" id="fi-confirm"><span>Installation confirmée par le client</span></label>
+              <div class="ofg1"><label class="ofl">Date d'installation</label><input type="date" class="ofc" id="fi-date"></div>
+              <div class="ofg1"><label class="ofl">Notes d'usage / protocole</label><textarea class="ofc" id="fi-notes" placeholder="Fréquence, mode utilisé, retours..."></textarea></div>
+            </div>
           </div>
-          <div class="ofg1"><label class="ofl">Objectifs / besoins exprimés</label><textarea class="ofc" id="fc-obj" placeholder="Fatigue, douleurs, immunité..."></textarea></div>
 
-          <div class="osec">Produits d'intérêt / achetés</div>
-          <div class="opg" id="opg"></div>
-
-          <div class="osec">Commande &amp; logistique</div>
-          <div class="ofg1"><label class="ofl">N° commande OlyLife</label><input type="text" class="ofc" id="fl-numcmd" placeholder="20260731040733959459"></div>
-          <div class="ofg1"><label class="ofl">Member ID OlyLife du client</label><input type="text" class="ofc" id="fl-memberid" placeholder="EA260498"></div>
-          <div class="ofg1"><label class="ofl">Date de commande</label><input type="date" class="ofc" id="fl-datecmd"></div>
-          <div class="ofg1"><label class="ofl">Transporteur</label><input type="text" class="ofc" id="fl-transp" placeholder="DHL" list="carrier-list">
-            <datalist id="carrier-list"><option value="DHL"><option value="UPS"><option value="FedEx"><option value="Chronopost"><option value="Colissimo / La Poste"><option value="EMS"><option value="By Mail / Autre"></datalist>
+          <div class="fb" id="fb-temoin">
+            <div class="osec">Témoignage</div>
+            <div class="ofg">
+              <div class="ofg1"><label class="ofl">Résultats / témoignage recueilli</label><textarea class="ofc" id="ft-texte" placeholder="J+30 — regain d'énergie..."></textarea></div>
+              <label class="ochk-row"><input type="checkbox" id="ft-autorise"><span>Autorisé à être réutilisé (marketing)</span></label>
+            </div>
           </div>
-          <div class="ofg1"><label class="ofl">N° de tracking</label><input type="text" class="ofc" id="fl-tracking" placeholder="CA295337286DE"></div>
-          <div class="ofg1"><label class="ofl">Date de livraison</label><input type="date" class="ofc" id="fl-datelivr"></div>
-          <div style="font-size:11px;color:var(--t3);background:var(--navy3);border:1px solid var(--bd);border-radius:var(--rs);padding:8px 12px;line-height:1.5">⚠️ Vérifiez que le téléphone du contact correspond bien au pays de livraison — sinon le facteur local ne peut pas le joindre.</div>
 
-          <div class="osec">Installation &amp; usage</div>
-          <label class="ochk-row"><input type="checkbox" id="fi-confirm"><span>Installation confirmée par le client</span></label>
-          <div class="ofg1"><label class="ofl">Date d'installation</label><input type="date" class="ofc" id="fi-date"></div>
-          <div class="ofg1"><label class="ofl">Notes d'usage / protocole</label><textarea class="ofc" id="fi-notes" placeholder="Fréquence, mode utilisé, retours..."></textarea></div>
-
-          <div class="osec">Témoignage</div>
-          <div class="ofg1"><label class="ofl">Résultats / témoignage recueilli</label><textarea class="ofc" id="ft-texte" placeholder="J+30 — regain d'énergie..."></textarea></div>
-          <label class="ochk-row"><input type="checkbox" id="ft-autorise"><span>Autorisé à être réutilisé (marketing)</span></label>
-
-          <div class="osec">Équipe / duplication</div>
-          <label class="ochk-row"><input type="checkbox" id="fe-partenaire" onchange="oTEQ()"><span>Ce contact est devenu partenaire OlyLife</span></label>
-          <div id="feq-wrap" style="display:none;flex-direction:column;gap:12px">
-            <div class="ofg1"><label class="ofl">Sponsor (parrain)</label><input type="text" class="ofc" id="fe-sponsor" placeholder="EA525922"></div>
-            <div class="ofg1"><label class="ofl">Placement (position arbre)</label><input type="text" class="ofc" id="fe-placement" placeholder="EA345417"></div>
-            <div class="ofg1"><label class="ofl">Côté binaire</label><select class="ofc" id="fe-cote"><option value="">—</option><option>Gauche</option><option>Droite</option></select></div>
-            <div class="ofg1"><label class="ofl">Génération</label><input type="number" class="ofc" id="fe-gen" placeholder="1" min="1" max="6"></div>
-            <div class="ofg1"><label class="ofl">Rang</label><select class="ofc" id="fe-rang"><option value="">—</option><option>M1</option><option>M2</option><option>M3</option><option>M4</option><option>M5</option><option>M6</option><option>M7</option></select></div>
+          <div class="fb" id="fb-equipe">
+            <div class="osec">Équipe / duplication</div>
+            <div class="ofg">
+              <label class="ochk-row"><input type="checkbox" id="fe-partenaire" onchange="oTEQ()"><span>Ce contact est devenu partenaire OlyLife</span></label>
+              <div id="feq-wrap" style="display:none;flex-direction:column;gap:12px">
+                <div class="ofg1"><label class="ofl">Sponsor (parrain)</label><input type="text" class="ofc" id="fe-sponsor" placeholder="EA525922"></div>
+                <div class="ofg1"><label class="ofl">Placement (position arbre)</label><input type="text" class="ofc" id="fe-placement" placeholder="EA345417"></div>
+                <div class="ofg1"><label class="ofl">Côté binaire</label><select class="ofc" id="fe-cote"><option value="">—</option><option>Gauche</option><option>Droite</option></select></div>
+                <div class="ofg1"><label class="ofl">Génération</label><input type="number" class="ofc" id="fe-gen" placeholder="1" min="1" max="6"></div>
+                <div class="ofg1"><label class="ofl">Rang</label><select class="ofc" id="fe-rang"><option value="">—</option><option>M1</option><option>M2</option><option>M3</option><option>M4</option><option>M5</option><option>M6</option><option>M7</option></select></div>
+              </div>
+            </div>
           </div>
 
           <div class="osec">Notes générales</div>
@@ -516,116 +641,323 @@ textarea.ofc{resize:vertical;min-height:76px;}
   <div class="omo-body" id="om-b"></div>
 </div>
 
+<!-- MODAL IMPORT EN MASSE -->
+<div id="oimp">
+  <div class="omo-hd">
+    <button class="omo-back" onclick="oCloseImport()">←</button>
+    <div class="omo-ttl">Importer des contacts</div>
+  </div>
+  <div class="omo-body">
+    <div class="os-note" style="margin-bottom:14px">Collez <b>n'importe quoi</b> : des lignes en vrac (nom, téléphone, email mélangés), un tableau CSV/Excel, ou un bloc JSON préparé par Claude. L'application détecte le format toute seule et vous montre un aperçu avant d'importer.</div>
+    <textarea class="ofc" id="oimp-ta" rows="8" style="font-family:monospace;font-size:12px" placeholder="Exemples acceptés :&#10;&#10;Marie DUPONT 06 12 34 56 78 marie@gmail.com&#10;KOUASSI Jean +225 07 08 09 10 11 envoyé par Dr Nassima&#10;&#10;— ou un CSV avec en-têtes nom;prenom;tel;email&#10;— ou un tableau JSON [{...}]"></textarea>
+    <div class="ofilter-row" id="oimp-def-row" style="margin-top:12px">
+      <select id="oimp-defref"><option value="">Référé par (défaut)…</option></select>
+      <select id="oimp-defsuivi"><option value="">Suivi par (défaut)…</option></select>
+    </div>
+    <button class="ob baqua bfull" style="margin-top:4px" onclick="oImpAnalyse()">🔍 Analyser</button>
+    <div class="ocard" id="oimp-prev-card" style="display:none;margin-top:14px">
+      <div class="ochd"><span class="oct" id="oimp-prev-ttl">Aperçu</span></div>
+      <div id="oimp-prev"></div>
+    </div>
+    <button class="ob bgold bfull" id="oimp-go" style="display:none;margin-top:12px" onclick="oImpGo()">Importer</button>
+    <div style="font-size:11px;color:var(--t3);margin-top:14px;line-height:1.6">💡 Pour une <b>capture d'écran</b> (liste WhatsApp, tableau photographié…) : envoyez-la à Claude, qui vous rend le bloc prêt à coller ici. Les doublons sont détectés automatiquement (n° de commande, Member ID, ou nom + prénom) et mis à jour au lieu d'être recréés.</div>
+  </div>
+</div>
+
 <div id="otc"></div>
 
 <script>
+// ═══════════════════════════════════════════════════════════════════
+// CONFIGURATION — pour épargner la saisie de l'URL à toute l'équipe,
+// collez ici l'URL /exec de votre déploiement Apps Script :
+var DEFAULT_GAS_URL='';
+// ═══════════════════════════════════════════════════════════════════
+
+// ── LOGO (une seule copie, injectée dans toutes les balises .wlht-logo)
+var LOGO_B64='data:image/png;base64,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';
+document.querySelectorAll('.wlht-logo').forEach(function(im){im.src=LOGO_B64;});
+
 // ── DONNÉES DE RÉFÉRENCE ─────────────────────────────────────────────
 var PRODUCTS=['Tera-P90+ (PEMF/Terahertz)','Frost Age (soin visage)','Revitaluxe (massage)','Shaken Massager (ceinture abdo)','Galaxy G-One (yeux)','Vitality Wand (douleurs ciblées)','Bama Air','SkyLine','SpringWater'];
 var ETAPE_BADGE={'Prospect':'bbl','Relance en cours':'bor','Closing / Devis':'bgo','Client - Logistique':'baq','Client - Installation':'baq','Client actif':'bgr','Ambassadeur':'bgo','Partenaire équipe':'bpu','Inactif':'bgy'};
 var QUALIF_BADGE={'Chaud':'brd','Tiède':'bor','Froid':'bgy'};
 var RELANCE_STEPS=[{k:'j2',d:2,l:'J+2 — 1er rappel'},{k:'j5',d:5,l:'J+5 — 2e rappel'},{k:'j12',d:12,l:'J+12 — dernier rappel'}];
-var SEUIL_LOGISTIQUE=5;   // jours sans tracking avant alerte (confirmé J+5)
-var DELAI_INSTALL=7;      // jours après livraison pour relancer sur l'installation
-var DELAI_TEMOIGNAGE=30;  // jours après installation pour demander un témoignage
+var SEUIL_LOGISTIQUE=5;
+var DELAI_INSTALL=7;
+var DELAI_TEMOIGNAGE=30;
 
-// ── CLOUD / CONFIG ────────────────────────────────────────────────────
-var GAS_URL='',OFFLINE=false,PARTNER_ID='',PARTNER_NOM='',OC=[],EID=null;
+// ── ÉTAT GLOBAL ──────────────────────────────────────────────────────
+var GAS_URL='',CODE='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
+function PARTNER_NOM(){return USER?USER.nom:'';}
+function ROLE(){return USER?USER.role:'';}
+
 function oGetCfg(){
   try{
-    var u=localStorage.getItem('owlht_gas_url');var o=localStorage.getItem('owlht_gas_offline');
-    var pid=localStorage.getItem('owlht_partner_id');var pnm=localStorage.getItem('owlht_partner_nom');
-    if(u)GAS_URL=u;if(o==='1')OFFLINE=true;if(pid)PARTNER_ID=pid;if(pnm)PARTNER_NOM=pnm;
+    GAS_URL=localStorage.getItem('owlht2_url')||DEFAULT_GAS_URL||'';
+    CODE=localStorage.getItem('owlht2_code')||'';
+    PARTNER_ID=localStorage.getItem('owlht_partner_id')||'';
   }catch(e){}
 }
 function oSaveCfg(){
   try{
-    if(GAS_URL)localStorage.setItem('owlht_gas_url',GAS_URL);if(OFFLINE)localStorage.setItem('owlht_gas_offline','1');
-    localStorage.setItem('owlht_partner_id',PARTNER_ID||'');localStorage.setItem('owlht_partner_nom',PARTNER_NOM||'');
+    localStorage.setItem('owlht2_url',GAS_URL||'');
+    localStorage.setItem('owlht2_code',CODE||'');
+    localStorage.setItem('owlht_partner_id',PARTNER_ID||'');
   }catch(e){}
 }
 function oSyncDot(s){var d=document.getElementById('osync-dot');if(!d)return;d.className='osync-dot';if(s==='ok')d.classList.add('ok');else if(s==='err')d.classList.add('err');else if(s==='spin')d.classList.add('spin');}
 
+// ── CACHE LOCAL (lecture hors ligne) ────────────────────────────────
+function cacheKey(){return'owlht2_cache_'+(CODE||'x');}
+function oLoadCache(){try{var s=localStorage.getItem(cacheKey());if(s){var d=JSON.parse(s);OC=d.contacts||[];USER=d.user||USER;CFG=d.config||CFG;USERS=d.users||USERS;}}catch(e){}}
+function oSaveCache(){try{localStorage.setItem(cacheKey(),JSON.stringify({contacts:OC,user:USER,config:CFG,users:USERS}));}catch(e){}}
+
+// ── CONNEXION / LECTURE ─────────────────────────────────────────────
+function oShowLogin(msg){
+  var u=document.getElementById('ol-url');
+  u.value=GAS_URL||'';
+  document.getElementById('ol-url-wrap').style.display=DEFAULT_GAS_URL?'none':'block';
+  document.getElementById('ol-code').value='';
+  var err=document.getElementById('ol-err');
+  if(msg){err.textContent=msg;err.style.display='block';}else{err.style.display='none';}
+  document.getElementById('ologin').classList.add('on');
+}
+function oHideLogin(){document.getElementById('ologin').classList.remove('on');}
+function oLogin(){
+  var u=(DEFAULT_GAS_URL||document.getElementById('ol-url').value.trim());
+  var c=document.getElementById('ol-code').value.trim();
+  var err=document.getElementById('ol-err');
+  if(!u||u.indexOf('script.google.com')<0||u.indexOf('/exec')<0){err.textContent='URL invalide — elle doit contenir script.google.com et se terminer par /exec.';err.style.display='block';return;}
+  if(!c){err.textContent='Saisissez votre code d\'accès.';err.style.display='block';return;}
+  err.style.display='none';
+  GAS_URL=u;CODE=c;oSaveCfg();
+  oPull();
+}
+function oLogout(){
+  CODE='';USER=null;OC=[];USERS=[];
+  try{localStorage.removeItem('owlht2_code');}catch(e){}
+  oHideSetup();oSyncDot('');oShowLogin();
+}
 function oPull(){
-  if(OFFLINE||!GAS_URL){oRefresh();return;}
+  if(!GAS_URL||!CODE){oShowLogin();return;}
   oLoader(true,'Synchronisation...');oSyncDot('spin');
-  fetch(GAS_URL+(GAS_URL.indexOf('?')>=0?'&':'?')+'t='+Date.now(),{cache:'no-store'})
+  fetch(GAS_URL+(GAS_URL.indexOf('?')>=0?'&':'?')+'code='+encodeURIComponent(CODE)+'&t='+Date.now(),{cache:'no-store'})
     .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
     .then(function(txt){
       var d=JSON.parse(txt);
-      if(d&&Array.isArray(d.contacts)){OC=d.contacts;OC.forEach(function(c){if(!c.actions)c.actions={};if(!c.produits)c.produits=[];});oLS();oSyncDot('ok');oT('Synchronisé — '+OC.length+' contact(s)','s');}
-      else{OC=[];oSyncDot('ok');}
-      oLoader(false);oRefresh();
+      oLoader(false);
+      if(!d.ok){
+        if(d.error==='auth'){oSyncDot('err');oShowLogin('Code d\'accès refusé — vérifiez auprès de votre administrateur.');return;}
+        throw new Error(d.error||'?');
+      }
+      USER=d.user;
+      OC=d.contacts||[];OC.forEach(function(c){if(!c.actions)c.actions={};if(!c.produits)c.produits=[];});
+      CFG=d.config||{referents:[],suiveurs:[]};
+      if(d.users)USERS=d.users;
+      oSaveCache();oHideLogin();oSyncDot('ok');
+      oT('Bonjour '+USER.nom+' — '+OC.length+' contact(s)','s');
+      applyRole();populateRefUI();oRefresh();
     })
-    .catch(function(){oSyncDot('err');oLoader(false);oT('Mode hors ligne','w');oLoad();oRefresh();});
-}
-function oPush(){
-  if(OFFLINE||!GAS_URL)return;
-  oSyncDot('spin');
-  var frm=document.createElement('form');
-  frm.method='POST';frm.action=GAS_URL;frm.target='opost_frame';frm.style.display='none';
-  var inp=document.createElement('input');inp.type='hidden';inp.name='data';inp.value=JSON.stringify({contacts:OC});
-  frm.appendChild(inp);document.body.appendChild(frm);frm.submit();document.body.removeChild(frm);
-  setTimeout(function(){oSyncDot('ok');},1500);
+    .catch(function(){
+      oSyncDot('err');oLoader(false);
+      if(USER){oT('Mode hors ligne — données en cache','w');oRefresh();}
+      else{oLoadCache();if(USER){oT('Mode hors ligne — données en cache','w');oHideLogin();applyRole();populateRefUI();oRefresh();}else{oShowLogin('Serveur injoignable. Vérifiez la connexion et l\'URL.');}}
+    });
 }
 
-// ── SETUP ──────────────────────────────────────────────────────────
+// ── ÉCRITURE (opérations) ───────────────────────────────────────────
+function oPost_(payload,silent){
+  if(!GAS_URL||!CODE)return;
+  payload.code=CODE;
+  oSyncDot('spin');
+  fetch(GAS_URL,{method:'POST',body:JSON.stringify(payload)})
+    .then(function(r){return r.text();})
+    .then(function(txt){
+      var d={};try{d=JSON.parse(txt);}catch(e){}
+      if(d.ok){oSyncDot('ok');}
+      else{
+        oSyncDot('err');
+        if(d.error==='auth'){oShowLogin('Session expirée — reconnectez-vous.');}
+        else if(d.error==='busy'){if(!silent)oT('Serveur occupé — réessayez dans un instant','w');}
+        else if(!silent)oT('Écriture refusée : '+(d.error||'?'),'e');
+      }
+    })
+    .catch(function(){oSyncDot('err');if(!silent)oT('Hors ligne — modification non synchronisée','w');});
+}
+function oPush(list){oSaveCache();oPost_({op:'upsert',contacts:list});}
+function oPushDel(ids){oSaveCache();oPost_({op:'delete',ids:ids});}
+function oPushUsers(){oSaveCache();oPost_({op:'saveUsers',users:USERS});}
+function oPushCfg(){oSaveCache();oPost_({op:'saveConfig',config:{referents:CFG.referents}});}
+
+// ── RÉGLAGES ────────────────────────────────────────────────────────
 function oShowSetup(){
   document.getElementById('o-setup-pid').value=PARTNER_ID;
-  document.getElementById('o-setup-pnom').value=PARTNER_NOM;
-  document.getElementById('o-setup-url').value=GAS_URL;
+  document.getElementById('os-who').textContent=USER?('Connecté : '+USER.nom+' — '+roleLabel(ROLE())):'—';
+  document.getElementById('os-url-txt').textContent=GAS_URL||'—';
   document.getElementById('osetup').classList.add('on');
 }
 function oHideSetup(){document.getElementById('osetup').classList.remove('on');}
-function oConnect(){
-  PARTNER_ID=document.getElementById('o-setup-pid').value.trim();
-  PARTNER_NOM=document.getElementById('o-setup-pnom').value.trim();
-  var u=document.getElementById('o-setup-url').value.trim();
-  if(!u||u.indexOf('script.google.com')<0||u.indexOf('/exec')<0){document.getElementById('o-setup-err').style.display='block';return;}
-  document.getElementById('o-setup-err').style.display='none';
-  GAS_URL=u;OFFLINE=false;localStorage.removeItem('owlht_gas_offline');oSaveCfg();oHideSetup();oPull();
-}
-function oImport(){
-  var raw=document.getElementById('o-import-ta').value.trim();
-  if(!raw){oT('Collez d\'abord les données à importer','e');return;}
-  var arr;
-  try{arr=JSON.parse(raw);if(!Array.isArray(arr))throw 0;}catch(e){oT('Format invalide — un tableau JSON est attendu','e');return;}
-  var added=0,updated=0,skipped=0;
-  arr.forEach(function(item){
-    if(!item.nom||!item.prenom){skipped++;return;}
-    var existing=OC.find(function(c){
-      return(item.numCommande&&c.numCommande===item.numCommande)
-        ||(item.memberIdOlyLife&&c.memberIdOlyLife&&c.memberIdOlyLife===item.memberIdOlyLife)
-        ||((c.nom||'').toUpperCase()===(item.nom||'').toUpperCase()&&(c.prenom||'').toLowerCase()===(item.prenom||'').toLowerCase());
-    });
-    if(existing){Object.assign(existing,item);if(!existing.actions)existing.actions={};if(!existing.produits)existing.produits=[];updated++;}
-    else{
-      OC.unshift(Object.assign({
-        id:'c_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
-        createdAt:new Date().toISOString().split('T')[0],
-        actions:{},produits:[],etape:'Prospect',qualification:'Chaud',canal:'WhatsApp',
-        referentId:PARTNER_ID,referentNom:PARTNER_NOM
-      },item));
-      added++;
-    }
+function oSavePid(){PARTNER_ID=document.getElementById('o-setup-pid').value.trim();oSaveCfg();oT('ID Partenaire enregistré','s');}
+function roleLabel(r){return r==='admin'?'Admin':r==='gestionnaire'?'Gestionnaire':'Référent';}
+
+// ── RÔLES → INTERFACE ───────────────────────────────────────────────
+function applyRole(){
+  var r=ROLE();
+  var isRef=(r==='referent');
+  var isAdmin=(r==='admin');
+  // Navigation
+  document.getElementById('onb2').classList.toggle('hide',isRef);
+  document.getElementById('onb3').classList.toggle('hide',isRef);
+  // Dashboard
+  document.getElementById('kpi2').classList.toggle('hide',isRef);
+  document.getElementById('kpi3').classList.toggle('hide',isRef);
+  document.getElementById('d-card-act').classList.toggle('hide',isRef);
+  document.getElementById('d-refhello').classList.toggle('hide',!isRef);
+  if(isRef)document.getElementById('d-refhello-t').textContent='Bienvenue, '+USER.nom;
+  // Contacts : filtres avancés + import
+  document.getElementById('ofilter-row').classList.toggle('hide',isRef);
+  document.getElementById('oimp-btn').style.display=isRef?'none':'inline-flex';
+  // Équipe : cartes admin
+  document.getElementById('eq-users-card').classList.toggle('hide',!isAdmin);
+  document.getElementById('eq-refs-card').classList.toggle('hide',!isAdmin);
+  // Formulaire : le référent ne voit que l'essentiel
+  ['fb-pipeline','fb-prod','fb-cmd','fb-install','fb-temoin','fb-equipe'].forEach(function(id){
+    document.getElementById(id).classList.toggle('hide',isRef);
   });
-  oLS();oPush();
-  document.getElementById('o-import-ta').value='';
-  oT(added+' créée(s), '+updated+' mise(s) à jour'+(skipped?', '+skipped+' ignorée(s)':''),'s');
-  oHideSetup();oRefresh();
-}
-function oOffline(){
-  PARTNER_ID=document.getElementById('o-setup-pid').value.trim();
-  PARTNER_NOM=document.getElementById('o-setup-pnom').value.trim();
-  OFFLINE=true;GAS_URL='';localStorage.setItem('owlht_gas_offline','1');localStorage.removeItem('owlht_gas_url');
-  oSaveCfg();oHideSetup();oSyncDot('');oLoad();oRefresh();oT('Mode local actif','w');
+  document.getElementById('fg-ref').style.display=isRef?'none':'flex';
+  document.getElementById('fg-suivi').style.display=isRef?'none':'flex';
+  // Si l'utilisateur est sur une vue désormais cachée → retour accueil
+  if(isRef){
+    var v=document.querySelector('.ov.on');
+    if(v&&(v.id==='ov-actions'||v.id==='ov-equipe'))oSw('dashboard',0);
+  }
 }
 
-// ── LOCAL STORAGE ──────────────────────────────────────────────────
-function oLoad(){try{var s=localStorage.getItem('owlht_contacts_v1');if(s){OC=JSON.parse(s);OC.forEach(function(c){if(!c.actions)c.actions={};if(!c.produits)c.produits=[];});}}catch(e){OC=[];}}
-function oLS(){try{localStorage.setItem('owlht_contacts_v1',JSON.stringify(OC));}catch(e){}}
+// ── LISTES DYNAMIQUES (référents / suiveurs) ────────────────────────
+function populateRefUI(){
+  var refs=CFG.referents||[];
+  var suiv=CFG.suiveurs||[];
+  // datalist référents
+  var dl=document.getElementById('ref-list');
+  dl.innerHTML=refs.map(function(x){return'<option value="'+esc(x)+'">';}).join('');
+  // select suivi par (formulaire)
+  var s=document.getElementById('fc-suivi');
+  var cur=s.value;
+  s.innerHTML='<option value="">— Non attribué —</option>'+suiv.map(function(x){return'<option'+(x===cur?' selected':'')+'>'+esc(x)+'</option>';}).join('');
+  // filtres contacts
+  var fr=document.getElementById('ofil-ref');
+  fr.innerHTML='<option value="">Tous les référents</option>'+refs.map(function(x){return'<option>'+esc(x)+'</option>';}).join('');
+  var fs=document.getElementById('ofil-suivi');
+  fs.innerHTML='<option value="">Tous les suiveurs</option><option value="__none__">Non attribué</option>'+suiv.map(function(x){return'<option>'+esc(x)+'</option>';}).join('');
+  // import : défauts
+  var dr=document.getElementById('oimp-defref');
+  dr.innerHTML='<option value="">Référé par (défaut)…</option>'+refs.map(function(x){return'<option>'+esc(x)+'</option>';}).join('');
+  var ds=document.getElementById('oimp-defsuivi');
+  ds.innerHTML='<option value="">Suivi par (défaut)…</option>'+suiv.map(function(x){return'<option>'+esc(x)+'</option>';}).join('');
+  // carte référents (admin)
+  renderRefChips();
+  renderUsers();
+}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ── ADMIN : référents ───────────────────────────────────────────────
+function renderRefChips(){
+  var box=document.getElementById('eq-refs-chips');
+  var refs=CFG.referents||[];
+  if(!refs.length){box.innerHTML='<span style="font-size:12px;color:var(--t3)">Aucun référent pour le moment.</span>';return;}
+  box.innerHTML=refs.map(function(x,i){return'<span class="otag">'+esc(x)+'<button onclick="oRefDel('+i+')" title="Retirer">✕</button></span>';}).join('');
+}
+function oRefAdd(){
+  var inp=document.getElementById('eq-ref-new');
+  var v=inp.value.trim();
+  if(!v)return;
+  if(!CFG.referents)CFG.referents=[];
+  if(CFG.referents.indexOf(v)>=0){oT('Ce référent existe déjà','w');return;}
+  CFG.referents.push(v);inp.value='';
+  oPushCfg();populateRefUI();oT('Référent ajouté : '+v,'s');
+}
+function oRefDel(i){
+  var v=CFG.referents[i];
+  if(!confirm('Retirer « '+v+' » de la liste des référents ?\n(Les fiches existantes gardent leur valeur.)'))return;
+  CFG.referents.splice(i,1);
+  oPushCfg();populateRefUI();
+}
+
+// ── ADMIN : utilisateurs ────────────────────────────────────────────
+function renderUsers(){
+  var box=document.getElementById('eq-users-list');
+  if(!box)return;
+  if(!USERS.length){box.innerHTML='<div style="padding:14px 16px;font-size:12px;color:var(--t3)">Aucun accès créé. Ajoutez vos gestionnaires et référents ici.</div>';return;}
+  box.innerHTML=USERS.map(function(u,i){
+    var rb=u.role==='admin'?'bgo':u.role==='gestionnaire'?'baq':'bpu';
+    return'<div class="ouser-row'+(u.actif===false?' ouser-off':'')+'">'
+      +'<span class="ouser-nm">'+esc(u.nom)+'</span>'
+      +'<span class="obdg '+rb+'">'+roleLabel(u.role)+'</span>'
+      +((u.tags&&u.tags.length)?'<span style="color:var(--t3);font-size:11px">🏷 '+esc(u.tags.join(', '))+'</span>':'')
+      +'<span class="ouser-code">'+esc(u.code||'—')+'</span>'
+      +'<span style="flex:1"></span>'
+      +'<button class="ob bedit bsm" style="min-height:30px;padding:4px 10px" onclick="oUserEdit('+i+')">✏️</button>'
+      +'<button class="ob bdel bsm" style="min-height:30px;padding:4px 10px" onclick="oUserDel('+i+')">🗑</button>'
+    +'</div>';
+  }).join('');
+}
+function oUserNew(){
+  document.getElementById('u-id').value='';
+  document.getElementById('u-nom').value='';
+  document.getElementById('u-role').value='referent';
+  document.getElementById('u-tags').value='';
+  document.getElementById('u-code').value=genCode();
+  document.getElementById('u-actif').checked=true;
+  document.getElementById('eq-user-form').style.display='block';
+}
+function oUserEdit(i){
+  var u=USERS[i];
+  document.getElementById('u-id').value=u.id;
+  document.getElementById('u-nom').value=u.nom||'';
+  document.getElementById('u-role').value=u.role||'referent';
+  document.getElementById('u-tags').value=(u.tags||[]).join(', ');
+  document.getElementById('u-code').value=u.code||'';
+  document.getElementById('u-actif').checked=u.actif!==false;
+  document.getElementById('eq-user-form').style.display='block';
+}
+function oUserCancel(){document.getElementById('eq-user-form').style.display='none';}
+function oUserDel(i){
+  if(!confirm('Supprimer l\'accès de « '+USERS[i].nom+' » ?'))return;
+  USERS.splice(i,1);oPushUsers();renderUsers();
+}
+function oUserSave(){
+  var nom=document.getElementById('u-nom').value.trim();
+  var code=document.getElementById('u-code').value.trim();
+  if(!nom||!code){oT('Nom et code d\'accès obligatoires','e');return;}
+  var dup=USERS.some(function(u){return u.code===code&&u.id!==document.getElementById('u-id').value;});
+  if(dup){oT('Ce code est déjà utilisé par un autre accès','e');return;}
+  var tags=document.getElementById('u-tags').value.split(',').map(function(x){return x.trim();}).filter(Boolean);
+  var role=document.getElementById('u-role').value;
+  if(role==='referent'&&!tags.length)tags=[nom];
+  var obj={
+    id:document.getElementById('u-id').value||('u_'+Date.now()),
+    nom:nom,role:role,tags:tags,code:code,
+    actif:document.getElementById('u-actif').checked
+  };
+  var idx=USERS.findIndex(function(u){return u.id===obj.id;});
+  if(idx>=0)USERS[idx]=obj;else USERS.push(obj);
+  // Un référent nouvellement créé → son tag rejoint la liste des référents
+  if(role==='referent'){
+    tags.forEach(function(t){if(CFG.referents.indexOf(t)<0)CFG.referents.push(t);});
+    oPushCfg();
+  }
+  oPushUsers();oUserCancel();populateRefUI();
+  oT('Accès enregistré — code : '+code,'s');
+}
+function genCode(){
+  var A='ABCDEFGHJKMNPQRSTUVWXYZ23456789',s='';
+  for(var i=0;i<6;i++)s+=A.charAt(Math.floor(Math.random()*A.length));
+  return s;
+}
+function oGenCode(){document.getElementById('u-code').value=genCode();}
+
+// ── LOADER / UTILS / TOAST ──────────────────────────────────────────
 function oLoader(on,txt){var el=document.getElementById('oload');var t=document.getElementById('oload-txt');if(on){el.classList.add('on');if(txt&&t)t.textContent=txt;}else el.classList.remove('on');}
-
-// ── UTILS ──────────────────────────────────────────────────────────
 function fD(d){if(!d)return'—';return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'});}
 function addD(ds,n){if(!ds)return null;var d=new Date(ds);d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];}
 function diffD(ds){if(!ds)return null;var d=new Date(ds);d.setHours(0,0,0,0);var t=new Date();t.setHours(0,0,0,0);return Math.round((d-t)/86400000);}
@@ -640,12 +972,10 @@ function trackingUrl(carrier,num){
   if(c.indexOf('chronopost')>=0)return'https://www.chronopost.fr/tracking-no-cms/suivi-page?listeNumerosLT='+n;
   if(c.indexOf('colissimo')>=0||c.indexOf('poste')>=0)return'https://www.laposte.fr/outils/suivre-vos-envois?code='+n;
   if(c.indexOf('ems')>=0)return'https://www.ems.post/en/global-network/tracking?trackingNumber='+n;
-  return'https://t.17track.net/en#nums='+n; // suivi universel (bon repli si transporteur inconnu / colis international)
+  return'https://t.17track.net/en#nums='+n;
 }
 function eBdg(e){return'<span class="obdg '+(ETAPE_BADGE[e]||'bgy')+'">'+(e||'—')+'</span>';}
 function qBdg(q){if(!q)return'';return'<span class="obdg '+(QUALIF_BADGE[q]||'bgy')+'">'+q+'</span>';}
-
-// ── TOAST ──────────────────────────────────────────────────────────
 function oT(msg,t){var tc=document.getElementById('otc');var el=document.createElement('div');el.className='ott'+(t?' '+t:'');el.textContent=msg;tc.appendChild(el);setTimeout(function(){el.style.transition='all .3s';el.style.opacity='0';el.style.transform='translateY(8px)';setTimeout(function(){el.remove();},320);},2600);}
 
 // ── NAVIGATION ─────────────────────────────────────────────────────
@@ -676,7 +1006,7 @@ var TONES=['pro','chaleureux','equipe'];
 var TONE_LABEL={pro:'💼 Pro',chaleureux:'🤝 Chaleureux',equipe:'⚡ Équipe'};
 
 function sign(lang,tone){
-  var nom=PARTNER_NOM||(lang==='en'?'The WLHT Team':'L\'équipe WLHT');
+  var nom=PARTNER_NOM()||(lang==='en'?'The WLHT Team':'L\'équipe WLHT');
   if(tone==='chaleureux')return'\n\n'+nom+' 😊';
   if(tone==='equipe')return'\n\n'+nom+' — WLHT';
   return'\n\n'+nom+' — OlyLife / WLHT';
@@ -773,13 +1103,10 @@ function buildMsgFor(item,lang,tone){
   return item.msg;
 }
 
-
-
 // ── MOTEUR D'ACTIONS UNIFIÉ ────────────────────────────────────────
 function computeActions(){
   var items=[];
   OC.forEach(function(c){
-    // Relance commerciale
     if(c.etape==='Prospect'||c.etape==='Relance en cours'){
       RELANCE_STEPS.forEach(function(s){
         var done=c.actions&&c.actions[s.k]&&c.actions[s.k].done;if(done||!c.createdAt)return;
@@ -787,7 +1114,6 @@ function computeActions(){
         if(diff!==null&&diff<=3)items.push({c:c,key:s.k,type:'Relance',label:s.l,diff:diff,msg:msgRelance(c,s.k,'fr')});
       });
     }
-    // Logistique — sans tracking après le seuil
     if(c.numCommande&&!c.tracking&&c.dateCommande){
       var doneL=c.actions&&c.actions.logistique&&c.actions.logistique.done;
       if(!doneL){
@@ -795,12 +1121,10 @@ function computeActions(){
         if(diff!==null&&diff<=3)items.push({c:c,key:'logistique',type:'Logistique',label:'Sans tracking depuis la commande',diff:diff,msg:msgLogRetard(c,'fr')});
       }
     }
-    // Tracking disponible — prévenir le client (déclenche dès que le tracking apparaît)
     if(c.tracking){
       var doneTr=c.actions&&c.actions.trackingEnvoye&&c.actions.trackingEnvoye.done;
       if(!doneTr)items.push({c:c,key:'trackingEnvoye',type:'Logistique',label:'Tracking disponible — prévenir le client',diff:0,msg:msgLogOk(c,'fr')});
     }
-    // Installation — suivi après livraison
     if(c.tracking&&!c.installConfirm){
       var doneI=c.actions&&c.actions.installation&&c.actions.installation.done;
       var base=c.dateLivraison||c.dateCommande;
@@ -809,7 +1133,6 @@ function computeActions(){
         if(diff!==null&&diff<=3)items.push({c:c,key:'installation',type:'Installation',label:'Suivi installation & mise en route',diff:diff,msg:msgInstall(c,'fr')});
       }
     }
-    // Témoignage — après installation confirmée
     if(c.installConfirm&&!c.temoignageTexte){
       var doneT=c.actions&&c.actions.temoignage&&c.actions.temoignage.done;
       if(!doneT&&c.dateInstall){
@@ -825,7 +1148,7 @@ function oDone(cid,key){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
   if(!c.actions)c.actions={};
   c.actions[key]={done:true,doneAt:new Date().toISOString().split('T')[0]};
-  oLS();oPush();oT('Action marquée comme faite !','s');oRefresh();
+  oPush([c]);oT('Action marquée comme faite !','s');oRefresh();
 }
 
 // ── DASHBOARD ───────────────────────────────────────────────────────
@@ -870,9 +1193,19 @@ var ACTIVE_FILTER='';
 function oChip(btn,val){document.querySelectorAll('#ofilter-chips .ofilter-chip').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');ACTIVE_FILTER=val;oFilt();}
 function oCli(){
   var q=document.getElementById('oq')?document.getElementById('oq').value.toLowerCase():'';
-  var l=OC.filter(function(c){return(!q||(c.nom+' '+c.prenom).toLowerCase().indexOf(q)>=0||(c.tel||'').indexOf(q)>=0)&&(!ACTIVE_FILTER||c.etape===ACTIVE_FILTER);});
+  var fref=document.getElementById('ofil-ref')?document.getElementById('ofil-ref').value:'';
+  var fsui=document.getElementById('ofil-suivi')?document.getElementById('ofil-suivi').value:'';
+  var l=OC.filter(function(c){
+    if(q&&(c.nom+' '+c.prenom).toLowerCase().indexOf(q)<0&&(c.tel||'').indexOf(q)<0)return false;
+    if(ACTIVE_FILTER&&c.etape!==ACTIVE_FILTER)return false;
+    if(fref&&(c.refere||'')!==fref)return false;
+    if(fsui==='__none__'&&(c.suiviPar||''))return false;
+    if(fsui&&fsui!=='__none__'&&(c.suiviPar||'')!==fsui)return false;
+    return true;
+  });
   var cl=document.getElementById('c-list');
   if(!l.length){cl.innerHTML='<div class="oemp"><div class="oemp-i">✦</div><div class="oemp-t">Aucun contact</div></div>';return;}
+  var showAttr=ROLE()!=='referent';
   cl.innerHTML=l.map(function(c){
     var num=(c.tel||'').replace(/\D/g,'');
     return'<div class="ocli-card" onclick="oOpenF(\''+c.id+'\')">'
@@ -880,7 +1213,10 @@ function oCli(){
       +'<div class="ocli-info">'
         +'<div class="ocli-name">'+c.nom+' '+c.prenom+'</div>'
         +'<div class="ocli-sub">'+(c.tel||'—')+(c.pays?' · '+c.pays:'')+'</div>'
-        +'<div style="margin-top:4px">'+eBdg(c.etape)+' '+qBdg(c.qualification)+'</div>'
+        +'<div style="margin-top:4px">'+eBdg(c.etape)+' '+qBdg(c.qualification)
+          +(showAttr&&c.refere?' <span class="obdg bgy">🏷 '+esc(c.refere)+'</span>':'')
+          +(showAttr&&c.suiviPar?' <span class="obdg baq">👤 '+esc(c.suiviPar)+'</span>':'')
+        +'</div>'
       +'</div>'
       +'<div class="ocli-right">'
         +(num?'<a href="https://wa.me/'+num+'" onclick="event.stopPropagation()" target="_blank" rel="noopener" style="background:var(--wa);color:#fff;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;text-decoration:none">WA</a>':'')
@@ -916,7 +1252,7 @@ function oAct(){
     if(a.key==='logistique'){
       var waMsg='Bonjour, je vous contacte au sujet de la commande OlyLife n°'+(a.c.numCommande||'')+' (Member ID '+(a.c.memberIdOlyLife||'')+'), le suivi n\'est toujours pas disponible. Merci de votre retour.';
       var mailSubj='Suivi commande OlyLife n°'+(a.c.numCommande||'');
-      var mailBody='Bonjour,\n\nMerci de me communiquer le statut d\'expédition de la commande n°'+(a.c.numCommande||'')+' (Member ID '+(a.c.memberIdOlyLife||'')+').\n\nCordialement,\n'+(PARTNER_NOM||'');
+      var mailBody='Bonjour,\n\nMerci de me communiquer le statut d\'expédition de la commande n°'+(a.c.numCommande||'')+' (Member ID '+(a.c.memberIdOlyLife||'')+').\n\nCordialement,\n'+(PARTNER_NOM()||'');
       extraBtn='<div class="brow"><a class="ob bgh" href="'+olySvcWA('logistics',waMsg)+'" target="_blank" rel="noopener">📨 WhatsApp Logistique OlyLife</a><a class="ob bgh" href="'+olySvcMail('logistics',mailSubj,mailBody)+'">✉️ Email Logistique</a></div>';
     }
     return'<div class="oacc '+cls+'">'
@@ -978,6 +1314,7 @@ function oAccTog(uid){var bd=document.getElementById('acb-'+uid);var arr=documen
 
 // ── ÉQUIPE ──────────────────────────────────────────────────────────
 function oEq(){
+  renderUsers();renderRefChips();
   var team=OC.filter(function(c){return c.etape==='Partenaire équipe'||c.estPartenaire;});
   document.getElementById('ev0').textContent=team.length;
   var directs=team.filter(function(c){return c.sponsor&&PARTNER_ID&&c.sponsor.toUpperCase()===PARTNER_ID.toUpperCase();}).length;
@@ -1009,9 +1346,10 @@ function oOpenF(id){
   var c=OC.find(function(x){return x.id===id;});if(!c)return;
   document.getElementById('om-t').textContent=c.nom+' '+c.prenom;
   var num=(c.tel||'').replace(/\D/g,'');
+  var isRef=(ROLE()==='referent');
 
   document.getElementById('om-b').innerHTML=
-    '<div style="background:linear-gradient(135deg,#081527,var(--navy3));border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px">'
+    '<div style="background:linear-gradient(135deg,#FFFFFF,var(--navy3));border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px">'
       +'<div style="width:52px;height:52px;border-radius:50%;background:var(--goldp);color:var(--gold);font-family:Cormorant Garamond,serif;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+initials(c)+'</div>'
       +'<div><div style="font-family:Cormorant Garamond,serif;font-size:18px;font-weight:700;color:var(--tx)">'+c.nom+' '+c.prenom+'</div>'
       +'<div style="font-size:11px;color:var(--t3);margin-top:2px">'+(c.pays||'')+(c.ville?' · '+c.ville:'')+'</div>'
@@ -1024,7 +1362,8 @@ function oOpenF(id){
     +'</div>'
     +'<div class="od-section"><div class="od-sec-ttl">Informations</div>'
       +'<div class="od-row"><span class="od-lbl">Téléphone</span><span class="od-val">'+(c.tel||'—')+'</span></div>'
-      +'<div class="od-row"><span class="od-lbl">Référé par</span><span class="od-val">'+(c.refere||'—')+'</span></div>'
+      +'<div class="od-row"><span class="od-lbl">Référé par</span><span class="od-val">'+esc(c.refere||'—')+'</span></div>'
+      +'<div class="od-row"><span class="od-lbl">Suivi par</span><span class="od-val">'+esc(c.suiviPar||'— Non attribué —')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">Canal</span><span class="od-val">'+(c.canal||'—')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">Registre</span><span class="od-val">'+(TONE_LABEL[c.registre]||TONE_LABEL.pro)+'</span></div>'
     +'</div>'
@@ -1048,14 +1387,14 @@ function oOpenF(id){
       +'<div class="od-row"><span class="od-lbl">Rang</span><span class="od-val">'+(c.rang||'—')+'</span></div>'
     +'</div>':'')
     +(c.notes?'<div class="od-section"><div class="od-sec-ttl">Notes</div><div style="padding:12px 16px;font-size:13px;line-height:1.7;color:var(--tx)">'+c.notes+'</div></div>':'')
-    +'<div style="display:flex;gap:8px;padding:4px 0 20px">'
+    +(isRef?'':'<div style="display:flex;gap:8px;padding:4px 0 20px">'
       +'<button class="ob bedit" style="flex:1" onclick="oClose();oEdit(\''+id+'\')">Modifier</button>'
       +'<button class="ob bdel" style="flex:1" onclick="oDel(\''+id+'\')">Supprimer</button>'
-    +'</div>';
+    +'</div>');
   document.getElementById('omo').classList.add('on');
 }
 function oClose(){document.getElementById('omo').classList.remove('on');}
-function oDel(id){if(!confirm('Supprimer cette fiche ?'))return;OC=OC.filter(function(c){return c.id!==id;});oLS();oPush();oClose();oRefresh();oT('Fiche supprimée','w');}
+function oDel(id){if(!confirm('Supprimer cette fiche ?'))return;OC=OC.filter(function(c){return c.id!==id;});oPushDel([id]);oClose();oRefresh();oT('Fiche supprimée','w');}
 
 // ── ÉDITION / FORMULAIRE ───────────────────────────────────────────
 function oEdit(id){
@@ -1064,7 +1403,7 @@ function oEdit(id){
   document.getElementById('offttl').textContent='Modifier — '+c.prenom+' '+c.nom;
   document.getElementById('obtn-save').textContent='Enregistrer les modifications';
   document.getElementById('fc-eid').value=id;
-  var map={'fc-nm':c.nom,'fc-pr':c.prenom,'fc-tel':c.tel,'fc-em':c.email,'fc-pays':c.pays,'fc-vil':c.ville,'fc-ref':c.refere,'fc-etape':c.etape,'fc-qualif':c.qualification,'fc-canal':c.canal,'fc-registre':c.registre,'fc-obj':c.objectifs,'fl-numcmd':c.numCommande,'fl-memberid':c.memberIdOlyLife,'fl-datecmd':c.dateCommande,'fl-transp':c.transporteur,'fl-tracking':c.tracking,'fl-datelivr':c.dateLivraison,'fi-date':c.dateInstall,'fi-notes':c.notesUsage,'ft-texte':c.temoignageTexte,'fe-sponsor':c.sponsor,'fe-placement':c.placement,'fe-cote':c.cote,'fe-gen':c.generation,'fe-rang':c.rang,'fc-notes':c.notes};
+  var map={'fc-nm':c.nom,'fc-pr':c.prenom,'fc-tel':c.tel,'fc-em':c.email,'fc-pays':c.pays,'fc-vil':c.ville,'fc-ref':c.refere,'fc-suivi':c.suiviPar,'fc-etape':c.etape,'fc-qualif':c.qualification,'fc-canal':c.canal,'fc-registre':c.registre,'fc-obj':c.objectifs,'fl-numcmd':c.numCommande,'fl-memberid':c.memberIdOlyLife,'fl-datecmd':c.dateCommande,'fl-transp':c.transporteur,'fl-tracking':c.tracking,'fl-datelivr':c.dateLivraison,'fi-date':c.dateInstall,'fi-notes':c.notesUsage,'ft-texte':c.temoignageTexte,'fe-sponsor':c.sponsor,'fe-placement':c.placement,'fe-cote':c.cote,'fe-gen':c.generation,'fe-rang':c.rang,'fc-notes':c.notes};
   Object.keys(map).forEach(function(k){var el=document.getElementById(k);if(el)el.value=map[k]||'';});
   document.getElementById('fi-confirm').checked=!!c.installConfirm;
   document.getElementById('ft-autorise').checked=!!c.temoignageAutorise;
@@ -1077,6 +1416,7 @@ function oReset(){
   document.getElementById('fc-eid').value='';EID=null;
   ['fc-nm','fc-pr','fc-tel','fc-em','fc-pays','fc-vil','fc-ref','fc-obj','fl-numcmd','fl-memberid','fl-datecmd','fl-transp','fl-tracking','fl-datelivr','fi-date','fi-notes','ft-texte','fe-sponsor','fe-placement','fe-gen','fc-notes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('fc-etape').value='Prospect';document.getElementById('fc-qualif').value='Chaud';document.getElementById('fc-canal').value='WhatsApp';document.getElementById('fc-registre').value='pro';
+  document.getElementById('fc-suivi').value='';
   document.getElementById('fe-cote').value='';document.getElementById('fe-rang').value='';
   document.getElementById('fi-confirm').checked=false;document.getElementById('ft-autorise').checked=false;document.getElementById('fe-partenaire').checked=false;
   oTEQ();
@@ -1090,8 +1430,11 @@ function oSave(){
   var tel=document.getElementById('fc-tel').value.trim();
   if(!nm||!pr||!tel){oT('Nom, prénom et téléphone sont obligatoires','e');return;}
   var prods=[];document.querySelectorAll('.oprd input:checked').forEach(function(cb){prods.push(cb.value);});
+  var isRef=(ROLE()==='referent');
   var data={
-    nom:nm.toUpperCase(),prenom:pr,tel:tel,email:document.getElementById('fc-em').value,pays:document.getElementById('fc-pays').value,ville:document.getElementById('fc-vil').value,refere:document.getElementById('fc-ref').value,
+    nom:nm.toUpperCase(),prenom:pr,tel:tel,email:document.getElementById('fc-em').value,pays:document.getElementById('fc-pays').value,ville:document.getElementById('fc-vil').value,
+    refere:isRef?((USER.tags&&USER.tags[0])||USER.nom):document.getElementById('fc-ref').value.trim(),
+    suiviPar:isRef?'':document.getElementById('fc-suivi').value,
     etape:document.getElementById('fc-etape').value,qualification:document.getElementById('fc-qualif').value,canal:document.getElementById('fc-canal').value,registre:document.getElementById('fc-registre').value,objectifs:document.getElementById('fc-obj').value,
     produits:prods,
     numCommande:document.getElementById('fl-numcmd').value,memberIdOlyLife:document.getElementById('fl-memberid').value,dateCommande:document.getElementById('fl-datecmd').value,transporteur:document.getElementById('fl-transp').value,tracking:document.getElementById('fl-tracking').value,dateLivraison:document.getElementById('fl-datelivr').value,
@@ -1099,12 +1442,143 @@ function oSave(){
     temoignageTexte:document.getElementById('ft-texte').value,temoignageAutorise:document.getElementById('ft-autorise').checked,
     estPartenaire:document.getElementById('fe-partenaire').checked,sponsor:document.getElementById('fe-sponsor').value,placement:document.getElementById('fe-placement').value,cote:document.getElementById('fe-cote').value,generation:document.getElementById('fe-gen').value,rang:document.getElementById('fe-rang').value,
     notes:document.getElementById('fc-notes').value,
-    referentId:PARTNER_ID,referentNom:PARTNER_NOM
+    referentId:PARTNER_ID,referentNom:PARTNER_NOM()
   };
+  // Mémoriser une édition d'un contact existant : ne pas écraser le suiviPar d'un référent
+  if(isRef&&EID){var old=OC.find(function(x){return x.id===EID;});if(old)data.suiviPar=old.suiviPar||'';}
+  var saved;
   var eid=document.getElementById('fc-eid').value;
-  if(eid){var idx=OC.findIndex(function(x){return x.id===eid;});if(idx>=0){OC[idx]=Object.assign({},OC[idx],data);oT(data.prenom+' '+data.nom+' mis à jour !','s');}}
-  else{OC.unshift(Object.assign({id:'c_'+Date.now(),createdAt:new Date().toISOString().split('T')[0],actions:{}},data));oT('Fiche de '+data.prenom+' '+data.nom+' créée !','s');}
-  oLS();oPush();oReset();oSw('contacts',1);
+  if(eid){var idx=OC.findIndex(function(x){return x.id===eid;});if(idx>=0){OC[idx]=Object.assign({},OC[idx],data);saved=OC[idx];oT(data.prenom+' '+data.nom+' mis à jour !','s');}}
+  else{saved=Object.assign({id:'c_'+Date.now(),createdAt:new Date().toISOString().split('T')[0],actions:{}},data);OC.unshift(saved);oT('Fiche de '+data.prenom+' '+data.nom+' créée !','s');}
+  if(saved)oPush([saved]);
+  oReset();oSw('contacts',1);
+}
+
+// ── IMPORT EN MASSE (vrac / CSV / JSON) ─────────────────────────────
+var IMP_PARSED=[];
+function oOpenImport(){
+  document.getElementById('oimp-ta').value='';
+  document.getElementById('oimp-prev-card').style.display='none';
+  document.getElementById('oimp-go').style.display='none';
+  IMP_PARSED=[];
+  document.getElementById('oimp').classList.add('on');
+}
+function oCloseImport(){document.getElementById('oimp').classList.remove('on');}
+
+function normPhone(p){return(p||'').replace(/[\s().\u00A0-]/g,'');}
+function parseVrac(text){
+  var out=[];
+  text.split(/\n/).forEach(function(line){
+    line=line.trim();if(!line)return;
+    var email=(line.match(/[\w.+-]+@[\w-]+\.[\w.-]+/)||[])[0]||'';
+    var phone=(line.match(/\+?\d[\d\s().\u00A0-]{6,}\d/)||[])[0]||'';
+    var ref='';
+    var mRef=line.match(/(?:envoy[ée]?e?\s+par|r[ée]f[ée]r[ée]?e?\s+par|de la part d[eu']\s*|via)\s+([^,;|]+)$/i);
+    if(mRef)ref=mRef[1].trim();
+    var rest=line;
+    if(email)rest=rest.replace(email,' ');
+    if(phone)rest=rest.replace(phone,' ');
+    if(mRef)rest=rest.replace(mRef[0],' ');
+    rest=rest.replace(/[,;|·—–-]+/g,' ').replace(/\s+/g,' ').trim();
+    var words=rest.split(' ').filter(function(w){return w&&!/^\d+$/.test(w);});
+    var nom='',prenom='';
+    for(var i=0;i<words.length;i++){
+      var w=words[i];
+      if(w.length>1&&w===w.toUpperCase()&&/[A-ZÀ-Ý]/.test(w)){nom=w;words.splice(i,1);break;}
+    }
+    prenom=words[0]||'';
+    if(!nom)nom=words[1]||'';
+    if(!nom&&!prenom&&!email&&!phone)return;
+    out.push({nom:nom,prenom:prenom,email:email,tel:normPhone(phone),refere:ref});
+  });
+  return out;
+}
+function parseCSV(text){
+  var delim=text.indexOf('\t')>=0?'\t':(text.split(';').length>text.split(',').length?';':',');
+  var rows=text.split(/\n/).map(function(r){return r.trim();}).filter(Boolean).map(function(r){return r.split(delim).map(function(x){return x.trim().replace(/^"|"$/g,'');});});
+  if(!rows.length)return[];
+  var H={nom:['nom','name','lastname'],prenom:['prenom','prénom','firstname'],tel:['tel','tél','telephone','téléphone','phone','whatsapp','mobile','numero','numéro'],email:['email','e-mail','mail','courriel'],pays:['pays','country'],ville:['ville','city'],refere:['refere','référé','referent','référent','refere par','référé par','source'],suiviPar:['suivi','suivi par','responsable','gestionnaire'],numCommande:['commande','n° commande','numcommande','order'],memberIdOlyLife:['member','member id','memberid']};
+  var head=rows[0].map(function(x){return x.toLowerCase();});
+  var isHead=head.some(function(h){return Object.keys(H).some(function(k){return H[k].indexOf(h)>=0;});});
+  var idx={};
+  if(isHead){
+    Object.keys(H).forEach(function(k){
+      idx[k]=-1;
+      head.forEach(function(h,i){if(idx[k]<0&&H[k].indexOf(h)>=0)idx[k]=i;});
+    });
+    rows=rows.slice(1);
+  }else{
+    idx={nom:0,prenom:1,tel:2,email:3,pays:-1,ville:-1,refere:-1,suiviPar:-1,numCommande:-1,memberIdOlyLife:-1};
+  }
+  return rows.map(function(r){
+    function g(k){return idx[k]>=0?(r[idx[k]]||''):'';}
+    return{nom:g('nom'),prenom:g('prenom'),tel:normPhone(g('tel')),email:g('email'),pays:g('pays'),ville:g('ville'),refere:g('refere'),suiviPar:g('suiviPar'),numCommande:g('numCommande'),memberIdOlyLife:g('memberIdOlyLife')};
+  }).filter(function(x){return x.nom||x.prenom||x.tel||x.email;});
+}
+function oImpAnalyse(){
+  var raw=document.getElementById('oimp-ta').value.trim();
+  if(!raw){oT('Collez d\'abord des données à analyser','e');return;}
+  var items=[];
+  if(raw.charAt(0)==='['){
+    try{items=JSON.parse(raw);if(!Array.isArray(items))throw 0;}catch(e){oT('JSON invalide — un tableau [{...}] est attendu','e');return;}
+  }else{
+    var firstLine=raw.split('\n')[0].toLowerCase();
+    var looksCSV=raw.indexOf('\t')>=0||((firstLine.split(';').length>2||firstLine.split(',').length>2)&&/nom|pr[ée]nom|tel|mail|email|phone/.test(firstLine));
+    items=looksCSV?parseCSV(raw):parseVrac(raw);
+  }
+  var defRef=document.getElementById('oimp-defref').value;
+  var defSuivi=document.getElementById('oimp-defsuivi').value;
+  items.forEach(function(it){
+    if(defRef&&!it.refere)it.refere=defRef;
+    if(defSuivi&&!it.suiviPar)it.suiviPar=defSuivi;
+    if(it.tel)it.tel=normPhone(it.tel);
+  });
+  IMP_PARSED=items;
+  var card=document.getElementById('oimp-prev-card');
+  var prev=document.getElementById('oimp-prev');
+  if(!items.length){card.style.display='block';document.getElementById('oimp-prev-ttl').textContent='Aperçu';prev.innerHTML='<div style="padding:14px 16px;font-size:12px;color:var(--t3)">Rien de reconnu — vérifiez le contenu collé.</div>';document.getElementById('oimp-go').style.display='none';return;}
+  document.getElementById('oimp-prev-ttl').textContent='Aperçu — '+items.length+' fiche(s) détectée(s)';
+  prev.innerHTML=items.map(function(it){
+    var warn=(!it.nom&&!it.prenom)||(!it.tel&&!it.email);
+    return'<div class="oimp-row'+(warn?' warn':'')+'">'
+      +'<span class="nm">'+esc((it.nom||'?')+' '+(it.prenom||''))+'</span>'
+      +'<span class="dt">'+esc(it.tel||'—')+' · '+esc(it.email||'—')+(it.refere?' · 🏷 '+esc(it.refere):'')+'</span>'
+      +(warn?'<span class="obdg bor">incomplet</span>':'<span class="obdg bgr">ok</span>')
+    +'</div>';
+  }).join('');
+  card.style.display='block';
+  var go=document.getElementById('oimp-go');
+  go.textContent='Importer '+items.length+' fiche(s)';
+  go.style.display='block';
+}
+function oImpGo(){
+  if(!IMP_PARSED.length)return;
+  var added=0,updated=0,skipped=0,changed=[];
+  IMP_PARSED.forEach(function(item){
+    if(!item.nom&&!item.prenom){skipped++;return;}
+    var existing=OC.find(function(c){
+      return(item.numCommande&&c.numCommande===item.numCommande)
+        ||(item.memberIdOlyLife&&c.memberIdOlyLife&&c.memberIdOlyLife===item.memberIdOlyLife)
+        ||((c.nom||'').toUpperCase()===(item.nom||'').toUpperCase()&&(c.prenom||'').toLowerCase()===(item.prenom||'').toLowerCase()&&(item.nom||item.prenom));
+    });
+    if(existing){
+      Object.keys(item).forEach(function(k){if(item[k])existing[k]=item[k];});
+      if(!existing.actions)existing.actions={};if(!existing.produits)existing.produits=[];
+      changed.push(existing);updated++;
+    }else{
+      var nc=Object.assign({
+        id:'c_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+        createdAt:new Date().toISOString().split('T')[0],
+        actions:{},produits:[],etape:'Prospect',qualification:'Chaud',canal:'WhatsApp',registre:'pro',
+        referentId:PARTNER_ID,referentNom:PARTNER_NOM()
+      },item);
+      if(nc.nom)nc.nom=nc.nom.toUpperCase();
+      OC.unshift(nc);changed.push(nc);added++;
+    }
+  });
+  if(changed.length)oPush(changed);
+  oT(added+' créée(s), '+updated+' mise(s) à jour'+(skipped?', '+skipped+' ignorée(s)':''),'s');
+  oCloseImport();oRefresh();
 }
 
 // ── PWA INSTALL ───────────────────────────────────────────────────
@@ -1115,9 +1589,8 @@ document.getElementById('opwa-yes').addEventListener('click',function(){var b=do
 // ── INIT ──────────────────────────────────────────────────────────
 oBuildProductGrid();
 oGetCfg();
-if(!GAS_URL&&!OFFLINE){oShowSetup();}
-else if(GAS_URL){oLoad();oPull();}
-else{oLoad();oDash();}
+if(GAS_URL&&CODE){oLoadCache();if(USER){applyRole();populateRefUI();oRefresh();}oPull();}
+else{oShowLogin();}
 </script>
 </body>
 </html>
