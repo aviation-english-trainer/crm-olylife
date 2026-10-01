@@ -259,11 +259,24 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .oimp-row.warn{background:var(--orp);}
 
 /* ── USERS (gestion des accès) ──────────────────────────────────── */
-.ouser-row{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--bd);font-size:12px;flex-wrap:wrap;}
+.ouser-row{padding:14px 14px 12px;border-bottom:1px solid var(--bd);font-size:12px;}
 .ouser-row:last-child{border-bottom:none;}
-.ouser-nm{font-weight:600;color:var(--tx);}
-.ouser-code{font-family:monospace;font-size:11px;background:var(--navy3);border:1px solid var(--bd2);border-radius:6px;padding:2px 7px;color:var(--gold);letter-spacing:1px;}
+.ouser-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.ouser-nm{font-weight:700;color:var(--tx);font-size:15px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ouser-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;color:var(--t3);font-size:11px;margin-bottom:10px;}
+.ouser-code{font-family:monospace;font-size:12px;background:var(--navy3);border:1px solid var(--bd2);border-radius:6px;padding:3px 8px;color:var(--gold);letter-spacing:1.5px;}
 .ouser-off{opacity:.45;}
+.ouser-actions{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
+.oua{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:48px;padding:6px 2px;border:none;border-radius:12px;font-family:Outfit,sans-serif;font-size:10px;font-weight:600;cursor:pointer;color:#fff;-webkit-tap-highlight-color:transparent;transition:transform .08s,filter .15s;}
+.oua:active{transform:scale(.94);filter:brightness(.92);}
+.oua span{font-size:18px;line-height:1;}
+.oua.v{background:var(--pu);}
+.oua.d{background:#E8A020;}
+.oua.d.off{background:var(--navy3);color:var(--t3);border:1px dashed var(--bd2);}
+.oua.w{background:var(--wa);}
+.oua.e{background:var(--navy3);color:var(--tx);border:1px solid var(--bd2);}
+.oua.x{background:var(--orp,#FDECEC);color:#C0392B;border:1px solid rgba(192,57,43,.25);}
+.ouser-digest-pill{display:inline-flex;align-items:center;gap:5px;background:rgba(232,160,32,.14);color:#9A6500;border-radius:20px;padding:3px 9px;font-weight:600;}
 .otag{display:inline-flex;align-items:center;gap:6px;background:var(--goldp);color:var(--gold);border-radius:20px;padding:5px 11px;font-size:12px;font-weight:600;}
 .otag button{background:none;border:none;color:var(--gold);cursor:pointer;font-size:13px;line-height:1;padding:0;}
 
@@ -534,9 +547,9 @@ textarea.ofc{resize:vertical;min-height:76px;}
               </select>
             </div>
           </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="ob bgold" onclick="oSaveMyDigest()">💾 Enregistrer</button>
-            <button class="ob" style="background:#E8A020;color:#fff;border:none" onclick="oDigestPreview()">👁 Aperçu de mon digest</button>
+          <div style="display:flex;gap:8px">
+            <button class="ob bgold" style="flex:1;min-height:46px" onclick="oSaveMyDigest()">💾 Enregistrer</button>
+            <button class="ob" style="flex:1;min-height:46px;background:#E8A020;color:#fff;border:none" onclick="oDigestModal(USER)">👁 Aperçu</button>
           </div>
           <div id="my-digest-status" style="font-size:11px;color:var(--t2);margin-top:10px"></div>
         </div>
@@ -1070,17 +1083,28 @@ function renderUsers(){
     var rb=u.role==='admin'?'bgo':u.role==='gestionnaire'?'baq':'bpu';
     var hasTag=u.tags&&u.tags.length;
     var firstTag=hasTag?u.tags[0]:'';
+    var nbC=hasTag?oContactsRef(firstTag).length:0;
+    var hasDigest=!!(u.digestEmail&&u.digestHeure);
     return'<div class="ouser-row'+(u.actif===false?' ouser-off':'')+'">'
-      +'<span class="ouser-nm">'+esc(u.nom)+'</span>'
-      +'<span class="obdg '+rb+'">'+roleLabel(u.role)+'</span>'
-      +(hasTag?'<span style="color:var(--t3);font-size:11px">🏷 '+esc(u.tags.join(', '))+'</span>':'')
-      +'<span class="ouser-code">'+esc(u.code||'—')+'</span>'
-      +'<span style="flex:1"></span>'
-      +(hasTag?'<button class="ob bsm" style="min-height:30px;padding:4px 10px;background:var(--pu);color:#fff;border:none" onclick="oViewSession(\''+esc(firstTag)+'\',\''+esc(u.nom)+'\')" title="Voir la session de '+esc(u.nom)+'">👁</button>':'')
-      +(u.digestEmail?'<button class="ob bsm" style="min-height:30px;padding:4px 10px;background:#E8A020;color:#fff;border:none" onclick="oDigestModal('+i+')" title="Aperçu digest email — '+esc(u.digestEmail)+'">📧</button>':'')
-      +'<button class="ob bsm" style="min-height:30px;padding:4px 10px;background:var(--wa);color:#fff;border:none" onclick="oInviteUser('+i+')" title="Envoyer invitation WhatsApp">📲</button>'
-      +'<button class="ob bedit bsm" style="min-height:30px;padding:4px 10px" onclick="oUserEdit('+i+')">✏️</button>'
-      +'<button class="ob bdel bsm" style="min-height:30px;padding:4px 10px" onclick="oUserDel('+i+')">🗑</button>'
+      +'<div class="ouser-top">'
+        +'<span class="ouser-nm">'+esc(u.nom)+'</span>'
+        +'<span class="obdg '+rb+'">'+roleLabel(u.role)+'</span>'
+      +'</div>'
+      +'<div class="ouser-meta">'
+        +'<span class="ouser-code">'+esc(u.code||'—')+'</span>'
+        +(hasTag?'<span>🏷 '+esc(u.tags.join(', '))+' · <b>'+nbC+'</b> contact'+(nbC>1?'s':'')+'</span>':'')
+        +(hasDigest?'<span class="ouser-digest-pill">📧 '+esc(u.digestHeure)+'</span>':'')
+        +(u.actif===false?'<span style="color:#C0392B;font-weight:600">⏸ Désactivé</span>':'')
+      +'</div>'
+      +'<div class="ouser-actions">'
+        +(hasTag
+          ?'<button class="oua v" onclick="oViewSession(\''+esc(firstTag)+'\',\''+esc(u.nom)+'\')"><span>👁</span>Session</button>'
+          :'<button class="oua e" style="opacity:.4" disabled><span>👁</span>Session</button>')
+        +'<button class="oua d'+(hasDigest?'':' off')+'" onclick="oDigestModal('+i+')"><span>📧</span>Digest</button>'
+        +'<button class="oua w" onclick="oInviteUser('+i+')"><span>📲</span>Inviter</button>'
+        +'<button class="oua e" onclick="oUserEdit('+i+')"><span>✏️</span>Modifier</button>'
+        +'<button class="oua x" onclick="oUserDel('+i+')"><span>🗑</span>Retirer</button>'
+      +'</div>'
     +'</div>';
   }).join('');
 }
@@ -1143,7 +1167,8 @@ function oUserEdit(i){
   document.getElementById('u-actif').checked=u.actif!==false;
   document.getElementById('u-digest-email').value=u.digestEmail||'';
   document.getElementById('u-digest-heure').value=u.digestHeure||'';
-  document.getElementById('eq-user-form').style.display='block';
+  var f=document.getElementById('eq-user-form');f.style.display='block';
+  setTimeout(function(){f.scrollIntoView({behavior:'smooth',block:'start'});},50);
 }
 function oUserCancel(){document.getElementById('eq-user-form').style.display='none';}
 function oUserDel(i){
@@ -1625,20 +1650,30 @@ function oContactsRef(tag){
 
 // ── IMPORT SEED CONTACTS THIERRY (si tag Thierry présent dans USERS et contacts absents) ──
 function oMergeSeedThierry(){
-  // Chercher si un utilisateur a le tag 'Thierry'
-  var hasTh=USERS.some(function(u){return u.tags&&(u.tags.indexOf('Thierry')>=0||u.tags.indexOf('Gil')>=0||u.tags.indexOf('Thierry Gil')>=0);});
-  if(!hasTh)return;
-  // Ne pas importer si des contacts Thierry existent déjà
-  var already=OC.filter(function(c){return c.ctags&&c.ctags.indexOf('Thierry')>=0;}).length;
-  if(already>0)return;
-  // Ajouter les contacts seed avec des IDs uniques
-  var now=Date.now();
+  if(ROLE()!=='admin')return; // seul l'admin déclenche l'import (évite les doublons multi-sessions)
+  // Détecte l'accès de Thierry Gil quel que soit son tag (DrThierry, Thierry, Gil…)
+  var thUser=USERS.find(function(u){return /thierry|gil/i.test((u.nom||'')+' '+(u.tags||[]).join(' '));});
+  if(!thUser)return;
+  var tag=(thUser.tags&&thUser.tags.length)?thUser.tags[0]:thUser.nom;
+  // Contacts seed déjà présents (par téléphone ou nom) → on ne réimporte pas
+  var exists=function(s){
+    return OC.some(function(c){
+      if(s.tel&&c.tel&&c.tel.replace(/\D/g,'')===s.tel.replace(/\D/g,''))return true;
+      return (c.nom||'').toUpperCase()===(s.nom||'').toUpperCase()&&(c.prenom||'').toUpperCase()===(s.prenom||'').toUpperCase();
+    });
+  };
+  var now=Date.now(),added=[];
   SEED_THIERRY.forEach(function(s,i){
-    var c=Object.assign({},s,{id:'seed_th_'+now+'_'+i});
-    OC.push(c);
+    if(exists(s))return;
+    var c=Object.assign({},s,{id:'seed_th_'+now+'_'+i,ctags:[tag],refere:thUser.nom,suiviPar:thUser.nom});
+    OC.push(c);added.push(c);
   });
-  oSaveCache();
-  oT('✅ '+SEED_THIERRY.length+' contacts de l\'équipe Thierry Gil importés','s');
+  // Re-tague d'éventuels anciens imports portant 'Thierry' vers le tag réel
+  OC.forEach(function(c){if(c.ctags&&c.ctags.indexOf('Thierry')>=0&&tag!=='Thierry'){c.ctags=[tag];c.refere=thUser.nom;c.suiviPar=thUser.nom;added.push(c);}});
+  if(!added.length)return;
+  if(CFG.referents&&CFG.referents.indexOf(tag)<0){CFG.referents.push(tag);oPushCfg();}
+  oPush(added); // → serveur + cache, visible depuis la session de Thierry
+  oT('✅ '+added.length+' contact(s) rattachés à '+thUser.nom,'s');
   oRefresh();
 }
 
@@ -1761,6 +1796,14 @@ function oLoadMyDigest(){
     st.innerHTML='⏸ Non configuré';
 }
 
+// Ouvre le client mail avec le digest complet d'un utilisateur (par id)
+function oDigestMailto(uid){
+  var u=USERS.find(function(x){return x.id===uid;})||(USER&&USER.id===uid?USER:null);
+  if(!u||!u.digestEmail)return;
+  var sujet='[OlyLife CRM] Résumé du '+new Date().toLocaleDateString('fr-FR');
+  window.open('mailto:'+encodeURIComponent(u.digestEmail)+'?subject='+encodeURIComponent(sujet)+'&body='+encodeURIComponent(oDigestBuildContent(u)),'_blank');
+}
+
 // Affiche un aperçu du digest dans une modale légère
 function oDigestModal(userOrIndex){
   var u=(typeof userOrIndex==='number')?USERS[userOrIndex]:userOrIndex;
@@ -1773,7 +1816,10 @@ function oDigestModal(userOrIndex){
     +'<button onclick="this.closest(\'[style*=fixed]\').remove()" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--t2)">✕</button>'
     +'</div>'
     +'<pre style="font-family:inherit;font-size:12px;white-space:pre-wrap;color:var(--t1);background:var(--bg2);padding:12px;border-radius:8px;line-height:1.6">'+esc(content)+'</pre>'
-    +(u.digestEmail?'<button class="ob bgold" style="margin-top:12px;width:100%" onclick="var m=\'mailto:\'+encodeURIComponent(\''+esc(u.digestEmail)+'\')+\'?subject=\'+encodeURIComponent(\'[OlyLife CRM] Résumé du \'+new Date().toLocaleDateString(\'fr-FR\'));window.open(m,\'_blank\')">📨 Envoyer à '+esc(u.digestEmail)+'</button>':'<div style="color:var(--t2);font-size:12px;margin-top:10px">⚠️ Aucun email configuré pour cet utilisateur</div>')
+    +(u.digestEmail
+      ?'<button class="ob bgold" style="margin-top:12px;width:100%;min-height:46px" onclick="oDigestMailto(\''+esc(u.id)+'\')">📨 Envoyer à '+esc(u.digestEmail)+'</button>'
+      :'<div style="color:var(--t2);font-size:12px;margin-top:10px">⚠️ Aucun email configuré pour cet utilisateur.</div>'
+        +(typeof userOrIndex==='number'?'<button class="ob bgh" style="margin-top:8px;width:100%;min-height:44px" onclick="this.closest(\'[style*=fixed]\').remove();oUserEdit('+userOrIndex+')">⚙️ Configurer l\'email</button>':''))
     +'</div></div>';
   var el=document.createElement('div');el.innerHTML=html;document.body.appendChild(el.firstChild);
 }
