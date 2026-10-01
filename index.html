@@ -896,11 +896,47 @@ function renderUsers(){
       +((u.tags&&u.tags.length)?'<span style="color:var(--t3);font-size:11px">🏷 '+esc(u.tags.join(', '))+'</span>':'')
       +'<span class="ouser-code">'+esc(u.code||'—')+'</span>'
       +'<span style="flex:1"></span>'
+      +'<button class="ob bsm" style="min-height:30px;padding:4px 10px;background:var(--wa);color:#fff;border:none" onclick="oInviteUser('+i+')" title="Envoyer invitation WhatsApp">📲</button>'
       +'<button class="ob bedit bsm" style="min-height:30px;padding:4px 10px" onclick="oUserEdit('+i+')">✏️</button>'
       +'<button class="ob bdel bsm" style="min-height:30px;padding:4px 10px" onclick="oUserDel('+i+')">🗑</button>'
     +'</div>';
   }).join('');
 }
+function oInviteUser(i){
+  var u=USERS[i];
+  if(!u)return;
+  var appUrl='https://aviation-english-trainer.github.io/crm-olylife/';
+  var nom=u.nom||'';
+  var code=u.code||'';
+  var roleLib=u.role==='referent'?'Référent':u.role==='gestionnaire'?'Gestionnaire':'Admin';
+  var msg='Bonjour '+nom+' 👋\n\n'
+    +'Je t\'invite à rejoindre notre CRM OlyLife — WLHT, l\'outil de suivi partagé de notre équipe.\n\n'
+    +'📲 *Accéder à l\'application :*\n'
+    +appUrl+'\n\n'
+    +'🔑 *Ton code d\'accès :* `'+code+'`\n'
+    +'👤 *Ton rôle :* '+roleLib+'\n\n'
+    +'📥 *Pour installer l\'app sur ton téléphone :*\n'
+    +'• *Android (Chrome) :* Ouvre le lien → 3 points en haut à droite → « Ajouter à l\'écran d\'accueil »\n'
+    +'• *iPhone (Safari) :* Ouvre le lien → icône Partager ↑ → « Sur l\'écran d\'accueil »\n\n'
+    +'L\'app fonctionne comme une vraie appli, sans téléchargement depuis les stores. 🌿\n\n'
+    +'À bientôt,\n'+PARTNER_NOM();
+  var waUrl='https://wa.me/?text='+encodeURIComponent(msg);
+  // Afficher modal de copie + bouton WhatsApp
+  var modal=document.createElement('div');
+  modal.style.cssText='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';
+  modal.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:20px 18px 32px;width:100%;max-width:520px;max-height:85vh;overflow-y:auto">'
+    +'<div style="font-family:Outfit,sans-serif;font-size:15px;font-weight:600;color:var(--gold);margin-bottom:12px">📲 Message d\'invitation — '+esc(nom)+'</div>'
+    +'<textarea id="inv-txt" style="width:100%;min-height:220px;border:1px solid var(--bd);border-radius:10px;padding:12px;font-size:13px;line-height:1.6;color:var(--tx);background:var(--navy3);resize:vertical">'+msg.replace(/`/g,'')+'</textarea>'
+    +'<div style="display:flex;gap:10px;margin-top:14px">'
+      +'<button onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById(\'inv-txt\').value).then(function(){oT(\'Message copié !\',\'s\');})" style="flex:1;padding:12px;border:1px solid var(--bd);border-radius:10px;background:var(--navy3);font-size:13px;cursor:pointer">📋 Copier</button>'
+      +'<a href="'+waUrl+'" target="_blank" style="flex:2;padding:12px;border-radius:10px;background:#25D366;color:#fff;text-align:center;font-size:14px;font-weight:600;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px">WhatsApp ↗</a>'
+    +'</div>'
+    +'<button onclick="this.closest(\'div[style*=fixed]\').remove()" style="width:100%;margin-top:10px;padding:11px;border:none;border-radius:10px;background:var(--navy3);color:var(--t2);font-size:13px;cursor:pointer">Fermer</button>'
+  +'</div>';
+  document.body.appendChild(modal);
+  modal.addEventListener('click',function(e){if(e.target===modal)modal.remove();});
+}
+
 function oUserNew(){
   document.getElementById('u-id').value='';
   document.getElementById('u-nom').value='';
