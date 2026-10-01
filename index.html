@@ -396,6 +396,7 @@ textarea.ofc{resize:vertical;min-height:76px;}
         <button class="ob bedit bsm" id="oimp-btn" onclick="oOpenImport()" style="min-height:32px;padding:5px 10px">⇪ Importer</button>
       </div>
       <div class="ofilter-row" id="ofilter-row">
+        <select id="ofil-tag" onchange="oFilt()"><option value="">Toutes les équipes</option></select>
         <select id="ofil-ref" onchange="oFilt()"><option value="">Tous les référents</option></select>
         <select id="ofil-suivi" onchange="oFilt()"><option value="">Tous les suiveurs</option></select>
       </div>
@@ -520,7 +521,10 @@ textarea.ofc{resize:vertical;min-height:76px;}
           <div class="ofg1"><label class="ofl">Ville</label><input type="text" class="ofc" id="fc-vil" placeholder="Abidjan"></div>
           <div class="ofg1" id="fg-ref"><label class="ofl">Référé par</label><input type="text" class="ofc" id="fc-ref" list="ref-list" placeholder="Choisir ou saisir un référent"><datalist id="ref-list"></datalist></div>
           <div class="ofg1" id="fg-suivi"><label class="ofl">Suivi par</label><select class="ofc" id="fc-suivi"><option value="">— Non attribué —</option></select></div>
-          <div class="ofg1"><label class="ofl">Tags <span style="color:var(--t3);font-weight:400;font-size:11px">— identifier le contact (ex : JC, Eddie, WLHT, Abidjan…)</span></label><input type="text" class="ofc" id="fc-ctags" placeholder="ex: Jean-Charles, Abidjan, P90" autocomplete="off"></div>
+          <div class="ofg1" id="fg-ctags"><label class="ofl">Équipe / Tag référent <span style="color:var(--t3);font-weight:400;font-size:11px">— à quel(s) référent(s) appartient ce contact ?</span></label>
+            <div id="fc-ctags-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;min-height:32px;padding:6px 10px;background:var(--navy3);border:1.5px solid var(--bd);border-radius:var(--rs)"></div>
+            <input type="hidden" id="fc-ctags">
+          </div>
 
           <div class="fb" id="fb-pipeline">
             <div class="osec">Pipeline</div>
@@ -839,21 +843,28 @@ function applyRole(){
 function populateRefUI(){
   var refs=CFG.referents||[];
   var suiv=CFG.suiveurs||[];
-  // datalist référents
+  // datalist référents (+ membres équipe pour "Référé par")
+  var allParrains=refs.slice();
+  USERS.forEach(function(u){if(u.nom&&allParrains.indexOf(u.nom)<0)allParrains.push(u.nom);});
   var dl=document.getElementById('ref-list');
-  dl.innerHTML=refs.map(function(x){return'<option value="'+esc(x)+'">';}).join('');
+  dl.innerHTML=allParrains.map(function(x){return'<option value="'+esc(x)+'">';}).join('');
   // select suivi par (formulaire)
   var s=document.getElementById('fc-suivi');
   var cur=s.value;
   s.innerHTML='<option value="">— Non attribué —</option>'+suiv.map(function(x){return'<option'+(x===cur?' selected':'')+'>'+esc(x)+'</option>';}).join('');
+  // chips tags dans le formulaire contact
+  renderCtagsChips();
+  // filtre équipe (tags)
+  var ft=document.getElementById('ofil-tag');
+  if(ft)ft.innerHTML='<option value="">Toutes les équipes</option>'+refs.map(function(x){return'<option>'+esc(x)+'</option>';}).join('');
   // filtres contacts
   var fr=document.getElementById('ofil-ref');
-  fr.innerHTML='<option value="">Tous les référents</option>'+refs.map(function(x){return'<option>'+esc(x)+'</option>';}).join('');
+  fr.innerHTML='<option value="">Tous les référents</option>'+allParrains.map(function(x){return'<option>'+esc(x)+'</option>';}).join('');
   var fs=document.getElementById('ofil-suivi');
   fs.innerHTML='<option value="">Tous les suiveurs</option><option value="__none__">Non attribué</option>'+suiv.map(function(x){return'<option>'+esc(x)+'</option>';}).join('');
   // import : défauts
   var dr=document.getElementById('oimp-defref');
-  dr.innerHTML='<option value="">Référé par (défaut)…</option>'+refs.map(function(x){return'<option>'+esc(x)+'</option>';}).join('');
+  dr.innerHTML='<option value="">Référé par (défaut)…</option>'+allParrains.map(function(x){return'<option>'+esc(x)+'</option>';}).join('');
   var ds=document.getElementById('oimp-defsuivi');
   ds.innerHTML='<option value="">Suivi par (défaut)…</option>'+suiv.map(function(x){return'<option>'+esc(x)+'</option>';}).join('');
   // carte référents (admin)
@@ -861,6 +872,63 @@ function populateRefUI(){
   renderUsers();
 }
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ── CHIPS TAGS CONTACT (sélection multi-référents) ──────────────────
+function renderCtagsChips(){
+  var box=document.getElementById('fc-ctags-chips');
+  if(!box)return;
+  var refs=CFG.referents||[];
+  if(!refs.length){box.innerHTML='<span style="font-size:11px;color:var(--t3)">Ajoutez d\'abord des référents dans l\'onglet Équipe.</span>';return;}
+  var sel=(document.getElementById('fc-ctags').value||'').split(',').map(function(t){return t.trim();}).filter(Boolean);
+  box.innerHTML=refs.map(function(r){
+    var on=sel.indexOf(r)>=0;
+    return'<button type="button" onclick="oToggleCtag(this,\''+esc(r)+'\')" style="padding:4px 12px;border-radius:20px;border:1.5px solid '+(on?'var(--pu)':'var(--bd)')+';background:'+(on?'var(--pup)':'var(--navy2)')+';color:'+(on?'var(--pu)':'var(--t2)')+';font-size:12px;font-weight:'+(on?'700':'500')+';cursor:pointer;transition:all .15s" data-tag="'+esc(r)+'">'+(on?'✓ ':'')+esc(r)+'</button>';
+  }).join('');
+}
+function oToggleCtag(btn,tag){
+  var inp=document.getElementById('fc-ctags');
+  var sel=(inp.value||'').split(',').map(function(t){return t.trim();}).filter(Boolean);
+  var idx=sel.indexOf(tag);
+  if(idx>=0)sel.splice(idx,1); else sel.push(tag);
+  inp.value=sel.join(', ');
+  renderCtagsChips();
+  updateRefListByTags(sel);
+}
+function updateRefListByTags(selTags){
+  var dl=document.getElementById('ref-list');
+  var refInp=document.getElementById('fc-ref');
+  if(!selTags||!selTags.length){
+    // pas de tag sélectionné → liste complète
+    var refs=CFG.referents||[];
+    var allParrains=refs.slice();
+    USERS.forEach(function(u){if(u.nom&&allParrains.indexOf(u.nom)<0)allParrains.push(u.nom);});
+    dl.innerHTML=allParrains.map(function(x){return'<option value="'+esc(x)+'">';}).join('');
+    refInp.placeholder='Choisir ou saisir un référent';
+    return;
+  }
+  // Cherche tous les contacts existants taguées avec au moins un des tags sélectionnés
+  // + les référents principaux de ces tags
+  var membres=[];
+  selTags.forEach(function(tag){
+    // le référent principal lui-même
+    if(membres.indexOf(tag)<0)membres.push(tag);
+    // les contacts existants taguées avec ce tag et qui sont partenaires/référents
+    OC.forEach(function(c){
+      if(c.ctags&&c.ctags.indexOf(tag)>=0){
+        var nom=(c.prenom||'')+' '+(c.nom||'');
+        nom=nom.trim();
+        if(nom&&membres.indexOf(nom)<0)membres.push(nom);
+      }
+    });
+    // membres de l'équipe (USERS) taguées avec ce tag
+    USERS.forEach(function(u){
+      if(u.tags&&u.tags.indexOf(tag)>=0&&u.nom&&membres.indexOf(u.nom)<0)membres.push(u.nom);
+    });
+  });
+  dl.innerHTML=membres.map(function(x){return'<option value="'+esc(x)+'">';}).join('');
+  refInp.placeholder='Qui dans l\'équipe '+selTags.join('/')+ ' a parrainé ce contact ?';
+  refInp.value=''; // reset pour inciter à choisir dans la liste filtrée
+}
 
 // ── ADMIN : référents ───────────────────────────────────────────────
 function renderRefChips(){
@@ -1235,11 +1303,19 @@ var ACTIVE_FILTER='';
 function oChip(btn,val){document.querySelectorAll('#ofilter-chips .ofilter-chip').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');ACTIVE_FILTER=val;oFilt();}
 function oCli(){
   var q=document.getElementById('oq')?document.getElementById('oq').value.toLowerCase():'';
+  var ftag=document.getElementById('ofil-tag')?document.getElementById('ofil-tag').value:'';
   var fref=document.getElementById('ofil-ref')?document.getElementById('ofil-ref').value:'';
   var fsui=document.getElementById('ofil-suivi')?document.getElementById('ofil-suivi').value:'';
+  // Référent : filtre auto sur son propre tag
+  var autoTag='';
+  if(ROLE()==='referent'&&USER.tags&&USER.tags.length)autoTag=USER.tags[0];
   var l=OC.filter(function(c){
     if(q&&(c.nom+' '+c.prenom).toLowerCase().indexOf(q)<0&&(c.tel||'').indexOf(q)<0)return false;
     if(ACTIVE_FILTER&&c.etape!==ACTIVE_FILTER)return false;
+    // filtre auto-tag référent
+    if(autoTag&&!(c.ctags&&c.ctags.indexOf(autoTag)>=0)&&(c.refere||'').indexOf(autoTag)<0)return false;
+    // filtre équipe manuel (admin/gestionnaire)
+    if(ftag&&!(c.ctags&&c.ctags.indexOf(ftag)>=0))return false;
     if(fref&&(c.refere||'')!==fref)return false;
     if(fsui==='__none__'&&(c.suiviPar||''))return false;
     if(fsui&&fsui!=='__none__'&&(c.suiviPar||'')!==fsui)return false;
@@ -1449,7 +1525,7 @@ function oEdit(id){
   document.getElementById('fc-eid').value=id;
   var map={'fc-nm':c.nom,'fc-pr':c.prenom,'fc-tel':c.tel,'fc-em':c.email,'fc-pays':c.pays,'fc-vil':c.ville,'fc-ref':c.refere,'fc-suivi':c.suiviPar,'fc-etape':c.etape,'fc-qualif':c.qualification,'fc-canal':c.canal,'fc-registre':c.registre,'fc-obj':c.objectifs,'fl-numcmd':c.numCommande,'fl-memberid':c.memberIdOlyLife,'fl-datecmd':c.dateCommande,'fl-transp':c.transporteur,'fl-tracking':c.tracking,'fl-datelivr':c.dateLivraison,'fi-date':c.dateInstall,'fi-notes':c.notesUsage,'ft-texte':c.temoignageTexte,'fe-sponsor':c.sponsor,'fe-placement':c.placement,'fe-cote':c.cote,'fe-gen':c.generation,'fe-rang':c.rang,'fc-notes':c.notes};
   Object.keys(map).forEach(function(k){var el=document.getElementById(k);if(el)el.value=map[k]||'';});
-  document.getElementById('fc-ctags').value=(c.ctags||[]).join(', ');
+  document.getElementById('fc-ctags').value=(c.ctags||[]).join(', ');renderCtagsChips();
   document.getElementById('fi-confirm').checked=!!c.installConfirm;
   document.getElementById('ft-autorise').checked=!!c.temoignageAutorise;
   document.getElementById('fe-partenaire').checked=!!c.estPartenaire;
@@ -1462,7 +1538,7 @@ function oReset(){
   ['fc-nm','fc-pr','fc-tel','fc-em','fc-pays','fc-vil','fc-ref','fc-obj','fl-numcmd','fl-memberid','fl-datecmd','fl-transp','fl-tracking','fl-datelivr','fi-date','fi-notes','ft-texte','fe-sponsor','fe-placement','fe-gen','fc-notes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('fc-etape').value='Prospect';document.getElementById('fc-qualif').value='Chaud';document.getElementById('fc-canal').value='WhatsApp';document.getElementById('fc-registre').value='pro';
   document.getElementById('fc-suivi').value='';
-  document.getElementById('fc-ctags').value='';
+  document.getElementById('fc-ctags').value='';renderCtagsChips();
   document.getElementById('fe-cote').value='';document.getElementById('fe-rang').value='';
   document.getElementById('fi-confirm').checked=false;document.getElementById('ft-autorise').checked=false;document.getElementById('fe-partenaire').checked=false;
   oTEQ();
