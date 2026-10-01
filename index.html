@@ -33,7 +33,7 @@
   --orw:#C9A84C;--orwbg:#FBF6E9;--orwtx:#8C6D1F;            /* or WLHT — signature, encadrés */
   --console:#0B2A1E;
   --sh:0 3px 14px rgba(18,106,60,.06);--r:14px;--rs:10px;
-  --safe-bottom:env(safe-area-inset-bottom,0px);--nav-h:64px;
+  --safe-bottom:env(safe-area-inset-bottom,0px);--nav-h:64px;--viewas-h:0px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{-webkit-text-size-adjust:100%;overscroll-behavior:none;background:var(--navy);}
@@ -286,6 +286,12 @@ textarea.ofc{resize:vertical;min-height:76px;}
 <!-- ONDES ANIMÉES — arrière-plan -->
 <div id="owaves" aria-hidden="true"><div class="owave w4"><svg viewBox="0 0 2880 320" preserveAspectRatio="none" aria-hidden="true"><path fill="#3D9C73" d="M0,230 C360,170 600,290 1440,230 C2280,170 2520,290 2880,230 L2880,320 L0,320 Z"/></svg></div><div class="owave w3"><svg viewBox="0 0 2880 320" preserveAspectRatio="none" aria-hidden="true"><path fill="#126A3C" d="M0,230 C360,170 600,290 1440,230 C2280,170 2520,290 2880,230 L2880,320 L0,320 Z"/></svg></div><div class="owave w2"><svg viewBox="0 0 2880 320" preserveAspectRatio="none" aria-hidden="true"><path fill="#218477" d="M0,200 C180,140 360,260 720,190 C1080,120 1260,260 1440,200 C1620,140 1800,260 2160,190 C2520,120 2700,260 2880,200 L2880,320 L0,320 Z"/></svg></div><div class="owave w1"><svg viewBox="0 0 2880 320" preserveAspectRatio="none" aria-hidden="true"><path fill="#3D9C73" d="M0,160 C240,80 480,240 720,160 C960,80 1200,240 1440,160 C1680,80 1920,240 2160,160 C2400,80 2640,240 2880,160 L2880,320 L0,320 Z"/></svg></div></div>
 
+<!-- BANDEAU MODE SESSION RÉFÉRENT -->
+<div id="view-as-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:800;background:linear-gradient(90deg,#7A5BB5,#5A3D9A);color:#fff;font-family:Outfit,sans-serif;font-size:13px;font-weight:600;padding:10px 16px;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.25)">
+  <span style="flex:1">👁 Vous consultez la session de <span id="view-as-name">—</span></span>
+  <button onclick="oExitViewAs()" style="background:rgba(255,255,255,.22);border:none;border-radius:8px;color:#fff;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer">✕ Retour admin</button>
+</div>
+
 <!-- ÉCRAN DE CONNEXION -->
 <div id="ologin">
   <div class="os-card">
@@ -452,7 +458,7 @@ textarea.ofc{resize:vertical;min-height:76px;}
 
       <!-- ADMIN : gestion des accès -->
       <div class="ocard hide" id="eq-users-card">
-        <div class="ochd"><span class="oct">🔐 Accès &amp; rôles</span><button class="ob bgh bsm" onclick="oUserNew()">＋ Ajouter</button></div>
+        <div class="ochd"><span class="oct">🔐 Accès &amp; rôles</span><div style="display:flex;gap:6px"><button class="ob bsm" style="background:#E8A020;color:#fff;border:none" onclick="oDigestSendAll()" title="Aperçu digest pour tous les utilisateurs configurés">📧 Digest</button><button class="ob bgh bsm" onclick="oUserNew()">＋ Ajouter</button></div></div>
         <div id="eq-users-list"></div>
         <div id="eq-user-form" style="display:none;padding:14px 16px;border-top:1px solid var(--bd);background:var(--navy3)">
           <input type="hidden" id="u-id">
@@ -471,11 +477,68 @@ textarea.ofc{resize:vertical;min-height:76px;}
               <div style="display:flex;gap:8px"><input type="text" class="ofc" id="u-code" placeholder="A7K2MN" style="flex:1;font-family:monospace;letter-spacing:2px"><button class="ob bgh" onclick="oGenCode()" type="button">🎲</button></div>
             </div>
             <label class="ochk-row"><input type="checkbox" id="u-actif" checked><span>Accès actif</span></label>
+            <div style="margin-top:14px;padding:12px;background:rgba(var(--gold-rgb,18,106,60),.07);border-radius:10px;border:1px solid rgba(var(--gold-rgb,18,106,60),.18)">
+              <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:10px">📧 Résumé quotidien par email</div>
+              <div class="ofg2" style="gap:10px">
+                <div><label class="ofl">Email de réception</label><input type="email" class="ofc" id="u-digest-email" placeholder="prenom@gmail.com"></div>
+                <div><label class="ofl">Heure de réception</label>
+                  <select class="ofc" id="u-digest-heure">
+                    <option value="">— Désactivé —</option>
+                    <option value="06:00">06h00</option>
+                    <option value="07:00">07h00</option>
+                    <option value="07:30">07h30</option>
+                    <option value="08:00">08h00</option>
+                    <option value="08:30">08h30</option>
+                    <option value="09:00">09h00</option>
+                    <option value="09:30">09h30</option>
+                    <option value="10:00">10h00</option>
+                    <option value="12:00">12h00</option>
+                    <option value="18:00">18h00</option>
+                    <option value="20:00">20h00</option>
+                    <option value="21:00">21h00</option>
+                  </select>
+                </div>
+              </div>
+              <div style="margin-top:8px;font-size:11px;color:var(--t2)">Le résumé liste les contacts chauds, les actions à faire et les mises à jour récentes.</div>
+            </div>
           </div>
           <div style="display:flex;gap:8px;margin-top:14px">
             <button class="ob bgold" style="flex:2" onclick="oUserSave()">Enregistrer l'accès</button>
             <button class="ob bgh" style="flex:1" onclick="oUserCancel()">Annuler</button>
           </div>
+        </div>
+      </div>
+
+      <!-- PROFIL DIGEST — visible par tous les rôles -->
+      <div class="ocard" id="eq-digest-card">
+        <div class="ochd"><span class="oct">📧 Mon résumé quotidien</span></div>
+        <div style="padding:14px 16px">
+          <div style="font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.6">Recevez chaque matin un résumé de vos contacts chauds, nouveaux prospects et actions à faire.</div>
+          <div class="ofg2" style="gap:10px;margin-bottom:12px">
+            <div><label class="ofl">Votre email de réception</label><input type="email" class="ofc" id="my-digest-email" placeholder="votre@email.com"></div>
+            <div><label class="ofl">Heure souhaitée</label>
+              <select class="ofc" id="my-digest-heure">
+                <option value="">— Désactivé —</option>
+                <option value="06:00">06h00</option>
+                <option value="07:00">07h00</option>
+                <option value="07:30">07h30</option>
+                <option value="08:00">08h00</option>
+                <option value="08:30">08h30</option>
+                <option value="09:00">09h00</option>
+                <option value="09:30">09h30</option>
+                <option value="10:00">10h00</option>
+                <option value="12:00">12h00</option>
+                <option value="18:00">18h00</option>
+                <option value="20:00">20h00</option>
+                <option value="21:00">21h00</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="ob bgold" onclick="oSaveMyDigest()">💾 Enregistrer</button>
+            <button class="ob" style="background:#E8A020;color:#fff;border:none" onclick="oDigestPreview()">👁 Aperçu de mon digest</button>
+          </div>
+          <div id="my-digest-status" style="font-size:11px;color:var(--t2);margin-top:10px"></div>
         </div>
       </div>
 
@@ -699,8 +762,31 @@ var DELAI_TEMOIGNAGE=30;
 
 // ── ÉTAT GLOBAL ──────────────────────────────────────────────────────
 var GAS_URL='',CODE='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
+// Mode "voir session d'un référent" — null = vue normale admin
+var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
+
+// ── CONTACTS RÉFÉRENTS THIERRY GIL (données initiales) ──────────────
+var SEED_THIERRY=[
+  {nom:'ELIANE',prenom:'',tel:'+33681085042',email:'',pays:'France',ville:'',etape:'Prospect',qualif:'Chaud',produits:['Tera-P90+ (PEMF/Terahertz)'],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'Teste la machine à pieds. Nage plus longtemps, plus vite, pas de fatigue après 1h. Intéressée — prix 1400€ confirmé.',actions:{},dateCreation:new Date('2026-09-17').toISOString()},
+  {nom:'SILVANO',prenom:'K.',tel:'+33624418141',email:'',pays:'France',ville:'',etape:'Prospect',qualif:'Tiède',produits:[],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'Contact WhatsApp de Thierry.',actions:{},dateCreation:new Date('2026-09-17').toISOString()},
+  {nom:'DESSAUD RESTINCLIERES',prenom:'Yveline et Christian',tel:'+33623702761',email:'',pays:'France',ville:'',etape:'Prospect',qualif:'Tiède',produits:['Tera-P90+ (PEMF/Terahertz)'],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'Référée par Thierry. Fille au chômage, intéressée par partenariat commercial. Jean-Charles gère la commande.',actions:{},dateCreation:new Date('2026-09-17').toISOString()},
+  {nom:'AMI',prenom:'François',tel:'+33760028891',email:'',pays:'France',ville:'',etape:'Prospect',qualif:'Chaud',produits:['Tera-P90+ (PEMF/Terahertz)'],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'Diabétique. Peau du tibia presque noire redevenue blanc rosée avec souffleur terahertz. Conseillé P90+.',actions:{},dateCreation:new Date('2026-09-17').toISOString()},
+  {nom:'CHEMTRAIL',prenom:'Gilbert',tel:'+33678723208',email:'',pays:'France',ville:'',etape:'Prospect',qualif:'Tiède',produits:[],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'Référé par Thierry.',actions:{},dateCreation:new Date('2026-09-18').toISOString()},
+  {nom:'CÔTÉ PROVENCE',prenom:'',tel:'+33608864627',email:'',pays:'France',ville:'Provence',etape:'Prospect',qualif:'Chaud',produits:['Tera-P90+ (PEMF/Terahertz)'],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'Beaucoup d\'argent et de contacts sociaux. Ex-Cartier. Intéressée business OlyLife.',actions:{},dateCreation:new Date('2026-09-18').toISOString()},
+  {nom:'VILLE',prenom:'Nathalie',tel:'',email:'',pays:'France',ville:'',etape:'Prospect',qualif:'Tiède',produits:[],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'Psychologiquement complexe. Beaucoup d\'argent et contacts sociaux vers le haut. Ex-Cartier. Intéressée business OlyLife.',actions:{},dateCreation:new Date('2026-09-18').toISOString()},
+  {nom:'DMSO X',prenom:'',tel:'+33648870550',email:'',pays:'France',ville:'',etape:'Prospect',qualif:'Chaud',produits:['Tera-P90+ (PEMF/Terahertz)'],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'« Idem une machine vite, elle souffre. » — à contacter en urgence.',actions:{},dateCreation:new Date('2026-09-18').toISOString()},
+  {nom:'K',prenom:'Enrique',tel:'+33628054650',email:'',pays:'France',ville:'',etape:'Prospect',qualif:'Chaud',produits:['Tera-P90+ (PEMF/Terahertz)'],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'Biologiste marin. Veut intégrer le groupe et acheter des machines. Envoyé par Thierry.',actions:{},dateCreation:new Date('2026-09-18').toISOString()},
+  {nom:'DELORME-ROSSINES',prenom:'Elisabeth',tel:'+33674009038',email:'',pays:'France',ville:'',etape:'Prospect',qualif:'Chaud',produits:['Tera-P90+ (PEMF/Terahertz)'],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'Médecin Chercheur. "Elizabeth va t\'acheter une machine et veut être sous toi." — à mettre sous Thierry.',actions:{},dateCreation:new Date('2026-09-19').toISOString()},
+  {nom:'CDS',prenom:'Sarah',tel:'+33771781717',email:'',pays:'France',ville:'',etape:'Prospect',qualif:'Tiède',produits:[],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'Soigne par technique psy/points. Association de diverses techniques. Mari banquier.',actions:{},dateCreation:new Date('2026-09-19').toISOString()},
+  {nom:'BLASSEL',prenom:'Nicolas',tel:'+33631268956',email:'nicolas.blassel@wanadoo.fr',pays:'France',ville:'',etape:'Prospect',qualif:'Tiède',produits:['Tera-P90+ (PEMF/Terahertz)'],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'Intéressé P90+. Voulait lien de découverte. Doit rencontrer Gilbert.',actions:{},dateCreation:new Date('2026-09-19').toISOString()},
+  {nom:'GAUMERD',prenom:'Gilbert',tel:'+33624656071',email:'',pays:'France',ville:'',etape:'Prospect',qualif:'Chaud',produits:['Tera-P90+ (PEMF/Terahertz)'],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'Veut négocier un container de machines. Haut placé chez un gros importateur de bananes. Confirmé : "Il va en acheter une" (01/10/2026).',actions:{},dateCreation:new Date('2026-09-19').toISOString()},
+  {nom:'MARTIN',prenom:'Christel',tel:'+33617705832',email:'',pays:'France',ville:'Paris',etape:'Prospect',qualif:'Chaud',produits:['Tera-P90+ (PEMF/Terahertz)'],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'Psychologue à Paris. Venue tester le P90+ chez Thierry. À relancer rapidement.',actions:{},dateCreation:new Date('2026-10-01').toISOString()},
+  {nom:'ANGLES',prenom:'Michel',tel:'+33607609129',email:'',pays:'France',ville:'',etape:'Client potentiel',qualif:'Chaud',produits:['Tera-P90+ (PEMF/Terahertz)'],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'Dr Michel Angles — co-fondateur de l\'AIMSIB (Association internationale de médecine scientifique intégrative et bienveillante). Resté 3 jours chez Thierry, a participé aux séances microscopie sang capillaire avant/après P90+. Parti avec machine emballée — très convaincu, l\'achètera très vite ou la rendra. Vient d\'acheter un microscope, veut vendre et que les bénéfices lui reviennent. Relation proche : "c\'est comme un frère."',actions:{},dateCreation:new Date('2026-10-01').toISOString()},
+  {nom:'GINA',prenom:'',tel:'',email:'',pays:'France',ville:'',etape:'Prospect',qualif:'Tiède',produits:[],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'Thérapeute en médecine chinoise. Thierry va lui demander ses disponibilités pour la contacter.',actions:{},dateCreation:new Date('2026-10-01').toISOString()},
+  {nom:'TEMINE',prenom:'Dalel',tel:'+213556379086',email:'',pays:'Algérie',ville:'',etape:'Prospect réseau',qualif:'Chaud',produits:['Tera-P90+ (PEMF/Terahertz)'],ctags:['Thierry'],refere:'Thierry Gil',suiviPar:'Thierry Gil',notes:'Dr Dalel Temine — ange leader en Algérie. Travaille en réanimation, connaît beaucoup de monde. Utilise dioxyde de chlore, DMSO, même en intraveineuse. Veut rejoindre le réseau — merveilleuse nouvelle. Vient d\'installer Signal et attend votre appel.',actions:{},dateCreation:new Date('2026-10-01').toISOString()}
+];
 
 function oGetCfg(){
   try{
@@ -767,7 +853,7 @@ function oPull(){
       if(d.users)USERS=d.users;
       oSaveCache();oHideLogin();oSyncDot('ok');
       oT('Bonjour '+USER.nom+' — '+OC.length+' contact(s)','s');
-      applyRole();populateRefUI();oRefresh();
+      applyRole();populateRefUI();oRefresh();oMergeSeedThierry();
     })
     .catch(function(){
       oSyncDot('err');oLoader(false);
@@ -982,12 +1068,16 @@ function renderUsers(){
   if(!USERS.length){box.innerHTML='<div style="padding:14px 16px;font-size:12px;color:var(--t3)">Aucun accès créé. Ajoutez vos gestionnaires et référents ici.</div>';return;}
   box.innerHTML=USERS.map(function(u,i){
     var rb=u.role==='admin'?'bgo':u.role==='gestionnaire'?'baq':'bpu';
+    var hasTag=u.tags&&u.tags.length;
+    var firstTag=hasTag?u.tags[0]:'';
     return'<div class="ouser-row'+(u.actif===false?' ouser-off':'')+'">'
       +'<span class="ouser-nm">'+esc(u.nom)+'</span>'
       +'<span class="obdg '+rb+'">'+roleLabel(u.role)+'</span>'
-      +((u.tags&&u.tags.length)?'<span style="color:var(--t3);font-size:11px">🏷 '+esc(u.tags.join(', '))+'</span>':'')
+      +(hasTag?'<span style="color:var(--t3);font-size:11px">🏷 '+esc(u.tags.join(', '))+'</span>':'')
       +'<span class="ouser-code">'+esc(u.code||'—')+'</span>'
       +'<span style="flex:1"></span>'
+      +(hasTag?'<button class="ob bsm" style="min-height:30px;padding:4px 10px;background:var(--pu);color:#fff;border:none" onclick="oViewSession(\''+esc(firstTag)+'\',\''+esc(u.nom)+'\')" title="Voir la session de '+esc(u.nom)+'">👁</button>':'')
+      +(u.digestEmail?'<button class="ob bsm" style="min-height:30px;padding:4px 10px;background:#E8A020;color:#fff;border:none" onclick="oDigestModal('+i+')" title="Aperçu digest email — '+esc(u.digestEmail)+'">📧</button>':'')
       +'<button class="ob bsm" style="min-height:30px;padding:4px 10px;background:var(--wa);color:#fff;border:none" onclick="oInviteUser('+i+')" title="Envoyer invitation WhatsApp">📲</button>'
       +'<button class="ob bedit bsm" style="min-height:30px;padding:4px 10px" onclick="oUserEdit('+i+')">✏️</button>'
       +'<button class="ob bdel bsm" style="min-height:30px;padding:4px 10px" onclick="oUserDel('+i+')">🗑</button>'
@@ -1038,6 +1128,8 @@ function oUserNew(){
   document.getElementById('u-tags').value='';
   document.getElementById('u-code').value=genCode();
   document.getElementById('u-actif').checked=true;
+  document.getElementById('u-digest-email').value='';
+  document.getElementById('u-digest-heure').value='';
   document.getElementById('eq-user-form').style.display='block';
 }
 function oUserEdit(i){
@@ -1049,6 +1141,8 @@ function oUserEdit(i){
   document.getElementById('u-tags').value=(u.tags||[]).join(', ');
   document.getElementById('u-code').value=u.code||'';
   document.getElementById('u-actif').checked=u.actif!==false;
+  document.getElementById('u-digest-email').value=u.digestEmail||'';
+  document.getElementById('u-digest-heure').value=u.digestHeure||'';
   document.getElementById('eq-user-form').style.display='block';
 }
 function oUserCancel(){document.getElementById('eq-user-form').style.display='none';}
@@ -1066,10 +1160,13 @@ function oUserSave(){
   var role=document.getElementById('u-role').value;
   if(role==='referent'&&!tags.length)tags=[nom];
   var tel=(document.getElementById('u-tel').value||'').trim().replace(/\s/g,'');
+  var digestEmail=(document.getElementById('u-digest-email').value||'').trim();
+  var digestHeure=document.getElementById('u-digest-heure').value||'';
   var obj={
     id:document.getElementById('u-id').value||('u_'+Date.now()),
     nom:nom,role:role,tags:tags,code:code,tel:tel,
-    actif:document.getElementById('u-actif').checked
+    actif:document.getElementById('u-actif').checked,
+    digestEmail:digestEmail,digestHeure:digestHeure
   };
   var idx=USERS.findIndex(function(u){return u.id===obj.id;});
   if(idx>=0)USERS[idx]=obj;else USERS.push(obj);
@@ -1121,7 +1218,7 @@ function oSw(v,i){
   document.getElementById('ocont').scrollTop=0;
   oRefreshView(v);
 }
-function oRefreshView(v){if(v==='dashboard')oDash();else if(v==='contacts')oCli();else if(v==='actions')oAct();else if(v==='equipe')oEq();}
+function oRefreshView(v){if(v==='dashboard')oDash();else if(v==='contacts')oCli();else if(v==='actions')oAct();else if(v==='equipe'){oEq();oLoadMyDigest();}}
 function oRefresh(){var v=document.querySelector('.ov.on');if(v)oRefreshView(v.id.replace('ov-',''));}
 
 // ── MESSAGES TYPES (3 registres × FR/EN) ─────────────────────────────
@@ -1328,6 +1425,29 @@ function oCli(){
   var ftag=document.getElementById('ofil-tag')?document.getElementById('ofil-tag').value:'';
   var fref=document.getElementById('ofil-ref')?document.getElementById('ofil-ref').value:'';
   var fsui=document.getElementById('ofil-suivi')?document.getElementById('ofil-suivi').value:'';
+  // Mode "voir session" admin → filtre sur le tag du référent visité
+  if(VIEW_AS_TAG){
+    var vl=OC.filter(function(c){return c.ctags&&c.ctags.indexOf(VIEW_AS_TAG)>=0;});
+    var vcl=document.getElementById('c-list');
+    if(!vl.length){vcl.innerHTML='<div class="oemp"><div class="oemp-i">✦</div><div class="oemp-t">Aucun contact pour ce référent</div></div>';return;}
+    vcl.innerHTML=vl.map(function(c){
+      var num=(c.tel||'').replace(/\D/g,'');
+      return'<div class="ocli-card" onclick="oOpenF(\''+c.id+'\')">'
+        +'<div class="ocli-avatar">'+initials(c)+'</div>'
+        +'<div class="ocli-info">'
+          +'<div class="ocli-name">'+esc(c.nom)+' '+esc(c.prenom)+'</div>'
+          +'<div class="ocli-sub">'+(c.tel||'—')+(c.pays?' · '+c.pays:'')+'</div>'
+          +(c.notes?'<div class="ocli-notes" style="font-size:11px;color:var(--t2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px">'+esc(c.notes)+'</div>':'')
+        +'</div>'
+        +'<div class="ocli-right">'
+          +(c.etape?'<span class="obdg '+(ETAPE_BADGE[c.etape]||'bgy')+'" style="font-size:10px">'+esc(c.etape)+'</span>':'')
+          +(c.qualif?'<span class="obdg '+(QUALIF_BADGE[c.qualif]||'bgy')+'" style="font-size:10px">'+esc(c.qualif)+'</span>':'')
+          +(num?'<a href="https://wa.me/'+num+'" onclick="event.stopPropagation()" target="_blank" style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--wa);color:#fff;font-size:14px;text-decoration:none;flex-shrink:0">💬</a>':'')
+        +'</div>'
+      +'</div>';
+    }).join('');
+    return;
+  }
   // Référent : filtre auto sur son propre tag
   var autoTag='';
   if(ROLE()==='referent'&&USER.tags&&USER.tags.length)autoTag=USER.tags[0];
@@ -1472,6 +1592,190 @@ function oEq(){
       +'<div class="ocli-right">'+(c.cote?'<span class="obdg bpu">'+c.cote+'</span>':'')+(c.rang?'<span class="obdg bgo">'+c.rang+'</span>':'')+'</div>'
       +'</div>';
   }).join('');
+}
+
+// ── MODE "VOIR SESSION RÉFÉRENT" (Admin uniquement) ──────────────────
+function oViewSession(tag,nom){
+  if(ROLE()!=='admin')return;
+  VIEW_AS_TAG=tag;VIEW_AS_NOM=nom;
+  // Afficher bandeau
+  var b=document.getElementById('view-as-banner');
+  b.style.display='flex';
+  document.getElementById('view-as-name').textContent=nom+' (tag : '+tag+')';
+  document.body.style.setProperty('--viewas-h','42px');
+  document.getElementById('ocont').style.paddingTop='42px';
+  // Basculer vers l'onglet Contacts filtré
+  oCli();
+  oSw('contacts',1);
+  oT('👁 Session de '+nom+' — '+oContactsRef(tag).length+' contact(s) visible(s)','s');
+}
+function oExitViewAs(){
+  VIEW_AS_TAG=null;VIEW_AS_NOM=null;
+  var b=document.getElementById('view-as-banner');
+  b.style.display='none';
+  document.getElementById('ocont').style.paddingTop='';
+  document.body.style.setProperty('--viewas-h','0px');
+  oCli();oRefresh();
+  oT('Retour à la vue admin','s');
+}
+function oContactsRef(tag){
+  // Retourne les contacts visibles par ce référent (tagués avec son tag)
+  return OC.filter(function(c){return c.ctags&&c.ctags.indexOf(tag)>=0;});
+}
+
+// ── IMPORT SEED CONTACTS THIERRY (si tag Thierry présent dans USERS et contacts absents) ──
+function oMergeSeedThierry(){
+  // Chercher si un utilisateur a le tag 'Thierry'
+  var hasTh=USERS.some(function(u){return u.tags&&(u.tags.indexOf('Thierry')>=0||u.tags.indexOf('Gil')>=0||u.tags.indexOf('Thierry Gil')>=0);});
+  if(!hasTh)return;
+  // Ne pas importer si des contacts Thierry existent déjà
+  var already=OC.filter(function(c){return c.ctags&&c.ctags.indexOf('Thierry')>=0;}).length;
+  if(already>0)return;
+  // Ajouter les contacts seed avec des IDs uniques
+  var now=Date.now();
+  SEED_THIERRY.forEach(function(s,i){
+    var c=Object.assign({},s,{id:'seed_th_'+now+'_'+i});
+    OC.push(c);
+  });
+  oSaveCache();
+  oT('✅ '+SEED_THIERRY.length+' contacts de l\'équipe Thierry Gil importés','s');
+  oRefresh();
+}
+
+// ── DIGEST EMAIL QUOTIDIEN ───────────────────────────────────────────
+function oDigestBuildContent(user){
+  var tag=user.tags&&user.tags.length?user.tags[0]:null;
+  var myContacts=tag?OC.filter(function(c){return c.ctags&&c.ctags.indexOf(tag)>=0;}):OC;
+  var today=new Date();today.setHours(0,0,0,0);
+  var yesterday=new Date(today);yesterday.setDate(yesterday.getDate()-1);
+
+  // Contacts chauds
+  var chauds=myContacts.filter(function(c){return c.qualif==='Chaud'||c.qualif==='Très chaud';});
+  // Nouveaux (créés hier ou aujourd'hui)
+  var nouveaux=myContacts.filter(function(c){
+    if(!c.dateCreation)return false;
+    var d=new Date(c.dateCreation);d.setHours(0,0,0,0);
+    return d>=yesterday;
+  });
+  // Actions à faire (étape Suivi ou contacts sans action récente)
+  var aFaire=myContacts.filter(function(c){return c.etape==='Suivi'||c.etape==='Relance';});
+
+  var lines=[];
+  lines.push('Bonjour '+user.nom+' 👋');
+  lines.push('');
+  lines.push('📊 VUE DE VOS CONTACTS OLYLIFE — '+today.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}));
+  lines.push('');
+  lines.push('Total contacts : '+myContacts.length);
+  lines.push('');
+
+  if(nouveaux.length){
+    lines.push('🆕 NOUVEAUX CONTACTS (24h)');
+    nouveaux.forEach(function(c){lines.push('  • '+c.nom+(c.prenom?' '+c.prenom:'')+(c.tel?' — '+c.tel:''));});
+    lines.push('');
+  }
+  if(chauds.length){
+    lines.push('🔥 CONTACTS CHAUDS À RAPPELER');
+    chauds.forEach(function(c){
+      lines.push('  • '+c.nom+(c.prenom?' '+c.prenom:'')+(c.tel?' — '+c.tel:''));
+      if(c.notes)lines.push('    '+c.notes.substring(0,100)+(c.notes.length>100?'…':''));
+    });
+    lines.push('');
+  }
+  if(aFaire.length){
+    lines.push('📋 SUIVIS EN ATTENTE');
+    aFaire.forEach(function(c){lines.push('  • '+c.nom+(c.prenom?' '+c.prenom:'')+(c.etape?' ['+c.etape+']':''));});
+    lines.push('');
+  }
+  lines.push('Bonne journée et bonnes ventes ! 💪');
+  lines.push('— Votre CRM OlyLife WLHT');
+  return lines.join('\n');
+}
+
+function oDigestPreview(){
+  if(!USER)return;
+  var content=oDigestBuildContent(USER);
+  var sujet='[OlyLife CRM] Résumé du '+new Date().toLocaleDateString('fr-FR');
+  var email=USER.digestEmail||'';
+  if(!email){oT('Veuillez d\'abord renseigner votre email dans Mon Profil','e');return;}
+  var mailto='mailto:'+encodeURIComponent(email)
+    +'?subject='+encodeURIComponent(sujet)
+    +'&body='+encodeURIComponent(content);
+  window.open(mailto,'_blank');
+  oT('Email digest préparé — vérifiez votre client mail','s');
+}
+
+function oDigestSendAll(){
+  // Admin uniquement — envoie un digest à tous les utilisateurs ayant un email configuré
+  if(ROLE()!=='admin'){oT('Réservé à l\'admin','e');return;}
+  var avecEmail=USERS.filter(function(u){return u.digestEmail&&u.digestHeure;});
+  if(!avecEmail.length){oT('Aucun utilisateur n\'a configuré un email digest','w');return;}
+  var sent=0;
+  avecEmail.forEach(function(u){
+    var content=oDigestBuildContent(u);
+    var sujet='[OlyLife CRM] Résumé du '+new Date().toLocaleDateString('fr-FR')+' — '+u.nom;
+    var mailto='mailto:'+encodeURIComponent(u.digestEmail)
+      +'?subject='+encodeURIComponent(sujet)
+      +'&body='+encodeURIComponent(content);
+    // Ouvre un onglet par destinataire (limité par le navigateur à 1 pour éviter les popups)
+    if(sent===0)window.open(mailto,'_blank');
+    sent++;
+  });
+  oT(avecEmail.length+' digest(s) préparés — '+avecEmail.length+' email(s) configurés','s');
+  oT('Note : ouvrez manuellement les autres destinataires depuis Admin → Équipe','i');
+}
+
+// Sauvegarde le profil digest de l'utilisateur connecté
+function oSaveMyDigest(){
+  var email=(document.getElementById('my-digest-email').value||'').trim();
+  var heure=document.getElementById('my-digest-heure').value||'';
+  if(email&&!heure){oT('Choisissez une heure de réception','e');return;}
+  // Met à jour USER local
+  USER.digestEmail=email;USER.digestHeure=heure;
+  // Met à jour USERS
+  var idx=USERS.findIndex(function(u){return u.id===USER.id;});
+  if(idx>=0){USERS[idx].digestEmail=email;USERS[idx].digestHeure=heure;}
+  // Pousse vers GAS
+  oPushUsers();oSaveCache();
+  var st=document.getElementById('my-digest-status');
+  if(email&&heure){
+    st.innerHTML='✅ Résumé activé à <b>'+heure+'</b> — envoyé à <b>'+esc(email)+'</b>';
+    oT('Profil digest enregistré','s');
+  }else{
+    st.innerHTML='⏸ Résumé désactivé';
+    oT('Résumé désactivé','w');
+  }
+}
+
+// Charge le profil digest de l'utilisateur connecté dans les champs
+function oLoadMyDigest(){
+  if(!USER)return;
+  var e=document.getElementById('my-digest-email');
+  var h=document.getElementById('my-digest-heure');
+  if(e)e.value=USER.digestEmail||'';
+  if(h)h.value=USER.digestHeure||'';
+  var st=document.getElementById('my-digest-status');
+  if(!st)return;
+  if(USER.digestEmail&&USER.digestHeure)
+    st.innerHTML='✅ Résumé actif à <b>'+USER.digestHeure+'</b> → <b>'+esc(USER.digestEmail)+'</b>';
+  else
+    st.innerHTML='⏸ Non configuré';
+}
+
+// Affiche un aperçu du digest dans une modale légère
+function oDigestModal(userOrIndex){
+  var u=(typeof userOrIndex==='number')?USERS[userOrIndex]:userOrIndex;
+  if(!u)return;
+  var content=oDigestBuildContent(u);
+  var html='<div style="position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px" onclick="this.remove()">'
+    +'<div style="background:var(--bg);border-radius:14px;padding:20px;max-width:540px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.3)" onclick="event.stopPropagation()">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+    +'<div style="font-weight:700;font-size:15px">📧 Aperçu digest — '+esc(u.nom)+'</div>'
+    +'<button onclick="this.closest(\'[style*=fixed]\').remove()" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--t2)">✕</button>'
+    +'</div>'
+    +'<pre style="font-family:inherit;font-size:12px;white-space:pre-wrap;color:var(--t1);background:var(--bg2);padding:12px;border-radius:8px;line-height:1.6">'+esc(content)+'</pre>'
+    +(u.digestEmail?'<button class="ob bgold" style="margin-top:12px;width:100%" onclick="var m=\'mailto:\'+encodeURIComponent(\''+esc(u.digestEmail)+'\')+\'?subject=\'+encodeURIComponent(\'[OlyLife CRM] Résumé du \'+new Date().toLocaleDateString(\'fr-FR\'));window.open(m,\'_blank\')">📨 Envoyer à '+esc(u.digestEmail)+'</button>':'<div style="color:var(--t2);font-size:12px;margin-top:10px">⚠️ Aucun email configuré pour cet utilisateur</div>')
+    +'</div></div>';
+  var el=document.createElement('div');el.innerHTML=html;document.body.appendChild(el.firstChild);
 }
 
 // ── PRODUITS (checkboxes) ─────────────────────────────────────────
