@@ -234,6 +234,63 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .oprd.on{border-color:var(--gold);background:var(--goldp);font-weight:600;color:var(--gold);}
 .oprd input[type=checkbox]{width:15px;height:15px;accent-color:var(--gold);cursor:pointer;flex-shrink:0;}
 
+/* ── STATUT DE TRAITEMENT (rouge → jaune → vert clair → vert foncé) ── */
+.ocli-card.st-afaire{border-left:6px solid #C63E47;background:linear-gradient(90deg,rgba(198,62,71,.13),var(--navy2) 55%);}
+.ocli-card.st-encours{border-left:6px solid #E3B320;background:linear-gradient(90deg,rgba(227,179,32,.18),var(--navy2) 55%);}
+.ocli-card.st-close{border-left:6px solid #6CCB8E;background:linear-gradient(90deg,rgba(108,203,142,.22),var(--navy2) 55%);}
+.ocli-card.st-reseau{border-left:6px solid #126A3C;background:linear-gradient(90deg,rgba(18,106,60,.20),var(--navy2) 55%);}
+.stbdg{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap;}
+.stbdg.afaire{background:#C63E47;}.stbdg.encours{background:#D9A400;}.stbdg.close{background:#4FB874;}.stbdg.reseau{background:#126A3C;}
+.st-pick{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;}
+.st-pick button{border:2px solid transparent;border-radius:12px;padding:9px 4px;font-family:Outfit,sans-serif;font-size:10.5px;font-weight:700;color:#fff;cursor:pointer;line-height:1.25;opacity:.55;transition:all .15s;-webkit-tap-highlight-color:transparent;}
+.st-pick button.on{opacity:1;border-color:var(--tx);transform:scale(1.04);box-shadow:0 3px 10px rgba(0,0,0,.18);}
+.st-pick button span{display:block;font-size:16px;margin-bottom:2px;}
+.st-pick .afaire{background:#C63E47;}.st-pick .encours{background:#D9A400;}.st-pick .close{background:#4FB874;}.st-pick .reseau{background:#126A3C;}
+.ofilters.st-row .ofilter-chip.afaire.on{background:#C63E47;border-color:#C63E47;color:#fff;}
+.ofilters.st-row .ofilter-chip.encours.on{background:#D9A400;border-color:#D9A400;color:#fff;}
+.ofilters.st-row .ofilter-chip.close.on{background:#4FB874;border-color:#4FB874;color:#fff;}
+.ofilters.st-row .ofilter-chip.reseau.on{background:#126A3C;border-color:#126A3C;color:#fff;}
+/* journal */
+.jrn-it{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--bd);}
+.jrn-it:last-child{border-bottom:none;}
+.jrn-ic{width:30px;height:30px;border-radius:50%;background:var(--navy3);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.jrn-dt{font-size:10.5px;color:var(--t3);margin-bottom:2px;}
+.jrn-au{font-weight:700;color:var(--pu);}
+.jrn-tx{font-size:13px;color:var(--tx);line-height:1.5;white-space:pre-wrap;}
+/* rappel */
+.rap-box{display:flex;align-items:center;gap:10px;background:rgba(227,179,32,.14);border:1px solid rgba(227,179,32,.45);border-radius:12px;padding:10px 12px;font-size:12px;margin-bottom:10px;}
+.rap-box.late{background:var(--rdp);border-color:rgba(198,62,71,.45);}
+.rap-box b{display:block;font-size:13px;}
+/* feuille "valider un contact" */
+#osv{display:none;position:fixed;inset:0;background:rgba(20,40,30,.45);backdrop-filter:blur(2px);z-index:900;align-items:flex-end;justify-content:center;}
+#osv.on{display:flex;}
+.osv-card{background:var(--bg,#F6FAF6);border-radius:20px 20px 0 0;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;padding:14px 16px calc(18px + var(--safe-bottom));box-shadow:0 -8px 30px rgba(0,0,0,.25);}
+.osv-grab{width:40px;height:4px;border-radius:2px;background:var(--bd2);margin:0 auto 12px;}
+.osv-ttl{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:700;color:var(--gold);margin-bottom:2px;}
+.osv-sub{font-size:12px;color:var(--t3);margin-bottom:12px;}
+.res-pick{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:12px;}
+.res-pick button{border:1.5px solid var(--bd2);background:var(--navy2);border-radius:12px;padding:10px 6px;font-family:Outfit,sans-serif;font-size:12px;font-weight:600;color:var(--tx);cursor:pointer;min-height:44px;}
+.res-pick button.on{border-color:var(--gold);background:var(--goldp);color:var(--gold);}
+.osv-ta{width:100%;min-height:96px;border:1.5px solid var(--bd2);border-radius:12px;padding:10px 12px;font-family:Outfit,sans-serif;font-size:14px;resize:vertical;background:var(--navy2);color:var(--tx);}
+.osv-ta.err{border-color:#C63E47;background:var(--rdp);}
+.rap-form{background:var(--navy3);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin-top:8px;}
+.rap-form .ofg2{gap:8px;}
+/* menu rapide appui long */
+#octx{display:none;position:fixed;inset:0;background:rgba(20,40,30,.45);backdrop-filter:blur(2px);z-index:900;align-items:flex-end;justify-content:center;}
+#octx.on{display:flex;}
+.ctx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.ctx-grid button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:64px;border:1px solid var(--bd2);background:var(--navy2);border-radius:14px;font-family:Outfit,sans-serif;font-size:11px;font-weight:600;color:var(--tx);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.ctx-grid button span{font-size:22px;line-height:1;}
+.ctx-grid button:active{transform:scale(.95);}
+.ctx-grid button.danger{color:#C63E47;border-color:rgba(198,62,71,.35);background:var(--rdp);}
+.ctx-grid button.main{background:var(--gold);color:#fff;border-color:var(--gold);}
+.ocli-card{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
+.ocli-card.pressing{transform:scale(.98);filter:brightness(.96);}
+/* notifications */
+.onotif-it{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--bd);align-items:flex-start;cursor:pointer;}
+.onotif-it:last-child{border-bottom:none;}
+.onotif-cnt{background:#C63E47;color:#fff;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:700;}
+
 /* ── FULL-SCREEN MODAL ───────────────────────────────────────────── */
 #omo,#oimp{display:none;position:fixed;inset:0;background:rgba(246,250,246,.86);backdrop-filter:blur(3px);z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 #omo.on,#oimp.on{display:block;}
@@ -391,6 +448,14 @@ textarea.ofc{resize:vertical;min-height:76px;}
         <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--orwtx);font-weight:700" id="d-refhello-t">Bienvenue</div>
         <div style="font-size:12px;color:var(--t2);margin-top:4px;line-height:1.6">Voici le suivi des contacts que vous avez référés à l'équipe WLHT. Merci pour votre confiance !</div>
       </div>
+      <div class="ocard hide" id="d-notif">
+        <div class="ochd"><span class="oct">🔔 Nouveautés sur vos contacts <span class="onotif-cnt" id="d-notif-n">0</span></span><button class="ob bgh bsm" onclick="oNotifSeen()">Tout lu</button></div>
+        <div id="d-notif-l"></div>
+      </div>
+      <div class="ocard hide" id="d-rap">
+        <div class="ochd"><span class="oct">⏰ Mes rappels</span><button class="ob bgh bsm" onclick="oSw('actions',2)">Voir tout</button></div>
+        <div id="d-rap-l"></div>
+      </div>
       <div class="kpig">
         <div class="kpi" id="kpi0"><div class="kpi-l">Contacts</div><div class="kpi-v" id="kv0">0</div><div class="kpi-s">dans le pipeline</div></div>
         <div class="kpi cgr" id="kpi1"><div class="kpi-l">Clients</div><div class="kpi-v" id="kv1">0</div><div class="kpi-s">actifs</div></div>
@@ -402,7 +467,7 @@ textarea.ofc{resize:vertical;min-height:76px;}
         <div id="d-al"></div>
       </div>
       <div class="ocard">
-        <div class="ochd"><span class="oct">Derniers contacts</span><button class="ob bgh bsm" onclick="oSw('contacts',1)">Voir tous</button></div>
+        <div class="ochd"><span class="oct">Contacts prioritaires</span><button class="ob bgh bsm" onclick="oSw('contacts',1)">Voir tous</button></div>
         <div id="d-tb" style="padding:8px"></div>
       </div>
     </div>
@@ -418,6 +483,13 @@ textarea.ofc{resize:vertical;min-height:76px;}
         <select id="ofil-tag" onchange="oFilt()"><option value="">Toutes les équipes</option></select>
         <select id="ofil-ref" onchange="oFilt()"><option value="">Tous les référents</option></select>
         <select id="ofil-suivi" onchange="oFilt()"><option value="">Tous les suiveurs</option></select>
+      </div>
+      <div class="ofilters st-row" id="ofilter-st">
+        <button class="ofilter-chip on" onclick="oStChip(this,'')">Tous</button>
+        <button class="ofilter-chip afaire" onclick="oStChip(this,'afaire')">🔴 À contacter <span id="stn-afaire"></span></button>
+        <button class="ofilter-chip encours" onclick="oStChip(this,'encours')">🟡 En cours <span id="stn-encours"></span></button>
+        <button class="ofilter-chip close" onclick="oStChip(this,'close')">🟢 Prêt <span id="stn-close"></span></button>
+        <button class="ofilter-chip reseau" onclick="oStChip(this,'reseau')">🌳 Réseau <span id="stn-reseau"></span></button>
       </div>
       <div class="ofilters" id="ofilter-chips">
         <button class="ofilter-chip on" onclick="oChip(this,'')" data-val="">Tous</button>
@@ -451,6 +523,10 @@ textarea.ofc{resize:vertical;min-height:76px;}
           <div style="margin-top:10px;font-size:11px;color:var(--t3);line-height:1.5">⚠️ Vérifiez toujours que le téléphone du destinataire correspond au pays de livraison — un mauvais numéro entraîne un colis non livré, retourné à l'expéditeur.</div>
         </div>
       </div>
+      <div class="ocard" id="a-rap-card" style="margin-bottom:14px">
+        <div class="ochd"><span class="oct">⏰ Rappels <span class="onotif-cnt" id="a-rap-n" style="background:#D9A400">0</span></span></div>
+        <div id="a-rap-l"></div>
+      </div>
       <div class="orpg">
         <div class="orps urg"><div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--rd)" id="rpu">0</div><div style="font-size:10px;font-weight:600;margin-top:2px;color:var(--tx)">En retard</div></div>
         <div class="orps soo"><div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--gold)" id="rpt">0</div><div style="font-size:10px;font-weight:600;margin-top:2px;color:var(--tx)">Aujourd'hui</div></div>
@@ -475,6 +551,7 @@ textarea.ofc{resize:vertical;min-height:76px;}
         <div id="eq-users-list"></div>
         <div style="padding:10px 14px 12px;border-top:1px solid var(--bd);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
           <button class="ob bsm" style="background:var(--pu);color:#fff;border:none;min-height:40px" onclick="oMergeSeedThierry(true)">📥 Importer les contacts de Thierry</button>
+          <button class="ob bsm" style="background:#C63E47;color:#fff;border:none;min-height:40px" onclick="oDedup(true)">🧹 Supprimer les doublons</button>
           <span style="font-size:11px;color:var(--t3);margin-left:auto" id="eq-version"></span>
         </div>
         <div id="eq-user-form" style="display:none;padding:14px 16px;border-top:1px solid var(--bd);background:var(--navy3)">
@@ -755,6 +832,57 @@ textarea.ofc{resize:vertical;min-height:76px;}
   </div>
 </div>
 
+<!-- FEUILLE : MENU RAPIDE (appui long sur une carte) -->
+<div id="octx" onclick="if(event.target===this)oCtxClose()">
+  <div class="osv-card" style="padding-top:12px">
+    <div class="osv-grab"></div>
+    <div class="osv-ttl" id="octx-ttl">Contact</div>
+    <div class="osv-sub" id="octx-sub">—</div>
+    <input type="hidden" id="octx-id">
+    <div class="ctx-grid" id="octx-btns"></div>
+    <div id="octx-panel" style="display:none;margin-top:12px" class="rap-form"></div>
+  </div>
+</div>
+
+<!-- FEUILLE : VALIDER UN CONTACT / OBSERVATION -->
+<div id="osv" onclick="if(event.target===this)oCloseSuivi()">
+  <div class="osv-card">
+    <div class="osv-grab"></div>
+    <div class="osv-ttl" id="osv-ttl">📞 Valider un contact</div>
+    <div class="osv-sub" id="osv-sub">—</div>
+    <input type="hidden" id="osv-id">
+    <div class="ofl" style="margin-bottom:6px">Résultat</div>
+    <div class="res-pick" id="osv-res">
+      <button type="button" class="on" data-v="✅ Joint par téléphone" onclick="oResPick(this)">✅ Joint</button>
+      <button type="button" data-v="📵 Pas de réponse" onclick="oResPick(this)">📵 Pas de réponse</button>
+      <button type="button" data-v="💬 Message WhatsApp envoyé" onclick="oResPick(this)">💬 WhatsApp envoyé</button>
+      <button type="button" data-v="📝 Observation" onclick="oResPick(this)">📝 Simple observation</button>
+    </div>
+    <div class="ofl" style="margin-bottom:6px">Observation <span class="oreq">* obligatoire</span></div>
+    <textarea class="osv-ta" id="osv-txt" placeholder="Ce qui a été dit, le besoin, la suite prévue…"></textarea>
+    <div class="ofl" style="margin:12px 0 6px">Statut du contact</div>
+    <div class="st-pick" id="osv-st">
+      <button type="button" class="afaire" data-v="afaire" onclick="oStPick(this)"><span>🔴</span>À contacter</button>
+      <button type="button" class="encours" data-v="encours" onclick="oStPick(this)"><span>🟡</span>En cours</button>
+      <button type="button" class="close" data-v="close" onclick="oStPick(this)"><span>🟢</span>Prêt à closer</button>
+      <button type="button" class="reseau" data-v="reseau" onclick="oStPick(this)"><span>🌳</span>Dans le réseau</button>
+    </div>
+    <label class="ochk-row" style="margin-top:4px"><input type="checkbox" id="osv-rap-on" onchange="document.getElementById('osv-rap').style.display=this.checked?'block':'none'"><span>⏰ Programmer un rappel</span></label>
+    <div class="rap-form" id="osv-rap" style="display:none">
+      <div class="ofg2">
+        <div><label class="ofl">Date</label><input type="date" class="ofc" id="osv-rap-date"></div>
+        <div><label class="ofl">Heure</label><input type="time" class="ofc" id="osv-rap-heure" value="10:00"></div>
+      </div>
+      <div style="margin-top:8px"><label class="ofl">Attribuer à</label><select class="ofc" id="osv-rap-pour"></select></div>
+      <div style="margin-top:8px"><label class="ofl">Objet du rappel</label><input type="text" class="ofc" id="osv-rap-txt" placeholder="Rappeler pour confirmer la commande…"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="ob bgh" style="flex:1;min-height:48px" onclick="oCloseSuivi()">Annuler</button>
+      <button class="ob bgold" style="flex:2;min-height:48px" onclick="oSuiviSave()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <div id="otc"></div>
 
 <script>
@@ -781,7 +909,7 @@ var DELAI_TEMOIGNAGE=30;
 var GAS_URL='',CODE='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v2.4 · 01/10 16h45';
+var APP_VERSION='v2.5 · 01/10 17h30';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -871,7 +999,7 @@ function oPull(){
       if(d.users)USERS=d.users;
       oSaveCache();oHideLogin();oSyncDot('ok');
       oT('Bonjour '+USER.nom+' — '+OC.length+' contact(s)','s');
-      applyRole();populateRefUI();oRefresh();oMergeSeedThierry();
+      applyRole();populateRefUI();oRefresh();oMergeSeedThierry();if(ROLE()==='admin')oDedup(false);
     })
     .catch(function(){
       oSyncDot('err');oLoader(false);
@@ -1435,16 +1563,12 @@ function oDash(){
         +'</div>';
     }).join('');
   }
-  var recent=[].concat(OC).sort(function(a,b){return new Date(b.createdAt)-new Date(a.createdAt);}).slice(0,4);
+  renderNotifs();renderRappels();
+  var mine=OC.filter(contactMeConcerne);
+  var recent=mine.sort(stSort).slice(0,5);
   var dtb=document.getElementById('d-tb');
   if(!recent.length){dtb.innerHTML='<div class="oemp"><div class="oemp-i">✦</div><div class="oemp-t">Aucun contact — ajoutez le premier !</div></div>';return;}
-  dtb.innerHTML=recent.map(function(c){
-    return'<div class="ocli-card" onclick="oOpenF(\''+c.id+'\')">'
-      +'<div class="ocli-avatar">'+initials(c)+'</div>'
-      +'<div class="ocli-info"><div class="ocli-name">'+c.nom+' '+c.prenom+'</div><div class="ocli-sub">'+(c.pays||'—')+(c.ville?' · '+c.ville:'')+'</div></div>'
-      +'<div class="ocli-right">'+eBdg(c.etape)+'</div>'
-      +'</div>';
-  }).join('');
+  dtb.innerHTML=recent.map(function(c){return cardHtml(c,ROLE()!=='referent');}).join('');
 }
 
 // ── CONTACTS ────────────────────────────────────────────────────────
@@ -1458,24 +1582,13 @@ function oCli(){
   // Mode "voir session" admin → filtre sur le tag du référent visité
   if(VIEW_AS_TAG){
     var vl=OC.filter(function(c){return c.ctags&&c.ctags.indexOf(VIEW_AS_TAG)>=0;});
+    stCounts(vl);
+    if(ACTIVE_STATUT)vl=vl.filter(function(c){return cStatut(c)===ACTIVE_STATUT;});
+    if(q)vl=vl.filter(function(c){return(c.nom+' '+c.prenom).toLowerCase().indexOf(q)>=0||(c.tel||'').indexOf(q)>=0;});
+    vl.sort(stSort);
     var vcl=document.getElementById('c-list');
     if(!vl.length){vcl.innerHTML='<div class="oemp"><div class="oemp-i">✦</div><div class="oemp-t">Aucun contact pour ce référent</div></div>';return;}
-    vcl.innerHTML=vl.map(function(c){
-      var num=(c.tel||'').replace(/\D/g,'');
-      return'<div class="ocli-card" onclick="oOpenF(\''+c.id+'\')">'
-        +'<div class="ocli-avatar">'+initials(c)+'</div>'
-        +'<div class="ocli-info">'
-          +'<div class="ocli-name">'+esc(c.nom)+' '+esc(c.prenom)+'</div>'
-          +'<div class="ocli-sub">'+(c.tel||'—')+(c.pays?' · '+c.pays:'')+'</div>'
-          +(c.notes?'<div class="ocli-notes" style="font-size:11px;color:var(--t2);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px">'+esc(c.notes)+'</div>':'')
-        +'</div>'
-        +'<div class="ocli-right">'
-          +(c.etape?'<span class="obdg '+(ETAPE_BADGE[c.etape]||'bgy')+'" style="font-size:10px">'+esc(c.etape)+'</span>':'')
-          +(c.qualif?'<span class="obdg '+(QUALIF_BADGE[c.qualif]||'bgy')+'" style="font-size:10px">'+esc(c.qualif)+'</span>':'')
-          +(num?'<a href="https://wa.me/'+num+'" onclick="event.stopPropagation()" target="_blank" style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--wa);color:#fff;font-size:14px;text-decoration:none;flex-shrink:0">💬</a>':'')
-        +'</div>'
-      +'</div>';
-    }).join('');
+    vcl.innerHTML=vl.map(function(c){return cardHtml(c,true);}).join('');
     return;
   }
   // Référent : filtre auto sur son propre tag
@@ -1493,27 +1606,13 @@ function oCli(){
     if(fsui&&fsui!=='__none__'&&(c.suiviPar||'')!==fsui)return false;
     return true;
   });
+  stCounts(l);
+  if(ACTIVE_STATUT)l=l.filter(function(c){return cStatut(c)===ACTIVE_STATUT;});
+  l.sort(stSort);
   var cl=document.getElementById('c-list');
   if(!l.length){cl.innerHTML='<div class="oemp"><div class="oemp-i">✦</div><div class="oemp-t">Aucun contact</div></div>';return;}
   var showAttr=ROLE()!=='referent';
-  cl.innerHTML=l.map(function(c){
-    var num=(c.tel||'').replace(/\D/g,'');
-    return'<div class="ocli-card" onclick="oOpenF(\''+c.id+'\')">'
-      +'<div class="ocli-avatar">'+initials(c)+'</div>'
-      +'<div class="ocli-info">'
-        +'<div class="ocli-name">'+c.nom+' '+c.prenom+'</div>'
-        +'<div class="ocli-sub">'+(c.tel||'—')+(c.pays?' · '+c.pays:'')+'</div>'
-        +'<div style="margin-top:4px">'+eBdg(c.etape)+' '+qBdg(c.qualification)
-          +(showAttr&&c.refere?' <span class="obdg bgy">🏷 '+esc(c.refere)+'</span>':'')
-          +(showAttr&&c.suiviPar?' <span class="obdg baq">👤 '+esc(c.suiviPar)+'</span>':'')
-          +((c.ctags&&c.ctags.length)?' '+c.ctags.map(function(t){return'<span class="obdg bpu">'+esc(t)+'</span>';}).join(' '):'')
-        +'</div>'
-      +'</div>'
-      +'<div class="ocli-right">'
-        +(num?'<a href="https://wa.me/'+num+'" onclick="event.stopPropagation()" target="_blank" rel="noopener" style="background:var(--wa);color:#fff;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;text-decoration:none">WA</a>':'')
-      +'</div>'
-      +'</div>';
-  }).join('');
+  cl.innerHTML=l.map(function(c){return cardHtml(c,showAttr);}).join('');
 }
 function oFilt(){oCli();}
 
@@ -1521,6 +1620,7 @@ function oFilt(){oCli();}
 var ACTIVE_ACT_FILTER='';
 function oActChip(btn,val){document.querySelectorAll('#oact-chips .ofilter-chip').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');ACTIVE_ACT_FILTER=val;oAct();}
 function oAct(){
+  renderRappels();
   var all=computeActions();
   CURRENT_ACTIONS=all;
   var u=all.filter(function(a){return a.diff<0;}).length;
@@ -1672,13 +1772,14 @@ function oMergeSeedThierry(manual){
   var now=Date.now(),added=[];
   SEED_THIERRY.forEach(function(s,i){
     if(exists(s))return;
-    var c=Object.assign({},s,{id:'seed_th_'+now+'_'+i,ctags:[tag],refere:thUser.nom,suiviPar:thUser.nom});
+    var c=Object.assign({},s,{id:'seed_th_'+now+'_'+i,ctags:[tag],refere:thUser.nom,suiviPar:'',qualification:s.qualif,createdAt:(s.dateCreation||'').slice(0,10),statut:'afaire',journal:[]});
+    delete c.qualif;delete c.dateCreation;
     OC.push(c);added.push(c);
   });
   // Re-tague d'éventuels anciens imports portant 'Thierry' vers le tag réel
   OC.forEach(function(c){if(c.ctags&&c.ctags.indexOf('Thierry')>=0&&tag!=='Thierry'){c.ctags=[tag];c.refere=thUser.nom;c.suiviPar=thUser.nom;added.push(c);}});
   if(!added.length){
-    if(manual)oT('Déjà en place : '+oContactsRef(tag).length+' contact(s) portent le tag '+tag,'s');
+    if(manual){var nd=oDedup(true);if(!nd)oT('Déjà en place : '+oContactsRef(tag).length+' contact(s) portent le tag '+tag,'s');}
     return;
   }
   if(CFG.referents&&CFG.referents.indexOf(tag)<0){CFG.referents.push(tag);oPushCfg();}
@@ -1694,8 +1795,11 @@ function oDigestBuildContent(user){
   var today=new Date();today.setHours(0,0,0,0);
   var yesterday=new Date(today);yesterday.setDate(yesterday.getDate()-1);
 
+  // Statuts & rappels
+  var aContacter=myContacts.filter(function(c){return cStatut(c)==='afaire';});
+  var raps=myContacts.filter(function(c){return c.rappel&&c.rappel.date&&diffD(c.rappel.date)<=0;});
   // Contacts chauds
-  var chauds=myContacts.filter(function(c){return c.qualif==='Chaud'||c.qualif==='Très chaud';});
+  var chauds=myContacts.filter(function(c){return(c.qualification||c.qualif)==='Chaud';});
   // Nouveaux (créés hier ou aujourd'hui)
   var nouveaux=myContacts.filter(function(c){
     if(!c.dateCreation)return false;
@@ -1710,8 +1814,19 @@ function oDigestBuildContent(user){
   lines.push('');
   lines.push('📊 VUE DE VOS CONTACTS OLYLIFE — '+today.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'}));
   lines.push('');
-  lines.push('Total contacts : '+myContacts.length);
+  lines.push('Total contacts : '+myContacts.length+' · 🔴 à contacter : '+aContacter.length+' · 🟡 en cours : '+myContacts.filter(function(c){return cStatut(c)==='encours';}).length+' · 🟢 prêts : '+myContacts.filter(function(c){return cStatut(c)==='close';}).length);
   lines.push('');
+  if(raps.length){
+    lines.push('⏰ RAPPELS DU JOUR / EN RETARD');
+    raps.forEach(function(c){lines.push('  • '+c.nom+(c.prenom?' '+c.prenom:'')+' — '+fD(c.rappel.date)+(c.rappel.heure?' '+c.rappel.heure:'')+(c.rappel.pour?' (pour '+c.rappel.pour+')':'')+(c.rappel.texte?' : '+c.rappel.texte:''));});
+    lines.push('');
+  }
+  if(aContacter.length){
+    lines.push('🔴 À CONTACTER (jamais traités)');
+    aContacter.slice(0,15).forEach(function(c){lines.push('  • '+c.nom+(c.prenom?' '+c.prenom:'')+(c.tel?' — '+c.tel:''));});
+    if(aContacter.length>15)lines.push('  … et '+(aContacter.length-15)+' autres');
+    lines.push('');
+  }
 
   if(nouveaux.length){
     lines.push('🆕 NOUVEAUX CONTACTS (24h)');
@@ -1834,6 +1949,333 @@ function oDigestModal(userOrIndex){
   var el=document.createElement('div');el.innerHTML=html;document.body.appendChild(el.firstChild);
 }
 
+// ── DÉDOUBLONNAGE (même téléphone, ou même nom+prénom) ─────────────
+function dupKey(c){
+  var t=(c.tel||'').replace(/\D/g,'');
+  if(t.length>=8)return't:'+t.slice(-9);
+  var n=((c.nom||'')+'|'+(c.prenom||'')).toUpperCase().replace(/\s+/g,' ').trim();
+  return n==='|'?null:'n:'+n;
+}
+function oDedup(manual){
+  if(ROLE()!=='admin'){if(manual)oT('Réservé à l\'admin','e');return 0;}
+  var groups={};
+  OC.forEach(function(c){var k=dupKey(c);if(!k)return;(groups[k]=groups[k]||[]).push(c);});
+  var toDel=[],toUpd=[];
+  Object.keys(groups).forEach(function(k){
+    var g=groups[k];if(g.length<2)return;
+    // on garde le plus riche (journal, puis le plus ancien)
+    g.sort(function(a,b){var ja=(a.journal||[]).length,jb=(b.journal||[]).length;if(ja!==jb)return jb-ja;return(a.createdAt||a.id||'').localeCompare(b.createdAt||b.id||'');});
+    var keep=g[0];
+    g.slice(1).forEach(function(d){
+      (d.ctags||[]).forEach(function(t){keep.ctags=keep.ctags||[];if(keep.ctags.indexOf(t)<0)keep.ctags.push(t);});
+      if(!keep.notes&&d.notes)keep.notes=d.notes;
+      if(!keep.email&&d.email)keep.email=d.email;
+      if(!keep.suiviPar&&d.suiviPar)keep.suiviPar=d.suiviPar;
+      if(d.journal&&d.journal.length){keep.journal=(keep.journal||[]).concat(d.journal);}
+      if(d.rappel&&!keep.rappel)keep.rappel=d.rappel;
+      toDel.push(d.id);
+    });
+    toUpd.push(keep);
+  });
+  if(!toDel.length){if(manual)oT('Aucun doublon détecté','s');return 0;}
+  if(manual&&!confirm(toDel.length+' doublon(s) détecté(s). Les supprimer en conservant la fiche la plus complète ?'))return 0;
+  OC=OC.filter(function(c){return toDel.indexOf(c.id)<0;});
+  oPush(toUpd);oPushDel(toDel);
+  oT('🧹 '+toDel.length+' doublon(s) supprimé(s)','s');oRefresh();
+  return toDel.length;
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SUIVI D'ACTIVITÉ : journal horodaté · statut couleur · rappels · notifications
+// ═══════════════════════════════════════════════════════════════════
+var STATUT_DEF={
+  afaire:{l:'À contacter',ic:'🔴',ord:0},
+  encours:{l:'En cours',ic:'🟡',ord:1},
+  close:{l:'Prêt à closer',ic:'🟢',ord:2},
+  reseau:{l:'Dans le réseau',ic:'🌳',ord:3}
+};
+// Statut effectif : rouge par défaut tant qu'aucune action n'a été validée
+function cStatut(c){
+  if(c.statut&&STATUT_DEF[c.statut])return c.statut;
+  if(c.estPartenaire||c.etape==='Partenaire équipe')return'reseau';
+  if(c.journal&&c.journal.length)return'encours';
+  return'afaire';
+}
+function stBdg(c){var s=cStatut(c);return'<span class="stbdg '+s+'">'+STATUT_DEF[s].ic+' '+STATUT_DEF[s].l+'</span>';}
+function fDT(ts){if(!ts)return'—';var d=new Date(ts);return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}
+function fDTfull(ts){if(!ts)return'—';var d=new Date(ts);return d.toLocaleDateString('fr-FR',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'})+' à '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});}
+function roleAuteur(){return roleLabel(ROLE());}
+// Ajoute une entrée au journal du contact (sans push — l'appelant pousse)
+function jrnAdd(c,type,texte){
+  if(!c.journal)c.journal=[];
+  var e={id:'j_'+Date.now()+'_'+Math.floor(Math.random()*1000),ts:new Date().toISOString(),auteur:PARTNER_NOM()||'—',role:ROLE(),type:type,texte:texte};
+  c.journal.push(e);c.lastActivity=e.ts;return e;
+}
+var JRN_IC={appel:'📞',note:'📝',statut:'🎯',rappel:'⏰',fait:'✅',systeme:'⚙️'};
+function jrnHtml(c){
+  var j=(c.journal||[]).slice().sort(function(a,b){return new Date(b.ts)-new Date(a.ts);});
+  if(!j.length)return'<div style="padding:14px 16px;font-size:12px;color:var(--t3)">Aucune action enregistrée pour l\'instant — ce contact est <b style="color:#C63E47">à contacter</b>.</div>';
+  return j.map(function(e){
+    return'<div class="jrn-it"><div class="jrn-ic">'+(JRN_IC[e.type]||'•')+'</div><div style="flex:1;min-width:0">'
+      +'<div class="jrn-dt">'+fDTfull(e.ts)+' · <span class="jrn-au">'+esc(e.auteur)+'</span>'+(e.role?' <span style="opacity:.7">('+roleLabel(e.role)+')</span>':'')+'</div>'
+      +'<div class="jrn-tx">'+esc(e.texte)+'</div></div></div>';
+  }).join('');
+}
+// Liste des personnes à qui attribuer un rappel (gestionnaires + admin)
+function gestionnaires(){
+  var l=USERS.filter(function(u){return u.actif!==false&&(u.role==='gestionnaire'||u.role==='admin');}).map(function(u){return u.nom;});
+  (CFG.suiveurs||[]).forEach(function(s){if(l.indexOf(s)<0)l.push(s);});
+  if(USER&&ROLE()!=='referent'&&l.indexOf(USER.nom)<0)l.unshift(USER.nom);
+  return l;
+}
+// Le rappel d'un contact me concerne-t-il ?
+function rappelPourMoi(c){
+  if(!c.rappel)return false;
+  var r=ROLE();
+  if(r==='admin')return true;
+  if(r==='gestionnaire')return c.rappel.pour===USER.nom||!c.rappel.pour||c.suiviPar===USER.nom;
+  var tag=(USER.tags||[])[0];
+  return !!(tag&&c.ctags&&c.ctags.indexOf(tag)>=0);
+}
+function rappelDiff(c){if(!c.rappel||!c.rappel.date)return null;return diffD(c.rappel.date);}
+function mesRappels(){
+  return OC.filter(function(c){return c.rappel&&c.rappel.date&&rappelPourMoi(c);})
+    .sort(function(a,b){return(a.rappel.date+(a.rappel.heure||'')).localeCompare(b.rappel.date+(b.rappel.heure||''));});
+}
+function rapBox(c,withBtns){
+  if(!c.rappel)return'';
+  var d=rappelDiff(c);var late=d!==null&&d<0;
+  var when=d===0?"Aujourd'hui":late?'En retard de '+Math.abs(d)+'j':'Dans '+d+'j';
+  return'<div class="rap-box'+(late?' late':'')+'"><span style="font-size:20px">⏰</span><div style="flex:1;min-width:0">'
+    +'<b>'+fD(c.rappel.date)+(c.rappel.heure?' à '+c.rappel.heure:'')+' · '+when+'</b>'
+    +(c.rappel.texte?'<div>'+esc(c.rappel.texte)+'</div>':'')
+    +'<div style="color:var(--t3);font-size:11px">Pour : <b>'+esc(c.rappel.pour||'— non attribué —')+'</b> · créé par '+esc(c.rappel.par||'—')+'</div></div>'
+    +(withBtns&&ROLE()!=='referent'?'<button class="ob bdone bsm" style="min-height:36px" onclick="event.stopPropagation();oRappelDone(\''+c.id+'\')">✅ Fait</button>':'')
+    +'</div>';
+}
+
+// ── Feuille "valider un contact" ───────────────────────────────────
+var SV_RES='✅ Joint par téléphone',SV_ST='';
+function oResPick(b){document.querySelectorAll('#osv-res button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');SV_RES=b.getAttribute('data-v');}
+function oStPick(b){document.querySelectorAll('#osv-st button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');SV_ST=b.getAttribute('data-v');}
+function oOpenSuivi(id){
+  var c=OC.find(function(x){return x.id===id;});if(!c)return;
+  document.getElementById('osv-id').value=id;
+  document.getElementById('osv-sub').textContent=c.nom+' '+(c.prenom||'')+(c.tel?' · '+c.tel:'');
+  var ta=document.getElementById('osv-txt');ta.value='';ta.classList.remove('err');
+  oResPick(document.querySelector('#osv-res button'));
+  // statut suggéré : rouge → jaune dès le premier contact validé
+  var cur=cStatut(c);var sug=cur==='afaire'?'encours':cur;
+  SV_ST=sug;document.querySelectorAll('#osv-st button').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-v')===sug);});
+  // rappel
+  document.getElementById('osv-rap-on').checked=false;document.getElementById('osv-rap').style.display='none';
+  var t=new Date();t.setDate(t.getDate()+2);document.getElementById('osv-rap-date').value=t.toISOString().slice(0,10);
+  document.getElementById('osv-rap-heure').value='10:00';document.getElementById('osv-rap-txt').value='';
+  var sel=document.getElementById('osv-rap-pour');var g=gestionnaires();
+  sel.innerHTML='<option value="">— Non attribué —</option>'+g.map(function(n){return'<option value="'+esc(n)+'">'+esc(n)+'</option>';}).join('');
+  sel.value=(ROLE()==='gestionnaire')?USER.nom:(c.suiviPar&&g.indexOf(c.suiviPar)>=0?c.suiviPar:(g[0]||''));
+  document.getElementById('osv').classList.add('on');
+  setTimeout(function(){ta.focus();},150);
+}
+function oCloseSuivi(){document.getElementById('osv').classList.remove('on');}
+function oSuiviSave(){
+  var id=document.getElementById('osv-id').value;
+  var c=OC.find(function(x){return x.id===id;});if(!c)return;
+  var ta=document.getElementById('osv-txt');var txt=ta.value.trim();
+  if(txt.length<3){ta.classList.add('err');ta.focus();oT('L\'observation est obligatoire','e');return;}
+  var old=cStatut(c);
+  jrnAdd(c,SV_RES.indexOf('Observation')>=0?'note':'appel',SV_RES+' — '+txt);
+  if(SV_ST&&SV_ST!==old){c.statut=SV_ST;jrnAdd(c,'statut','Statut : '+STATUT_DEF[old].l+' → '+STATUT_DEF[SV_ST].l);}
+  else if(!c.statut)c.statut=old==='afaire'?'encours':old;
+  if(c.statut==='reseau'&&!c.estPartenaire){c.estPartenaire=true;if(c.etape!=='Partenaire équipe')c.etape='Partenaire équipe';}
+  if(document.getElementById('osv-rap-on').checked){
+    var rd=document.getElementById('osv-rap-date').value;
+    if(!rd){oT('Indiquez la date du rappel','e');return;}
+    c.rappel={date:rd,heure:document.getElementById('osv-rap-heure').value||'',pour:document.getElementById('osv-rap-pour').value||'',texte:document.getElementById('osv-rap-txt').value.trim(),par:PARTNER_NOM(),ts:new Date().toISOString()};
+    jrnAdd(c,'rappel','Rappel programmé le '+fD(rd)+(c.rappel.heure?' à '+c.rappel.heure:'')+' pour '+(c.rappel.pour||'— non attribué —')+(c.rappel.texte?' : '+c.rappel.texte:''));
+  }
+  // Si personne ne suit encore ce contact et qu'un gestionnaire intervient → il le prend
+  if(!c.suiviPar&&ROLE()==='gestionnaire')c.suiviPar=USER.nom;
+  oPush([c]);oCloseSuivi();
+  if(document.getElementById('omo').classList.contains('on'))oOpenF(id);
+  oRefresh();oT('✅ Action enregistrée — '+STATUT_DEF[c.statut].ic+' '+STATUT_DEF[c.statut].l,'s');
+}
+// Changement manuel de statut depuis la fiche
+function oSetStatut(id,st){
+  var c=OC.find(function(x){return x.id===id;});if(!c||!STATUT_DEF[st])return;
+  var old=cStatut(c);if(old===st)return;
+  if(st==='afaire'&&!confirm('Remettre ce contact en « À contacter » ?'))return;
+  c.statut=st;jrnAdd(c,'statut','Statut : '+STATUT_DEF[old].l+' → '+STATUT_DEF[st].l);
+  if(st==='reseau'&&!c.estPartenaire){c.estPartenaire=true;c.etape='Partenaire équipe';}
+  oPush([c]);oOpenF(id);oRefresh();oT(STATUT_DEF[st].ic+' '+STATUT_DEF[st].l,'s');
+}
+function oRappelDone(id){
+  var c=OC.find(function(x){return x.id===id;});if(!c||!c.rappel)return;
+  jrnAdd(c,'fait','Rappel du '+fD(c.rappel.date)+' effectué'+(c.rappel.texte?' : '+c.rappel.texte:''));
+  c.rappel=null;oPush([c]);
+  if(document.getElementById('omo').classList.contains('on'))oOpenF(id);
+  oRefresh();oT('Rappel marqué fait — pensez à noter l\'observation','s');
+  oOpenSuivi(id);
+}
+
+// ── Rappels (listes) ───────────────────────────────────────────────
+function rapItem(c){
+  var d=rappelDiff(c);var late=d<0;
+  var col=late?'color:var(--rd)':d===0?'color:#B48A00':'color:var(--gr)';
+  var when=d===0?"Aujourd'hui":late?'Retard '+Math.abs(d)+'j':'Dans '+d+'j';
+  return'<div style="padding:10px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px">'
+    +'<div style="font-size:20px">'+(late?'🚨':'⏰')+'</div>'
+    +'<div style="flex:1;min-width:0" onclick="oOpenF(\''+c.id+'\')">'
+      +'<div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(c.nom)+' '+esc(c.prenom||'')+' '+stBdg(c)+'</div>'
+      +'<div style="font-size:11px;color:var(--t3)"><span style="'+col+';font-weight:700">'+when+'</span> · '+fD(c.rappel.date)+(c.rappel.heure?' '+c.rappel.heure:'')+(c.rappel.pour?' · 👤 '+esc(c.rappel.pour):'')+'</div>'
+      +(c.rappel.texte?'<div style="font-size:12px;color:var(--tx);margin-top:2px">'+esc(c.rappel.texte)+'</div>':'')
+    +'</div>'
+    +(c.tel?'<a class="ob bph bsm" href="tel:'+c.tel+'" onclick="event.stopPropagation()" style="min-height:36px">📞</a>':'')
+    +(ROLE()!=='referent'?'<button class="ob bdone bsm" style="min-height:36px" onclick="oRappelDone(\''+c.id+'\')">✅</button>':'')
+  +'</div>';
+}
+function renderRappels(){
+  var l=mesRappels();
+  var ar=document.getElementById('a-rap-l'),an=document.getElementById('a-rap-n');
+  if(an)an.textContent=l.length;
+  if(ar)ar.innerHTML=l.length?l.map(rapItem).join(''):'<div style="padding:12px 16px;font-size:12px;color:var(--t3)">Aucun rappel programmé. Depuis une fiche : « Valider un contact » → ⏰ Programmer un rappel.</div>';
+  var dc=document.getElementById('d-rap'),dl=document.getElementById('d-rap-l');
+  var due=l.filter(function(c){return rappelDiff(c)<=1;});
+  if(dc){dc.classList.toggle('hide',!due.length);if(dl)dl.innerHTML=due.slice(0,5).map(rapItem).join('');}
+  return l;
+}
+
+// ── Notifications (actions faites par d'autres sur mes contacts) ───
+function notifKey(){return'owlht2_seen_'+(CODE||'x');}
+function notifSeenTs(){try{return localStorage.getItem(notifKey())||'';}catch(e){return'';}}
+function contactMeConcerne(c){
+  var r=ROLE();
+  if(r==='admin')return true;
+  if(r==='gestionnaire')return c.suiviPar===USER.nom||(c.rappel&&c.rappel.pour===USER.nom);
+  var tag=(USER.tags||[])[0];
+  return !!(tag&&((c.ctags&&c.ctags.indexOf(tag)>=0)||(c.refere||'').indexOf(tag)>=0));
+}
+function mesNotifs(){
+  var seen=notifSeenTs(),me=PARTNER_NOM(),out=[];
+  OC.forEach(function(c){
+    if(!c.journal||!contactMeConcerne(c))return;
+    c.journal.forEach(function(e){if(e.auteur!==me&&e.ts>seen)out.push({c:c,e:e});});
+  });
+  return out.sort(function(a,b){return b.e.ts.localeCompare(a.e.ts);});
+}
+function renderNotifs(){
+  var n=mesNotifs();
+  var card=document.getElementById('d-notif');if(!card)return n;
+  card.classList.toggle('hide',!n.length);
+  document.getElementById('d-notif-n').textContent=n.length;
+  document.getElementById('d-notif-l').innerHTML=n.slice(0,8).map(function(x){
+    return'<div class="onotif-it" onclick="oOpenF(\''+x.c.id+'\')"><div class="jrn-ic">'+(JRN_IC[x.e.type]||'•')+'</div><div style="flex:1;min-width:0">'
+      +'<div style="font-size:13px;font-weight:700">'+esc(x.c.nom)+' '+esc(x.c.prenom||'')+' '+stBdg(x.c)+'</div>'
+      +'<div class="jrn-dt">'+fDT(x.e.ts)+' · <span class="jrn-au">'+esc(x.e.auteur)+'</span> ('+roleLabel(x.e.role)+')</div>'
+      +'<div style="font-size:12px;color:var(--tx);overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">'+esc(x.e.texte)+'</div></div></div>';
+  }).join('')+(n.length>8?'<div style="padding:8px 14px;font-size:11px;color:var(--t3)">… et '+(n.length-8)+' autre(s)</div>':'');
+  var nb=document.getElementById('nbhome');if(nb){nb.textContent=n.length;nb.classList.toggle('on',n.length>0);}
+  return n;
+}
+function oNotifSeen(){try{localStorage.setItem(notifKey(),new Date().toISOString());}catch(e){}renderNotifs();oT('Notifications marquées comme lues','s');}
+
+// ── Filtre statut (liste contacts) ─────────────────────────────────
+var ACTIVE_STATUT='';
+function oStChip(btn,val){document.querySelectorAll('#ofilter-st .ofilter-chip').forEach(function(b){b.classList.remove('on');});btn.classList.add('on');ACTIVE_STATUT=val;oFilt();}
+function stSort(a,b){var d=STATUT_DEF[cStatut(a)].ord-STATUT_DEF[cStatut(b)].ord;if(d)return d;var ra=a.rappel?a.rappel.date:'9',rb=b.rappel?b.rappel.date:'9';if(ra!==rb)return ra<rb?-1:1;return(b.lastActivity||b.createdAt||'').localeCompare(a.lastActivity||a.createdAt||'');}
+function stCounts(list){
+  var n={afaire:0,encours:0,close:0,reseau:0};list.forEach(function(c){n[cStatut(c)]++;});
+  Object.keys(n).forEach(function(k){var el=document.getElementById('stn-'+k);if(el)el.textContent=n[k]?'('+n[k]+')':'';});
+}
+// Carte contact unifiée (liste, vue session, accueil)
+function cardHtml(c,showAttr){
+  var num=(c.tel||'').replace(/\D/g,'');var s=cStatut(c);
+  var last=(c.journal&&c.journal.length)?c.journal[c.journal.length-1]:null;
+  var d=rappelDiff(c);
+  return'<div class="ocli-card st-'+s+'" data-cid="'+c.id+'" onclick="oCardClick(event,\''+c.id+'\')">'
+    +'<div class="ocli-avatar">'+initials(c)+'</div>'
+    +'<div class="ocli-info" style="min-width:0">'
+      +'<div class="ocli-name">'+esc(c.nom)+' '+esc(c.prenom||'')+'</div>'
+      +'<div class="ocli-sub">'+(c.tel||'—')+(c.pays?' · '+c.pays:'')+'</div>'
+      +'<div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:4px;align-items:center">'+stBdg(c)
+        +(c.rappel?'<span class="obdg '+(d<0?'brd':d===0?'bgo':'bor')+'">⏰ '+(d<0?'retard':d===0?"auj.":fD(c.rappel.date))+'</span>':'')
+        +eBdg(c.etape)+qBdg(c.qualification||c.qualif)
+        +(showAttr&&c.suiviPar?'<span class="obdg baq">👤 '+esc(c.suiviPar)+'</span>':'')
+        +(showAttr&&c.ctags&&c.ctags.length?c.ctags.map(function(t){return'<span class="obdg bpu">'+esc(t)+'</span>';}).join(''):'')
+      +'</div>'
+      +(last?'<div style="font-size:11px;color:var(--t2);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(JRN_IC[last.type]||'•')+' '+fDT(last.ts)+' · '+esc(last.auteur)+' : '+esc(last.texte)+'</div>'
+            :(c.notes?'<div style="font-size:11px;color:var(--t2);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(c.notes)+'</div>':''))
+    +'</div>'
+    +'<div class="ocli-right" style="flex-direction:column;gap:6px">'
+      +'<button class="ob bsm" style="min-height:34px;padding:4px 10px;background:var(--gold);color:#fff;border:none;white-space:nowrap" onclick="event.stopPropagation();oOpenSuivi(\''+c.id+'\')">📞 Valider</button>'
+      +(num?'<a href="https://wa.me/'+num+'" onclick="event.stopPropagation()" target="_blank" rel="noopener" style="background:var(--wa);color:#fff;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:600;text-decoration:none;text-align:center">WA</a>':'')
+    +'</div>'
+  +'</div>';
+}
+
+// ── APPUI LONG SUR UNE CARTE → MENU RAPIDE ─────────────────────────
+var LP_T=null,LP_FIRED=false,LP_EL=null,LP_X=0,LP_Y=0;
+function lpCancel(){if(LP_T){clearTimeout(LP_T);LP_T=null;}if(LP_EL){LP_EL.classList.remove('pressing');LP_EL=null;}}
+document.addEventListener('pointerdown',function(e){
+  var card=e.target.closest&&e.target.closest('.ocli-card[data-cid]');
+  if(!card||e.target.closest('a,button'))return;
+  LP_FIRED=false;LP_EL=card;LP_X=e.clientX;LP_Y=e.clientY;card.classList.add('pressing');
+  LP_T=setTimeout(function(){LP_FIRED=true;card.classList.remove('pressing');if(navigator.vibrate)navigator.vibrate(25);oCtxOpen(card.getAttribute('data-cid'));},520);
+},{passive:true});
+document.addEventListener('pointermove',function(e){if(LP_T&&(Math.abs(e.clientX-LP_X)>10||Math.abs(e.clientY-LP_Y)>10))lpCancel();},{passive:true});
+['pointerup','pointercancel','scroll'].forEach(function(ev){document.addEventListener(ev,lpCancel,{passive:true,capture:true});});
+document.addEventListener('contextmenu',function(e){var card=e.target.closest&&e.target.closest('.ocli-card[data-cid]');if(card){e.preventDefault();if(!LP_FIRED){LP_FIRED=true;lpCancel();oCtxOpen(card.getAttribute('data-cid'));}}});
+function oCardClick(e,id){if(LP_FIRED){LP_FIRED=false;e.preventDefault();return;}oOpenF(id);}
+
+function oCtxOpen(id){
+  var c=OC.find(function(x){return x.id===id;});if(!c)return;
+  document.getElementById('octx-id').value=id;
+  document.getElementById('octx-ttl').textContent=c.nom+' '+(c.prenom||'');
+  document.getElementById('octx-sub').innerHTML=stBdg(c)+' '+(c.tel||'')+(c.refere?' · 🏷 '+esc(c.refere):'')+(c.suiviPar?' · 👤 '+esc(c.suiviPar):'');
+  document.getElementById('octx-panel').style.display='none';
+  var isRef=ROLE()==='referent';
+  var b='<button class="main" onclick="oCtxClose();oOpenSuivi(\''+id+'\')"><span>📞</span>Valider</button>'
+    +'<button onclick="oCtxClose();oOpenF(\''+id+'\')"><span>👁</span>Ouvrir</button>';
+  if(!isRef){
+    b+='<button onclick="oCtxClose();oEdit(\''+id+'\')"><span>✏️</span>Modifier</button>'
+      +'<button onclick="oCtxPanel(\'tag\')"><span>🏷</span>Changer tag</button>'
+      +'<button onclick="oCtxPanel(\'ref\')"><span>🔗</span>Référent</button>'
+      +'<button onclick="oCtxPanel(\'sui\')"><span>👤</span>Gestionnaire</button>'
+      +'<button class="danger" onclick="oCtxDel()"><span>🗑</span>Supprimer</button>';
+  }
+  document.getElementById('octx-btns').innerHTML=b;
+  document.getElementById('octx').classList.add('on');
+}
+function oCtxClose(){document.getElementById('octx').classList.remove('on');}
+function oCtxPanel(kind){
+  var id=document.getElementById('octx-id').value;var c=OC.find(function(x){return x.id===id;});if(!c)return;
+  var p=document.getElementById('octx-panel');var opts='',lbl='',cur='';
+  var refs=(CFG.referents||[]).slice();USERS.forEach(function(u){(u.tags||[]).forEach(function(t){if(refs.indexOf(t)<0)refs.push(t);});});
+  if(kind==='tag'){lbl='Tag / équipe du contact';cur=(c.ctags||[])[0]||'';opts=refs;}
+  else if(kind==='ref'){lbl='Référé par';cur=c.refere||'';opts=refs;}
+  else{lbl='Suivi par (gestionnaire)';cur=c.suiviPar||'';opts=gestionnaires();}
+  p.innerHTML='<label class="ofl">'+lbl+'</label>'
+    +'<select class="ofc" id="octx-sel"><option value="">— Aucun —</option>'+opts.map(function(o){return'<option value="'+esc(o)+'"'+(o===cur?' selected':'')+'>'+esc(o)+'</option>';}).join('')+'<option value="__new__">＋ Autre…</option></select>'
+    +'<input type="text" class="ofc" id="octx-new" placeholder="Nouvelle valeur" style="display:none;margin-top:8px">'
+    +'<button class="ob bgold bfull" style="margin-top:10px;min-height:44px" onclick="oCtxApply(\''+kind+'\')">Appliquer</button>';
+  p.style.display='block';
+  document.getElementById('octx-sel').onchange=function(){document.getElementById('octx-new').style.display=this.value==='__new__'?'block':'none';};
+}
+function oCtxApply(kind){
+  var id=document.getElementById('octx-id').value;var c=OC.find(function(x){return x.id===id;});if(!c)return;
+  var v=document.getElementById('octx-sel').value;
+  if(v==='__new__'){v=document.getElementById('octx-new').value.trim();if(!v){oT('Saisissez une valeur','e');return;}}
+  if(kind==='tag'){var o=(c.ctags||[]).join(', ')||'—';c.ctags=v?[v]:[];jrnAdd(c,'systeme','Tag : '+o+' → '+(v||'—'));if(v&&CFG.referents.indexOf(v)<0){CFG.referents.push(v);oPushCfg();}}
+  else if(kind==='ref'){jrnAdd(c,'systeme','Référent : '+(c.refere||'—')+' → '+(v||'—'));c.refere=v;if(v&&CFG.referents.indexOf(v)<0){CFG.referents.push(v);oPushCfg();}}
+  else{jrnAdd(c,'systeme','Gestionnaire : '+(c.suiviPar||'—')+' → '+(v||'—'));c.suiviPar=v;}
+  oPush([c]);oCtxClose();populateRefUI();oRefresh();oT('Modification enregistrée','s');
+}
+function oCtxDel(){
+  var id=document.getElementById('octx-id').value;var c=OC.find(function(x){return x.id===id;});if(!c)return;
+  if(!confirm('Supprimer définitivement « '+c.nom+' '+(c.prenom||'')+' » ?'))return;
+  OC=OC.filter(function(x){return x.id!==id;});oPushDel([id]);oCtxClose();oRefresh();oT('Fiche supprimée','w');
+}
+
 // ── PRODUITS (checkboxes) ─────────────────────────────────────────
 function oBuildProductGrid(){
   var g=document.getElementById('opg');
@@ -1861,6 +2303,13 @@ function oOpenF(id){
       +(c.tel?'<a class="ob bph" href="tel:'+c.tel+'" style="flex:1">Appel</a>':'')
       +(c.email?'<a class="ob bem" href="mailto:'+c.email+'" style="flex:1">Email</a>':'')
     +'</div>'
+    +'<div class="od-section"><div class="od-sec-ttl">Suivi du contact</div><div style="padding:12px 16px">'
+      +(isRef?'<div style="margin-bottom:12px">'+stBdg(c)+(c.suiviPar?' <span class="obdg baq">👤 suivi par '+esc(c.suiviPar)+'</span>':' <span class="obdg bgy">pas encore pris en charge</span>')+'</div>'
+             :'<div class="st-pick">'+Object.keys(STATUT_DEF).map(function(k){return'<button type="button" class="'+k+(cStatut(c)===k?' on':'')+'" onclick="oSetStatut(\''+id+'\',\''+k+'\')"><span>'+STATUT_DEF[k].ic+'</span>'+STATUT_DEF[k].l+'</button>';}).join('')+'</div>')
+      +rapBox(c,true)
+      +'<button class="ob bgold bfull" style="min-height:48px" onclick="oOpenSuivi(\''+id+'\')">📞 Valider un contact / ajouter une observation</button>'
+    +'</div></div>'
+    +'<div class="od-section"><div class="od-sec-ttl">Journal des actions ('+((c.journal||[]).length)+')</div>'+jrnHtml(c)+'</div>'
     +'<div class="od-section"><div class="od-sec-ttl">Informations</div>'
       +'<div class="od-row"><span class="od-lbl">Téléphone</span><span class="od-val">'+(c.tel||'—')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">Référé par</span><span class="od-val">'+esc(c.refere||'—')+'</span></div>'
