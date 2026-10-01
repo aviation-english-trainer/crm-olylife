@@ -310,7 +310,7 @@ textarea.ofc{resize:vertical;min-height:76px;}
   <div class="os-card">
     <div class="os-hd">
       <div class="os-hd-ttl"><img class="wlht-logo" alt="" style="height:22px;width:auto;vertical-align:-4px;margin-right:6px"> CRM OlyLife — WLHT</div>
-      <div class="os-hd-sub">Connexion — chaque membre de l'équipe a son propre code d'accès</div>
+      <div class="os-hd-sub">Connexion — chaque membre de l'équipe a son propre code d'accès <span style="opacity:.6;font-size:10px" id="ol-version"></span></div>
     </div>
     <div class="os-bd">
       <div id="ol-url-wrap">
@@ -473,6 +473,10 @@ textarea.ofc{resize:vertical;min-height:76px;}
       <div class="ocard hide" id="eq-users-card">
         <div class="ochd"><span class="oct">🔐 Accès &amp; rôles</span><div style="display:flex;gap:6px"><button class="ob bsm" style="background:#E8A020;color:#fff;border:none" onclick="oDigestSendAll()" title="Aperçu digest pour tous les utilisateurs configurés">📧 Digest</button><button class="ob bgh bsm" onclick="oUserNew()">＋ Ajouter</button></div></div>
         <div id="eq-users-list"></div>
+        <div style="padding:10px 14px 12px;border-top:1px solid var(--bd);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <button class="ob bsm" style="background:var(--pu);color:#fff;border:none;min-height:40px" onclick="oMergeSeedThierry(true)">📥 Importer les contacts de Thierry</button>
+          <span style="font-size:11px;color:var(--t3);margin-left:auto" id="eq-version"></span>
+        </div>
         <div id="eq-user-form" style="display:none;padding:14px 16px;border-top:1px solid var(--bd);background:var(--navy3)">
           <input type="hidden" id="u-id">
           <div class="ofg">
@@ -777,6 +781,7 @@ var DELAI_TEMOIGNAGE=30;
 var GAS_URL='',CODE='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
+var APP_VERSION='v2.4 · 01/10 16h45';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -1243,7 +1248,7 @@ function oSw(v,i){
   document.getElementById('ocont').scrollTop=0;
   oRefreshView(v);
 }
-function oRefreshView(v){if(v==='dashboard')oDash();else if(v==='contacts')oCli();else if(v==='actions')oAct();else if(v==='equipe'){oEq();oLoadMyDigest();}}
+function oRefreshView(v){if(v==='dashboard')oDash();else if(v==='contacts')oCli();else if(v==='actions')oAct();else if(v==='equipe'){oEq();oLoadMyDigest();var ve=document.getElementById('eq-version');if(ve)ve.textContent=APP_VERSION;}}
 function oRefresh(){var v=document.querySelector('.ov.on');if(v)oRefreshView(v.id.replace('ov-',''));}
 
 // ── MESSAGES TYPES (3 registres × FR/EN) ─────────────────────────────
@@ -1649,11 +1654,13 @@ function oContactsRef(tag){
 }
 
 // ── IMPORT SEED CONTACTS THIERRY (si tag Thierry présent dans USERS et contacts absents) ──
-function oMergeSeedThierry(){
-  if(ROLE()!=='admin')return; // seul l'admin déclenche l'import (évite les doublons multi-sessions)
+function oMergeSeedThierry(manual){
+  if(ROLE()!=='admin'){if(manual)oT('Réservé à l\'admin','e');return;} // seul l'admin déclenche l'import
   // Détecte l'accès de Thierry Gil quel que soit son tag (DrThierry, Thierry, Gil…)
-  var thUser=USERS.find(function(u){return /thierry|gil/i.test((u.nom||'')+' '+(u.tags||[]).join(' '));});
-  if(!thUser)return;
+  var thUser=null;
+  for(var k=0;k<USERS.length;k++){var u=USERS[k];if(/thierry|gil/i.test((u.nom||'')+' '+(u.tags||[]).join(' '))){thUser=u;break;}}
+  if(!thUser){if(manual)oT('Aucun accès « Thierry » trouvé dans l\'équipe','e');return;}
+  if(manual)oT('Accès trouvé : '+thUser.nom+' · tag '+((thUser.tags||[])[0]||'—'),'i');
   var tag=(thUser.tags&&thUser.tags.length)?thUser.tags[0]:thUser.nom;
   // Contacts seed déjà présents (par téléphone ou nom) → on ne réimporte pas
   var exists=function(s){
@@ -1670,10 +1677,13 @@ function oMergeSeedThierry(){
   });
   // Re-tague d'éventuels anciens imports portant 'Thierry' vers le tag réel
   OC.forEach(function(c){if(c.ctags&&c.ctags.indexOf('Thierry')>=0&&tag!=='Thierry'){c.ctags=[tag];c.refere=thUser.nom;c.suiviPar=thUser.nom;added.push(c);}});
-  if(!added.length)return;
+  if(!added.length){
+    if(manual)oT('Déjà en place : '+oContactsRef(tag).length+' contact(s) portent le tag '+tag,'s');
+    return;
+  }
   if(CFG.referents&&CFG.referents.indexOf(tag)<0){CFG.referents.push(tag);oPushCfg();}
   oPush(added); // → serveur + cache, visible depuis la session de Thierry
-  oT('✅ '+added.length+' contact(s) rattachés à '+thUser.nom,'s');
+  oT('✅ '+added.length+' contact(s) rattachés à '+thUser.nom+' (tag '+tag+')','s');
   oRefresh();
 }
 
@@ -2086,6 +2096,7 @@ document.getElementById('opwa-yes').addEventListener('click',function(){var b=do
 // ── INIT ──────────────────────────────────────────────────────────
 oBuildProductGrid();
 oGetCfg();
+(function(){var v=document.getElementById('ol-version');if(v)v.textContent='· '+APP_VERSION;})();
 if(GAS_URL&&CODE){oLoadCache();if(USER){applyRole();populateRefUI();oRefresh();}oPull();}
 else{oShowLogin();}
 </script>
