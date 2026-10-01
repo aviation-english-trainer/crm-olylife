@@ -520,6 +520,7 @@ textarea.ofc{resize:vertical;min-height:76px;}
           <div class="ofg1"><label class="ofl">Ville</label><input type="text" class="ofc" id="fc-vil" placeholder="Abidjan"></div>
           <div class="ofg1" id="fg-ref"><label class="ofl">Référé par</label><input type="text" class="ofc" id="fc-ref" list="ref-list" placeholder="Choisir ou saisir un référent"><datalist id="ref-list"></datalist></div>
           <div class="ofg1" id="fg-suivi"><label class="ofl">Suivi par</label><select class="ofc" id="fc-suivi"><option value="">— Non attribué —</option></select></div>
+          <div class="ofg1"><label class="ofl">Tags <span style="color:var(--t3);font-weight:400;font-size:11px">— identifier le contact (ex : JC, Eddie, WLHT, Abidjan…)</span></label><input type="text" class="ofc" id="fc-ctags" placeholder="ex: Jean-Charles, Abidjan, P90" autocomplete="off"></div>
 
           <div class="fb" id="fb-pipeline">
             <div class="osec">Pipeline</div>
@@ -1257,6 +1258,7 @@ function oCli(){
         +'<div style="margin-top:4px">'+eBdg(c.etape)+' '+qBdg(c.qualification)
           +(showAttr&&c.refere?' <span class="obdg bgy">🏷 '+esc(c.refere)+'</span>':'')
           +(showAttr&&c.suiviPar?' <span class="obdg baq">👤 '+esc(c.suiviPar)+'</span>':'')
+          +((c.ctags&&c.ctags.length)?' '+c.ctags.map(function(t){return'<span class="obdg bpu">'+esc(t)+'</span>';}).join(' '):'')
         +'</div>'
       +'</div>'
       +'<div class="ocli-right">'
@@ -1405,6 +1407,7 @@ function oOpenF(id){
       +'<div class="od-row"><span class="od-lbl">Téléphone</span><span class="od-val">'+(c.tel||'—')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">Référé par</span><span class="od-val">'+esc(c.refere||'—')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">Suivi par</span><span class="od-val">'+esc(c.suiviPar||'— Non attribué —')+'</span></div>'
+      +((c.ctags&&c.ctags.length)?'<div class="od-row"><span class="od-lbl">Tags</span><span class="od-val" style="display:flex;flex-wrap:wrap;gap:4px">'+c.ctags.map(function(t){return'<span class="obdg bpu">'+esc(t)+'</span>';}).join('')+'</span></div>':'')
       +'<div class="od-row"><span class="od-lbl">Canal</span><span class="od-val">'+(c.canal||'—')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">Registre</span><span class="od-val">'+(TONE_LABEL[c.registre]||TONE_LABEL.pro)+'</span></div>'
     +'</div>'
@@ -1446,6 +1449,7 @@ function oEdit(id){
   document.getElementById('fc-eid').value=id;
   var map={'fc-nm':c.nom,'fc-pr':c.prenom,'fc-tel':c.tel,'fc-em':c.email,'fc-pays':c.pays,'fc-vil':c.ville,'fc-ref':c.refere,'fc-suivi':c.suiviPar,'fc-etape':c.etape,'fc-qualif':c.qualification,'fc-canal':c.canal,'fc-registre':c.registre,'fc-obj':c.objectifs,'fl-numcmd':c.numCommande,'fl-memberid':c.memberIdOlyLife,'fl-datecmd':c.dateCommande,'fl-transp':c.transporteur,'fl-tracking':c.tracking,'fl-datelivr':c.dateLivraison,'fi-date':c.dateInstall,'fi-notes':c.notesUsage,'ft-texte':c.temoignageTexte,'fe-sponsor':c.sponsor,'fe-placement':c.placement,'fe-cote':c.cote,'fe-gen':c.generation,'fe-rang':c.rang,'fc-notes':c.notes};
   Object.keys(map).forEach(function(k){var el=document.getElementById(k);if(el)el.value=map[k]||'';});
+  document.getElementById('fc-ctags').value=(c.ctags||[]).join(', ');
   document.getElementById('fi-confirm').checked=!!c.installConfirm;
   document.getElementById('ft-autorise').checked=!!c.temoignageAutorise;
   document.getElementById('fe-partenaire').checked=!!c.estPartenaire;
@@ -1458,6 +1462,7 @@ function oReset(){
   ['fc-nm','fc-pr','fc-tel','fc-em','fc-pays','fc-vil','fc-ref','fc-obj','fl-numcmd','fl-memberid','fl-datecmd','fl-transp','fl-tracking','fl-datelivr','fi-date','fi-notes','ft-texte','fe-sponsor','fe-placement','fe-gen','fc-notes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('fc-etape').value='Prospect';document.getElementById('fc-qualif').value='Chaud';document.getElementById('fc-canal').value='WhatsApp';document.getElementById('fc-registre').value='pro';
   document.getElementById('fc-suivi').value='';
+  document.getElementById('fc-ctags').value='';
   document.getElementById('fe-cote').value='';document.getElementById('fe-rang').value='';
   document.getElementById('fi-confirm').checked=false;document.getElementById('ft-autorise').checked=false;document.getElementById('fe-partenaire').checked=false;
   oTEQ();
@@ -1476,6 +1481,7 @@ function oSave(){
     nom:nm.toUpperCase(),prenom:pr,tel:tel,email:document.getElementById('fc-em').value,pays:document.getElementById('fc-pays').value,ville:document.getElementById('fc-vil').value,
     refere:isRef?((USER.tags&&USER.tags[0])||USER.nom):document.getElementById('fc-ref').value.trim(),
     suiviPar:isRef?'':document.getElementById('fc-suivi').value,
+    ctags:(document.getElementById('fc-ctags').value||'').split(',').map(function(t){return t.trim();}).filter(Boolean),
     etape:document.getElementById('fc-etape').value,qualification:document.getElementById('fc-qualif').value,canal:document.getElementById('fc-canal').value,registre:document.getElementById('fc-registre').value,objectifs:document.getElementById('fc-obj').value,
     produits:prods,
     numCommande:document.getElementById('fl-numcmd').value,memberIdOlyLife:document.getElementById('fl-memberid').value,dateCommande:document.getElementById('fl-datecmd').value,transporteur:document.getElementById('fl-transp').value,tracking:document.getElementById('fl-tracking').value,dateLivraison:document.getElementById('fl-datelivr').value,
