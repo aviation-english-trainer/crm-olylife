@@ -1,0 +1,20 @@
+{
+  "name": "CRM OlyLife — WLHT",
+  "short_name": "CRM OlyLife",
+  "description": "Suivi des contacts, rappels et équipe OlyLife — Water Life High Tech",
+  "id": "/crm-olylife/",
+  "start_url": "./index.html?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F6FAF6",
+  "theme_color": "#126A3C",
+  "lang": "fr",
+  "categories": ["business", "productivity"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-192-maskable.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
