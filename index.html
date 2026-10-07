@@ -751,6 +751,19 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 .leaflet-popup-content{font-family:'Outfit',sans-serif!important;font-size:13px;margin:12px 14px!important;min-width:190px;}
 .leaflet-popup-content b{font-size:14px;}
 .leaflet-popup-content .ob{min-height:38px;font-size:12px;width:100%;margin-top:8px;}
+.map-pin{background:none!important;border:none!important;}
+.map-pin span{display:block;width:34px;height:34px;line-height:34px;text-align:center;font-size:28px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));transform-origin:50% 100%;animation:pinDrop .5s cubic-bezier(.2,.8,.3,1.2);}
+@keyframes pinDrop{from{transform:translateY(-14px) scale(.6);opacity:0}to{transform:none;opacity:1}}
+.av-seg{display:flex;gap:6px;margin-bottom:12px;}
+.av-seg button{flex:1;min-height:44px;border:1.5px solid var(--bd);border-radius:12px;background:#fff;font-size:13px;font-weight:600;color:var(--t2);cursor:pointer;}
+.av-seg button.on{border-color:var(--gold);background:var(--goldp);color:var(--gold);}
+.av-remb{margin-top:14px;padding:12px;border-radius:12px;background:var(--navy3);border:1px solid var(--bd);}
+.av-remb .ttl{font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px;}
+.av-remb .row{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:5px 0;border-bottom:1px dashed var(--bd);}
+.av-remb .row:last-of-type{border-bottom:none;}
+.av-bar{height:6px;border-radius:6px;background:var(--bd);overflow:hidden;margin:6px 0 2px;}
+.av-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),#7CC08A);transition:width .4s;}
+.av-tag-don{background:#FDF1D8;color:#8A5A00;}
 .map-bdg{display:inline-block;background:var(--aqp,#E8F4F0);color:var(--aqua);border-radius:9px;padding:2px 8px;font-size:10.5px;font-weight:600;margin:3px 3px 0 0;}
 .map-count{font-size:12px;color:var(--t2);margin:10px 2px 0;line-height:1.6;}
 
@@ -1485,20 +1498,32 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 <div id="oavs">
   <div class="omo-hd">
     <button class="omo-back" onclick="oAvClose()">←</button>
-    <div class="omo-ttl">💶 Avance d'argent</div>
+    <div class="omo-ttl" id="oavs-ttl">💶 Avance d'argent</div>
   </div>
   <div class="omo-body">
     <div class="os-note" style="margin-bottom:14px" id="oavs-sub">—</div>
-    <input type="hidden" id="av-cid"><input type="hidden" id="av-id">
+    <input type="hidden" id="av-cid"><input type="hidden" id="av-id"><input type="hidden" id="av-type" value="avance">
+    <div class="av-seg"><button type="button" id="av-t-avance" class="on" onclick="oAvType('avance')">💶 Avance<br><small style="font-weight:400">à rembourser</small></button><button type="button" id="av-t-don" onclick="oAvType('don')">🎁 Don<br><small style="font-weight:400">sans remboursement</small></button></div>
     <div class="ofg">
+      <div class="ofg1"><label class="ofl">Qui a avancé / donné l'argent ? <span class="oreq">*</span></label><select class="ofc" id="av-par"></select><div style="font-size:11px;color:var(--t3);margin-top:4px">Montant transmis depuis son BO OlyLife. La ligne apparaît aussi sur sa fiche membre.</div></div>
       <div class="ofg1"><label class="ofl">Montant <span class="oreq">*</span></label><input type="number" class="ofc" id="av-montant" placeholder="500" min="0" step="0.01" inputmode="decimal"></div>
       <div class="ofg1"><label class="ofl">Devise</label><select class="ofc" id="av-devise"><option>€</option><option>FCFA</option><option>USD</option><option>MAD</option></select></div>
-      <div class="ofg1"><label class="ofl">Date de l'avance</label><input type="date" class="ofc" id="av-date"></div>
-      <div class="ofg1"><label class="ofl">Échéance de remboursement <span class="oreq">*</span></label><input type="date" class="ofc" id="av-ech"></div>
+      <div class="ofg1"><label class="ofl" id="av-date-lbl">Date de l'avance <span class="oreq">*</span></label><input type="date" class="ofc" id="av-date"></div>
+      <div class="ofg1" id="av-ech-wrap"><label class="ofl">Échéance de remboursement <span class="oreq">*</span></label><input type="date" class="ofc" id="av-ech"></div>
       <div class="ofg1"><label class="ofl">Motif / appareil financé</label><input type="text" class="ofc" id="av-motif" placeholder="Tera-P90+"></div>
     </div>
-    <div class="os-note" style="margin-top:12px;font-size:11.5px">⏰ Rappels automatiques par <b>e-mail</b> 3 jours avant, la veille et le jour J (aux gestionnaires du contact et à l'admin). Le message <b>WhatsApp</b> pré-rempli est à un clic depuis la fiche et depuis l'écran Actions.</div>
-    <button class="ob bgold bfull" style="margin-top:14px;min-height:48px" onclick="oAvSave()">Enregistrer l'avance</button>
+    <div class="av-remb" id="av-remb" style="display:none">
+      <div class="ttl">💰 Remboursements</div>
+      <div id="av-remb-list"></div>
+      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+        <input type="date" class="ofc" id="av-r-date" style="flex:1;min-width:130px">
+        <input type="number" class="ofc" id="av-r-montant" placeholder="Montant" min="0" step="0.01" inputmode="decimal" style="flex:1;min-width:100px">
+        <button class="ob bgh" type="button" onclick="oAvRembAdd(false)">➕ Partiel</button>
+        <button class="ob baqua" type="button" onclick="oAvRembAdd(true)">✅ Solde complet</button>
+      </div>
+    </div>
+    <div class="os-note" style="margin-top:12px;font-size:11.5px" id="av-note">⏰ Rappels automatiques par <b>e-mail</b> 3 jours avant, la veille et le jour J (aux gestionnaires du contact et à l'admin). Le message <b>WhatsApp</b> pré-rempli est à un clic depuis la fiche et depuis l'écran Actions.</div>
+    <button class="ob bgold bfull" style="margin-top:14px;min-height:48px" id="av-save-btn" onclick="oAvSave()">Enregistrer l'avance</button>
   </div>
 </div>
 
@@ -1688,7 +1713,7 @@ var DELAI_TEMOIGNAGE=30;
 var GAS_URL='',CODE='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.6 · 07/10';
+var APP_VERSION='v3.7 · 08/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -2405,9 +2430,9 @@ function computeActions(){
       }
     }
     (c.avances||[]).forEach(function(a){
-      if(a.statut==='rembourse'||!a.echeance)return;
+      if(a.type==='don'||a.statut==='rembourse'||!a.echeance)return;
       var diff=diffD(a.echeance);
-      if(diff!==null&&diff<=3)items.push({c:c,key:'av_'+a.id,type:'Avance',label:'💶 Avance de '+a.montant+' '+(a.devise||'€')+(a.motif?' ('+a.motif+')':'')+' — '+(diff<0?'retard de '+Math.abs(diff)+' j':diff===0?'échéance aujourd\'hui':'échéance '+fD(a.echeance)),diff:diff,msg:avWaMsg(c,a)});
+      if(diff!==null&&diff<=3)items.push({c:c,key:'av_'+a.id,type:'Avance',label:'💶 Avance de '+a.montant+' '+(a.devise||'€')+(avRendu(a)?' (reste '+avReste(a)+' '+(a.devise||'€')+')':'')+(a.motif?' ('+a.motif+')':'')+' — '+(diff<0?'retard de '+Math.abs(diff)+' j':diff===0?'échéance aujourd\'hui':'échéance '+fD(a.echeance)),diff:diff,msg:avWaMsg(c,a)});
     });
   });
   items.sort(function(a,b){return a.diff-b.diff;});
@@ -2417,7 +2442,7 @@ function oDone(cid,key){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
   if(key&&key.indexOf('av_')===0){
     var a=(c.avances||[]).find(function(x){return'av_'+x.id===key;});
-    if(a){a.statut='rembourse';a.rembourseLe=new Date().toISOString().split('T')[0];jrnAdd(c,'fait','💶 Avance de '+a.montant+' '+(a.devise||'€')+' remboursée');oPush([c]);oT('💶 Avance marquée remboursée','s');oRefresh();return;}
+    if(a){a.rembs=a.rembs||[];a.rembs.push({date:todayYMD(),montant:avReste(a),complet:true});avRecalc(a);jrnAdd(c,'fait','💶 Avance de '+a.montant+' '+(a.devise||'€')+' entièrement remboursée');oPush([c]);oT('✅ Avance soldée','s');emojiBurst(['✅','💰']);oRefresh();return;}
   }
   if(!c.actions)c.actions={};
   c.actions[key]={done:true,doneAt:new Date().toISOString().split('T')[0]};
@@ -3195,24 +3220,57 @@ function oTEQ(){document.getElementById('feq-wrap').style.display=document.getEl
 // ── FICHE MODAL ──────────────────────────────────────────────────────
 function odSec(ttl,body,open){return'<div class="od-section'+(open?'':' clps')+'"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">'+ttl+'</div><div class="od-bd">'+body+'</div></div>';}
 function rangBdg(c){return c.rangOly?'<span class="obdg bgo">🏅 '+esc(c.rangOly)+'</span>':'';}
-function avanceEnCours(c){return(c.avances||[]).some(function(a){return a.statut!=='rembourse';});}
+function avanceEnCours(c){return(c.avances||[]).some(function(a){return a.type!=='don'&&a.statut!=='rembourse';});}
+function avRendu(a){return(a.rembs||[]).reduce(function(t,r){return t+(+r.montant||0);},0);}
+function avReste(a){return Math.max(0,(+a.montant||0)-avRendu(a));}
+function avRecalc(a){
+  if(a.type==='don'){a.statut='don';return;}
+  var rd=avRendu(a);
+  if(rd>=(+a.montant||0)-0.004){a.statut='rembourse';var last=(a.rembs||[]).slice().sort(function(x,y){return(x.date||'')<(y.date||'')?1:-1;})[0];a.rembourseLe=last?last.date:(a.rembourseLe||todayYMD());}
+  else if(rd>0){a.statut='partiel';a.rembourseLe='';}
+  else{a.statut='encours';a.rembourseLe='';}
+}
+function nmKey(x){return String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/^dr\.?\s+/,'').replace(/[^a-z0-9]+/g,' ').trim();}
+function avParMatches(a,c){
+  if(!a||!c)return false;
+  if(a.parId&&a.parId===c.id)return true;
+  var k=nmKey(a.par);if(!k)return false;
+  return k===nmKey((c.nom||'')+' '+(c.prenom||''))||k===nmKey((c.prenom||'')+' '+(c.nom||''));
+}
+function avStBdg(a){
+  if(a.type==='don')return'<span class="obdg av-tag-don">🎁 don · sans remboursement</span>';
+  var diff=a.echeance?diffD(a.echeance):null,done=a.statut==='rembourse',rd=avRendu(a);
+  if(done)return'<span class="obdg bgr">✅ remboursée'+(a.rembourseLe?' le '+fD(a.rembourseLe):'')+'</span>';
+  var part=rd>0?'<span class="obdg baq">💰 partiel : '+rd+' / '+a.montant+' '+esc(a.devise||'€')+'</span> ':'';
+  return part+(diff!==null&&diff<0?'<span class="obdg brd">🚨 retard de '+Math.abs(diff)+' j</span>'
+    :diff===0?'<span class="obdg bor">⏰ échéance aujourd\'hui</span>'
+    :'<span class="obdg bgo">échéance '+fD(a.echeance)+'</span>');
+}
+function avRowHtml(c,a,vuePayeur){
+  var isRef=(ROLE()==='referent'),done=a.statut==='rembourse'||a.type==='don',rd=avRendu(a),pct=a.montant?Math.min(100,Math.round(rd/a.montant*100)):0;
+  return'<div class="av-it"><div class="av-b"><span class="av-m">'+esc(String(a.montant))+' '+esc(a.devise||'€')+'</span> '+avStBdg(a)
+    +(a.type!=='don'&&rd>0&&!done?'<div class="av-bar"><i style="width:'+pct+'%"></i></div>':'')
+    +'<small>'+(a.type==='don'?'Donné':'Avancé')+' le '+fD(a.date)+(a.motif?' · '+esc(a.motif):'')
+    +(vuePayeur?' · à <b>'+esc(c.nom+' '+(c.prenom||''))+'</b>':(a.par?' · par <b>'+esc(a.par)+'</b>':''))
+    +((a.rembs||[]).length?'<br>↩ '+a.rembs.map(function(r){return fD(r.date)+' : '+r.montant+' '+esc(a.devise||'€');}).join(' · '):'')+'</small></div>'
+    +(isRef?'':'<div style="display:flex;gap:4px;flex-shrink:0">'
+      +(!done&&c.tel?'<a class="tb-ic" title="Rappel WhatsApp" href="'+mkWA(c.tel,avWaMsg(c,a))+'" target="_blank" rel="noopener">💬</a>':'')
+      +(!done?'<button class="tb-ic go" title="Remboursement partiel ou complet" onclick="oAvOpen(\''+c.id+'\',\''+a.id+'\')">💰</button>':'<button class="tb-ic" title="Modifier" onclick="oAvOpen(\''+c.id+'\',\''+a.id+'\')">✏️</button>')
+      +'<button class="tb-ic" title="Supprimer" onclick="oAvDel(\''+c.id+'\',\''+a.id+'\')">🗑</button>'
+    +'</div>')+'</div>';
+}
+function avDonneesHtml(c){
+  var rows=[];
+  OC.forEach(function(b){(b.avances||[]).forEach(function(a){if(b.id!==c.id&&avParMatches(a,c))rows.push(avRowHtml(b,a,true));});});
+  if(!rows.length)return'';
+  var tot={};OC.forEach(function(b){(b.avances||[]).forEach(function(a){if(avParMatches(a,c)&&a.type!=='don'&&a.statut!=='rembourse'){var d=a.devise||'€';tot[d]=(tot[d]||0)+avReste(a);}});});
+  var tl=Object.keys(tot).filter(function(k){return tot[k]>0;}).map(function(k){return tot[k]+' '+k;}).join(' · ');
+  return odSec('💸 Avances / dons consentis ('+rows.length+')',rows.join('')+(tl?'<div style="padding:10px 16px;font-size:12px;color:var(--t2);border-top:1px solid var(--bd)"><b>Reste à récupérer :</b> '+tl+'</div>':''),true);
+}
 function avListHtml(c){
   var avs=c.avances||[],isRef=(ROLE()==='referent');
-  var rows=avs.map(function(a){
-    var diff=a.echeance?diffD(a.echeance):null,done=a.statut==='rembourse';
-    var st=done?'<span class="obdg bgr">✅ remboursée'+(a.rembourseLe?' le '+fD(a.rembourseLe):'')+'</span>'
-      :diff!==null&&diff<0?'<span class="obdg brd">🚨 retard de '+Math.abs(diff)+' j</span>'
-      :diff===0?'<span class="obdg bor">⏰ échéance aujourd\'hui</span>'
-      :'<span class="obdg bgo">échéance '+fD(a.echeance)+'</span>';
-    return'<div class="av-it"><div class="av-b"><span class="av-m">'+esc(String(a.montant))+' '+esc(a.devise||'€')+'</span> '+st
-      +'<small>Avancé le '+fD(a.date)+(a.motif?' · '+esc(a.motif):'')+(a.par?' · par '+esc(a.par):'')+'</small></div>'
-      +(isRef?'':'<div style="display:flex;gap:4px;flex-shrink:0">'
-        +(!done&&c.tel?'<a class="tb-ic" title="Rappel WhatsApp" href="'+mkWA(c.tel,avWaMsg(c,a))+'" target="_blank" rel="noopener">💬</a>':'')
-        +(!done?'<button class="tb-ic go" title="Marquer remboursée" onclick="oAvMark(\''+c.id+'\',\''+a.id+'\')">✅</button>':'')
-        +'<button class="tb-ic" title="Supprimer" onclick="oAvDel(\''+c.id+'\',\''+a.id+'\')">🗑</button>'
-      +'</div>')+'</div>';
-  }).join('');
-  return rows+(isRef?'':'<div style="padding:10px 16px"><button class="ob baqua bsm" onclick="oAvOpen(\''+c.id+'\')">➕ Nouvelle avance</button></div>');
+  var rows=avs.map(function(a){return avRowHtml(c,a,false);}).join('');
+  return rows+(isRef?'':'<div style="padding:10px 16px"><button class="ob baqua bsm" onclick="oAvOpen(\''+c.id+'\')">➕ Avance ou don</button></div>');
 }
 function oOpenF(id){
   var c=OC.find(function(x){return x.id===id;});if(!c)return;
@@ -3243,7 +3301,8 @@ function oOpenF(id){
       +(ROLE()==='admin'&&stkList().some(function(x){return(+x.qte||0)>0;})?'<button class="ob baqua bfull" style="min-height:44px;margin-top:8px" onclick="oStkOpen(\''+id+'\')">📦 Remise immédiate depuis un stock</button>':'')
     +'</div></div>'
     +odSec('Journal des actions ('+((c.journal||[]).length)+')',jrnHtml(c),true)
-    +((c.avances&&c.avances.length)||!isRef?odSec('💶 Avances d\'argent'+((c.avances||[]).length?' ('+c.avances.length+')':''),avListHtml(c),avanceEnCours(c)):'')
+    +((c.avances&&c.avances.length)||!isRef?odSec('💶 Avances / dons reçus'+((c.avances||[]).length?' ('+c.avances.length+')':''),avListHtml(c),avanceEnCours(c)):'')
+    +avDonneesHtml(c)
     +odSec('Informations',
       '<div class="od-row"><span class="od-lbl">Téléphone</span><span class="od-val">'+(c.tel||'—')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">E-mail</span><span class="od-val">'+esc(c.email||'—')+'</span></div>'
@@ -4421,47 +4480,117 @@ function oDrGo(v){oDrawerClose();setTimeout(function(){oSw(v);},60);}
 
 // ── Avances d'argent ───────────────────────────────────────────────
 function avWaMsg(c,a){
-  return'Bonjour '+(c.prenom||'')+', j\'espère que vous allez bien 🌿\n\nPetit rappel amical concernant l\'avance de '+a.montant+' '+(a.devise||'€')+' du '+fD(a.date)+(a.motif?' pour votre '+a.motif:'')+' : le remboursement est prévu le '+fD(a.echeance)+'.\n\nMerci de me confirmer que c\'est toujours bon pour vous. Belle journée !\n'+(PARTNER_NOM()||'L\'équipe WLHT')+' — Water Life High Tech';
+  return'Bonjour '+(c.prenom||'')+', j\'espère que vous allez bien 🌿\n\nPetit rappel amical concernant l\'avance de '+a.montant+' '+(a.devise||'€')+' du '+fD(a.date)+(a.motif?' pour votre '+a.motif:'')+(avRendu(a)?' (déjà rendu : '+avRendu(a)+' '+(a.devise||'€')+', reste '+avReste(a)+' '+(a.devise||'€')+')':'')+' : le remboursement est prévu le '+fD(a.echeance)+'.\n\nMerci de me confirmer que c\'est toujours bon pour vous. Belle journée !\n'+(PARTNER_NOM()||'L\'équipe WLHT')+' — Water Life High Tech';
+}
+var AV_CUR=null;
+function avPayeurs(excludeId){
+  var out=[],seen={};
+  function add(v,l,g){if(seen[l.toLowerCase()])return;seen[l.toLowerCase()]=1;out.push({v:v,l:l,g:g});}
+  if(USER)add('u:'+USER.id,USER.nom+' ('+roleLabel(ROLE())+')','Équipe');
+  USERS.forEach(function(u){if(u.actif===false||u.pending)return;add('u:'+u.id,u.nom+' ('+roleLabel(u.role)+')','Équipe');});
+  OC.slice().sort(function(a,b){return(a.nom||'').localeCompare(b.nom||'');}).forEach(function(c){
+    if(c.id===excludeId||mtEstEA(c))return;
+    add('c:'+c.id,(c.nom||'')+' '+(c.prenom||'')+(c.memberIdOlyLife?' · '+c.memberIdOlyLife:''),'Membres / clients');
+  });
+  return out;
+}
+function avParName(v){
+  if(!v)return'';
+  if(v.indexOf('u:')===0){var id=v.slice(2);if(USER&&USER.id===id)return USER.nom;var u=USERS.find(function(x){return x.id===id;});return u?u.nom:'';}
+  var c=OC.find(function(x){return x.id===v.slice(2);});return c?(c.nom||'')+' '+(c.prenom||''):'';
+}
+function oAvType(t){
+  document.getElementById('av-type').value=t;
+  document.getElementById('av-t-avance').classList.toggle('on',t==='avance');
+  document.getElementById('av-t-don').classList.toggle('on',t==='don');
+  document.getElementById('av-ech-wrap').style.display=t==='don'?'none':'';
+  document.getElementById('av-date-lbl').innerHTML=(t==='don'?'Date du don':'Date de l\'avance')+' <span class="oreq">*</span>';
+  document.getElementById('oavs-ttl').textContent=t==='don'?'🎁 Don d\'argent':'💶 Avance d\'argent';
+  document.getElementById('av-note').innerHTML=t==='don'
+    ?'🎁 Un <b>don</b> n\'appelle aucun remboursement : pas d\'échéance, pas de rappel. Il est simplement tracé sur la fiche du bénéficiaire et sur celle du donateur.'
+    :'⏰ Rappels automatiques par <b>e-mail</b> 3 jours avant, la veille et le jour J (aux gestionnaires du contact et à l\'admin). Le message <b>WhatsApp</b> pré-rempli est à un clic depuis la fiche et depuis l\'écran Actions.';
+  document.getElementById('av-save-btn').textContent=t==='don'?'Enregistrer le don':'Enregistrer l\'avance';
+  var rb=document.getElementById('av-remb');rb.style.display=(t==='avance'&&AV_CUR&&AV_CUR.id)?'':'none';
+}
+function avRembRender(){
+  var a=AV_CUR;if(!a)return;
+  var box=document.getElementById('av-remb-list');
+  var rs=(a.rembs||[]).slice().sort(function(x,y){return(x.date||'')<(y.date||'')?-1:1;});
+  box.innerHTML=(rs.length?rs.map(function(r,i){return'<div class="row"><span style="flex:1">'+fD(r.date)+' — <b>'+r.montant+' '+esc(a.devise||'€')+'</b>'+(r.complet?' <span class="obdg bgr">solde</span>':' <span class="obdg baq">partiel</span>')+'</span><button class="tb-ic" type="button" title="Retirer" onclick="oAvRembDel('+i+')">🗑</button></div>';}).join(''):'<div style="font-size:12px;color:var(--t3)">Aucun remboursement enregistré.</div>')
+    +'<div style="font-size:12px;margin-top:6px;color:var(--t2)">Rendu : <b>'+avRendu(a)+'</b> / '+a.montant+' '+esc(a.devise||'€')+' · reste <b>'+avReste(a)+' '+esc(a.devise||'€')+'</b></div>';
+  document.getElementById('av-r-date').value=todayYMD();document.getElementById('av-r-montant').value='';
+}
+function oAvRembAdd(complet){
+  var a=AV_CUR;if(!a)return;
+  var d=val('av-r-date')||todayYMD(),m=parseFloat(val('av-r-montant'));
+  a.montant=parseFloat(val('av-montant'))||a.montant;
+  if(complet)m=avReste(a);
+  if(!m||m<=0){oT('Indiquez le montant remboursé','e');return;}
+  a.rembs=a.rembs||[];a.rembs.push({date:d,montant:Math.round(m*100)/100,complet:!!complet||avReste(a)-m<=0.004});
+  avRembRender();if(!complet)emojiBurst(['💰','✨']);else emojiBurst(['✅','🎉','💰']);
+}
+function oAvRembDel(i){
+  var a=AV_CUR;if(!a||!a.rembs)return;
+  var rs=a.rembs.slice().sort(function(x,y){return(x.date||'')<(y.date||'')?-1:1;});var r=rs[i];
+  a.rembs=a.rembs.filter(function(x){return x!==r;});avRembRender();
 }
 function oAvOpen(cid,aid){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
   var a=aid?(c.avances||[]).find(function(x){return x.id===aid;}):null;
+  AV_CUR=a?JSON.parse(JSON.stringify(a)):null;
   document.getElementById('av-cid').value=cid;
   document.getElementById('av-id').value=a?a.id:'';
-  document.getElementById('oavs-sub').innerHTML='Pour <b>'+esc(c.nom+' '+(c.prenom||''))+'</b>'+(c.tel?' · '+esc(c.tel):'');
+  document.getElementById('oavs-sub').innerHTML='Bénéficiaire : <b>'+esc(c.nom+' '+(c.prenom||''))+'</b>'+(c.tel?' · '+esc(c.tel):'');
+  var sel=document.getElementById('av-par'),groups={};
+  avPayeurs(cid).forEach(function(o){(groups[o.g]=groups[o.g]||[]).push(o);});
+  sel.innerHTML=Object.keys(groups).map(function(g){return'<optgroup label="'+esc(g)+'">'+groups[g].map(function(o){return'<option value="'+esc(o.v)+'">'+esc(o.l)+'</option>';}).join('')+'</optgroup>';}).join('');
+  var parV=a?(a.parRef||''):('u:'+(USER?USER.id:''));
+  if(a&&!parV&&a.par){var m=avPayeurs(cid).find(function(o){return nmKey(avParName(o.v))===nmKey(a.par);});if(m)parV=m.v;}
+  sel.value=parV;if(sel.value!==parV&&a&&a.par){var og=document.createElement('option');og.value='n:'+a.par;og.textContent=a.par;sel.appendChild(og);sel.value='n:'+a.par;}
   document.getElementById('av-montant').value=a?a.montant:'';
   document.getElementById('av-devise').value=a?(a.devise||'€'):'€';
   document.getElementById('av-date').value=a?(a.date||''):todayYMD();
   document.getElementById('av-ech').value=a?(a.echeance||''):'';
   document.getElementById('av-motif').value=a?(a.motif||''):'';
+  oAvType(a&&a.type==='don'?'don':'avance');
+  if(AV_CUR&&AV_CUR.type!=='don')avRembRender();
   oSheetOpen('oavs');
 }
 function oAvClose(){oSheetClose('oavs');}
 function oAvSave(){
   var cid=document.getElementById('av-cid').value;
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
-  var montant=parseFloat(document.getElementById('av-montant').value);
-  var ech=document.getElementById('av-ech').value;
-  if(!montant||montant<=0){oT('Indiquez le montant avancé','e');return;}
-  if(!ech){oT('Indiquez la date d\'échéance du remboursement','e');return;}
+  var type=val('av-type')||'avance',montant=parseFloat(val('av-montant')),ech=val('av-ech'),date=val('av-date'),parV=val('av-par');
+  if(!parV){oT('Indiquez qui a avancé / donné l\'argent','e');return;}
+  if(!montant||montant<=0){oT('Indiquez le montant','e');return;}
+  if(!date){oT('Indiquez la date','e');return;}
+  if(type==='avance'&&!ech){oT('Indiquez la date d\'échéance du remboursement','e');return;}
+  if(type==='avance'&&ech<date){oT('L\'échéance doit être après la date de l\'avance','e');return;}
   var aid=document.getElementById('av-id').value;
   c.avances=c.avances||[];
   var a=aid?c.avances.find(function(x){return x.id===aid;}):null;
-  if(!a){a={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),statut:'encours',par:PARTNER_NOM()};c.avances.push(a);}
-  a.montant=montant;a.devise=document.getElementById('av-devise').value;
-  a.date=document.getElementById('av-date').value||todayYMD();a.echeance=ech;
-  a.motif=document.getElementById('av-motif').value.trim();
-  a.sent={};
-  jrnAdd(c,'note','💶 Avance '+(aid?'modifiée':'enregistrée')+' : '+montant+' '+a.devise+(a.motif?' pour '+a.motif:'')+' — remboursement prévu le '+fD(ech));
-  oPush([c]);oAvClose();oOpenF(cid);oT('💶 Avance enregistrée — rappels automatiques programmés','s');
+  var isNew=!a;
+  if(!a){a={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),statut:'encours',saisiPar:PARTNER_NOM()};c.avances.push(a);}
+  var oldPar=a.parId;
+  a.type=type;a.montant=montant;a.devise=val('av-devise');a.date=date;a.motif=val('av-motif').trim();
+  a.echeance=type==='don'?'':ech;
+  a.parRef=parV;a.par=parV.indexOf('n:')===0?parV.slice(2):avParName(parV);
+  a.parId=parV.indexOf('c:')===0?parV.slice(2):'';
+  if(parV.indexOf('u:')===0){var pm=OC.find(function(x){return nmKey((x.nom||'')+' '+(x.prenom||''))===nmKey(a.par)||nmKey((x.prenom||'')+' '+(x.nom||''))===nmKey(a.par);});if(pm)a.parId=pm.id;}
+  a.rembs=(AV_CUR&&AV_CUR.rembs)||a.rembs||[];
+  if(type==='don')a.rembs=[];
+  avRecalc(a);if(isNew)a.sent={};
+  var lib=type==='don'?'🎁 Don':'💶 Avance';
+  jrnAdd(c,a.statut==='rembourse'?'fait':'note',lib+' '+(isNew?'enregistré'+(type==='don'?'':'e'):'mis'+(type==='don'?'':'e')+' à jour')+' : '+montant+' '+a.devise+(a.motif?' pour '+a.motif:'')+' — par '+a.par
+    +(type==='don'?'':' — remboursement prévu le '+fD(ech)+(avRendu(a)?' · rendu '+avRendu(a)+' '+a.devise+(a.statut==='rembourse'?' ✅ soldée':' (reste '+avReste(a)+' '+a.devise+')'):'')));
+  var changed=[c];
+  var payer=a.parId?OC.find(function(x){return x.id===a.parId;}):null;
+  if(payer&&payer.id!==c.id){jrnAdd(payer,'note',lib+(type==='don'?' consenti':' consentie')+' à '+c.nom+' '+(c.prenom||'')+' : '+montant+' '+a.devise+(a.motif?' ('+a.motif+')':'')+(type==='don'?'':a.statut==='rembourse'?' — ✅ entièrement remboursée':' — reste '+avReste(a)+' '+a.devise));changed.push(payer);}
+  oPush(changed);oAvClose();oOpenF(cid);
+  if(a.statut==='rembourse')emojiBurst(['✅','🎉','💰']);
+  oT(type==='don'?'🎁 Don enregistré':a.statut==='rembourse'?'✅ Avance soldée':'💶 Avance enregistrée — rappels automatiques programmés','s');
 }
-function oAvMark(cid,aid){
-  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
-  var a=(c.avances||[]).find(function(x){return x.id===aid;});if(!a)return;
-  a.statut='rembourse';a.rembourseLe=new Date().toISOString().split('T')[0];
-  jrnAdd(c,'fait','💶 Avance de '+a.montant+' '+(a.devise||'€')+' remboursée');
-  oPush([c]);oOpenF(cid);oT('✅ Avance marquée remboursée','s');
-}
+function oAvMark(cid,aid){oAvOpen(cid,aid);}
 function oAvDel(cid,aid){
   if(!confirm('Supprimer cette avance ?'))return;
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
@@ -4534,7 +4663,7 @@ function oCarte(){
       var html='<b>'+esc(c.nom+' '+(c.prenom||''))+'</b><br><small style="color:#777">'+esc((c.ville||'')+(c.pays?' · '+c.pays:''))+(c.geo.approx?' (position approximative)':'')+'</small><div style="margin-top:4px">'+apps+'</div>'
         +(c.tel?'<button class="ob bwa" onclick="oMapWA(\''+c.id+'\')">💬 Demander une mise en relation</button>':'')
         +'<button class="ob bgh" style="margin-top:6px" onclick="oOpenF(\''+c.id+'\')">Ouvrir la fiche</button>';
-      var m=L.marker([c.geo.lat,c.geo.lng]).addTo(MAP).bindPopup(html);
+      var m=L.marker([c.geo.lat,c.geo.lng],{icon:L.divIcon({className:'map-pin',html:'<span>📍</span>',iconSize:[34,34],iconAnchor:[17,32],popupAnchor:[0,-30]})}).addTo(MAP).bindPopup(html);
       MAP_MK.push(m);pts.push([c.geo.lat,c.geo.lng]);
     });
     setTimeout(function(){MAP.invalidateSize();if(pts.length)MAP.fitBounds(pts,{padding:[36,36],maxZoom:11});},80);
