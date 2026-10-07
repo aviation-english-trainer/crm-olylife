@@ -306,8 +306,8 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .onotif-cnt{background:#C63E47;color:#fff;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:700;}
 
 /* ── FULL-SCREEN MODAL ───────────────────────────────────────────── */
-#omo,#oimp{display:none;position:fixed;inset:0;background:rgba(246,250,246,.86);backdrop-filter:blur(3px);z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-#omo.on,#oimp.on{display:block;}
+#omo,#oimp,#oavs,#oreq{display:none;position:fixed;inset:0;background:rgba(246,250,246,.86);backdrop-filter:blur(3px);z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+#omo.on,#oimp.on,#oavs.on,#oreq.on{display:block;}
 .omo-hd{background:linear-gradient(135deg,#FFFFFF,var(--navy3));padding:16px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;border-bottom:1px solid var(--bd);}
 .omo-back{background:rgba(18,106,60,.09);border:none;color:var(--tx);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .omo-ttl{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:var(--gold);flex:1;}
@@ -630,6 +630,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
   #osv .osv-card,#octx .osv-card,#ocal .osv-card{border-radius:20px;max-width:560px;max-height:88vh;}
   .osv-grab{display:none;}
   #oimp .omo-hd,#oimp .omo-body{max-width:980px;margin-left:auto;margin-right:auto;}
+  #oavs .omo-hd,#oavs .omo-body,#oreq .omo-hd,#oreq .omo-body{max-width:720px;margin-left:auto;margin-right:auto;}
   #obulk{bottom:22px;margin-left:calc(var(--side-w) / 2);}
   #eq-users-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));}
   #eq-users-list .ouser-row{border-right:1px solid var(--bd);}
@@ -741,6 +742,50 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 .oimp-diff{font-size:10.5px;line-height:1.55;margin-top:3px;}
 .oimp-diff .nw{color:var(--gr);font-weight:600;}
 .oimp-diff .kn{color:var(--t3);}
+/* ═══════════════ v3.2 — ARBRE MAGIQUE (généalogie à bulles) ═══════════════ */
+.mt-scroll{overflow-x:auto;padding:6px 2px 26px;-webkit-overflow-scrolling:touch;}
+.mt-wrap{min-width:max-content;padding:16px 24px 10px;margin:0 auto;}
+.mt-node{display:flex;flex-direction:column;align-items:center;position:relative;padding:0 9px;}
+.mt-kids{display:none;align-items:flex-start;padding-top:30px;position:relative;}
+.mt-kids.open{display:flex;}
+.mt-kids>.mt-node::before{content:'';position:absolute;top:0;left:50%;width:2px;height:30px;transform:translateX(-50%);background:linear-gradient(180deg,var(--gold),#CBDCCB);}
+.mt-kids>.mt-node::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:#CBDCCB;}
+.mt-kids>.mt-node:first-child::after{left:50%;}
+.mt-kids>.mt-node:last-child::after{right:50%;}
+.mt-kids>.mt-node:only-child::after{display:none;}
+.mt-stem{width:2px;height:16px;background:linear-gradient(180deg,#CBDCCB,var(--gold));margin-top:4px;}
+.mt-b{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;color:#fff;border:3px solid rgba(255,255,255,.75);box-shadow:0 8px 20px rgba(18,60,35,.22),inset 0 -8px 14px rgba(0,0,0,.14),inset 0 5px 10px rgba(255,255,255,.4);transition:transform .18s cubic-bezier(.34,1.5,.64,1),box-shadow .18s;animation:mtFloat 3.4s ease-in-out infinite alternate;-webkit-tap-highlight-color:transparent;user-select:none;}
+.mt-b:hover{transform:scale(1.13) translateY(-2px);box-shadow:0 14px 30px rgba(18,60,35,.3),inset 0 -8px 14px rgba(0,0,0,.14),inset 0 5px 10px rgba(255,255,255,.4);z-index:5;}
+.mt-b:active{transform:scale(.95);}
+.mt-node:nth-child(2n) .mt-b{animation-delay:.7s;animation-duration:3.9s;}
+.mt-node:nth-child(3n) .mt-b{animation-delay:1.3s;animation-duration:3.1s;}
+@keyframes mtFloat{from{transform:translateY(0);}to{transform:translateY(-6px);}}
+.mt-b .ini{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.25);}
+.mt-b .crown{position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:15px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2));animation:mtCrown 2.4s ease-in-out infinite alternate;}
+@keyframes mtCrown{from{transform:translateX(-50%) rotate(-7deg);}to{transform:translateX(-50%) rotate(7deg);}}
+.mt-b .cnt{position:absolute;bottom:-7px;right:-5px;background:var(--gold);color:#fff;border-radius:11px;font-size:10.5px;font-weight:800;padding:2px 7px;border:2.5px solid #F6FAF6;font-family:Outfit,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.18);}
+.mt-b.leaf .cnt{display:none;}
+/* couleurs par rang */
+.mt-b.r0{background:radial-gradient(circle at 32% 28%,#9FB9A8,#5F7F6C 70%);}
+.mt-b.r1{background:radial-gradient(circle at 32% 28%,#A8D08D,#5E8F4E 70%);}
+.mt-b.r2{background:radial-gradient(circle at 32% 28%,#6FC7B4,#1E7F6E 70%);}
+.mt-b.r3{background:radial-gradient(circle at 32% 28%,#F3D08A,#C9872B 70%);}
+.mt-b.r4{background:radial-gradient(circle at 32% 28%,#B99CE8,#6C45B5 70%);}
+.mt-b.r5{background:radial-gradient(circle at 32% 28%,#F2958D,#B3372E 70%);}
+.mt-lbl{margin-top:8px;font-size:11px;font-weight:700;color:var(--tx);text-align:center;max-width:104px;line-height:1.3;cursor:pointer;}
+.mt-lbl:hover{color:var(--gold);text-decoration:underline;}
+.mt-lbl small{display:block;color:var(--t3);font-size:9.5px;font-weight:500;}
+.mt-kids.open>.mt-node{animation:mtPop .4s cubic-bezier(.34,1.56,.64,1) backwards;}
+.mt-kids.open>.mt-node:nth-child(2){animation-delay:.06s;}
+.mt-kids.open>.mt-node:nth-child(3){animation-delay:.12s;}
+.mt-kids.open>.mt-node:nth-child(4){animation-delay:.18s;}
+.mt-kids.open>.mt-node:nth-child(5){animation-delay:.24s;}
+.mt-kids.open>.mt-node:nth-child(n+6){animation-delay:.3s;}
+@keyframes mtPop{from{opacity:0;transform:scale(.25) translateY(-16px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.mt-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+.mt-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:10.5px;color:var(--t2);align-items:center;margin-left:auto;}
+.mt-legend i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:4px;vertical-align:-2px;}
+
 
 </style>
 </head>
@@ -1030,14 +1075,14 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
           <button class="ob bgold bfull" style="margin-top:8px;min-height:46px" onclick="oProposeUser()">➕ Proposer ce référent à l'admin</button>
         </div>
         <div id="eq-admin-tools" style="padding:10px 14px 12px;border-top:1px solid var(--bd);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-          <button class="ob bsm" style="background:var(--pu);color:#fff;border:none;min-height:40px" onclick="oMergeSeedThierry(true)">📥 Importer les contacts de Thierry</button>
+          <button class="ob bsm" style="background:var(--pu);color:#fff;border:none;min-height:40px" onclick="oOpenImport()">⇪ Importer des contacts</button>
           <button class="ob bsm" style="background:#C63E47;color:#fff;border:none;min-height:40px" onclick="oDedup(true)">🧹 Supprimer les doublons</button>
           <span style="font-size:11px;color:var(--t3);margin-left:auto" id="eq-version"></span>
         </div>
         <div id="eq-user-form" style="display:none;padding:14px 16px;border-top:1px solid var(--bd);background:var(--navy3)">
           <input type="hidden" id="u-id">
           <div class="ofg">
-            <div class="ofg1"><label class="ofl">Nom affiché</label><input type="text" class="ofc" id="u-nom" placeholder="Dr Nassima Bouzeroura"></div>
+            <div class="ofg1"><label class="ofl">Nom affiché</label><input type="text" class="ofc" id="u-nom" placeholder="Sophie MARTIN"></div>
             <div class="ofg1"><label class="ofl">Rôle</label>
               <select class="ofc" id="u-role">
                 <option value="referent">Référent — voit uniquement ses contacts référés</option>
@@ -1045,8 +1090,8 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
                 <option value="admin">Admin — accès complet</option>
               </select>
             </div>
-            <div class="ofg1"><label class="ofl">Téléphone / WhatsApp</label><input type="tel" class="ofc" id="u-tel" placeholder="+33 6 12 34 56 78"></div>
-            <div class="ofg1"><label class="ofl">Tags référent associés (séparés par des virgules)</label><input type="text" class="ofc" id="u-tags" list="ref-list" placeholder="Dr Nassima"></div>
+            <div class="ofg1"><label class="ofl">Téléphone / WhatsApp</label><input type="tel" class="ofc" id="u-tel" placeholder="+33 6 00 00 00 00"></div>
+            <div class="ofg1"><label class="ofl">Tags référent associés (séparés par des virgules)</label><input type="text" class="ofc" id="u-tags" list="ref-list" placeholder="Sophie"></div>
             <div class="ofg1"><label class="ofl">Code d'accès</label>
               <div style="display:flex;gap:8px"><input type="text" class="ofc" id="u-code" placeholder="A7K2MN" style="flex:1;font-family:monospace;letter-spacing:2px"><button class="ob bgh" onclick="oGenCode()" type="button">🎲</button></div>
             </div>
@@ -1277,7 +1322,12 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <div class="ocard" style="padding:14px 16px;margin-bottom:12px">
         <div style="font-size:13px;color:var(--t2);line-height:1.6">🧬 <b>Arbre de parrainage OlyLife.</b> Construit à partir des fiches : l'ID membre (EA…) de chaque contact est relié à son sponsor. Touchez une bulle pour ouvrir la fiche. <span id="genea-hint" style="color:var(--t3)">Pour charger l'arbre complet, envoyez votre généalogie du Back-Office à Claude : l'import en masse saura la lire.</span></div>
       </div>
-      <div class="ocard" style="padding:16px;overflow-x:auto" id="genea-tree"></div>
+      <div class="mt-toolbar">
+        <button class="ob bgh bsm" onclick="oGeneaAll(true)">🌳 Tout déplier</button>
+        <button class="ob bgh bsm" onclick="oGeneaAll(false)">🍃 Tout replier</button>
+        <div class="mt-legend"><span><i style="background:#5E8F4E"></i>P1</span><span><i style="background:#1E7F6E"></i>P2</span><span><i style="background:#C9872B"></i>P3</span><span><i style="background:#6C45B5"></i>P4</span><span><i style="background:#B3372E"></i>P5</span><span><i style="background:#5F7F6C"></i>sans rang</span></div>
+      </div>
+      <div class="ocard mt-scroll" id="genea-tree"></div>
     </div>
 
   </div><!-- /ocont -->
@@ -1349,7 +1399,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
   </div>
   <div class="omo-body">
     <div class="os-note" style="margin-bottom:14px">Collez <b>n'importe quoi</b> : des lignes en vrac (nom, téléphone, email mélangés), un tableau CSV/Excel, un bloc JSON préparé par Claude, ou <b>la page complète d'une commande du Back-Office OlyLife</b> (français ou anglais — Ctrl+A puis Ctrl+C sur la page, et collez tout ici). L'application détecte le format toute seule, repère les doublons et vous montre ce qui est déjà connu et ce qui est nouveau avant d'importer.</div>
-    <textarea class="ofc" id="oimp-ta" rows="8" style="font-family:monospace;font-size:12px" placeholder="Exemples acceptés :&#10;&#10;Marie DUPONT 06 12 34 56 78 marie@gmail.com&#10;KOUASSI Jean +225 07 08 09 10 11 envoyé par Dr Nassima&#10;&#10;— ou un CSV avec en-têtes nom;prenom;tel;email&#10;— ou un tableau JSON [{...}]"></textarea>
+    <textarea class="ofc" id="oimp-ta" rows="8" style="font-family:monospace;font-size:12px" placeholder="Exemples acceptés :&#10;&#10;Marie DUPONT 06 12 34 56 78 marie@gmail.com&#10;KOUASSI Jean +225 07 08 09 10 11 envoyé par Sophie&#10;&#10;— ou un CSV avec en-têtes nom;prenom;tel;email&#10;— ou un tableau JSON [{...}]"></textarea>
     <div class="ofilter-row" id="oimp-def-row" style="margin-top:12px">
       <select id="oimp-defref"><option value="">Référé par (défaut)…</option></select>
       <select id="oimp-defsuivi"><option value="">Suivi par (défaut)…</option></select>
@@ -1534,7 +1584,7 @@ var DELAI_TEMOIGNAGE=30;
 var GAS_URL='',CODE='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.1 · 07/10';
+var APP_VERSION='v3.2 · 07/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -1916,7 +1966,7 @@ function renderUsers(){
       +'<div class="ouser-meta">'
         +(isAdm?'<span class="ouser-code">'+esc(u.code||'—')+'</span>':'')
         +(hasTag?'<span>🏷 '+esc(u.tags.join(', '))+' · <b>'+nbC+'</b> contact'+(nbC>1?'s':'')+'</span>':'')
-        +(hasDigest?'<span class="ouser-digest-pill">📧 '+esc(u.digestHeure)+'</span>':'')
+        +(hasDigest?'<span class="ouser-digest-pill" title="'+esc(u.digestEmail)+'">📧 Résumé à '+esc(u.digestHeure)+' → '+esc(u.digestEmail)+'</span>':'<span style="color:var(--t3)">📭 résumé quotidien non configuré</span>')
         +(pend?'<span class="obdg bor">⏳ En attente d\'approbation'+(u.proposePar?' · proposé par '+esc(u.proposePar):'')+'</span>':(u.actif===false?'<span style="color:#C0392B;font-weight:600">⏸ Désactivé</span>':''))
       +'</div>'
       +(pend&&isAdm?'<button class="ob bgold bfull" style="margin-bottom:8px;min-height:44px" onclick="oApproveUser('+i+')">✅ Approuver et générer le code</button>':'')
@@ -4316,25 +4366,55 @@ function oCarte(){
   });
 }
 
-// ── Généalogie ─────────────────────────────────────────────────────
+// ── Généalogie : l'arbre magique ───────────────────────────────────
+function mtRang(c){var m=String(c.rangOly||'').match(/P([1-5])/i);return m?+m[1]:0;}
+function mtEstEA(c){return !c.prenom&&/^(EA|AF)\d+$/i.test(String(c.nom||'').trim());}
+function mtIni(c){
+  if(mtEstEA(c))return'👤';
+  var i=((c.prenom||'').charAt(0)+(c.nom||'').charAt(0)).toUpperCase();
+  return i||'?';
+}
+function mtLbl(c){
+  if(mtEstEA(c))return{t:String(c.nom).toUpperCase(),s:c.rangOly?c.rangOly:'membre'};
+  var ea=c.memberIdOlyLife?String(c.memberIdOlyLife).toUpperCase():'';
+  return{t:(c.prenom?c.prenom+' ':'')+(c.nom||''),s:(ea?ea+(c.rangOly?' · ':''):'')+(c.rangOly||'')};
+}
+function oGeneaToggle(ev,nid,cid,hasKids){
+  if(ev)ev.stopPropagation();
+  if(!hasKids){oOpenF(cid);return;}
+  var k=document.getElementById(nid);if(k)k.classList.toggle('open');
+}
+function oGeneaAll(open){
+  document.querySelectorAll('#genea-tree .mt-kids').forEach(function(k){k.classList.toggle('open',open);});
+}
 function oGenea(){
   var list=OC.filter(function(c){return c.memberIdOlyLife||c.estPartenaire;});
-  var byEA={};list.forEach(function(c){var ea=String(c.memberIdOlyLife||'').toUpperCase().trim();if(ea)byEA[ea]=c;});
+  var byEA={};list.forEach(function(c){var ea=String(c.memberIdOlyLife||'').toUpperCase().trim()||(mtEstEA(c)?String(c.nom).toUpperCase():'');if(ea&&!byEA[ea])byEA[ea]=c;});
   var kids={},roots=[];
   list.forEach(function(c){
-    var sp=(String(c.sponsor||'').toUpperCase().match(/EA\d+/)||[])[0]||'';
+    var sp=(String(c.sponsor||'').toUpperCase().match(/(EA|AF)\d+/)||[])[0]||'';
     if(sp&&byEA[sp]&&byEA[sp].id!==c.id)(kids[byEA[sp].id]=kids[byEA[sp].id]||[]).push(c);
     else roots.push(c);
   });
+  function nbDesc(c,d){if(d>30)return 0;var ch=kids[c.id]||[];var n=ch.length;ch.forEach(function(k){n+=nbDesc(k,d+1);});return n;}
   function node(c,depth){
     var ch=(kids[c.id]||[]).sort(function(a,b){return(a.nom||'').localeCompare(b.nom||'');});
-    return'<li><span class="gn" onclick="oOpenF(\''+c.id+'\')"><span class="tav st-'+cStatut(c)+'">'+initials(c)+'</span><span style="min-width:0"><b>'+esc(c.nom+' '+(c.prenom||''))+'</b><small>'+esc(c.memberIdOlyLife||'—')+(ch.length?' · '+ch.length+' filleul'+(ch.length>1?'s':''):'')+'</small></span>'+(c.rangOly?'<span class="rgb">'+esc(c.rangOly.split(' ')[0])+'</span>':'')+'</span>'
-      +(ch.length&&depth<8?'<ul>'+ch.map(function(k){return node(k,depth+1);}).join('')+'</ul>':'')+'</li>';
+    var r=mtRang(c),l=mtLbl(c),nid='mtk_'+c.id;
+    var crown=r>=5?'👑':r===4?'💎':r===3?'⭐':'';
+    return'<div class="mt-node">'
+      +'<div class="mt-b r'+r+(ch.length?'':' leaf')+'" onclick="oGeneaToggle(event,\''+nid+'\',\''+c.id+'\','+(ch.length?'true':'false')+')" title="'+esc(l.t)+(ch.length?' — toucher pour ouvrir la branche':' — toucher pour ouvrir la fiche')+'">'
+        +(crown?'<span class="crown">'+crown+'</span>':'')
+        +'<span class="ini">'+mtIni(c)+'</span>'
+        +(ch.length?'<span class="cnt">'+ch.length+'</span>':'')
+      +'</div>'
+      +'<div class="mt-lbl" onclick="event.stopPropagation();oOpenF(\''+c.id+'\')">'+esc(l.t)+(l.s?'<small>'+esc(l.s)+'</small>':'')+'</div>'
+      +(ch.length&&depth<30?'<div class="mt-stem"></div><div class="mt-kids'+(depth<1?' open':'')+'" id="'+nid+'">'+ch.map(function(k){return node(k,depth+1);}).join('')+'</div>':'')
+    +'</div>';
   }
-  roots.sort(function(a,b){return(kids[b.id]||[]).length-(kids[a.id]||[]).length||(a.nom||'').localeCompare(b.nom||'');});
+  roots.sort(function(a,b){return nbDesc(b,0)-nbDesc(a,0)||(a.nom||'').localeCompare(b.nom||'');});
   document.getElementById('genea-tree').innerHTML=list.length
-    ?'<ul class="gtree">'+roots.map(function(r){return node(r,0);}).join('')+'</ul>'
-    :'<div class="oemp"><div class="oemp-i">🧬</div><div class="oemp-t">Aucun membre OlyLife identifié pour l\'instant</div><div style="font-size:12px;color:var(--t3);margin-top:6px;line-height:1.6">Renseignez l\'ID membre (EA…) et le sponsor dans les fiches, ou envoyez votre généalogie du Back-Office à Claude pour un import en masse.</div></div>';
+    ?'<div class="mt-wrap" style="display:flex;gap:40px;align-items:flex-start">'+roots.map(function(r){return node(r,0);}).join('')+'</div>'
+    :'<div class="oemp"><div class="oemp-i">🧬</div><div class="oemp-t">Aucun membre OlyLife identifié pour l\'instant</div><div style="font-size:12px;color:var(--t3);margin-top:6px;line-height:1.6">Renseignez l\'ID membre (EA…) et le sponsor dans les fiches, ou collez la généalogie préparée par Claude dans Importer.</div></div>';
 }
 
 // ── Demande d'infos d'inscription ──────────────────────────────────
