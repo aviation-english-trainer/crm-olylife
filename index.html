@@ -894,6 +894,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <button class="sd-it" data-nav="genea" onclick="oSw('genea')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2.5" width="6" height="5" rx="1.5"/><rect x="2.5" y="16.5" width="6" height="5" rx="1.5"/><rect x="15.5" y="16.5" width="6" height="5" rx="1.5"/><path d="M12 7.5v4m0 0H5.5v5m6.5-5h6.5v5"/></svg><em>Généalogie</em></button>
     </nav>
     <div class="sd-foot">
+      <button class="sd-it" id="sd-imp" onclick="oOpenImport()" title="Importer des contacts en masse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg><em>Importer</em></button>
       <button class="sd-it" onclick="oBOffice()" title="BO Office — Back-office Team WaterLifeHighTech"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg><em>BO Office</em></button>
       <button class="sd-it" onclick="oTunnels()" title="App Tunnels — Un lien, un client"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><em>App Tunnels</em></button>
       <button class="sd-it" onclick="oShowSetup()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><em>Réglages</em></button>
@@ -1164,6 +1165,20 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       </div>
 
       <!-- ADMIN : liste des référents -->
+      <div class="ocard" id="eq-stock-card">
+        <div class="ochd"><span class="oct">📦 Stock de machines</span><button id="stk-add-btn" class="ob bgh bsm" style="display:none" onclick="oStkForm()">＋ Ajouter</button></div>
+        <div id="stk-form" style="display:none;padding:12px 16px;border-bottom:1px solid var(--bd)">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <select class="ofc" id="stk-qui" style="flex:1;min-width:140px"></select>
+            <select class="ofc" id="stk-prod" style="flex:1.4;min-width:170px"></select>
+            <input type="number" class="ofc" id="stk-qte" value="1" min="0" style="flex:0 0 80px">
+            <button class="ob bgold" style="min-height:44px" onclick="oStkAdd()">OK</button>
+          </div>
+        </div>
+        <div id="stk-list"></div>
+        <div style="padding:10px 16px;font-size:11px;color:var(--t3);line-height:1.6;border-top:1px solid var(--bd)">💡 <b>Remise immédiate :</b> quand une machine du stock est remise à un client, utilisez le bouton « 📦 Remise depuis un stock » de sa fiche — le stock baisse et la fiche rappelle de passer la commande BO avec <b>facturation = adresse du client</b> et <b>livraison = adresse du porteur de stock</b> (reconstitution).</div>
+      </div>
+
       <div class="ocard hide" id="eq-refs-card">
         <div class="ochd"><span class="oct">🏷️ Référents — sources de contacts</span></div>
         <div style="padding:14px 16px">
@@ -1204,8 +1219,20 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
           <div class="ofg1"><label class="ofl">E-mail</label><input type="email" class="ofc" id="fc-em" placeholder="contact@email.com"></div>
           <div class="ofg1"><label class="ofl">Pays</label><input type="text" class="ofc" id="fc-pays" placeholder="France"></div>
           <div class="ofg1"><label class="ofl">Ville</label><input type="text" class="ofc" id="fc-vil" placeholder="Paris"></div>
-          <div class="ofg1"><label class="ofl">Adresse postale</label><input type="text" class="ofc" id="fc-adr" placeholder="81 Chemin de Crémat, BAT 1" autocomplete="off"></div>
-          <div class="ofg1"><label class="ofl">Code postal</label><input type="text" class="ofc" id="fc-cp" placeholder="06200" autocomplete="off"></div>
+          <div class="ofg1"><label class="ofl">📦 Adresse de livraison</label><input type="text" class="ofc" id="fc-adr" placeholder="81 Chemin de Crémat, BAT 1" autocomplete="off"></div>
+          <div class="ofg1"><label class="ofl">Code postal (livraison)</label><input type="text" class="ofc" id="fc-cp" placeholder="06200" autocomplete="off"></div>
+          <div class="ofg1"><label class="ofl">Destinataire de la livraison <span style="color:var(--t3);font-weight:400;font-size:11px">— seulement si différent du contact</span></label>
+            <div style="display:flex;gap:8px"><input type="text" class="ofc" id="liv-nm" placeholder="Nom" style="flex:1"><input type="text" class="ofc" id="liv-pr" placeholder="Prénom" style="flex:1"></div>
+            <div style="display:flex;gap:8px;margin-top:6px"><input type="tel" class="ofc" id="liv-tel" placeholder="Téléphone livraison" style="flex:1"><input type="email" class="ofc" id="liv-em" placeholder="Email livraison" style="flex:1"></div>
+          </div>
+          <div class="ofg1">
+            <button type="button" class="ob bgh bsm" id="btn-fact" onclick="oToggleFact()">🧾 Adresse de facturation différente ▾</button>
+            <div id="fact-wrap" style="display:none;flex-direction:column;gap:8px;margin-top:8px;padding:12px;background:var(--navy3);border:1.5px dashed var(--bd);border-radius:var(--rs)">
+              <input type="text" class="ofc" id="fact-adr" placeholder="Adresse de facturation">
+              <div style="display:flex;gap:8px"><input type="text" class="ofc" id="fact-cp" placeholder="CP" style="flex:0 0 90px"><input type="text" class="ofc" id="fact-vil" placeholder="Ville" style="flex:1"></div>
+              <input type="text" class="ofc" id="fact-pays" placeholder="Pays">
+            </div>
+          </div>
           <div class="ofg1" id="fg-ref"><label class="ofl">Référé par</label>
             <select class="ofc" id="fc-ref" onchange="oRefSelectChange(this)">
               <option value="">— Choisir un parrain / une marraine —</option>
@@ -1439,6 +1466,20 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
   </div>
 </div>
 
+<!-- FEUILLE : REMISE DEPUIS UN STOCK -->
+<div id="ostk" onclick="if(event.target===this)oStkClose()">
+  <div class="osv-card">
+    <div class="osv-grab"></div>
+    <div class="osv-ttl">📦 Remise immédiate depuis un stock</div>
+    <div class="osv-sub" id="ostk-sub">—</div>
+    <input type="hidden" id="ostk-cid">
+    <div class="ofl" style="margin-bottom:6px">Machine remise</div>
+    <select class="ofc" id="ostk-line"></select>
+    <button class="ob bgold bfull" style="margin-top:14px;min-height:48px" onclick="oStkGive()">Valider la remise (stock −1)</button>
+    <div class="oinst-note" style="margin-top:10px">La fiche du client recevra la consigne : commande BO avec <b>facturation = client</b> · <b>livraison = porteur du stock</b>.</div>
+  </div>
+</div>
+
 <!-- FEUILLE : DEMANDE D'INFOS D'INSCRIPTION -->
 <div id="oreq">
   <div class="omo-hd">
@@ -1587,7 +1628,7 @@ var DELAI_TEMOIGNAGE=30;
 var GAS_URL='',CODE='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.3 · 07/10';
+var APP_VERSION='v3.4 · 07/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -1793,6 +1834,7 @@ function applyRole(){
   document.getElementById('ofilter-row').classList.toggle('hide',isRef);
   document.getElementById('oimp-btn').style.display=isRef?'none':'inline-flex';
   var ib2=document.getElementById('oimp-btn2');if(ib2)ib2.style.display=isRef?'none':'inline-flex';
+  var sdi=document.getElementById('sd-imp');if(sdi)sdi.classList.toggle('hide',isRef);
   // Équipe : cartes admin
   document.getElementById('eq-users-card').classList.toggle('hide',isRef);
   document.getElementById('ofilter-vue').classList.toggle('hide',isRef);
@@ -1800,6 +1842,7 @@ function applyRole(){
   var ea=document.getElementById('eq-admin-tools');if(ea)ea.style.display=isAdmin?'flex':'none';
   var ep=document.getElementById('eq-propose');if(ep)ep.style.display=(r==='gestionnaire')?'block':'none';
   document.getElementById('eq-refs-card').classList.toggle('hide',!isAdmin);
+  var sk=document.getElementById('eq-stock-card');if(sk)sk.classList.toggle('hide',isRef);
   // Formulaire : le référent ne voit que l'essentiel
   ['fb-pipeline','fb-prod','fb-cmd','fb-install','fb-temoin','fb-equipe'].forEach(function(id){
     document.getElementById(id).classList.toggle('hide',isRef);
@@ -2409,7 +2452,7 @@ function oAccTog(uid){var bd=document.getElementById('acb-'+uid);var arr=documen
 
 // ── ÉQUIPE ──────────────────────────────────────────────────────────
 function oEq(){
-  renderUsers();renderRefChips();
+  renderUsers();renderRefChips();renderStock();
   var team=OC.filter(function(c){return c.etape==='Partenaire équipe'||c.estPartenaire;});
   document.getElementById('ev0').textContent=team.length;
   var directs=team.filter(function(c){return c.sponsor&&PARTNER_ID&&c.sponsor.toUpperCase()===PARTNER_ID.toUpperCase();}).length;
@@ -3109,6 +3152,7 @@ function oOpenF(id){
       +rapBox(c,true)
       +rdvBox(c)
       +'<button class="ob bgold bfull" style="min-height:48px" onclick="oOpenSuivi(\''+id+'\')">📞 Valider un contact / ajouter une observation</button>'
+      +(ROLE()==='admin'&&stkList().some(function(x){return(+x.qte||0)>0;})?'<button class="ob baqua bfull" style="min-height:44px;margin-top:8px" onclick="oStkOpen(\''+id+'\')">📦 Remise immédiate depuis un stock</button>':'')
     +'</div></div>'
     +odSec('Journal des actions ('+((c.journal||[]).length)+')',jrnHtml(c),true)
     +((c.avances&&c.avances.length)||!isRef?odSec('💶 Avances d\'argent'+((c.avances||[]).length?' ('+c.avances.length+')':''),avListHtml(c),avanceEnCours(c)):'')
@@ -3120,9 +3164,10 @@ function oOpenF(id){
       +((c.ctags&&c.ctags.length)?'<div class="od-row"><span class="od-lbl">Tags</span><span class="od-val" style="display:flex;flex-wrap:wrap;gap:4px">'+c.ctags.map(function(t){return'<span class="obdg bpu">'+esc(t)+'</span>';}).join('')+'</span></div>':'')
       +'<div class="od-row"><span class="od-lbl">Canal</span><span class="od-val">'+(c.canal||'—')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">Registre</span><span class="od-val">'+(TONE_LABEL[c.registre]||TONE_LABEL.pro)+'</span></div>',false)
-    +((c.adresse||c.cp||c.essaiOk)?odSec('📍 Adresse & carte',
-      '<div class="od-row"><span class="od-lbl">Adresse</span><span class="od-val">'+esc(c.adresse||'—')+'</span></div>'
-      +'<div class="od-row"><span class="od-lbl">CP / Ville</span><span class="od-val">'+esc((c.cp||'')+' '+(c.ville||'')||'—')+'</span></div>'
+    +((c.adresse||c.cp||c.essaiOk||c.factAdresse||c.livNom)?odSec('📦 Livraison · 🧾 Facturation',
+      '<div class="od-row"><span class="od-lbl">📦 Livraison</span><span class="od-val">'+esc([c.adresse,(c.cp||'')+' '+(c.ville||''),c.pays].map(function(x){return String(x||'').trim();}).filter(Boolean).join(', ')||'—')+'</span></div>'
+      +((c.livNom||c.livPrenom||c.livTel||c.livEmail)?'<div class="od-row"><span class="od-lbl">Destinataire</span><span class="od-val">'+esc(((c.livNom||'')+' '+(c.livPrenom||'')).trim())+(c.livTel?' · '+esc(c.livTel):'')+(c.livEmail?' · '+esc(c.livEmail):'')+'</span></div>':'')
+      +'<div class="od-row"><span class="od-lbl">🧾 Facturation</span><span class="od-val">'+((c.factAdresse||c.factCp||c.factVille||c.factPays)?esc([c.factAdresse,(c.factCp||'')+' '+(c.factVille||''),c.factPays].map(function(x){return String(x||'').trim();}).filter(Boolean).join(', ')):'<span class="t-muted">identique à la livraison</span>')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">Essai de l\'appareil</span><span class="od-val">'+(c.essaiOk?'✅ accepte de faire essayer':'—')+'</span></div>'
       +(c.geo?'<div class="od-row"><span class="od-lbl">Carte</span><span class="od-val"><a style="color:var(--aqua);cursor:pointer" onclick="oClose();oSw(\'carte\')">Voir sur la carte ↗</a></span></div>':''),false):'')
     +((c.memberIdOlyLife||c.numCommande||c.rangOly||c.boCompte||c.pieceId)?odSec('🟢 OlyLife — compte & commande',
@@ -3165,7 +3210,7 @@ function oEdit(id){
   document.getElementById('obtn-save').textContent='Enregistrer les modifications';
   document.getElementById('fc-eid').value=id;
   oBuildBoList();
-  var map={'fc-nm':c.nom,'fc-pr':c.prenom,'fc-tel':c.tel,'fc-em':c.email,'fc-pays':c.pays,'fc-vil':c.ville,'fc-adr':c.adresse,'fc-cp':c.cp,'fo-rang':c.rangOly,'fo-bo':c.boCompte,'fl-idcard':c.pieceId,'fc-ref':c.refere,'fc-suivi':c.suiviPar,'fc-etape':c.etape,'fc-qualif':c.qualification,'fc-canal':c.canal,'fc-registre':c.registre,'fc-obj':c.objectifs,'fl-numcmd':c.numCommande,'fl-memberid':c.memberIdOlyLife,'fl-datecmd':c.dateCommande,'fl-transp':c.transporteur,'fl-tracking':c.tracking,'fl-datelivr':c.dateLivraison,'fi-date':c.dateInstall,'fi-notes':c.notesUsage,'ft-texte':c.temoignageTexte,'fe-sponsor':c.sponsor,'fe-placement':c.placement,'fe-cote':c.cote,'fe-gen':c.generation,'fe-rang':c.rang,'fc-notes':c.notes};
+  var map={'fc-nm':c.nom,'fc-pr':c.prenom,'fc-tel':c.tel,'fc-em':c.email,'fc-pays':c.pays,'fc-vil':c.ville,'fc-adr':c.adresse,'fc-cp':c.cp,'fo-rang':c.rangOly,'fo-bo':c.boCompte,'fl-idcard':c.pieceId,'liv-nm':c.livNom,'liv-pr':c.livPrenom,'liv-tel':c.livTel,'liv-em':c.livEmail,'fact-adr':c.factAdresse,'fact-cp':c.factCp,'fact-vil':c.factVille,'fact-pays':c.factPays,'fc-ref':c.refere,'fc-suivi':c.suiviPar,'fc-etape':c.etape,'fc-qualif':c.qualification,'fc-canal':c.canal,'fc-registre':c.registre,'fc-obj':c.objectifs,'fl-numcmd':c.numCommande,'fl-memberid':c.memberIdOlyLife,'fl-datecmd':c.dateCommande,'fl-transp':c.transporteur,'fl-tracking':c.tracking,'fl-datelivr':c.dateLivraison,'fi-date':c.dateInstall,'fi-notes':c.notesUsage,'ft-texte':c.temoignageTexte,'fe-sponsor':c.sponsor,'fe-placement':c.placement,'fe-cote':c.cote,'fe-gen':c.generation,'fe-rang':c.rang,'fc-notes':c.notes};
   Object.keys(map).forEach(function(k){var el=document.getElementById(k);if(!el)return;if(k==='fc-ref'){var refVal=map[k]||'';var found=false;for(var i=0;i<el.options.length;i++){if(el.options[i].value===refVal){el.value=refVal;found=true;break;}}if(!found&&refVal){var opt=document.createElement('option');opt.value=refVal;opt.textContent=refVal;el.insertBefore(opt,el.options[el.options.length-1]);el.value=refVal;}document.getElementById('fc-ref-autre').style.display='none';}else{el.value=map[k]||'';}});
   document.getElementById('fc-ctags').value=(c.ctags||[]).join(', ');renderCtagsChips();updateRefListByTags((c.ctags||[]));
   var cs=suivisDe(c);document.querySelectorAll('.fc-sui').forEach(function(x){x.checked=cs.indexOf(x.value)>=0;x.parentNode.classList.toggle('on',x.checked);});
@@ -3173,6 +3218,7 @@ function oEdit(id){
   document.getElementById('ft-autorise').checked=!!c.temoignageAutorise;
   document.getElementById('fe-partenaire').checked=!!c.estPartenaire;
   document.getElementById('fo-essai').checked=!!c.essaiOk;
+  oSetFact(!!(c.factAdresse||c.factCp||c.factVille||c.factPays));
   oTEQ();
   document.querySelectorAll('.oprd').forEach(function(p){var cb=p.querySelector('input');cb.checked=(c.produits||[]).indexOf(cb.value)>=0;p.classList.toggle('on',cb.checked);});
   oSw('nouvelle',4);document.getElementById('ocont').scrollTop=0;
@@ -3180,7 +3226,7 @@ function oEdit(id){
 function oReset(){
   document.getElementById('fc-eid').value='';EID=null;
   oBuildBoList();
-  ['fc-nm','fc-pr','fc-tel','fc-em','fc-pays','fc-vil','fc-adr','fc-cp','fo-bo','fl-idcard','fc-obj','fl-numcmd','fl-memberid','fl-datecmd','fl-transp','fl-tracking','fl-datelivr','fi-date','fi-notes','ft-texte','fe-sponsor','fe-placement','fe-gen','fc-notes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  ['fc-nm','fc-pr','fc-tel','fc-em','fc-pays','fc-vil','fc-adr','fc-cp','fo-bo','fl-idcard','liv-nm','liv-pr','liv-tel','liv-em','fact-adr','fact-cp','fact-vil','fact-pays','fc-obj','fl-numcmd','fl-memberid','fl-datecmd','fl-transp','fl-tracking','fl-datelivr','fi-date','fi-notes','ft-texte','fe-sponsor','fe-placement','fe-gen','fc-notes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('fc-etape').value='Prospect';document.getElementById('fc-qualif').value='Chaud';document.getElementById('fc-canal').value='WhatsApp';document.getElementById('fc-registre').value='pro';
   document.getElementById('fc-suivi').value='';document.querySelectorAll('.fc-sui').forEach(function(x){x.checked=false;x.parentNode.classList.remove('on');});
   document.getElementById('fc-ref').value='';
@@ -3189,6 +3235,7 @@ function oReset(){
   document.getElementById('fe-cote').value='';document.getElementById('fe-rang').value='';
   document.getElementById('fi-confirm').checked=false;document.getElementById('ft-autorise').checked=false;document.getElementById('fe-partenaire').checked=false;
   document.getElementById('fo-essai').checked=false;document.getElementById('fo-rang').value='';
+  oSetFact(false);
   oTEQ();
   document.querySelectorAll('.oprd').forEach(function(p){p.classList.remove('on');p.querySelector('input').checked=false;});
   document.getElementById('offttl').textContent='Nouveau contact';
@@ -3216,6 +3263,8 @@ function oSave(){
   var data={
     nom:nm.toUpperCase(),prenom:pr,tel:tel,email:document.getElementById('fc-em').value,pays:document.getElementById('fc-pays').value,ville:document.getElementById('fc-vil').value,
     adresse:val('fc-adr'),cp:val('fc-cp'),rangOly:val('fo-rang'),pieceId:val('fl-idcard'),essaiOk:document.getElementById('fo-essai').checked,
+    livNom:val('liv-nm'),livPrenom:val('liv-pr'),livTel:val('liv-tel'),livEmail:val('liv-em'),
+    factAdresse:val('fact-adr'),factCp:val('fact-cp'),factVille:val('fact-vil'),factPays:val('fact-pays'),
     boCompte:(function(){var raw=val('fo-bo').trim();if(!raw)return'';var ea=(raw.match(/EA\d+/i)||[])[0];if(ea){ea=ea.toUpperCase();var o=OC.find(function(x){return String(x.memberIdOlyLife||'').toUpperCase()===ea;});if(o)return ea+' — '+o.nom+' '+(o.prenom||'');}return raw;}()),
     refere:isRef?((USER.tags&&USER.tags[0])||USER.nom):(function(){var sv=document.getElementById('fc-ref').value;return sv==='__autre__'?(document.getElementById('fc-ref-autre').value.trim()):sv;}()),
     suivis:(function(){var l=[];document.querySelectorAll('.fc-sui:checked').forEach(function(x){l.push(x.value);});return l;}()),
@@ -3318,7 +3367,9 @@ function parseOlyOrders(text){
     var destinataire=val(bl,/^(nom du destinataire|recipient'?s name)$/i);
     var idcard=val(bl,/^(id card number|num[ée]ro de carte d'identit[ée])$/i);
     var email=val(bl,/^(adresse e-?mail|email address)$/i);
-    var tel=val(bl,/^(t[ée]l[ée]phone|phone number|recipient'?s phone number)/i);
+    var tel=val(bl,/^(t[ée]l[ée]phone|phone number)$/i);
+    var recipTel=val(bl,/^(recipient'?s phone number|num[ée]ro de t[ée]l[ée]phone du destinataire)/i);
+    if(!tel)tel=recipTel;
     var pays=val(bl,/^(pays|country)/i);
     var adr=val(bl,/^(adresse d[ée]taill[ée]e|detailed address)$/i);
     var cp=val(bl,/^(code postal|postal code)$/i);
@@ -3360,7 +3411,9 @@ function parseOlyOrders(text){
     var dateCmd=/^\d{8}/.test(num)?num.slice(0,4)+'-'+num.slice(4,6)+'-'+num.slice(6,8):'';
     if(dLivr&&dLivr===dateCmd)dLivr='';
     var notes=['Commande OlyLife n°'+num+(dateCmd?' du '+fD(dateCmd):''),montant?'Montant : '+montant+' USD':'',type?'Type : '+type:'',stCmd?'Statut commande : '+stCmd:'',prodTxt.length?'Produits : '+prodTxt.join(', '):'',adr?'Livraison : '+adr:'',destinataire&&destinataire!==nomC?'Destinataire : '+destinataire:'',rem?'Remarque : '+rem:''].filter(Boolean).join('\n');
-    return{nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,numCommande:num,memberIdOlyLife:(member||'').toUpperCase(),pieceId:idcard,dateCommande:dateCmd,transporteur:transporteur,tracking:tracking.join(' / '),dateLivraison:dLivr,rangOly:rang,produits:prods,etape:'Client - Logistique',qualification:'Chaud',statut:'close',notes:notes,_src:'olylife'};
+    var livNom=(destinataire&&destinataire.replace(/\s+/g,' ').toLowerCase()!==nomC.replace(/\s+/g,' ').toLowerCase())?destinataire:'';
+    var livTel=(recipTel&&normPhone(recipTel)!==normPhone(tel))?normPhone(recipTel):'';
+    return{nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,livNom:livNom,livTel:livTel,numCommande:num,memberIdOlyLife:(member||'').toUpperCase(),pieceId:idcard,dateCommande:dateCmd,transporteur:transporteur,tracking:tracking.join(' / '),dateLivraison:dLivr,rangOly:rang,produits:prods,etape:'Client - Logistique',qualification:'Chaud',statut:'close',notes:notes,_src:'olylife'};
   }).filter(function(x){return x.nom||x.tel||x.numCommande;});
 }
 function parseCSV(text){
@@ -3396,7 +3449,7 @@ function impFindExisting(it){
     return!!(it.nom&&it.prenom)&&(c.nom||'').trim().toUpperCase()===(it.nom||'').trim().toUpperCase()&&prem(c.prenom)===prem(it.prenom);
   })||null;
 }
-var IMP_FLBL={tel:'téléphone',email:'e-mail',pays:'pays',ville:'ville',adresse:'adresse',cp:'code postal',numCommande:'n° commande',memberIdOlyLife:'ID membre',pieceId:'pièce d\'identité',tracking:'n° de tracking',transporteur:'transporteur',dateLivraison:'date de livraison',dateCommande:'date de commande',rangOly:'rang OlyLife',refere:'référent',suiviPar:'suivi par',produits:'produits',notes:'notes de commande',statut:'statut',etape:'étape'};
+var IMP_FLBL={tel:'téléphone',email:'e-mail',pays:'pays',ville:'ville',adresse:'adresse livraison',cp:'code postal',livNom:'destinataire livraison',livTel:'tél. livraison',factAdresse:'adresse facturation',numCommande:'n° commande',memberIdOlyLife:'ID membre',pieceId:'pièce d\'identité',tracking:'n° de tracking',transporteur:'transporteur',dateLivraison:'date de livraison',dateCommande:'date de commande',rangOly:'rang OlyLife',refere:'référent',suiviPar:'suivi par',produits:'produits',notes:'notes de commande',statut:'statut',etape:'étape'};
 var IMP_SKIP={id:1,createdAt:1,createdBy:1,journal:1,actions:1,rdvs:1,avances:1,suivis:1,geo:1,qualification:1,canal:1,registre:1,referentId:1,referentNom:1,_src:1,_state:1,_exid:1};
 var IMP_FORCE={tracking:1,transporteur:1,dateLivraison:1,rangOly:1,numCommande:1,dateCommande:1,memberIdOlyLife:1};
 function impDiff(it,ex){
@@ -4138,7 +4191,7 @@ document.addEventListener('keydown',function(e){
   var t=e.target,tag=(t&&t.tagName||'').toLowerCase(),typing=tag==='input'||tag==='textarea'||tag==='select'||(t&&t.isContentEditable);
   if((e.ctrlKey||e.metaKey)&&(e.key==='k'||e.key==='K')){e.preventDefault();oSearchFocus();return;}
   if(e.key==='Escape'){
-    var order=[['odrawer',oDrawerClose],['oavs',oAvClose],['oreq',oReqClose],['ocal',oCalClose],['octx',oCtxClose],['osv',oCloseSuivi],['oimp',oCloseImport],['omo',oClose],['osetup',oHideSetup]];
+    var order=[['odrawer',oDrawerClose],['ostk',oStkClose],['oavs',oAvClose],['oreq',oReqClose],['ocal',oCalClose],['octx',oCtxClose],['osv',oCloseSuivi],['oimp',oCloseImport],['omo',oClose],['osetup',oHideSetup]];
     for(var i=0;i<order.length;i++){var el=document.getElementById(order[i][0]);if(el&&el.classList.contains('on')){order[i][1]();e.preventDefault();return;}}
     if(Object.keys(SEL).length){SEL={};oSelMode(false);}
     if(typing&&t.blur)t.blur();
@@ -4158,7 +4211,7 @@ document.addEventListener('keydown',function(e){
 })();
 
 // ── FEUILLES & MODALES : bouton « retour » du téléphone les ferme ──
-var HIST_OPEN=0,IGNORE_POP=false,SHEET_ORDER=['odrawer','oavs','oreq','ocal','octx','osv','omo','oimp','osetup'];
+var HIST_OPEN=0,IGNORE_POP=false,SHEET_ORDER=['odrawer','ostk','oavs','oreq','ocal','octx','osv','omo','oimp','osetup'];
 function oSheetOpen(id){
   var el=document.getElementById(id);if(!el)return;
   if(!el.classList.contains('on')){el.classList.add('on');try{history.pushState({sheet:id},'');HIST_OPEN++;}catch(e){}}
@@ -4244,6 +4297,8 @@ function oInstallSkip(){
 // ═══════════════════════════════════════════════════════════════════
 // v3.1 — TIROIR · AVANCES · CARTE · GÉNÉALOGIE · COLLECTE D'INFOS
 // ═══════════════════════════════════════════════════════════════════
+function oSetFact(on){var w=document.getElementById('fact-wrap');var b=document.getElementById('btn-fact');if(!w||!b)return;w.style.display=on?'flex':'none';b.textContent=on?'🧾 Adresse de facturation différente ▴':'🧾 Adresse de facturation différente ▾';}
+function oToggleFact(){var w=document.getElementById('fact-wrap');oSetFact(w&&w.style.display==='none');}
 var TUNNELS_URL='https://team-waterlifehightech.com/app-tunnels/';
 var BOFFICE_URL='https://www.team-waterlifehightech.com/bo-office/';
 function oTunnels(){window.open(TUNNELS_URL,'_blank');}
@@ -4472,6 +4527,88 @@ function oReqSend(kind){
     else prompt('Message :',msg);
   }
   oRefresh();
+}
+
+// ── Stock de machines (CFG.stocks) ─────────────────────────────────
+function stkList(){return CFG.stocks||[];}
+function stkSave(){CFG.stocks=stkList();oSaveCache();oPost_({op:'saveConfig',config:{referents:CFG.referents||[],stocks:CFG.stocks}});}
+function stkPeople(){
+  var p=[];if(USER&&ROLE()==='admin')p.push(USER.nom);
+  USERS.forEach(function(u){if(u.actif!==false&&!u.pending&&p.indexOf(u.nom)<0)p.push(u.nom);});
+  if(USER&&p.indexOf(USER.nom)<0)p.unshift(USER.nom);
+  return p;
+}
+function renderStock(){
+  var box=document.getElementById('stk-list');if(!box)return;
+  var isAdm=ROLE()==='admin';
+  var ab=document.getElementById('stk-add-btn');if(ab)ab.style.display=isAdm?'':'none';
+  var l=stkList();
+  if(!l.length){box.innerHTML='<div style="padding:14px 16px;font-size:12px;color:var(--t3)">Aucune machine en stock pour l\'instant.'+(isAdm?' Ajoutez les machines achetées avec « ＋ Ajouter ».':'')+'</div>';return;}
+  var tot={};l.forEach(function(x){tot[x.produit]=(tot[x.produit]||0)+(+x.qte||0);});
+  box.innerHTML=l.map(function(x,i){
+    return'<div class="av-it"><div class="av-b"><span class="av-m">'+esc(String(x.qte))+' ×</span> <b>'+esc(x.produit)+'</b><small>📍 chez '+esc(x.qui)+'</small></div>'
+      +(isAdm?'<div style="display:flex;gap:4px;flex-shrink:0;align-items:center">'
+        +'<button class="tb-ic" title="−1" onclick="oStkDelta('+i+',-1)">➖</button>'
+        +'<button class="tb-ic go" title="+1" onclick="oStkDelta('+i+',1)">➕</button>'
+        +'<button class="tb-ic" title="Supprimer la ligne" onclick="oStkDel('+i+')">🗑</button>'
+      +'</div>':'')+'</div>';
+  }).join('')
+  +'<div style="padding:10px 16px;font-size:12px;color:var(--t2);border-top:1px solid var(--bd)"><b>Total :</b> '+Object.keys(tot).map(function(k){return tot[k]+' × '+k.split('(')[0].trim();}).join(' · ')+'</div>';
+}
+function oStkForm(){
+  var f=document.getElementById('stk-form');
+  var on=f.style.display==='none';
+  f.style.display=on?'block':'none';
+  if(on){
+    document.getElementById('stk-qui').innerHTML=stkPeople().map(function(n){return'<option>'+esc(n)+'</option>';}).join('');
+    document.getElementById('stk-prod').innerHTML=PRODUCTS.map(function(p){return'<option>'+esc(p)+'</option>';}).join('');
+    document.getElementById('stk-qte').value=1;
+  }
+}
+function oStkAdd(){
+  if(ROLE()!=='admin'){oT('Réservé à l\'admin','e');return;}
+  var qui=val('stk-qui'),prod=val('stk-prod'),qte=parseInt(val('stk-qte'),10)||0;
+  if(!qui||!prod||qte<0)return;
+  CFG.stocks=stkList();
+  var ex=CFG.stocks.find(function(x){return x.qui===qui&&x.produit===prod;});
+  if(ex)ex.qte=(+ex.qte||0)+qte;
+  else CFG.stocks.push({id:Date.now().toString(36),qui:qui,produit:prod,qte:qte});
+  stkSave();renderStock();document.getElementById('stk-form').style.display='none';
+  oT('📦 Stock mis à jour : '+qte+' × '+prod+' chez '+qui,'s');
+}
+function oStkDelta(i,d){
+  if(ROLE()!=='admin')return;
+  var x=stkList()[i];if(!x)return;
+  x.qte=Math.max(0,(+x.qte||0)+d);
+  stkSave();renderStock();
+}
+function oStkDel(i){
+  if(ROLE()!=='admin')return;
+  if(!confirm('Supprimer cette ligne de stock ?'))return;
+  CFG.stocks.splice(i,1);stkSave();renderStock();
+}
+function oStkOpen(cid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var dispo=stkList().filter(function(x){return(+x.qte||0)>0;});
+  if(!dispo.length){oT('Aucune machine en stock — gérez le stock dans Équipe','w');return;}
+  document.getElementById('ostk-cid').value=cid;
+  document.getElementById('ostk-sub').textContent='Pour '+c.nom+' '+(c.prenom||'');
+  document.getElementById('ostk-line').innerHTML=dispo.map(function(x){return'<option value="'+esc(x.id)+'">'+esc(x.produit)+' — chez '+esc(x.qui)+' ('+x.qte+' dispo)</option>';}).join('');
+  oSheetOpen('ostk');
+}
+function oStkClose(){oSheetClose('ostk');}
+function oStkGive(){
+  if(ROLE()!=='admin'){oT('Réservé à l\'admin (gestion du stock)','e');return;}
+  var cid=document.getElementById('ostk-cid').value;
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var lid=val('ostk-line');
+  var x=stkList().find(function(y){return y.id===lid;});
+  if(!x||(+x.qte||0)<1)return;
+  x.qte=(+x.qte)-1;stkSave();
+  jrnAdd(c,'fait','📦 '+x.produit+' remis immédiatement depuis le stock de '+x.qui+'. ➜ À faire : commande BO avec FACTURATION = adresse du client et LIVRAISON = adresse de '+x.qui+' (reconstitution du stock).');
+  if(c.produits&&c.produits.indexOf(x.produit)<0)c.produits.push(x.produit);
+  oPush([c]);oStkClose();oOpenF(cid);
+  oT('📦 Remise enregistrée — stock de '+x.qui+' : '+x.qte+' restant(s)','s');
 }
 
 // ── Liste des comptes BO (datalist) ────────────────────────────────
