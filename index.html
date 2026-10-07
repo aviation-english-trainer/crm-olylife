@@ -894,6 +894,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <button class="sd-it" data-nav="genea" onclick="oSw('genea')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2.5" width="6" height="5" rx="1.5"/><rect x="2.5" y="16.5" width="6" height="5" rx="1.5"/><rect x="15.5" y="16.5" width="6" height="5" rx="1.5"/><path d="M12 7.5v4m0 0H5.5v5m6.5-5h6.5v5"/></svg><em>Généalogie</em></button>
     </nav>
     <div class="sd-foot">
+      <button class="sd-it" onclick="oBOffice()" title="BO Office — Back-office Team WaterLifeHighTech"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg><em>BO Office</em></button>
       <button class="sd-it" onclick="oTunnels()" title="App Tunnels — Un lien, un client"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><em>App Tunnels</em></button>
       <button class="sd-it" onclick="oShowSetup()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><em>Réglages</em></button>
       <div class="sd-user"><span class="sd-av" id="sd-av">·</span><div><b id="sd-un">—</b><small id="sd-ur">—</small></div></div>
@@ -1190,6 +1191,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <div style="background:linear-gradient(135deg,#FFFFFF,var(--navy3));padding:16px;border-radius:var(--r) var(--r) 0 0;border:1px solid var(--bd);border-bottom:none">
         <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);font-weight:700" id="offttl">Nouveau contact</div>
         <div style="font-size:11px;color:var(--t3);margin-top:3px">Champs obligatoires *</div>
+        <button type="button" class="ob baqua bsm" id="oimp-btn2" style="margin-top:10px" onclick="oOpenImport()">⇪ Importer des contacts en masse (liste, CSV, page BO OlyLife…)</button>
       </div>
       <div style="background:var(--navy2);border-radius:0 0 var(--r) var(--r);border:1px solid var(--bd);border-top:none;padding:16px;margin-bottom:16px">
         <input type="hidden" id="fc-eid">
@@ -1350,6 +1352,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <button class="odr-it" onclick="oDrawerClose();oNew()"><span class="em">➕</span>Nouveau contact</button>
       <button class="odr-it" id="odr-req" onclick="oDrawerClose();oReqOpen()"><span class="em">📨</span>Demander les infos d'inscription</button>
       <button class="odr-it" id="odr-imp" onclick="oDrawerClose();oOpenImport()"><span class="em">⇪</span>Importer des contacts</button>
+      <button class="odr-it" onclick="oDrawerClose();oBOffice()"><span class="em">🏢</span>BO Office — Team WLHT</button>
       <button class="odr-it" onclick="oDrawerClose();oTunnels()"><span class="em">🔗</span>App Tunnels — Un lien, un client</button>
       <button class="odr-it" onclick="oDrawerClose();oShowSetup()"><span class="em">⚙️</span>Réglages</button>
       <button class="odr-it" onclick="oDrawerClose();oLogout()"><span class="em">🚪</span>Se déconnecter</button>
@@ -1584,7 +1587,7 @@ var DELAI_TEMOIGNAGE=30;
 var GAS_URL='',CODE='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.2 · 07/10';
+var APP_VERSION='v3.3 · 07/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -1789,6 +1792,7 @@ function applyRole(){
   // Contacts : filtres avancés + import
   document.getElementById('ofilter-row').classList.toggle('hide',isRef);
   document.getElementById('oimp-btn').style.display=isRef?'none':'inline-flex';
+  var ib2=document.getElementById('oimp-btn2');if(ib2)ib2.style.display=isRef?'none':'inline-flex';
   // Équipe : cartes admin
   document.getElementById('eq-users-card').classList.toggle('hide',isRef);
   document.getElementById('ofilter-vue').classList.toggle('hide',isRef);
@@ -3500,7 +3504,20 @@ function oImpGo(){
   });
   if(changed.length)oPush(changed);
   oT(added+' créée(s) · '+updated+' complétée(s)'+(dups?' · '+dups+' doublon(s) refusé(s)':'')+(skipped?' · '+skipped+' ignorée(s)':''),'s');
-  oCloseImport();oRefresh();
+  oCloseImport();
+  if(changed.length===1){oRefresh();oOpenF(changed[0].id);return;}
+  if(changed.length>1){IMP_LAST=changed.map(function(c){return c.id;});IMP_FILTER=true;oClearFiltersSilent();oSw('contacts');return;}
+  oRefresh();
+}
+var IMP_LAST=[],IMP_FILTER=false;
+function oImpFilterOff(){IMP_FILTER=false;oCli();}
+function oClearFiltersSilent(){
+  ['ofil-tag','ofil-ref','ofil-suivi','oq','gq','pq'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  var x=document.getElementById('oq-x');if(x)x.style.display='none';
+  ACTIVE_FILTER='';ACTIVE_STATUT='';
+  document.querySelectorAll('#ofilter-chips .ofilter-chip').forEach(function(b,i){b.classList.toggle('on',i===0);});
+  document.querySelectorAll('#ofilter-st .ofilter-chip').forEach(function(b,i){b.classList.toggle('on',i===0);});
+  oVueSet('',true);
 }
 
 
@@ -3795,6 +3812,7 @@ function oFilt(){LIST_LIMIT=150;oCli();}
 function activeFilterCount(){return['ofil-tag','ofil-ref','ofil-suivi'].filter(function(id){return val(id);}).length+(ACTIVE_FILTER?1:0);}
 function oToggleFilt(){document.getElementById('ofilt-panel').classList.toggle('on');}
 function oClearFilters(){
+  IMP_FILTER=false;
   ['ofil-tag','ofil-ref','ofil-suivi','oq','gq','pq'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('oq-x').style.display='none';
   ACTIVE_FILTER='';ACTIVE_STATUT='';
@@ -3807,10 +3825,12 @@ function oCli(){
   var q=val('oq');
   vueCounts(filterContacts(q,{vue:false}));
   var base=filterContacts(q,{});stCounts(base);
-  var l=filterContacts(q,{statut:true});sortList(l);CUR_LIST=l;
+  var l=filterContacts(q,{statut:true});
+  if(IMP_FILTER&&IMP_LAST.length)l=l.filter(function(c){return IMP_LAST.indexOf(c.id)>=0;});
+  sortList(l);CUR_LIST=l;
   var fc=activeFilterCount(),fn=document.getElementById('ofilt-n');fn.textContent=fc;fn.classList.toggle('on',fc>0);
   var filtered=fc||q||ACTIVE_STATUT||ACTIVE_VUE;
-  document.getElementById('c-count').innerHTML='<span><b>'+l.length+'</b> contact'+(l.length>1?'s':'')+(filtered?' sur '+OC.length:'')+'</span>'+(filtered?'<a onclick="oClearFilters()">✕ Effacer les filtres</a>':'')+(VIEW_AS_TAG?'<span class="obdg bpu">👁 Session '+esc(VIEW_AS_NOM||VIEW_AS_TAG)+'</span>':'');
+  document.getElementById('c-count').innerHTML=(IMP_FILTER&&IMP_LAST.length?'<span class="obdg baq">📥 Contrôle du dernier import — '+l.length+' fiche(s)</span><a onclick="oImpFilterOff()">✕ Afficher tous les contacts</a>':'<span><b>'+l.length+'</b> contact'+(l.length>1?'s':'')+(filtered?' sur '+OC.length:'')+'</span>'+(filtered?'<a onclick="oClearFilters()">✕ Effacer les filtres</a>':''))+(VIEW_AS_TAG?'<span class="obdg bpu">👁 Session '+esc(VIEW_AS_NOM||VIEW_AS_TAG)+'</span>':'');
   var sb=document.getElementById('osel-btn');if(sb){sb.classList.toggle('on',SEL_MODE);sb.style.display=isDesk()?'none':'';}
   var cl=document.getElementById('c-list');
   if(!l.length){cl.innerHTML='<div class="oemp"><div class="oemp-i">✦</div><div class="oemp-t">Aucun contact'+(filtered?' pour ces filtres':'')+'</div></div>';renderBulk();return;}
@@ -4225,7 +4245,9 @@ function oInstallSkip(){
 // v3.1 — TIROIR · AVANCES · CARTE · GÉNÉALOGIE · COLLECTE D'INFOS
 // ═══════════════════════════════════════════════════════════════════
 var TUNNELS_URL='https://team-waterlifehightech.com/app-tunnels/';
+var BOFFICE_URL='https://www.team-waterlifehightech.com/bo-office/';
 function oTunnels(){window.open(TUNNELS_URL,'_blank');}
+function oBOffice(){window.open(BOFFICE_URL,'_blank');}
 
 // ── Tiroir de navigation (téléphone) ───────────────────────────────
 function oDrawerOpen(){
