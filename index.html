@@ -1720,7 +1720,7 @@ var DELAI_TEMOIGNAGE=30;
 var GAS_URL='',CODE='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.8 · 08/10';
+var APP_VERSION='v3.8.1 · 08/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -2796,12 +2796,12 @@ function oDigestModal(userOrIndex){
   if(!u)return;
   var content=oDigestBuildContent(u);
   var html='<div style="position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:16px" onclick="this.remove()">'
-    +'<div style="background:var(--bg);border-radius:14px;padding:20px;max-width:540px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.3)" onclick="event.stopPropagation()">'
+    +'<div style="background:#fff;color:var(--tx);border-radius:16px;padding:20px;max-width:540px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.3)" onclick="event.stopPropagation()">'
     +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
     +'<div style="font-weight:700;font-size:15px">📧 Aperçu digest — '+esc(u.nom)+'</div>'
     +'<button onclick="this.closest(\'[style*=fixed]\').remove()" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--t2)">✕</button>'
     +'</div>'
-    +'<pre style="font-family:inherit;font-size:12px;white-space:pre-wrap;color:var(--t1);background:var(--bg2);padding:12px;border-radius:8px;line-height:1.6">'+esc(content)+'</pre>'
+    +'<pre style="font-family:inherit;font-size:12.5px;white-space:pre-wrap;color:var(--tx);background:var(--navy3);border:1px solid var(--bd);padding:12px;border-radius:10px;line-height:1.6;margin:0">'+esc(content)+'</pre>'
     +(u.digestEmail
       ?'<button class="ob bgold" style="margin-top:12px;width:100%;min-height:46px" onclick="oDigestMailto(\''+esc(u.id)+'\')">📨 Envoyer à '+esc(u.digestEmail)+'</button>'
       :'<div style="color:var(--t2);font-size:12px;margin-top:10px">⚠️ Aucun email configuré pour cet utilisateur.</div>'
