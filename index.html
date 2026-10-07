@@ -668,6 +668,80 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
   .ctbl{font-size:13.5px;}
 }
 
+/* ═══════════════ v3.1 — TIROIR DE NAVIGATION (téléphone) ═══════════════ */
+.otop-burger{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:12px;border:none;background:rgba(18,106,60,.08);color:var(--gr);cursor:pointer;flex-shrink:0;margin-right:10px;-webkit-tap-highlight-color:transparent;}
+.otop-burger:active{background:rgba(18,106,60,.16);transform:scale(.94);}
+@media (min-width:760px){.otop-burger{display:none;}}
+#odrawer{position:fixed;inset:0;z-index:400;visibility:hidden;pointer-events:none;}
+#odrawer.on{visibility:visible;pointer-events:auto;}
+.odr-bg{position:absolute;inset:0;background:rgba(10,47,28,.45);opacity:0;transition:opacity .22s;backdrop-filter:blur(2px);}
+#odrawer.on .odr-bg{opacity:1;}
+.odr-p{position:absolute;top:0;left:0;bottom:0;width:min(84vw,330px);background:linear-gradient(180deg,#0F4A2B,#0A2F1C);color:rgba(255,255,255,.85);display:flex;flex-direction:column;transform:translateX(-102%);transition:transform .26s cubic-bezier(.3,.9,.3,1);box-shadow:8px 0 32px rgba(0,0,0,.25);padding:calc(14px + env(safe-area-inset-top,0px)) 14px calc(14px + env(safe-area-inset-bottom,0px));overflow-y:auto;}
+#odrawer.on .odr-p{transform:translateX(0);}
+.odr-hd{display:flex;align-items:center;gap:11px;padding:4px 6px 16px;}
+.odr-hd img{width:40px;height:40px;border-radius:11px;background:#fff;padding:3px;}
+.odr-hd b{font-family:'Cormorant Garamond',serif;font-size:19px;color:#fff;display:block;line-height:1.1;}
+.odr-hd span{font-size:10.5px;color:rgba(255,255,255,.55);}
+.odr-user{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:10px 12px;margin-bottom:14px;}
+.odr-user .sd-av{width:36px;height:36px;border-radius:50%;background:var(--gold);color:#0A2F1C;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.odr-user b{font-size:13.5px;color:#fff;display:block;}
+.odr-user small{font-size:11px;color:rgba(255,255,255,.6);}
+.odr-sec{font-size:9.5px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:rgba(255,255,255,.4);padding:12px 8px 6px;}
+.odr-it{display:flex;align-items:center;gap:12px;width:100%;border:none;background:none;color:rgba(255,255,255,.82);font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;padding:12px 10px;border-radius:12px;cursor:pointer;text-align:left;position:relative;-webkit-tap-highlight-color:transparent;text-decoration:none;}
+.odr-it:active{background:rgba(255,255,255,.1);}
+.odr-it.on{background:rgba(201,162,77,.18);color:#F3D9A4;}
+.odr-it svg{width:20px;height:20px;stroke:currentColor;flex-shrink:0;}
+.odr-it .em{width:22px;text-align:center;font-size:16px;flex-shrink:0;}
+.odr-it .nbdg{margin-left:auto;background:var(--rd);color:#fff;font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:10px;display:none;}
+.odr-it .nbdg.on{display:inline-block;}
+.odr-ver{margin-top:auto;padding:14px 8px 2px;font-size:10.5px;color:rgba(255,255,255,.35);text-align:center;}
+
+/* ═══════════════ v3.1 — SECTIONS DÉPLIABLES (fiche contact) ═══════════════ */
+.od-sec-ttl.tog{cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;-webkit-tap-highlight-color:transparent;}
+.od-sec-ttl.tog::after{content:'▾';font-size:12px;color:var(--t3);transition:transform .18s;}
+.od-section.clps .od-sec-ttl.tog::after{transform:rotate(-90deg);}
+.od-section.clps .od-bd{display:none;}
+
+/* ═══════════════ v3.1 — AVANCES D'ARGENT ═══════════════ */
+.av-it{display:flex;align-items:flex-start;gap:10px;padding:11px 16px;border-bottom:1px solid var(--bd);}
+.av-it:last-child{border-bottom:none;}
+.av-it .av-m{font-weight:700;font-size:15px;color:var(--tx);white-space:nowrap;}
+.av-it small{display:block;font-size:11.5px;color:var(--t3);margin-top:2px;line-height:1.5;}
+.av-it .av-b{flex:1;min-width:0;}
+.av-late{color:var(--rd);font-weight:700;}
+.av-ok{color:var(--gr);}
+
+/* ═══════════════ v3.1 — CARTE MONDIALE ═══════════════ */
+#carte-map{height:calc(100dvh - var(--top-h) - 230px);min-height:360px;border-radius:var(--r);border:1px solid var(--bd);box-shadow:var(--sh);z-index:1;background:var(--navy3);}
+@media (min-width:760px){#carte-map{height:calc(100dvh - var(--top-h) - 190px);}}
+.leaflet-popup-content{font-family:'Outfit',sans-serif!important;font-size:13px;margin:12px 14px!important;min-width:190px;}
+.leaflet-popup-content b{font-size:14px;}
+.leaflet-popup-content .ob{min-height:38px;font-size:12px;width:100%;margin-top:8px;}
+.map-bdg{display:inline-block;background:var(--aqp,#E8F4F0);color:var(--aqua);border-radius:9px;padding:2px 8px;font-size:10.5px;font-weight:600;margin:3px 3px 0 0;}
+.map-count{font-size:12px;color:var(--t2);margin:10px 2px 0;line-height:1.6;}
+
+/* ═══════════════ v3.1 — GÉNÉALOGIE ═══════════════ */
+.gtree,.gtree ul{list-style:none;margin:0;padding-left:22px;position:relative;}
+.gtree{padding-left:0;}
+.gtree ul::before{content:'';position:absolute;left:8px;top:0;bottom:14px;border-left:2px solid var(--bd);}
+.gtree li{position:relative;padding:4px 0 0;}
+.gtree ul li::before{content:'';position:absolute;left:-14px;top:24px;width:14px;border-top:2px solid var(--bd);}
+.gn{display:inline-flex;align-items:center;gap:9px;background:var(--navy2);border:1.5px solid var(--bd);border-radius:14px;padding:7px 13px 7px 8px;cursor:pointer;transition:all .15s;max-width:100%;}
+.gn:hover{border-color:var(--gold);box-shadow:var(--sh);}
+.gn .tav{width:30px;height:30px;font-size:11px;flex-shrink:0;}
+.gn b{font-size:13px;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:46vw;}
+.gn small{display:block;font-size:10.5px;color:var(--t3);}
+.gn .rgb{font-size:9.5px;font-weight:700;background:var(--goldp);color:var(--gold);border-radius:8px;padding:1px 7px;margin-left:2px;flex-shrink:0;}
+
+/* ═══════════════ v3.1 — POLISH GÉNÉRAL ═══════════════ */
+.ov.on{animation:ovin .2s ease;}
+@keyframes ovin{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:none;}}
+.ob:active{transform:scale(.97);}
+.dk:active{transform:scale(.97);}
+.oimp-diff{font-size:10.5px;line-height:1.55;margin-top:3px;}
+.oimp-diff .nw{color:var(--gr);font-weight:600;}
+.oimp-diff .kn{color:var(--t3);}
+
 </style>
 </head>
 <body>
@@ -771,13 +845,19 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <button class="sd-it" data-nav="agenda" onclick="oSw('agenda')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><em>Agenda</em><i class="nbdg" data-b="agenda"></i></button>
       <button class="sd-it" data-nav="actions" onclick="oSw('actions')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><em>Actions</em><i class="nbdg" data-b="actions"></i></button>
       <button class="sd-it" data-nav="equipe" onclick="oSw('equipe')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v5m0 0L6.5 17m5.5-4.5L17.5 17"/></svg><em>Équipe</em><i class="nbdg" data-b="equipe"></i></button>
+      <button class="sd-it" data-nav="carte" onclick="oSw('carte')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.6-7-11a7 7 0 0 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg><em>Carte</em></button>
+      <button class="sd-it" data-nav="genea" onclick="oSw('genea')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2.5" width="6" height="5" rx="1.5"/><rect x="2.5" y="16.5" width="6" height="5" rx="1.5"/><rect x="15.5" y="16.5" width="6" height="5" rx="1.5"/><path d="M12 7.5v4m0 0H5.5v5m6.5-5h6.5v5"/></svg><em>Généalogie</em></button>
     </nav>
     <div class="sd-foot">
+      <button class="sd-it" onclick="oTunnels()" title="App Tunnels — Un lien, un client"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><em>App Tunnels</em></button>
       <button class="sd-it" onclick="oShowSetup()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><em>Réglages</em></button>
       <div class="sd-user"><span class="sd-av" id="sd-av">·</span><div><b id="sd-un">—</b><small id="sd-ur">—</small></div></div>
     </div>
   </aside>
   <header id="otop">
+    <button class="otop-burger" id="oburger" onclick="oDrawerOpen()" aria-label="Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="3" y1="6.5" x2="21" y2="6.5"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="17.5" x2="21" y2="17.5"/></svg>
+    </button>
     <div class="otop-title" id="ottl">Tableau de bord</div>
     <label class="otop-search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="search" id="gq" placeholder="Rechercher un contact, un téléphone, une commande…   ( / )" autocomplete="off" oninput="oGlobalSearch(this.value)" onkeydown="if(event.key==='Enter'&&CUR_LIST.length===1){oOpenF(CUR_LIST[0].id);}"></label>
     <div class="otop-right">
@@ -1077,6 +1157,8 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
           <div class="ofg1"><label class="ofl">E-mail</label><input type="email" class="ofc" id="fc-em" placeholder="contact@email.com"></div>
           <div class="ofg1"><label class="ofl">Pays</label><input type="text" class="ofc" id="fc-pays" placeholder="France"></div>
           <div class="ofg1"><label class="ofl">Ville</label><input type="text" class="ofc" id="fc-vil" placeholder="Paris"></div>
+          <div class="ofg1"><label class="ofl">Adresse postale</label><input type="text" class="ofc" id="fc-adr" placeholder="81 Chemin de Crémat, BAT 1" autocomplete="off"></div>
+          <div class="ofg1"><label class="ofl">Code postal</label><input type="text" class="ofc" id="fc-cp" placeholder="06200" autocomplete="off"></div>
           <div class="ofg1" id="fg-ref"><label class="ofl">Référé par</label>
             <select class="ofc" id="fc-ref" onchange="oRefSelectChange(this)">
               <option value="">— Choisir un parrain / une marraine —</option>
@@ -1115,6 +1197,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
           <div class="fb" id="fb-prod">
             <div class="osec">Produits d'intérêt / achetés</div>
             <div class="opg" id="opg"></div>
+            <label class="ochk-row" style="margin-top:10px"><input type="checkbox" id="fo-essai"><span>🗺️ <b>Accepte de faire essayer son appareil</b> — apparaîtra sur la carte mondiale (avec son accord)</span></label>
           </div>
 
           <div class="fb" id="fb-cmd">
@@ -1122,6 +1205,9 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
             <div class="ofg">
               <div class="ofg1"><label class="ofl">N° commande OlyLife</label><input type="text" class="ofc" id="fl-numcmd" placeholder="20260731040733959459"></div>
               <div class="ofg1"><label class="ofl">Member ID OlyLife du client</label><input type="text" class="ofc" id="fl-memberid" placeholder="EA260498"></div>
+              <div class="ofg1"><label class="ofl">Rang OlyLife</label><select class="ofc" id="fo-rang"><option value="">—</option><option>P1 - Starter</option><option>P2 - Builder</option><option>P3 - Leader</option><option>P4 - Supervisor</option><option>P5 - Pioneer</option></select></div>
+              <div class="ofg1"><label class="ofl">Commande passée sur le Back-Office de…</label><input type="text" class="ofc" id="fo-bo" list="bo-list" placeholder="Rechercher un nom ou EA…" autocomplete="off"><datalist id="bo-list"></datalist></div>
+              <div class="ofg1"><label class="ofl">N° pièce d'identité (passeport / CNI)</label><input type="text" class="ofc" id="fl-idcard" placeholder="CJ2F2V566" autocomplete="off"></div>
               <div class="ofg1"><label class="ofl">Date de commande</label><input type="date" class="ofc" id="fl-datecmd"></div>
               <div class="ofg1"><label class="ofl">Transporteur</label><input type="text" class="ofc" id="fl-transp" placeholder="DHL" list="carrier-list">
                 <datalist id="carrier-list"><option value="DHL"><option value="UPS"><option value="FedEx"><option value="Chronopost"><option value="Colissimo / La Poste"><option value="EMS"><option value="By Mail / Autre"></datalist>
@@ -1174,7 +1260,52 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       </div>
     </div>
 
+    <!-- CARTE MONDIALE DES ESSAIS -->
+    <div class="ov" id="ov-carte">
+      <div class="ocard" style="padding:14px 16px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <div style="font-size:13px;color:var(--t2);line-height:1.6;flex:1;min-width:220px">🗺️ <b>Appareils à l'essai près de chez vous.</b> Seuls les contacts ayant coché « accepte de faire essayer son appareil » dans leur fiche apparaissent ici.</div>
+          <button class="ob baqua" onclick="oGeoRun()" id="btn-geo">📍 Géolocaliser les adresses</button>
+        </div>
+        <div class="map-count" id="carte-count"></div>
+      </div>
+      <div id="carte-map"></div>
+    </div>
+
+    <!-- GÉNÉALOGIE -->
+    <div class="ov" id="ov-genea">
+      <div class="ocard" style="padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:13px;color:var(--t2);line-height:1.6">🧬 <b>Arbre de parrainage OlyLife.</b> Construit à partir des fiches : l'ID membre (EA…) de chaque contact est relié à son sponsor. Touchez une bulle pour ouvrir la fiche. <span id="genea-hint" style="color:var(--t3)">Pour charger l'arbre complet, envoyez votre généalogie du Back-Office à Claude : l'import en masse saura la lire.</span></div>
+      </div>
+      <div class="ocard" style="padding:16px;overflow-x:auto" id="genea-tree"></div>
+    </div>
+
   </div><!-- /ocont -->
+
+  <div id="odrawer">
+    <div class="odr-bg" onclick="oDrawerClose()"></div>
+    <div class="odr-p">
+      <div class="odr-hd"><img class="wlht-logo" alt=""><div><b>CRM OlyLife</b><span>Water Life High Tech</span></div></div>
+      <div class="odr-user"><span class="sd-av" id="odr-av">·</span><div style="min-width:0"><b id="odr-un">—</b><small id="odr-ur">—</small></div></div>
+      <div class="odr-sec">Navigation</div>
+      <button class="odr-it" data-dnav="dashboard" onclick="oDrGo('dashboard')"><span class="em">🏠</span>Accueil<span class="nbdg" data-b="dashboard"></span></button>
+      <button class="odr-it" data-dnav="contacts" onclick="oDrGo('contacts')"><span class="em">👥</span>Contacts<span class="nbdg" data-b="contacts"></span></button>
+      <button class="odr-it" data-dnav="pipeline" onclick="oDrGo('pipeline')"><span class="em">📊</span>Pipeline</button>
+      <button class="odr-it" data-dnav="agenda" onclick="oDrGo('agenda')"><span class="em">📅</span>Agenda<span class="nbdg" data-b="agenda"></span></button>
+      <button class="odr-it" data-dnav="actions" onclick="oDrGo('actions')"><span class="em">🔔</span>Actions<span class="nbdg" data-b="actions"></span></button>
+      <button class="odr-it" data-dnav="equipe" onclick="oDrGo('equipe')"><span class="em">🤝</span>Équipe</button>
+      <button class="odr-it" data-dnav="carte" onclick="oDrGo('carte')"><span class="em">🗺️</span>Carte des essais</button>
+      <button class="odr-it" data-dnav="genea" onclick="oDrGo('genea')"><span class="em">🧬</span>Généalogie</button>
+      <div class="odr-sec">Outils</div>
+      <button class="odr-it" onclick="oDrawerClose();oNew()"><span class="em">➕</span>Nouveau contact</button>
+      <button class="odr-it" id="odr-req" onclick="oDrawerClose();oReqOpen()"><span class="em">📨</span>Demander les infos d'inscription</button>
+      <button class="odr-it" id="odr-imp" onclick="oDrawerClose();oOpenImport()"><span class="em">⇪</span>Importer des contacts</button>
+      <button class="odr-it" onclick="oDrawerClose();oTunnels()"><span class="em">🔗</span>App Tunnels — Un lien, un client</button>
+      <button class="odr-it" onclick="oDrawerClose();oShowSetup()"><span class="em">⚙️</span>Réglages</button>
+      <button class="odr-it" onclick="oDrawerClose();oLogout()"><span class="em">🚪</span>Se déconnecter</button>
+      <div class="odr-ver" id="odr-ver"></div>
+    </div>
+  </div>
 
   <nav id="onav">
     <button class="onb" data-nav="dashboard" onclick="oSw('dashboard')">
@@ -1217,7 +1348,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <div class="omo-ttl">Importer des contacts</div>
   </div>
   <div class="omo-body">
-    <div class="os-note" style="margin-bottom:14px">Collez <b>n'importe quoi</b> : des lignes en vrac (nom, téléphone, email mélangés), un tableau CSV/Excel, ou un bloc JSON préparé par Claude. L'application détecte le format toute seule et vous montre un aperçu avant d'importer.</div>
+    <div class="os-note" style="margin-bottom:14px">Collez <b>n'importe quoi</b> : des lignes en vrac (nom, téléphone, email mélangés), un tableau CSV/Excel, un bloc JSON préparé par Claude, ou <b>la page complète d'une commande du Back-Office OlyLife</b> (français ou anglais — Ctrl+A puis Ctrl+C sur la page, et collez tout ici). L'application détecte le format toute seule, repère les doublons et vous montre ce qui est déjà connu et ce qui est nouveau avant d'importer.</div>
     <textarea class="ofc" id="oimp-ta" rows="8" style="font-family:monospace;font-size:12px" placeholder="Exemples acceptés :&#10;&#10;Marie DUPONT 06 12 34 56 78 marie@gmail.com&#10;KOUASSI Jean +225 07 08 09 10 11 envoyé par Dr Nassima&#10;&#10;— ou un CSV avec en-têtes nom;prenom;tel;email&#10;— ou un tableau JSON [{...}]"></textarea>
     <div class="ofilter-row" id="oimp-def-row" style="margin-top:12px">
       <select id="oimp-defref"><option value="">Référé par (défaut)…</option></select>
@@ -1231,6 +1362,49 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <label class="ochk-row" id="oimp-inc-row" style="display:none;margin-top:10px"><input type="checkbox" id="oimp-inc" onchange="oImpGo_lbl()"><span>Importer aussi les <b id="oimp-inc-n">0</b> fiche(s) sans téléphone ni email</span></label>
     <button class="ob bgold bfull" id="oimp-go" style="display:none;margin-top:12px" onclick="oImpGo()">Importer</button>
     <div style="font-size:11px;color:var(--t3);margin-top:14px;line-height:1.6">💡 Pour une <b>capture d'écran</b> (liste WhatsApp, tableau photographié…) : envoyez-la à Claude, qui vous rend le bloc prêt à coller ici. Les doublons sont détectés automatiquement (n° de commande, Member ID, ou nom + prénom) et mis à jour au lieu d'être recréés.</div>
+  </div>
+</div>
+
+<!-- FEUILLE : AVANCE D'ARGENT -->
+<div id="oavs">
+  <div class="omo-hd">
+    <button class="omo-back" onclick="oAvClose()">←</button>
+    <div class="omo-ttl">💶 Avance d'argent</div>
+  </div>
+  <div class="omo-body">
+    <div class="os-note" style="margin-bottom:14px" id="oavs-sub">—</div>
+    <input type="hidden" id="av-cid"><input type="hidden" id="av-id">
+    <div class="ofg">
+      <div class="ofg1"><label class="ofl">Montant <span class="oreq">*</span></label><input type="number" class="ofc" id="av-montant" placeholder="500" min="0" step="0.01" inputmode="decimal"></div>
+      <div class="ofg1"><label class="ofl">Devise</label><select class="ofc" id="av-devise"><option>€</option><option>FCFA</option><option>USD</option><option>MAD</option></select></div>
+      <div class="ofg1"><label class="ofl">Date de l'avance</label><input type="date" class="ofc" id="av-date"></div>
+      <div class="ofg1"><label class="ofl">Échéance de remboursement <span class="oreq">*</span></label><input type="date" class="ofc" id="av-ech"></div>
+      <div class="ofg1"><label class="ofl">Motif / appareil financé</label><input type="text" class="ofc" id="av-motif" placeholder="Tera-P90+"></div>
+    </div>
+    <div class="os-note" style="margin-top:12px;font-size:11.5px">⏰ Rappels automatiques par <b>e-mail</b> 3 jours avant, la veille et le jour J (aux gestionnaires du contact et à l'admin). Le message <b>WhatsApp</b> pré-rempli est à un clic depuis la fiche et depuis l'écran Actions.</div>
+    <button class="ob bgold bfull" style="margin-top:14px;min-height:48px" onclick="oAvSave()">Enregistrer l'avance</button>
+  </div>
+</div>
+
+<!-- FEUILLE : DEMANDE D'INFOS D'INSCRIPTION -->
+<div id="oreq">
+  <div class="omo-hd">
+    <button class="omo-back" onclick="oReqClose()">←</button>
+    <div class="omo-ttl">📨 Demander les infos d'inscription</div>
+  </div>
+  <div class="omo-body">
+    <div class="os-note" style="margin-bottom:14px">Envoie au futur client / distributeur un message WhatsApp pré-rédigé demandant <b>toutes les informations nécessaires</b> à son enregistrement OlyLife (identité exacte du passeport ou CNI, adresses, e-mail, mot de passe). Sa réponse se colle ensuite telle quelle dans <b>Importer</b>.</div>
+    <div class="ofg">
+      <div class="ofg1"><label class="ofl">Prénom <span class="oreq">*</span></label><input type="text" class="ofc" id="rq-pr" placeholder="Sophie"></div>
+      <div class="ofg1"><label class="ofl">Nom</label><input type="text" class="ofc" id="rq-nm" placeholder="MARTIN"></div>
+      <div class="ofg1"><label class="ofl">Téléphone / WhatsApp <span class="oreq">*</span></label><input type="tel" class="ofc" id="rq-tel" placeholder="+33 6 12 34 56 78"></div>
+    </div>
+    <label class="ochk-row" style="margin-top:10px"><input type="checkbox" id="rq-create" checked><span>Créer la fiche contact si elle n'existe pas encore</span></label>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="ob bwa" style="flex:1;min-height:48px" onclick="oReqSend('wa')">💬 Envoyer sur WhatsApp</button>
+      <button class="ob bgh" style="min-height:48px" onclick="oReqSend('copy')">📋 Copier</button>
+    </div>
+    <div class="ocard" style="margin-top:14px"><div class="ochd"><span class="oct">Aperçu du message</span></div><div style="padding:12px 16px;font-size:12px;line-height:1.7;color:var(--t2);white-space:pre-wrap" id="rq-prev"></div></div>
   </div>
 </div>
 
@@ -1360,7 +1534,7 @@ var DELAI_TEMOIGNAGE=30;
 var GAS_URL='',CODE='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.0 · 07/10';
+var APP_VERSION='v3.1 · 07/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -2063,12 +2237,21 @@ function computeActions(){
         if(diff!==null&&diff<=3)items.push({c:c,key:'temoignage',type:'Témoignage',label:'Demande de témoignage',diff:diff,msg:msgTemoin(c,'fr')});
       }
     }
+    (c.avances||[]).forEach(function(a){
+      if(a.statut==='rembourse'||!a.echeance)return;
+      var diff=diffD(a.echeance);
+      if(diff!==null&&diff<=3)items.push({c:c,key:'av_'+a.id,type:'Avance',label:'💶 Avance de '+a.montant+' '+(a.devise||'€')+(a.motif?' ('+a.motif+')':'')+' — '+(diff<0?'retard de '+Math.abs(diff)+' j':diff===0?'échéance aujourd\'hui':'échéance '+fD(a.echeance)),diff:diff,msg:avWaMsg(c,a)});
+    });
   });
   items.sort(function(a,b){return a.diff-b.diff;});
   return items;
 }
 function oDone(cid,key){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  if(key&&key.indexOf('av_')===0){
+    var a=(c.avances||[]).find(function(x){return'av_'+x.id===key;});
+    if(a){a.statut='rembourse';a.rembourseLe=new Date().toISOString().split('T')[0];jrnAdd(c,'fait','💶 Avance de '+a.montant+' '+(a.devise||'€')+' remboursée');oPush([c]);oT('💶 Avance marquée remboursée','s');oRefresh();return;}
+  }
   if(!c.actions)c.actions={};
   c.actions[key]={done:true,doneAt:new Date().toISOString().split('T')[0]};
   var LBLS={j2:'Relance J+2',j5:'Relance J+5',j12:'Relance J+12',logistique:'Relance logistique',trackingEnvoye:'Tracking envoyé au client',installation:'Suivi installation',temoignage:'Demande de témoignage'};
@@ -2825,6 +3008,27 @@ function oTP(lbl){lbl.classList.toggle('on',lbl.querySelector('input').checked);
 function oTEQ(){document.getElementById('feq-wrap').style.display=document.getElementById('fe-partenaire').checked?'flex':'none';}
 
 // ── FICHE MODAL ──────────────────────────────────────────────────────
+function odSec(ttl,body,open){return'<div class="od-section'+(open?'':' clps')+'"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">'+ttl+'</div><div class="od-bd">'+body+'</div></div>';}
+function rangBdg(c){return c.rangOly?'<span class="obdg bgo">🏅 '+esc(c.rangOly)+'</span>':'';}
+function avanceEnCours(c){return(c.avances||[]).some(function(a){return a.statut!=='rembourse';});}
+function avListHtml(c){
+  var avs=c.avances||[],isRef=(ROLE()==='referent');
+  var rows=avs.map(function(a){
+    var diff=a.echeance?diffD(a.echeance):null,done=a.statut==='rembourse';
+    var st=done?'<span class="obdg bgr">✅ remboursée'+(a.rembourseLe?' le '+fD(a.rembourseLe):'')+'</span>'
+      :diff!==null&&diff<0?'<span class="obdg brd">🚨 retard de '+Math.abs(diff)+' j</span>'
+      :diff===0?'<span class="obdg bor">⏰ échéance aujourd\'hui</span>'
+      :'<span class="obdg bgo">échéance '+fD(a.echeance)+'</span>';
+    return'<div class="av-it"><div class="av-b"><span class="av-m">'+esc(String(a.montant))+' '+esc(a.devise||'€')+'</span> '+st
+      +'<small>Avancé le '+fD(a.date)+(a.motif?' · '+esc(a.motif):'')+(a.par?' · par '+esc(a.par):'')+'</small></div>'
+      +(isRef?'':'<div style="display:flex;gap:4px;flex-shrink:0">'
+        +(!done&&c.tel?'<a class="tb-ic" title="Rappel WhatsApp" href="'+mkWA(c.tel,avWaMsg(c,a))+'" target="_blank" rel="noopener">💬</a>':'')
+        +(!done?'<button class="tb-ic go" title="Marquer remboursée" onclick="oAvMark(\''+c.id+'\',\''+a.id+'\')">✅</button>':'')
+        +'<button class="tb-ic" title="Supprimer" onclick="oAvDel(\''+c.id+'\',\''+a.id+'\')">🗑</button>'
+      +'</div>')+'</div>';
+  }).join('');
+  return rows+(isRef?'':'<div style="padding:10px 16px"><button class="ob baqua bsm" onclick="oAvOpen(\''+c.id+'\')">➕ Nouvelle avance</button></div>');
+}
 function oOpenF(id){
   var c=OC.find(function(x){return x.id===id;});if(!c)return;
   ACTIVE_ID=id;markActiveRow();
@@ -2835,9 +3039,9 @@ function oOpenF(id){
   document.getElementById('om-b').innerHTML=
     '<div style="background:linear-gradient(135deg,#FFFFFF,var(--navy3));border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px">'
       +'<div style="width:52px;height:52px;border-radius:50%;background:var(--goldp);color:var(--gold);font-family:Cormorant Garamond,serif;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+initials(c)+'</div>'
-      +'<div><div style="font-family:Cormorant Garamond,serif;font-size:18px;font-weight:700;color:var(--tx)">'+c.nom+' '+c.prenom+'</div>'
-      +'<div style="font-size:11px;color:var(--t3);margin-top:2px">'+(c.pays||'')+(c.ville?' · '+c.ville:'')+'</div>'
-      +'<div style="margin-top:6px">'+eBdg(c.etape)+' '+qBdg(c.qualification)+'</div></div>'
+      +'<div style="min-width:0"><div style="font-family:Cormorant Garamond,serif;font-size:18px;font-weight:700;color:var(--tx)">'+c.nom+' '+c.prenom+'</div>'
+      +'<div style="font-size:11px;color:var(--t3);margin-top:2px">'+(c.pays||'')+(c.ville?' · '+c.ville:'')+(c.memberIdOlyLife?' · '+esc(c.memberIdOlyLife):'')+'</div>'
+      +'<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">'+eBdg(c.etape)+' '+qBdg(c.qualification)+rangBdg(c)+(c.essaiOk?'<span class="obdg baq">🗺️ essai possible</span>':'')+'</div></div>'
     +'</div>'
     +'<div style="display:flex;gap:8px;margin-bottom:14px">'
       +(num?'<a class="ob bwa" href="https://wa.me/'+num+'" target="_blank" rel="noopener" style="flex:1">WhatsApp</a>':'')
@@ -2852,35 +3056,43 @@ function oOpenF(id){
       +rdvBox(c)
       +'<button class="ob bgold bfull" style="min-height:48px" onclick="oOpenSuivi(\''+id+'\')">📞 Valider un contact / ajouter une observation</button>'
     +'</div></div>'
-    +'<div class="od-section"><div class="od-sec-ttl">Journal des actions ('+((c.journal||[]).length)+')</div>'+jrnHtml(c)+'</div>'
-    +'<div class="od-section"><div class="od-sec-ttl">Informations</div>'
-      +'<div class="od-row"><span class="od-lbl">Téléphone</span><span class="od-val">'+(c.tel||'—')+'</span></div>'
+    +odSec('Journal des actions ('+((c.journal||[]).length)+')',jrnHtml(c),true)
+    +((c.avances&&c.avances.length)||!isRef?odSec('💶 Avances d\'argent'+((c.avances||[]).length?' ('+c.avances.length+')':''),avListHtml(c),avanceEnCours(c)):'')
+    +odSec('Informations',
+      '<div class="od-row"><span class="od-lbl">Téléphone</span><span class="od-val">'+(c.tel||'—')+'</span></div>'
+      +'<div class="od-row"><span class="od-lbl">E-mail</span><span class="od-val">'+esc(c.email||'—')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">Référé par</span><span class="od-val">'+esc(c.refere||'—')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">Suivi par</span><span class="od-val">'+esc(c.suiviPar||'— Non attribué —')+'</span></div>'
       +((c.ctags&&c.ctags.length)?'<div class="od-row"><span class="od-lbl">Tags</span><span class="od-val" style="display:flex;flex-wrap:wrap;gap:4px">'+c.ctags.map(function(t){return'<span class="obdg bpu">'+esc(t)+'</span>';}).join('')+'</span></div>':'')
       +'<div class="od-row"><span class="od-lbl">Canal</span><span class="od-val">'+(c.canal||'—')+'</span></div>'
-      +'<div class="od-row"><span class="od-lbl">Registre</span><span class="od-val">'+(TONE_LABEL[c.registre]||TONE_LABEL.pro)+'</span></div>'
-    +'</div>'
-    +(c.produits&&c.produits.length?'<div class="od-section"><div class="od-sec-ttl">Produits</div><div style="padding:12px 16px;display:flex;flex-wrap:wrap;gap:6px">'+c.produits.map(function(p){return'<span class="obdg baq">'+p+'</span>';}).join('')+'</div></div>':'')
-    +(c.objectifs?'<div class="od-section"><div class="od-sec-ttl">Objectifs</div><div style="padding:12px 16px;font-size:14px;line-height:1.6;color:var(--tx)">'+c.objectifs+'</div></div>':'')
-    +(c.numCommande?'<div class="od-section"><div class="od-sec-ttl">Commande &amp; logistique</div>'
-      +'<div class="od-row"><span class="od-lbl">N° commande</span><span class="od-val">'+c.numCommande+'</span></div>'
-      +'<div class="od-row"><span class="od-lbl">Date</span><span class="od-val">'+fD(c.dateCommande)+'</span></div>'
-      +'<div class="od-row"><span class="od-lbl">Transporteur</span><span class="od-val">'+(c.transporteur||'—')+'</span></div>'
-      +'<div class="od-row"><span class="od-lbl">Tracking</span><span class="od-val">'+(c.tracking?(trackingUrl(c.transporteur,c.tracking)?'<a href="'+trackingUrl(c.transporteur,c.tracking)+'" target="_blank" rel="noopener" style="color:var(--aqua)">'+c.tracking+' ↗</a>':c.tracking):'<span class="obdg bor">en attente</span>')+'</span></div>'
-    +'</div>':'')
-    +(c.notesUsage||c.dateInstall?'<div class="od-section"><div class="od-sec-ttl">Installation &amp; usage</div>'
-      +'<div class="od-row"><span class="od-lbl">Confirmée</span><span class="od-val">'+(c.installConfirm?'✅ Oui':'Non')+'</span></div>'
-      +(c.notesUsage?'<div style="padding:12px 16px;font-size:13px;color:var(--tx)">'+c.notesUsage+'</div>':'')
-    +'</div>':'')
-    +(c.temoignageTexte?'<div class="od-section"><div class="od-sec-ttl">Témoignage</div><div style="padding:12px 16px;font-size:14px;line-height:1.6;color:var(--gr)">'+c.temoignageTexte+(c.temoignageAutorise?' <span class="obdg bgr">réutilisable</span>':'')+'</div></div>':'')
-    +(c.estPartenaire?'<div class="od-section"><div class="od-sec-ttl">Équipe / MLM</div>'
-      +'<div class="od-row"><span class="od-lbl">Sponsor</span><span class="od-val">'+(c.sponsor||'—')+'</span></div>'
+      +'<div class="od-row"><span class="od-lbl">Registre</span><span class="od-val">'+(TONE_LABEL[c.registre]||TONE_LABEL.pro)+'</span></div>',false)
+    +((c.adresse||c.cp||c.essaiOk)?odSec('📍 Adresse & carte',
+      '<div class="od-row"><span class="od-lbl">Adresse</span><span class="od-val">'+esc(c.adresse||'—')+'</span></div>'
+      +'<div class="od-row"><span class="od-lbl">CP / Ville</span><span class="od-val">'+esc((c.cp||'')+' '+(c.ville||'')||'—')+'</span></div>'
+      +'<div class="od-row"><span class="od-lbl">Essai de l\'appareil</span><span class="od-val">'+(c.essaiOk?'✅ accepte de faire essayer':'—')+'</span></div>'
+      +(c.geo?'<div class="od-row"><span class="od-lbl">Carte</span><span class="od-val"><a style="color:var(--aqua);cursor:pointer" onclick="oClose();oSw(\'carte\')">Voir sur la carte ↗</a></span></div>':''),false):'')
+    +((c.memberIdOlyLife||c.numCommande||c.rangOly||c.boCompte||c.pieceId)?odSec('🟢 OlyLife — compte & commande',
+      '<div class="od-row"><span class="od-lbl">ID membre</span><span class="od-val">'+esc(c.memberIdOlyLife||'—')+'</span></div>'
+      +'<div class="od-row"><span class="od-lbl">Rang</span><span class="od-val">'+esc(c.rangOly||'—')+'</span></div>'
+      +'<div class="od-row"><span class="od-lbl">Commande sur le BO de</span><span class="od-val">'+esc(c.boCompte||'—')+'</span></div>'
+      +(c.pieceId?'<div class="od-row"><span class="od-lbl">Pièce d\'identité</span><span class="od-val">'+esc(c.pieceId)+'</span></div>':'')
+      +(c.numCommande?'<div class="od-row"><span class="od-lbl">N° commande</span><span class="od-val">'+c.numCommande+'</span></div>'
+        +'<div class="od-row"><span class="od-lbl">Date</span><span class="od-val">'+fD(c.dateCommande)+'</span></div>'
+        +'<div class="od-row"><span class="od-lbl">Transporteur</span><span class="od-val">'+(c.transporteur||'—')+'</span></div>'
+        +'<div class="od-row"><span class="od-lbl">Tracking</span><span class="od-val">'+(c.tracking?(trackingUrl(c.transporteur,c.tracking)?'<a href="'+trackingUrl(c.transporteur,c.tracking)+'" target="_blank" rel="noopener" style="color:var(--aqua)">'+c.tracking+' ↗</a>':c.tracking):'<span class="obdg bor">en attente</span>')+'</span></div>'
+        +(c.dateLivraison?'<div class="od-row"><span class="od-lbl">Livraison</span><span class="od-val">'+fD(c.dateLivraison)+'</span></div>':''):''),false):'')
+    +(c.produits&&c.produits.length?odSec('Produits','<div style="padding:12px 16px;display:flex;flex-wrap:wrap;gap:6px">'+c.produits.map(function(p){return'<span class="obdg baq">'+p+'</span>';}).join('')+'</div>',false):'')
+    +(c.objectifs?odSec('Objectifs','<div style="padding:12px 16px;font-size:14px;line-height:1.6;color:var(--tx)">'+c.objectifs+'</div>',false):'')
+    +(c.notesUsage||c.dateInstall?odSec('Installation & usage',
+      '<div class="od-row"><span class="od-lbl">Confirmée</span><span class="od-val">'+(c.installConfirm?'✅ Oui':'Non')+'</span></div>'
+      +(c.notesUsage?'<div style="padding:12px 16px;font-size:13px;color:var(--tx)">'+c.notesUsage+'</div>':''),false):'')
+    +(c.temoignageTexte?odSec('Témoignage','<div style="padding:12px 16px;font-size:14px;line-height:1.6;color:var(--gr)">'+c.temoignageTexte+(c.temoignageAutorise?' <span class="obdg bgr">réutilisable</span>':'')+'</div>',false):'')
+    +(c.estPartenaire?odSec('Équipe / MLM',
+      '<div class="od-row"><span class="od-lbl">Sponsor</span><span class="od-val">'+(c.sponsor||'—')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">Placement</span><span class="od-val">'+(c.placement||'—')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">Côté / Génération</span><span class="od-val">'+(c.cote||'—')+' · Gén. '+(c.generation||'—')+'</span></div>'
-      +'<div class="od-row"><span class="od-lbl">Rang</span><span class="od-val">'+(c.rang||'—')+'</span></div>'
-    +'</div>':'')
-    +(c.notes?'<div class="od-section"><div class="od-sec-ttl">Notes</div><div style="padding:12px 16px;font-size:13px;line-height:1.7;color:var(--tx)">'+c.notes+'</div></div>':'')
+      +'<div class="od-row"><span class="od-lbl">Rang leadership</span><span class="od-val">'+(c.rang||'—')+'</span></div>',false):'')
+    +(c.notes?odSec('Notes','<div style="padding:12px 16px;font-size:13px;line-height:1.7;color:var(--tx);white-space:pre-wrap">'+esc(c.notes)+'</div>',false):'')
     +(isRef?'':'<div style="display:flex;gap:8px;padding:4px 0 20px">'
       +'<button class="ob bedit" style="flex:1" onclick="oClose();oEdit(\''+id+'\')">Modifier</button>'
       +'<button class="ob bdel" style="flex:1" onclick="oDel(\''+id+'\')">Supprimer</button>'
@@ -2898,20 +3110,23 @@ function oEdit(id){
   document.getElementById('offttl').textContent='Modifier — '+c.prenom+' '+c.nom;
   document.getElementById('obtn-save').textContent='Enregistrer les modifications';
   document.getElementById('fc-eid').value=id;
-  var map={'fc-nm':c.nom,'fc-pr':c.prenom,'fc-tel':c.tel,'fc-em':c.email,'fc-pays':c.pays,'fc-vil':c.ville,'fc-ref':c.refere,'fc-suivi':c.suiviPar,'fc-etape':c.etape,'fc-qualif':c.qualification,'fc-canal':c.canal,'fc-registre':c.registre,'fc-obj':c.objectifs,'fl-numcmd':c.numCommande,'fl-memberid':c.memberIdOlyLife,'fl-datecmd':c.dateCommande,'fl-transp':c.transporteur,'fl-tracking':c.tracking,'fl-datelivr':c.dateLivraison,'fi-date':c.dateInstall,'fi-notes':c.notesUsage,'ft-texte':c.temoignageTexte,'fe-sponsor':c.sponsor,'fe-placement':c.placement,'fe-cote':c.cote,'fe-gen':c.generation,'fe-rang':c.rang,'fc-notes':c.notes};
+  oBuildBoList();
+  var map={'fc-nm':c.nom,'fc-pr':c.prenom,'fc-tel':c.tel,'fc-em':c.email,'fc-pays':c.pays,'fc-vil':c.ville,'fc-adr':c.adresse,'fc-cp':c.cp,'fo-rang':c.rangOly,'fo-bo':c.boCompte,'fl-idcard':c.pieceId,'fc-ref':c.refere,'fc-suivi':c.suiviPar,'fc-etape':c.etape,'fc-qualif':c.qualification,'fc-canal':c.canal,'fc-registre':c.registre,'fc-obj':c.objectifs,'fl-numcmd':c.numCommande,'fl-memberid':c.memberIdOlyLife,'fl-datecmd':c.dateCommande,'fl-transp':c.transporteur,'fl-tracking':c.tracking,'fl-datelivr':c.dateLivraison,'fi-date':c.dateInstall,'fi-notes':c.notesUsage,'ft-texte':c.temoignageTexte,'fe-sponsor':c.sponsor,'fe-placement':c.placement,'fe-cote':c.cote,'fe-gen':c.generation,'fe-rang':c.rang,'fc-notes':c.notes};
   Object.keys(map).forEach(function(k){var el=document.getElementById(k);if(!el)return;if(k==='fc-ref'){var refVal=map[k]||'';var found=false;for(var i=0;i<el.options.length;i++){if(el.options[i].value===refVal){el.value=refVal;found=true;break;}}if(!found&&refVal){var opt=document.createElement('option');opt.value=refVal;opt.textContent=refVal;el.insertBefore(opt,el.options[el.options.length-1]);el.value=refVal;}document.getElementById('fc-ref-autre').style.display='none';}else{el.value=map[k]||'';}});
   document.getElementById('fc-ctags').value=(c.ctags||[]).join(', ');renderCtagsChips();updateRefListByTags((c.ctags||[]));
   var cs=suivisDe(c);document.querySelectorAll('.fc-sui').forEach(function(x){x.checked=cs.indexOf(x.value)>=0;x.parentNode.classList.toggle('on',x.checked);});
   document.getElementById('fi-confirm').checked=!!c.installConfirm;
   document.getElementById('ft-autorise').checked=!!c.temoignageAutorise;
   document.getElementById('fe-partenaire').checked=!!c.estPartenaire;
+  document.getElementById('fo-essai').checked=!!c.essaiOk;
   oTEQ();
   document.querySelectorAll('.oprd').forEach(function(p){var cb=p.querySelector('input');cb.checked=(c.produits||[]).indexOf(cb.value)>=0;p.classList.toggle('on',cb.checked);});
   oSw('nouvelle',4);document.getElementById('ocont').scrollTop=0;
 }
 function oReset(){
   document.getElementById('fc-eid').value='';EID=null;
-  ['fc-nm','fc-pr','fc-tel','fc-em','fc-pays','fc-vil','fc-obj','fl-numcmd','fl-memberid','fl-datecmd','fl-transp','fl-tracking','fl-datelivr','fi-date','fi-notes','ft-texte','fe-sponsor','fe-placement','fe-gen','fc-notes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  oBuildBoList();
+  ['fc-nm','fc-pr','fc-tel','fc-em','fc-pays','fc-vil','fc-adr','fc-cp','fo-bo','fl-idcard','fc-obj','fl-numcmd','fl-memberid','fl-datecmd','fl-transp','fl-tracking','fl-datelivr','fi-date','fi-notes','ft-texte','fe-sponsor','fe-placement','fe-gen','fc-notes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('fc-etape').value='Prospect';document.getElementById('fc-qualif').value='Chaud';document.getElementById('fc-canal').value='WhatsApp';document.getElementById('fc-registre').value='pro';
   document.getElementById('fc-suivi').value='';document.querySelectorAll('.fc-sui').forEach(function(x){x.checked=false;x.parentNode.classList.remove('on');});
   document.getElementById('fc-ref').value='';
@@ -2919,6 +3134,7 @@ function oReset(){
   document.getElementById('fc-ctags').value='';renderCtagsChips();
   document.getElementById('fe-cote').value='';document.getElementById('fe-rang').value='';
   document.getElementById('fi-confirm').checked=false;document.getElementById('ft-autorise').checked=false;document.getElementById('fe-partenaire').checked=false;
+  document.getElementById('fo-essai').checked=false;document.getElementById('fo-rang').value='';
   oTEQ();
   document.querySelectorAll('.oprd').forEach(function(p){p.classList.remove('on');p.querySelector('input').checked=false;});
   document.getElementById('offttl').textContent='Nouveau contact';
@@ -2929,10 +3145,24 @@ function oSave(){
   var pr=document.getElementById('fc-pr').value.trim();
   var tel=document.getElementById('fc-tel').value.trim();
   if(!nm||!pr||!tel){oT('Nom, prénom et téléphone sont obligatoires','e');return;}
+  if(!document.getElementById('fc-eid').value){
+    var _t9=tel9(tel);
+    var dup=OC.find(function(c){
+      var ct=tel9(c.tel);
+      if(_t9&&_t9.length>=9&&ct===_t9)return true;
+      return(c.nom||'').trim().toUpperCase()===nm.toUpperCase()&&prem(c.prenom)===prem(pr);
+    });
+    if(dup){
+      if(_t9&&tel9(dup.tel)===_t9){oT('⛔ Doublon refusé : '+dup.prenom+' '+dup.nom+' existe déjà avec ce numéro','e');oOpenF(dup.id);return;}
+      if(!confirm('⚠️ '+dup.nom+' '+(dup.prenom||'')+' existe déjà (tél. '+(dup.tel||'—')+').\n\nOK = créer quand même une NOUVELLE fiche.\nAnnuler = ouvrir la fiche existante.')){oOpenF(dup.id);return;}
+    }
+  }
   var prods=[];document.querySelectorAll('.oprd input:checked').forEach(function(cb){prods.push(cb.value);});
   var isRef=(ROLE()==='referent');
   var data={
     nom:nm.toUpperCase(),prenom:pr,tel:tel,email:document.getElementById('fc-em').value,pays:document.getElementById('fc-pays').value,ville:document.getElementById('fc-vil').value,
+    adresse:val('fc-adr'),cp:val('fc-cp'),rangOly:val('fo-rang'),pieceId:val('fl-idcard'),essaiOk:document.getElementById('fo-essai').checked,
+    boCompte:(function(){var raw=val('fo-bo').trim();if(!raw)return'';var ea=(raw.match(/EA\d+/i)||[])[0];if(ea){ea=ea.toUpperCase();var o=OC.find(function(x){return String(x.memberIdOlyLife||'').toUpperCase()===ea;});if(o)return ea+' — '+o.nom+' '+(o.prenom||'');}return raw;}()),
     refere:isRef?((USER.tags&&USER.tags[0])||USER.nom):(function(){var sv=document.getElementById('fc-ref').value;return sv==='__autre__'?(document.getElementById('fc-ref-autre').value.trim()):sv;}()),
     suivis:(function(){var l=[];document.querySelectorAll('.fc-sui:checked').forEach(function(x){l.push(x.value);});return l;}()),
     ctags:(document.getElementById('fc-ctags').value||'').split(',').map(function(t){return t.trim();}).filter(Boolean),
@@ -2952,6 +3182,7 @@ function oSave(){
   if(eid){var idx=OC.findIndex(function(x){return x.id===eid;});if(idx>=0){OC[idx]=Object.assign({},OC[idx],data);saved=OC[idx];oT(data.prenom+' '+data.nom+' mis à jour !','s');}}
   else{saved=Object.assign({id:'c_'+Date.now(),createdAt:new Date().toISOString().split('T')[0],actions:{}},data);OC.unshift(saved);oT('Fiche de '+data.prenom+' '+data.nom+' créée !','s');}
   if(saved)oPush([saved]);
+  if(saved&&saved.essaiOk&&(saved.adresse||saved.ville)&&(!saved.geo||saved.geo.q!==geoQ(saved)))geocodeOne(saved,function(ok){if(ok)oPush([saved]);});
   oReset();oSw('contacts',1);
 }
 
@@ -2997,62 +3228,85 @@ function parseVrac(text){
   return out;
 }
 // Libellés de formulaires/exports qui ne sont PAS des contacts
-var LABEL_RX=/^(informations?\b|image\b|id\b|produits?\b|maison$|remarques?|mode de livraison|par courrier|code postal|num[ée]ro|adresse|pays\b|france$|nom\b|surnom|montant|type de commande|prix|quantit|statut|total|sous-total|livraison|exp[ée]dition|destinataire|membre|member|order|commande|date\b|t[ée]l[ée]phone|e-?mail|courriel|ville|r[ée]gion|usd|eur|[\d\s+.,()\-]+$|ea\d{5,}$|\d+\s+(rue|av|avenue|bd|boulevard|chemin|all[ée]e|impasse|place)\b)/i;
+var LABEL_RX=/^(informations?\b|image\b|id\b|produits?\b|maison$|remarques?|mode de livraison|par courrier|code postal|num[ée]ro|adresse|pays\b|france$|nom\b|surnom|montant|type de commande|prix|quantit|statut|total|sous-total|livraison|exp[ée]dition|destinataire|membre|member|order|commande|date\b|t[ée]l[ée]phone|e-?mail|courriel|ville|r[ée]gion|usd|eur|logo$|index$|language$|settled$|by mail$|return$|operation$|nickname|copyright|my (membership )?order|data management|business management|events hub|network management|financial management|campaign query|contact customer service|document center|announcement notification|basic information|member information|mailing information|delivery (information|method|time|quantity)|order (number|amount|type|status|information)|product (ordered|id|name)|unit price|quantity|phone number|email address|country|detailed address|postal code|recipient|id card|tax identification|logistic company|tracking number|member registration|[\d\s+.,()\-]+$|ea\d{5,}$|\d+\s+(rue|av|avenue|bd|boulevard|chemin|all[ée]e|impasse|place)\b)/i;
 function isLabelLine(s){s=(s||'').trim();return !s||/[:：]\s*$/.test(s)||LABEL_RX.test(s);}
-// Détecte un relevé de commande OlyLife (back-office : "Numéro de commande:", "ID membre:", "Nom:" …)
-function looksOlyOrder(text){return /num[ée]ro de commande\s*[:：]/i.test(text)&&/id membre\s*[:：]/i.test(text);}
+// Détecte un relevé de commande OlyLife (back-office FR ou EN : "Numéro de commande:" / "Order Number：")
+function looksOlyOrder(text){
+  return(/num[ée]ro de commande\s*[:：]/i.test(text)&&/id membre\s*[:：]/i.test(text))
+      ||(/order number\s*[:：]/i.test(text)&&/member id\s*[:：]/i.test(text));
+}
+function deEnt(x){return String(x||'').replace(/&ccedil;/gi,'ç').replace(/&eacute;/gi,'é').replace(/&egrave;/gi,'è').replace(/&ecirc;/gi,'ê').replace(/&agrave;/gi,'à').replace(/&ocirc;/gi,'ô').replace(/&icirc;/gi,'î').replace(/&ugrave;/gi,'ù').replace(/&amp;/gi,'&').replace(/&#(\d+);/g,function(_,n){return String.fromCharCode(+n);});}
+var RANG_OLY={p1:'P1 - Starter',p2:'P2 - Builder',p3:'P3 - Leader',p4:'P4 - Supervisor',p5:'P5 - Pioneer',starter:'P1 - Starter',builder:'P2 - Builder',leader:'P3 - Leader',supervisor:'P4 - Supervisor',pioneer:'P5 - Pioneer'};
 function parseOlyOrders(text){
-  var lines=text.split(/\r?\n/).map(function(l){return l.replace(/ /g,' ').trim();});
-  // découpe en blocs : un bloc par "Numéro de commande:"
+  text=deEnt(text);
+  var lines=text.split(/\r?\n/).map(function(l){return l.replace(/ /g,' ').trim();});
+  var SPLIT=/^(num[ée]ro de commande|order number)\s*[:：]/i;
   var blocks=[],cur=null;
   lines.forEach(function(l){
-    if(/^num[ée]ro de commande\s*[:：]/i.test(l)){cur=[];blocks.push(cur);}
+    if(SPLIT.test(l)){cur=[];blocks.push(cur);}
     if(cur)cur.push(l);
   });
   function val(bl,labelRx){
     for(var i=0;i<bl.length;i++){
       var m=bl[i].match(/^(.+?)\s*[:：]\s*(.*)$/);
-      if(!m||!labelRx.test(m[1]))continue;
+      if(!m||!labelRx.test(m[1].trim()))continue;
       if(m[2])return m[2].trim();
       var nx=bl[i+1]||'';
-      return(/[:：]\s*$/.test(nx)||/^(informations?|produits? command)/i.test(nx))?'':nx.trim();
+      return(/[:：]\s*$/.test(nx)||/^(informations?|produits? command|basic information|member information|mailing information|product ordered)/i.test(nx))?'':nx.trim();
     }
     return'';
   }
   return blocks.map(function(bl){
-    var num=val(bl,/^num[ée]ro de commande$/i);
-    var montant=val(bl,/^montant/i);
-    var member=val(bl,/^id membre$/i);
-    var nomC=val(bl,/^nom$/i)||val(bl,/^nom du destinataire$/i);
-    var email=val(bl,/^adresse e-?mail$/i);
-    var tel=val(bl,/t[ée]l[ée]phone/i);
-    var pays=val(bl,/^pays/i);
-    var adr=val(bl,/^adresse d[ée]taill[ée]e$/i);
-    var cp=val(bl,/^code postal$/i);
-    var rem=val(bl,/^remarques?$/i);
-    var type=val(bl,/^type de commande$/i);
-    // produits : lignes "image OLY-XXX Nom du produit USD$600.00 1"
+    var num=val(bl,/^(num[ée]ro de commande|order number)$/i);
+    var montant=val(bl,/^(montant|order amount)/i);
+    var member=val(bl,/^(id membre|member id)$/i);
+    var nomC=val(bl,/^(nom|name)$/i)||val(bl,/^(nom du destinataire|recipient'?s name)$/i);
+    var destinataire=val(bl,/^(nom du destinataire|recipient'?s name)$/i);
+    var idcard=val(bl,/^(id card number|num[ée]ro de carte d'identit[ée])$/i);
+    var email=val(bl,/^(adresse e-?mail|email address)$/i);
+    var tel=val(bl,/^(t[ée]l[ée]phone|phone number|recipient'?s phone number)/i);
+    var pays=val(bl,/^(pays|country)/i);
+    var adr=val(bl,/^(adresse d[ée]taill[ée]e|detailed address)$/i);
+    var cp=val(bl,/^(code postal|postal code)$/i);
+    var rem=val(bl,/^(remarques?|remarks)$/i);
+    var type=val(bl,/^(type de commande|order type)$/i);
+    var stCmd=val(bl,/^(statut de la commande|order status)$/i);
+    // Produits : "image OLY-XXX Nom du produit USD$600.00 1"
     var prods=[],prodTxt=[];
     bl.forEach(function(l){
-      var m=l.match(/^(?:image\s+)?(OLY-[A-Z0-9]+)\s+(.+?)\s+(?:USD\$?|US\$|\$|€)\s*([\d.,]+)\s+(\d+)\s*$/i);
+      var m=l.match(/(OLY-[A-Z0-9]+)\s+(.+?)\s+(?:USD\$?|US\$|\$|€)\s*([\d.,]+)\s+(\d+)\s*$/i);
       if(!m)return;
-      var name=m[2].replace(/^olylife\s*/i,'').trim();
+      var name=m[2].replace(/^olylife\s*/i,'').replace(/^image\s+/i,'').trim();
       prodTxt.push(m[4]+'× '+name+' ('+m[3]+' USD)');
       var key=name.toLowerCase().replace(/[\s\-]/g,'');
       PRODUCTS.forEach(function(P){var pk=P.toLowerCase().split('(')[0].replace(/[\s\-+]/g,'');if(pk&&(key.indexOf(pk)>=0||pk.indexOf(key)>=0)&&prods.indexOf(P)<0)prods.push(P);});
       if(/p90/i.test(name)&&prods.indexOf(PRODUCTS[0])<0)prods.push(PRODUCTS[0]);
     });
-    // nom / prénom : OlyLife écrit "NOM PRENOM"
+    // Transporteur + tracking + date de livraison (tableau « Delivery information »)
+    var transporteur='',tracking=[],dLivr='';
+    bl.forEach(function(l){
+      var mc=l.match(/\b(DHL|UPS|FedEx|Chronopost|Colissimo|La Poste|EMS|GLS|TNT|DPD|Aramex)\b/i);
+      if(mc&&!transporteur)transporteur=mc[1].toUpperCase()==='LA POSTE'?'Colissimo / La Poste':mc[1];
+      (l.match(/\b([A-Z]{2}\d{9}[A-Z]{2})\b/g)||[]).forEach(function(t){if(tracking.indexOf(t)<0)tracking.push(t);});
+      var md=l.match(/\b(20\d{2}-\d{2}-\d{2})\b/g);
+      if(md)dLivr=md[md.length-1];
+    });
+    // Rang OlyLife éventuel (P1…P5 / Starter…Pioneer)
+    var rang='';
+    bl.forEach(function(l){var mr=l.match(/\b(P[1-5])\b[\s–-]*(Starter|Builder|Leader|Supervisor|Pioneer)?/i)||l.match(/\b(Starter|Builder|Leader|Supervisor|Pioneer)\b/i);if(mr&&!rang)rang=RANG_OLY[(mr[1]||mr[0]).toLowerCase()]||'';});
+    // Nom / prénoms : OlyLife écrit "NOM Prénom1 Prénom2 …"
     var parts=nomC.split(/\s+/).filter(Boolean);
     var nom=parts.shift()||'';
-    var prenom=parts.join(' ');prenom=prenom?prenom.charAt(0)+prenom.slice(1).toLowerCase():'';
-    // ville depuis l'adresse "113 RUE INGRES , 59100, Roubaix, France"
-    var ville='';var segs=adr.split(',').map(function(s){return s.trim();}).filter(Boolean);
-    for(var i=0;i<segs.length;i++){if(/^\d{4,5}$/.test(segs[i])&&segs[i+1]&&!/^france$/i.test(segs[i+1])){ville=segs[i+1];break;}}
+    var prenom=parts.map(function(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();}).join(' ');
+    // Ville depuis l'adresse "81 Chemin de Crémat, BAT 1, 06200, Nice, France"
+    var ville='';var segs=adr.split(',').map(function(x){return x.trim();}).filter(Boolean);
+    for(var i=0;i<segs.length;i++){if(/^\d{4,5}$/.test(segs[i])&&segs[i+1]&&!/^(france|belgique|suisse|maroc)$/i.test(segs[i+1])){ville=segs[i+1];break;}}
     if(!ville&&segs.length>=3)ville=segs[segs.length-2];
+    if(!cp){var mcp=adr.match(/\b(\d{5})\b/);if(mcp)cp=mcp[1];}
     var dateCmd=/^\d{8}/.test(num)?num.slice(0,4)+'-'+num.slice(4,6)+'-'+num.slice(6,8):'';
-    var notes=['Commande OlyLife n°'+num+(dateCmd?' du '+fD(dateCmd):''),montant?'Montant : '+montant+' USD':'',type?'Type : '+type:'',prodTxt.length?'Produits : '+prodTxt.join(', '):'',adr?'Livraison : '+adr:'',rem?'Remarque : '+rem:''].filter(Boolean).join('\n');
-    return{nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,numCommande:num,memberIdOlyLife:member,dateCommande:dateCmd,produits:prods,etape:'Client - Logistique',qualification:'Chaud',statut:'close',notes:notes,_src:'olylife'};
+    if(dLivr&&dLivr===dateCmd)dLivr='';
+    var notes=['Commande OlyLife n°'+num+(dateCmd?' du '+fD(dateCmd):''),montant?'Montant : '+montant+' USD':'',type?'Type : '+type:'',stCmd?'Statut commande : '+stCmd:'',prodTxt.length?'Produits : '+prodTxt.join(', '):'',adr?'Livraison : '+adr:'',destinataire&&destinataire!==nomC?'Destinataire : '+destinataire:'',rem?'Remarque : '+rem:''].filter(Boolean).join('\n');
+    return{nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,numCommande:num,memberIdOlyLife:(member||'').toUpperCase(),pieceId:idcard,dateCommande:dateCmd,transporteur:transporteur,tracking:tracking.join(' / '),dateLivraison:dLivr,rangOly:rang,produits:prods,etape:'Client - Logistique',qualification:'Chaud',statut:'close',notes:notes,_src:'olylife'};
   }).filter(function(x){return x.nom||x.tel||x.numCommande;});
 }
 function parseCSV(text){
@@ -3076,6 +3330,32 @@ function parseCSV(text){
     function g(k){return idx[k]>=0?(r[idx[k]]||''):'';}
     return{nom:g('nom'),prenom:g('prenom'),tel:normPhone(g('tel')),email:g('email'),pays:g('pays'),ville:g('ville'),refere:g('refere'),suiviPar:g('suiviPar'),numCommande:g('numCommande'),memberIdOlyLife:g('memberIdOlyLife')};
   }).filter(function(x){return x.nom||x.prenom||x.tel||x.email;});
+}
+function tel9(t){return String(t||'').replace(/\D/g,'').slice(-9);}
+function prem(p){return String(p||'').trim().toLowerCase().split(/\s+/)[0]||'';}
+function impFindExisting(it){
+  return OC.find(function(c){
+    if(it.numCommande&&c.numCommande===it.numCommande)return true;
+    if(it.memberIdOlyLife&&c.memberIdOlyLife&&String(c.memberIdOlyLife).toUpperCase()===String(it.memberIdOlyLife).toUpperCase())return true;
+    var t=tel9(it.tel);if(t&&t.length>=9&&tel9(c.tel)===t)return true;
+    if(it.email&&c.email&&c.email.toLowerCase().trim()===it.email.toLowerCase().trim())return true;
+    return!!(it.nom&&it.prenom)&&(c.nom||'').trim().toUpperCase()===(it.nom||'').trim().toUpperCase()&&prem(c.prenom)===prem(it.prenom);
+  })||null;
+}
+var IMP_FLBL={tel:'téléphone',email:'e-mail',pays:'pays',ville:'ville',adresse:'adresse',cp:'code postal',numCommande:'n° commande',memberIdOlyLife:'ID membre',pieceId:'pièce d\'identité',tracking:'n° de tracking',transporteur:'transporteur',dateLivraison:'date de livraison',dateCommande:'date de commande',rangOly:'rang OlyLife',refere:'référent',suiviPar:'suivi par',produits:'produits',notes:'notes de commande',statut:'statut',etape:'étape'};
+var IMP_SKIP={id:1,createdAt:1,createdBy:1,journal:1,actions:1,rdvs:1,avances:1,suivis:1,geo:1,qualification:1,canal:1,registre:1,referentId:1,referentNom:1,_src:1,_state:1,_exid:1};
+var IMP_FORCE={tracking:1,transporteur:1,dateLivraison:1,rangOly:1,numCommande:1,dateCommande:1,memberIdOlyLife:1};
+function impDiff(it,ex){
+  var news=[],known=[];
+  Object.keys(it).forEach(function(k){
+    if(IMP_SKIP[k]||it[k]==null||it[k]==='')return;
+    if(Array.isArray(it[k])){var miss=it[k].filter(function(v){return(ex[k]||[]).indexOf(v)<0;});if(miss.length)news.push(IMP_FLBL[k]||k);else if(it[k].length)known.push(IMP_FLBL[k]||k);return;}
+    if(k==='notes'){if(it.numCommande&&String(ex.notes||'').indexOf(it.numCommande)>=0)known.push(IMP_FLBL[k]);else news.push(IMP_FLBL[k]);return;}
+    if(!ex[k])news.push(IMP_FLBL[k]||k);
+    else if(IMP_FORCE[k]&&String(ex[k])!==String(it[k]))news.push((IMP_FLBL[k]||k)+' (mis à jour)');
+    else known.push(IMP_FLBL[k]||k);
+  });
+  return{news:news,known:known};
 }
 function oImpAnalyse(){
   var raw=document.getElementById('oimp-ta').value.trim();
@@ -3103,10 +3383,20 @@ function oImpAnalyse(){
   document.getElementById('oimp-prev-ttl').textContent='Aperçu — '+items.length+' fiche(s) détectée(s)';
   prev.innerHTML=items.map(function(it){
     var warn=(!it.nom&&!it.prenom)||(!it.tel&&!it.email);
+    var ex=warn?null:impFindExisting(it),badge,detail='';
+    if(warn)badge='<span class="obdg bor">incomplet</span>';
+    else if(!ex){badge='<span class="obdg bgr">🆕 nouveau</span>';it._state='new';}
+    else{
+      var d=impDiff(it,ex);
+      if(d.news.length){badge='<span class="obdg baq">🔁 complète la fiche</span>';it._state='merge';
+        detail='<div class="oimp-diff"><span class="nw">➕ Nouveau : '+esc(d.news.join(', '))+'</span>'+(d.known.length?'<br><span class="kn">Déjà enregistré : '+esc(d.known.join(', '))+'</span>':'')+'</div>';
+      }else{badge='<span class="obdg bgy">⛔ doublon — ignoré</span>';it._state='dup';
+        detail='<div class="oimp-diff"><span class="kn">Fiche identique déjà présente : '+esc(ex.nom+' '+(ex.prenom||''))+'</span></div>';}
+    }
     return'<div class="oimp-row'+(warn?' warn':'')+'">'
       +'<span class="nm">'+esc((it.nom||'?')+' '+(it.prenom||''))+'</span>'
-      +'<span class="dt">'+esc(it.tel||'—')+' · '+esc(it.email||'—')+(it.refere?' · 🏷 '+esc(it.refere):'')+'</span>'
-      +(warn?'<span class="obdg bor">incomplet</span>':'<span class="obdg bgr">ok</span>')
+      +'<span class="dt">'+esc(it.tel||'—')+' · '+esc(it.email||'—')+(it.refere?' · 🏷 '+esc(it.refere):'')+detail+'</span>'
+      +badge
     +'</div>';
   }).join('');
   card.style.display='block';
@@ -3119,34 +3409,47 @@ function oImpAnalyse(){
 }
 function oImpGo(){
   if(!IMP_PARSED.length)return;
-  var added=0,updated=0,skipped=0,changed=[];
+  var added=0,updated=0,skipped=0,dups=0,changed=[];
   var keepInc=document.getElementById('oimp-inc')&&document.getElementById('oimp-inc').checked;
   IMP_PARSED.forEach(function(item){
     if(!item.nom&&!item.prenom){skipped++;return;}
     if(!keepInc&&!item.tel&&!item.email){skipped++;return;}
-    delete item._src;
-    var existing=OC.find(function(c){
-      return(item.numCommande&&c.numCommande===item.numCommande)
-        ||(item.memberIdOlyLife&&c.memberIdOlyLife&&c.memberIdOlyLife===item.memberIdOlyLife)
-        ||((c.nom||'').toUpperCase()===(item.nom||'').toUpperCase()&&(c.prenom||'').toLowerCase()===(item.prenom||'').toLowerCase()&&(item.nom||item.prenom));
-    });
+    delete item._src;delete item._state;
+    var existing=impFindExisting(item);
     if(existing){
-      Object.keys(item).forEach(function(k){if(item[k])existing[k]=item[k];});
+      var adds=[];
+      Object.keys(item).forEach(function(k){
+        if(IMP_SKIP[k]||item[k]==null||item[k]==='')return;
+        if(k==='notes'){
+          if(item.numCommande&&String(existing.notes||'').indexOf(item.numCommande)>=0)return;
+          existing.notes=(existing.notes?existing.notes+'\n\n':'')+item.notes;adds.push('notes');return;
+        }
+        if(Array.isArray(item[k])){
+          existing[k]=existing[k]||[];
+          item[k].forEach(function(v){if(existing[k].indexOf(v)<0){existing[k].push(v);if(adds.indexOf(IMP_FLBL[k]||k)<0)adds.push(IMP_FLBL[k]||k);}});
+          return;
+        }
+        if(!existing[k]){existing[k]=item[k];adds.push(IMP_FLBL[k]||k);}
+        else if(IMP_FORCE[k]&&String(existing[k])!==String(item[k])){existing[k]=item[k];adds.push((IMP_FLBL[k]||k)+' (mis à jour)');}
+      });
       if(!existing.actions)existing.actions={};if(!existing.produits)existing.produits=[];
-      changed.push(existing);updated++;
+      if(adds.length){
+        jrnAdd(existing,'systeme','Import : fiche complétée — '+adds.filter(function(v,i,a){return a.indexOf(v)===i;}).join(', '));
+        changed.push(existing);updated++;
+      }else dups++;
     }else{
       var nc=Object.assign({
         id:'c_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
         createdAt:new Date().toISOString().split('T')[0],
         actions:{},produits:[],etape:'Prospect',qualification:'Chaud',canal:'WhatsApp',registre:'pro',
-        referentId:PARTNER_ID,referentNom:PARTNER_NOM()
+        referentId:PARTNER_ID,referentNom:PARTNER_NOM(),createdBy:PARTNER_NOM()
       },item);
       if(nc.nom)nc.nom=nc.nom.toUpperCase();
       OC.unshift(nc);changed.push(nc);added++;
     }
   });
   if(changed.length)oPush(changed);
-  oT(added+' créée(s), '+updated+' mise(s) à jour'+(skipped?', '+skipped+' ignorée(s)':''),'s');
+  oT(added+' créée(s) · '+updated+' complétée(s)'+(dups?' · '+dups+' doublon(s) refusé(s)':'')+(skipped?' · '+skipped+' ignorée(s)':''),'s');
   oCloseImport();oRefresh();
 }
 
@@ -3155,7 +3458,7 @@ function oImpGo(){
 // v3 — INTERFACE RESPONSIVE : navigation · accueil · contacts (tableau,
 // sélection multiple) · pipeline · agenda · Calendly · raccourcis clavier
 // ═══════════════════════════════════════════════════════════════════
-var VIEW_T={dashboard:'Tableau de bord',contacts:'Contacts',pipeline:'Pipeline',agenda:'Agenda',actions:'Actions',equipe:'Équipe',nouvelle:'Nouveau contact'};
+var VIEW_T={dashboard:'Tableau de bord',contacts:'Contacts',pipeline:'Pipeline',agenda:'Agenda',actions:'Actions',equipe:'Équipe',nouvelle:'Nouveau contact',carte:'Carte des essais',genea:'Généalogie'};
 var CUR_VIEW='dashboard',CUR_LIST=[],SORT={k:'statut',d:1},SEL={},SEL_MODE=false,ACTIVE_ID=null,LIST_LIMIT=150;
 function mq(q){try{return window.matchMedia(q).matches;}catch(e){return false;}}
 function isDesk(){return mq('(min-width:760px)');}
@@ -3192,6 +3495,7 @@ function oRefreshView(v){
   if(v==='dashboard')oDash();else if(v==='contacts')oCli();else if(v==='pipeline')oPipe();
   else if(v==='agenda')oAgenda();else if(v==='actions')oAct();
   else if(v==='equipe'){oEq();oLoadMyDigest();var ve=document.getElementById('eq-version');if(ve)ve.textContent=APP_VERSION;}
+  else if(v==='carte')oCarte();else if(v==='genea')oGenea();
   navBadges();
 }
 function oRefresh(){var v=document.querySelector('.ov.on');if(v)oRefreshView(v.id.replace('ov-',''));}
@@ -3764,7 +4068,7 @@ document.addEventListener('keydown',function(e){
   var t=e.target,tag=(t&&t.tagName||'').toLowerCase(),typing=tag==='input'||tag==='textarea'||tag==='select'||(t&&t.isContentEditable);
   if((e.ctrlKey||e.metaKey)&&(e.key==='k'||e.key==='K')){e.preventDefault();oSearchFocus();return;}
   if(e.key==='Escape'){
-    var order=[['ocal',oCalClose],['octx',oCtxClose],['osv',oCloseSuivi],['oimp',oCloseImport],['omo',oClose],['osetup',oHideSetup]];
+    var order=[['odrawer',oDrawerClose],['oavs',oAvClose],['oreq',oReqClose],['ocal',oCalClose],['octx',oCtxClose],['osv',oCloseSuivi],['oimp',oCloseImport],['omo',oClose],['osetup',oHideSetup]];
     for(var i=0;i<order.length;i++){var el=document.getElementById(order[i][0]);if(el&&el.classList.contains('on')){order[i][1]();e.preventDefault();return;}}
     if(Object.keys(SEL).length){SEL={};oSelMode(false);}
     if(typing&&t.blur)t.blur();
@@ -3784,7 +4088,7 @@ document.addEventListener('keydown',function(e){
 })();
 
 // ── FEUILLES & MODALES : bouton « retour » du téléphone les ferme ──
-var HIST_OPEN=0,IGNORE_POP=false,SHEET_ORDER=['ocal','octx','osv','omo','oimp','osetup'];
+var HIST_OPEN=0,IGNORE_POP=false,SHEET_ORDER=['odrawer','oavs','oreq','ocal','octx','osv','omo','oimp','osetup'];
 function oSheetOpen(id){
   var el=document.getElementById(id);if(!el)return;
   if(!el.classList.contains('on')){el.classList.add('on');try{history.pushState({sheet:id},'');HIST_OPEN++;}catch(e){}}
@@ -3867,8 +4171,224 @@ function oInstallSkip(){
   oT('Pensez à installer l\'application — elle vous sera redemandée à la prochaine ouverture','w');
 }
 
+// ═══════════════════════════════════════════════════════════════════
+// v3.1 — TIROIR · AVANCES · CARTE · GÉNÉALOGIE · COLLECTE D'INFOS
+// ═══════════════════════════════════════════════════════════════════
+var TUNNELS_URL='https://team-waterlifehightech.com/app-tunnels/';
+function oTunnels(){window.open(TUNNELS_URL,'_blank');}
+
+// ── Tiroir de navigation (téléphone) ───────────────────────────────
+function oDrawerOpen(){
+  if(USER){
+    document.getElementById('odr-un').textContent=USER.nom||'—';
+    document.getElementById('odr-ur').textContent=roleLabel(ROLE());
+    document.getElementById('odr-av').textContent=ini(USER.nom||'?');
+  }
+  document.getElementById('odr-ver').textContent='CRM OlyLife · '+APP_VERSION;
+  var isRef=ROLE()==='referent';
+  ['odr-req','odr-imp'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display=isRef?'none':'';});
+  document.querySelectorAll('#odrawer [data-dnav]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-dnav')===CUR_VIEW);});
+  navBadges();
+  oSheetOpen('odrawer');
+}
+function oDrawerClose(){oSheetClose('odrawer');}
+function oDrGo(v){oDrawerClose();setTimeout(function(){oSw(v);},60);}
+
+// ── Avances d'argent ───────────────────────────────────────────────
+function avWaMsg(c,a){
+  return'Bonjour '+(c.prenom||'')+', j\'espère que vous allez bien 🌿\n\nPetit rappel amical concernant l\'avance de '+a.montant+' '+(a.devise||'€')+' du '+fD(a.date)+(a.motif?' pour votre '+a.motif:'')+' : le remboursement est prévu le '+fD(a.echeance)+'.\n\nMerci de me confirmer que c\'est toujours bon pour vous. Belle journée !\n'+(PARTNER_NOM()||'L\'équipe WLHT')+' — Water Life High Tech';
+}
+function oAvOpen(cid,aid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var a=aid?(c.avances||[]).find(function(x){return x.id===aid;}):null;
+  document.getElementById('av-cid').value=cid;
+  document.getElementById('av-id').value=a?a.id:'';
+  document.getElementById('oavs-sub').innerHTML='Pour <b>'+esc(c.nom+' '+(c.prenom||''))+'</b>'+(c.tel?' · '+esc(c.tel):'');
+  document.getElementById('av-montant').value=a?a.montant:'';
+  document.getElementById('av-devise').value=a?(a.devise||'€'):'€';
+  document.getElementById('av-date').value=a?(a.date||''):todayYMD();
+  document.getElementById('av-ech').value=a?(a.echeance||''):'';
+  document.getElementById('av-motif').value=a?(a.motif||''):'';
+  oSheetOpen('oavs');
+}
+function oAvClose(){oSheetClose('oavs');}
+function oAvSave(){
+  var cid=document.getElementById('av-cid').value;
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var montant=parseFloat(document.getElementById('av-montant').value);
+  var ech=document.getElementById('av-ech').value;
+  if(!montant||montant<=0){oT('Indiquez le montant avancé','e');return;}
+  if(!ech){oT('Indiquez la date d\'échéance du remboursement','e');return;}
+  var aid=document.getElementById('av-id').value;
+  c.avances=c.avances||[];
+  var a=aid?c.avances.find(function(x){return x.id===aid;}):null;
+  if(!a){a={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),statut:'encours',par:PARTNER_NOM()};c.avances.push(a);}
+  a.montant=montant;a.devise=document.getElementById('av-devise').value;
+  a.date=document.getElementById('av-date').value||todayYMD();a.echeance=ech;
+  a.motif=document.getElementById('av-motif').value.trim();
+  a.sent={};
+  jrnAdd(c,'note','💶 Avance '+(aid?'modifiée':'enregistrée')+' : '+montant+' '+a.devise+(a.motif?' pour '+a.motif:'')+' — remboursement prévu le '+fD(ech));
+  oPush([c]);oAvClose();oOpenF(cid);oT('💶 Avance enregistrée — rappels automatiques programmés','s');
+}
+function oAvMark(cid,aid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var a=(c.avances||[]).find(function(x){return x.id===aid;});if(!a)return;
+  a.statut='rembourse';a.rembourseLe=new Date().toISOString().split('T')[0];
+  jrnAdd(c,'fait','💶 Avance de '+a.montant+' '+(a.devise||'€')+' remboursée');
+  oPush([c]);oOpenF(cid);oT('✅ Avance marquée remboursée','s');
+}
+function oAvDel(cid,aid){
+  if(!confirm('Supprimer cette avance ?'))return;
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  c.avances=(c.avances||[]).filter(function(x){return x.id!==aid;});
+  oPush([c]);oOpenF(cid);oT('Avance supprimée','w');
+}
+
+// ── Carte mondiale des essais ──────────────────────────────────────
+var MAP=null,MAP_MK=[];
+function geoQ(c){return[c.adresse,c.cp,c.ville,c.pays||'France'].filter(Boolean).join(', ');}
+function essaiContacts(){return OC.filter(function(c){return c.essaiOk;});}
+function loadLeaflet(cb){
+  if(window.L&&L.map)return cb(true);
+  var done=false;function fin(ok){if(done)return;done=true;cb(ok);}
+  if(!document.getElementById('lf-css')){var l=document.createElement('link');l.id='lf-css';l.rel='stylesheet';l.href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';document.head.appendChild(l);}
+  var sc=document.createElement('script');sc.src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';sc.async=true;
+  sc.onload=function(){fin(!!window.L);};sc.onerror=function(){fin(false);};document.head.appendChild(sc);
+  setTimeout(function(){fin(!!window.L);},9000);
+}
+function geocodeOne(c,cb){
+  var q=geoQ(c);if(!q)return cb(false);
+  fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(q))
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d&&d[0]){c.geo={lat:+d[0].lat,lng:+d[0].lon,q:q};cb(true);}
+      else if(c.ville){ // repli : ville seule
+        fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent([c.ville,c.pays||'France'].join(', ')))
+          .then(function(r){return r.json();})
+          .then(function(d2){if(d2&&d2[0]){c.geo={lat:+d2[0].lat,lng:+d2[0].lon,q:q,approx:true};cb(true);}else cb(false);})
+          .catch(function(){cb(false);});
+      }else cb(false);
+    }).catch(function(){cb(false);});
+}
+function oGeoRun(){
+  var todo=essaiContacts().filter(function(c){return(c.adresse||c.ville)&&(!c.geo||c.geo.q!==geoQ(c));});
+  var btn=document.getElementById('btn-geo');
+  if(!todo.length){oT('Toutes les adresses sont déjà géolocalisées','s');return;}
+  var i=0,okN=0,ch=[];
+  btn.disabled=true;
+  (function next(){
+    if(i>=todo.length){btn.disabled=false;btn.textContent='📍 Géolocaliser les adresses';if(ch.length)oPush(ch);oCarte();oT('📍 '+okN+'/'+todo.length+' adresse(s) géolocalisée(s)','s');return;}
+    var c=todo[i++];btn.textContent='📍 '+i+' / '+todo.length+'…';
+    geocodeOne(c,function(ok){if(ok){okN++;ch.push(c);}setTimeout(next,1150);});
+  })();
+}
+function mapMiseEnRelationMsg(c){
+  var apps=(c.produits&&c.produits.length?c.produits.join(', '):'appareil OlyLife');
+  return'Bonjour '+(c.prenom||'')+' 🌿\n\nC\'est '+(PARTNER_NOM()||'l\'équipe WLHT')+' ('+roleLabel(ROLE())+' Water Life High Tech). Merci encore d\'avoir accepté de faire découvrir votre '+apps+' !\n\nJ\'accompagne une personne proche de chez vous qui aimerait essayer l\'appareil avant de se décider. Êtes-vous d\'accord pour que je vous mette en contact ? Je vous transmets ses coordonnées dès votre accord.\n\nMerci beaucoup 🙏\n'+(PARTNER_NOM()||'')+' — Water Life High Tech';
+}
+function oMapWA(id){var c=OC.find(function(x){return x.id===id;});if(!c||!c.tel)return;window.open(mkWA(c.tel,mapMiseEnRelationMsg(c)),'_blank');}
+function oCarte(){
+  var list=essaiContacts();
+  var located=list.filter(function(c){return c.geo&&c.geo.lat;});
+  var togeo=list.filter(function(c){return(c.adresse||c.ville)&&(!c.geo||c.geo.q!==geoQ(c));});
+  var noaddr=list.filter(function(c){return!c.adresse&&!c.ville;});
+  document.getElementById('carte-count').innerHTML='<b>'+list.length+'</b> contact(s) acceptent de faire essayer leur appareil · <b>'+located.length+'</b> sur la carte'
+    +(togeo.length?' · <b style="color:var(--gold)">'+togeo.length+'</b> à géolocaliser (bouton ci-dessus)':'')
+    +(noaddr.length?' · <b style="color:var(--rd)">'+noaddr.length+'</b> sans adresse (à compléter dans la fiche)':'');
+  loadLeaflet(function(ok){
+    var el=document.getElementById('carte-map');
+    if(!ok){el.innerHTML='<div class="d-empty" style="padding:40px">Impossible de charger la carte (connexion requise).</div>';return;}
+    if(!MAP){
+      MAP=L.map('carte-map',{scrollWheelZoom:true}).setView([20,0],2);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(MAP);
+    }
+    MAP_MK.forEach(function(m){MAP.removeLayer(m);});MAP_MK=[];
+    var pts=[];
+    located.forEach(function(c){
+      var apps=(c.produits||[]).map(function(p){return'<span class="map-bdg">'+esc(p.split('(')[0].trim())+'</span>';}).join('')||'<span class="map-bdg">Appareil OlyLife</span>';
+      var html='<b>'+esc(c.nom+' '+(c.prenom||''))+'</b><br><small style="color:#777">'+esc((c.ville||'')+(c.pays?' · '+c.pays:''))+(c.geo.approx?' (position approximative)':'')+'</small><div style="margin-top:4px">'+apps+'</div>'
+        +(c.tel?'<button class="ob bwa" onclick="oMapWA(\''+c.id+'\')">💬 Demander une mise en relation</button>':'')
+        +'<button class="ob bgh" style="margin-top:6px" onclick="oOpenF(\''+c.id+'\')">Ouvrir la fiche</button>';
+      var m=L.marker([c.geo.lat,c.geo.lng]).addTo(MAP).bindPopup(html);
+      MAP_MK.push(m);pts.push([c.geo.lat,c.geo.lng]);
+    });
+    setTimeout(function(){MAP.invalidateSize();if(pts.length)MAP.fitBounds(pts,{padding:[36,36],maxZoom:11});},80);
+  });
+}
+
+// ── Généalogie ─────────────────────────────────────────────────────
+function oGenea(){
+  var list=OC.filter(function(c){return c.memberIdOlyLife||c.estPartenaire;});
+  var byEA={};list.forEach(function(c){var ea=String(c.memberIdOlyLife||'').toUpperCase().trim();if(ea)byEA[ea]=c;});
+  var kids={},roots=[];
+  list.forEach(function(c){
+    var sp=(String(c.sponsor||'').toUpperCase().match(/EA\d+/)||[])[0]||'';
+    if(sp&&byEA[sp]&&byEA[sp].id!==c.id)(kids[byEA[sp].id]=kids[byEA[sp].id]||[]).push(c);
+    else roots.push(c);
+  });
+  function node(c,depth){
+    var ch=(kids[c.id]||[]).sort(function(a,b){return(a.nom||'').localeCompare(b.nom||'');});
+    return'<li><span class="gn" onclick="oOpenF(\''+c.id+'\')"><span class="tav st-'+cStatut(c)+'">'+initials(c)+'</span><span style="min-width:0"><b>'+esc(c.nom+' '+(c.prenom||''))+'</b><small>'+esc(c.memberIdOlyLife||'—')+(ch.length?' · '+ch.length+' filleul'+(ch.length>1?'s':''):'')+'</small></span>'+(c.rangOly?'<span class="rgb">'+esc(c.rangOly.split(' ')[0])+'</span>':'')+'</span>'
+      +(ch.length&&depth<8?'<ul>'+ch.map(function(k){return node(k,depth+1);}).join('')+'</ul>':'')+'</li>';
+  }
+  roots.sort(function(a,b){return(kids[b.id]||[]).length-(kids[a.id]||[]).length||(a.nom||'').localeCompare(b.nom||'');});
+  document.getElementById('genea-tree').innerHTML=list.length
+    ?'<ul class="gtree">'+roots.map(function(r){return node(r,0);}).join('')+'</ul>'
+    :'<div class="oemp"><div class="oemp-i">🧬</div><div class="oemp-t">Aucun membre OlyLife identifié pour l\'instant</div><div style="font-size:12px;color:var(--t3);margin-top:6px;line-height:1.6">Renseignez l\'ID membre (EA…) et le sponsor dans les fiches, ou envoyez votre généalogie du Back-Office à Claude pour un import en masse.</div></div>';
+}
+
+// ── Demande d'infos d'inscription ──────────────────────────────────
+function reqMsg(pr){
+  var sig=PARTNER_NOM()||'L\'équipe WLHT';
+  return'Bonjour '+(pr||'')+' 👋\n\nPour créer votre compte OlyLife et passer votre commande, merci de me renvoyer EN UN SEUL MESSAGE les informations suivantes :\n\n1️⃣ Votre identité EXACTEMENT comme sur votre PASSEPORT (tous les noms et tous les prénoms) + le numéro du passeport.\n   ➡️ Pas de passeport ? La carte nationale d\'identité est acceptée. (Permis de conduire et autres cartes refusés — sauf carte de résident pour les personnes étrangères.)\n2️⃣ Votre adresse postale complète de livraison — et l\'adresse de facturation si elle est différente.\n3️⃣ Votre adresse e-mail.\n4️⃣ Un mot de passe d\'au moins 8 caractères (lettres et chiffres ; symboles possibles mais non obligatoires) — vous pourrez le modifier ensuite.\n\n🔒 Ces informations restent strictement confidentielles : elles servent uniquement à votre enregistrement officiel OlyLife.\n\nMerci beaucoup, à très vite !\n'+sig+' — Water Life High Tech';
+}
+function oReqPrev(){var e=document.getElementById('rq-prev');if(e)e.textContent=reqMsg(val('rq-pr').trim()||'…');}
+function oReqOpen(){
+  ['rq-pr','rq-nm','rq-tel'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('rq-create').checked=true;
+  oReqPrev();oSheetOpen('oreq');
+}
+function oReqClose(){oSheetClose('oreq');}
+function oReqSend(kind){
+  var pr=val('rq-pr').trim(),nm=val('rq-nm').trim(),tel=val('rq-tel').trim();
+  if(!pr||!tel){oT('Prénom et téléphone sont obligatoires','e');return;}
+  var msg=reqMsg(pr);
+  if(document.getElementById('rq-create').checked){
+    var t9=tel9(tel);
+    var ex=OC.find(function(c){return(t9&&t9.length>=9&&tel9(c.tel)===t9)||(nm&&(c.nom||'').trim().toUpperCase()===nm.toUpperCase()&&prem(c.prenom)===prem(pr));});
+    if(ex){jrnAdd(ex,'note','📨 Demande d\'infos d\'inscription OlyLife envoyée');oPush([ex]);}
+    else{
+      var nc={id:'c_'+Date.now(),createdAt:new Date().toISOString().split('T')[0],actions:{},produits:[],nom:(nm||'?').toUpperCase(),prenom:pr,tel:tel,etape:'Closing / Devis',qualification:'Chaud',canal:'WhatsApp',registre:'pro',statut:'encours',referentId:PARTNER_ID,referentNom:PARTNER_NOM(),createdBy:PARTNER_NOM()};
+      jrnAdd(nc,'note','📨 Demande d\'infos d\'inscription OlyLife envoyée');
+      OC.unshift(nc);oPush([nc]);
+    }
+  }
+  if(kind==='wa'){window.open(mkWA(tel,msg),'_blank');oReqClose();oT('📨 Message prêt dans WhatsApp — sa réponse se colle dans Importer','s');}
+  else{
+    var done=function(){oT('📋 Message copié','s');};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(msg).then(done,function(){prompt('Message :',msg);});
+    else prompt('Message :',msg);
+  }
+  oRefresh();
+}
+
+// ── Liste des comptes BO (datalist) ────────────────────────────────
+function oBuildBoList(){
+  var dl=document.getElementById('bo-list');if(!dl)return;
+  var seen={};
+  dl.innerHTML=OC.filter(function(c){return c.memberIdOlyLife;}).slice(0,500).map(function(c){
+    var v=String(c.memberIdOlyLife).toUpperCase()+' — '+c.nom+' '+(c.prenom||'');
+    if(seen[v])return'';seen[v]=1;
+    return'<option value="'+esc(v)+'">';
+  }).join('');
+}
+
+// Aperçu en direct du message de collecte
+(function(){var e=document.getElementById('rq-pr');if(e)e.addEventListener('input',oReqPrev);})();
+
 // ── INIT ──────────────────────────────────────────────────────────
 oBuildProductGrid();
+oBuildBoList();
 oGetCfg();
 (function(){var v=document.getElementById('ol-version');if(v)v.textContent='· '+APP_VERSION;})();
 if(GAS_URL&&CODE){oLoadCache();if(USER){applyRole();populateRefUI();oRefresh();}oPull();}
