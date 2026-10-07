@@ -754,6 +754,12 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 .map-pin{background:none!important;border:none!important;}
 .map-pin span{display:block;width:34px;height:34px;line-height:34px;text-align:center;font-size:28px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));transform-origin:50% 100%;animation:pinDrop .5s cubic-bezier(.2,.8,.3,1.2);}
 @keyframes pinDrop{from{transform:translateY(-14px) scale(.6);opacity:0}to{transform:none;opacity:1}}
+.av-line{position:relative;border:1px solid var(--bd);border-radius:12px;padding:10px 10px 8px;margin-bottom:8px;background:#fff;}
+.av-line .num{position:absolute;top:-8px;left:10px;background:var(--gold);color:#fff;font-size:10px;font-weight:700;border-radius:10px;padding:1px 8px;}
+.av-line .del{position:absolute;top:6px;right:6px;}
+.av-line .ofg2{gap:8px;margin-top:6px;}
+.av-line .ofl{font-size:10.5px;}
+#av-lines{padding-top:10px;}#av-lines.don .l-ech{display:none;}
 .av-seg{display:flex;gap:6px;margin-bottom:12px;}
 .av-seg button{flex:1;min-height:44px;border:1.5px solid var(--bd);border-radius:12px;background:#fff;font-size:13px;font-weight:600;color:var(--t2);cursor:pointer;}
 .av-seg button.on{border-color:var(--gold);background:var(--goldp);color:var(--gold);}
@@ -1505,11 +1511,12 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <input type="hidden" id="av-cid"><input type="hidden" id="av-id"><input type="hidden" id="av-type" value="avance">
     <div class="av-seg"><button type="button" id="av-t-avance" class="on" onclick="oAvType('avance')">💶 Avance<br><small style="font-weight:400">à rembourser</small></button><button type="button" id="av-t-don" onclick="oAvType('don')">🎁 Don<br><small style="font-weight:400">sans remboursement</small></button></div>
     <div class="ofg">
-      <div class="ofg1"><label class="ofl">Qui a avancé / donné l'argent ? <span class="oreq">*</span></label><select class="ofc" id="av-par"></select><div style="font-size:11px;color:var(--t3);margin-top:4px">Montant transmis depuis son BO OlyLife. La ligne apparaît aussi sur sa fiche membre.</div></div>
-      <div class="ofg1"><label class="ofl">Montant <span class="oreq">*</span></label><input type="number" class="ofc" id="av-montant" placeholder="500" min="0" step="0.01" inputmode="decimal"></div>
+      <div class="ofg1"><label class="ofl" id="av-lines-lbl">Qui a avancé / donné l'argent ? <span class="oreq">*</span></label>
+        <div id="av-lines"></div>
+        <button class="ob bgh bsm" type="button" id="av-add-line" onclick="oAvLineAdd()">➕ Ajouter une autre personne</button>
+        <div style="font-size:11px;color:var(--t3);margin-top:6px">Une ligne par personne : montant transmis depuis son BO OlyLife, avec sa propre date et sa propre échéance. Chaque ligne apparaît aussi sur la fiche membre de la personne, et les rappels lui sont envoyés.</div>
+      </div>
       <div class="ofg1"><label class="ofl">Devise</label><select class="ofc" id="av-devise"><option>€</option><option>FCFA</option><option>USD</option><option>MAD</option></select></div>
-      <div class="ofg1"><label class="ofl" id="av-date-lbl">Date de l'avance <span class="oreq">*</span></label><input type="date" class="ofc" id="av-date"></div>
-      <div class="ofg1" id="av-ech-wrap"><label class="ofl">Échéance de remboursement <span class="oreq">*</span></label><input type="date" class="ofc" id="av-ech"></div>
       <div class="ofg1"><label class="ofl">Motif / appareil financé</label><input type="text" class="ofc" id="av-motif" placeholder="Tera-P90+"></div>
     </div>
     <div class="av-remb" id="av-remb" style="display:none">
@@ -1713,7 +1720,7 @@ var DELAI_TEMOIGNAGE=30;
 var GAS_URL='',CODE='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.7 · 08/10';
+var APP_VERSION='v3.8 · 08/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -2432,7 +2439,8 @@ function computeActions(){
     (c.avances||[]).forEach(function(a){
       if(a.type==='don'||a.statut==='rembourse'||!a.echeance)return;
       var diff=diffD(a.echeance);
-      if(diff!==null&&diff<=3)items.push({c:c,key:'av_'+a.id,type:'Avance',label:'💶 Avance de '+a.montant+' '+(a.devise||'€')+(avRendu(a)?' (reste '+avReste(a)+' '+(a.devise||'€')+')':'')+(a.motif?' ('+a.motif+')':'')+' — '+(diff<0?'retard de '+Math.abs(diff)+' j':diff===0?'échéance aujourd\'hui':'échéance '+fD(a.echeance)),diff:diff,msg:avWaMsg(c,a)});
+      if(diff!==null&&diff<=3&&avParTel(a)&&!(a.sent&&a.sent.payeurWa))items.push({c:c,key:'avp_'+a.id,type:'Avance',tel:avParTel(a),label:'📣 Informer '+a.par+' (a avancé '+a.montant+' '+(a.devise||'€')+') — '+(diff<0?'retard de '+Math.abs(diff)+' j':diff===0?'échéance aujourd\'hui':'échéance '+fD(a.echeance)),diff:diff+0.5,msg:avWaPayeur(c,a)});
+      if(diff!==null&&diff<=3)items.push({c:c,key:'av_'+a.id,type:'Avance',label:'💶 Avance de '+a.montant+' '+(a.devise||'€')+(avRendu(a)?' (reste '+avReste(a)+' '+(a.devise||'€')+')':'')+(a.motif?' ('+a.motif+')':'')+(a.par?' · par '+a.par:'')+' — '+(diff<0?'retard de '+Math.abs(diff)+' j':diff===0?'échéance aujourd\'hui':'échéance '+fD(a.echeance)),diff:diff,msg:avWaMsg(c,a)});
     });
   });
   items.sort(function(a,b){return a.diff-b.diff;});
@@ -2440,6 +2448,10 @@ function computeActions(){
 }
 function oDone(cid,key){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  if(key&&key.indexOf('avp_')===0){
+    var ap=(c.avances||[]).find(function(x){return'avp_'+x.id===key;});
+    if(ap){ap.sent=ap.sent||{};ap.sent.payeurWa=todayYMD();jrnAdd(c,'fait','📣 '+ap.par+' informé(e) de l\'échéance de son avance');oPush([c]);oT('📣 Payeur informé','s');oRefresh();return;}
+  }
   if(key&&key.indexOf('av_')===0){
     var a=(c.avances||[]).find(function(x){return'av_'+x.id===key;});
     if(a){a.rembs=a.rembs||[];a.rembs.push({date:todayYMD(),montant:avReste(a),complet:true});avRecalc(a);jrnAdd(c,'fait','💶 Avance de '+a.montant+' '+(a.devise||'€')+' entièrement remboursée');oPush([c]);oT('✅ Avance soldée','s');emojiBurst(['✅','💰']);oRefresh();return;}
@@ -2504,9 +2516,9 @@ function oAct(){
         +'</div>'
         +'<textarea class="oacc-ta" id="acta-'+uid+'">'+buildMsgFor(a,lang,tone)+'</textarea>'
         +extraBtn
-        +'<button type="button" class="ob bwa bfull" onclick="oSendWA(\''+a.c.tel+'\',\''+uid+'\')" style="margin:8px 0">Envoyer sur WhatsApp</button>'
+        +'<button type="button" class="ob bwa bfull" onclick="oSendWA(\''+(a.tel||a.c.tel)+'\',\''+uid+'\')" style="margin:8px 0">Envoyer sur WhatsApp'+(a.tel?' à '+esc((a.label.match(/Informer (.+?) \(/)||[])[1]||'la personne'):'')+'</button>'
         +'<div style="display:flex;gap:8px">'
-          +'<a class="ob bph" href="tel:'+(a.c.tel||'')+'" style="flex:1">Appeler</a>'
+          +'<a class="ob bph" href="tel:'+(a.tel||a.c.tel||'')+'" style="flex:1">Appeler</a>'
           +'<button class="ob bdone" style="flex:2" onclick="oDone(\''+a.c.id+'\',\''+a.key+'\')">Marquer fait</button>'
         +'</div>'
       +'</div>'
@@ -3254,7 +3266,8 @@ function avRowHtml(c,a,vuePayeur){
     +(vuePayeur?' · à <b>'+esc(c.nom+' '+(c.prenom||''))+'</b>':(a.par?' · par <b>'+esc(a.par)+'</b>':''))
     +((a.rembs||[]).length?'<br>↩ '+a.rembs.map(function(r){return fD(r.date)+' : '+r.montant+' '+esc(a.devise||'€');}).join(' · '):'')+'</small></div>'
     +(isRef?'':'<div style="display:flex;gap:4px;flex-shrink:0">'
-      +(!done&&c.tel?'<a class="tb-ic" title="Rappel WhatsApp" href="'+mkWA(c.tel,avWaMsg(c,a))+'" target="_blank" rel="noopener">💬</a>':'')
+      +(!done&&c.tel?'<a class="tb-ic" title="Rappel WhatsApp au bénéficiaire" href="'+mkWA(c.tel,avWaMsg(c,a))+'" target="_blank" rel="noopener">💬</a>':'')
+      +(!done&&avParTel(a)?'<a class="tb-ic" title="Informer '+esc(a.par||'le payeur')+' (WhatsApp)" href="'+mkWA(avParTel(a),avWaPayeur(c,a))+'" target="_blank" rel="noopener">📣</a>':'')
       +(!done?'<button class="tb-ic go" title="Remboursement partiel ou complet" onclick="oAvOpen(\''+c.id+'\',\''+a.id+'\')">💰</button>':'<button class="tb-ic" title="Modifier" onclick="oAvOpen(\''+c.id+'\',\''+a.id+'\')">✏️</button>')
       +'<button class="tb-ic" title="Supprimer" onclick="oAvDel(\''+c.id+'\',\''+a.id+'\')">🗑</button>'
     +'</div>')+'</div>';
@@ -4499,12 +4512,43 @@ function avParName(v){
   if(v.indexOf('u:')===0){var id=v.slice(2);if(USER&&USER.id===id)return USER.nom;var u=USERS.find(function(x){return x.id===id;});return u?u.nom:'';}
   var c=OC.find(function(x){return x.id===v.slice(2);});return c?(c.nom||'')+' '+(c.prenom||''):'';
 }
+var AV_OPTS='';
+function avParInfo(v){
+  if(!v)return{nom:'',tel:'',email:''};
+  if(v.indexOf('u:')===0){var id=v.slice(2);var u=(USER&&USER.id===id)?USER:USERS.find(function(x){return x.id===id;});return u?{nom:u.nom,tel:u.tel||'',email:u.email||u.digestEmail||''}:{nom:'',tel:'',email:''};}
+  if(v.indexOf('c:')===0){var c=OC.find(function(x){return x.id===v.slice(2);});return c?{nom:(c.nom||'')+' '+(c.prenom||''),tel:c.tel||'',email:c.email||''}:{nom:'',tel:'',email:''};}
+  return{nom:v.slice(2),tel:'',email:''};
+}
+function avLineHtml(i,a){
+  var t=val('av-type')||'avance';
+  return'<div class="av-line" data-i="'+i+'"><span class="num">Personne '+(i+1)+'</span>'
+    +(AV_CUR?'':'<button class="tb-ic del" type="button" title="Retirer cette ligne" onclick="oAvLineDel(this)">✕</button>')
+    +'<label class="ofl" style="margin-top:4px">Qui ?</label><select class="ofc l-par">'+AV_OPTS+'</select>'
+    +'<div class="ofg2"><div><label class="ofl">Montant <span class="oreq">*</span></label><input type="number" class="ofc l-montant" placeholder="500" min="0" step="0.01" inputmode="decimal" value="'+(a?a.montant:'')+'"></div>'
+    +'<div><label class="ofl l-date-lbl">'+(t==='don'?'Date du don':'Date de l\'avance')+'</label><input type="date" class="ofc l-date" value="'+(a?(a.date||''):todayYMD())+'"></div></div>'
+    +'<div class="l-ech"><label class="ofl" style="margin-top:6px">Échéance de remboursement <span class="oreq">*</span></label><input type="date" class="ofc l-ech-in" value="'+(a?(a.echeance||''):'')+'"></div></div>';
+}
+function oAvLineAdd(a,parV){
+  var box=document.getElementById('av-lines'),i=box.children.length;
+  box.insertAdjacentHTML('beforeend',avLineHtml(i,a));
+  var ln=box.lastElementChild,sel=ln.querySelector('.l-par');
+  var v=parV||('u:'+(USER?USER.id:''));
+  sel.value=v;
+  if(sel.value!==v&&a&&a.par){var og=document.createElement('option');og.value='n:'+a.par;og.textContent=a.par;sel.appendChild(og);sel.value='n:'+a.par;}
+  return ln;
+}
+function oAvLineDel(btn){var box=document.getElementById('av-lines');if(box.children.length<=1){oT('Il faut au moins une personne','w');return;}btn.closest('.av-line').remove();Array.prototype.forEach.call(box.children,function(l,i){l.querySelector('.num').textContent='Personne '+(i+1);});}
+function avLines(){
+  return Array.prototype.map.call(document.querySelectorAll('#av-lines .av-line'),function(l){
+    return{parV:l.querySelector('.l-par').value,montant:parseFloat(l.querySelector('.l-montant').value),date:l.querySelector('.l-date').value,ech:l.querySelector('.l-ech-in').value};
+  });
+}
 function oAvType(t){
   document.getElementById('av-type').value=t;
   document.getElementById('av-t-avance').classList.toggle('on',t==='avance');
   document.getElementById('av-t-don').classList.toggle('on',t==='don');
-  document.getElementById('av-ech-wrap').style.display=t==='don'?'none':'';
-  document.getElementById('av-date-lbl').innerHTML=(t==='don'?'Date du don':'Date de l\'avance')+' <span class="oreq">*</span>';
+  document.getElementById('av-lines').classList.toggle('don',t==='don');
+  document.querySelectorAll('#av-lines .l-date-lbl').forEach(function(l){l.textContent=t==='don'?'Date du don':'Date de l\'avance';});
   document.getElementById('oavs-ttl').textContent=t==='don'?'🎁 Don d\'argent':'💶 Avance d\'argent';
   document.getElementById('av-note').innerHTML=t==='don'
     ?'🎁 Un <b>don</b> n\'appelle aucun remboursement : pas d\'échéance, pas de rappel. Il est simplement tracé sur la fiche du bénéficiaire et sur celle du donateur.'
@@ -4523,7 +4567,7 @@ function avRembRender(){
 function oAvRembAdd(complet){
   var a=AV_CUR;if(!a)return;
   var d=val('av-r-date')||todayYMD(),m=parseFloat(val('av-r-montant'));
-  a.montant=parseFloat(val('av-montant'))||a.montant;
+  var l0=avLines()[0];if(l0&&l0.montant)a.montant=l0.montant;
   if(complet)m=avReste(a);
   if(!m||m<=0){oT('Indiquez le montant remboursé','e');return;}
   a.rembs=a.rembs||[];a.rembs.push({date:d,montant:Math.round(m*100)/100,complet:!!complet||avReste(a)-m<=0.004});
@@ -4534,6 +4578,11 @@ function oAvRembDel(i){
   var rs=a.rembs.slice().sort(function(x,y){return(x.date||'')<(y.date||'')?-1:1;});var r=rs[i];
   a.rembs=a.rembs.filter(function(x){return x!==r;});avRembRender();
 }
+function avWaPayeur(c,a){
+  var pr=(a.par||'').split(' ')[0];
+  return'Bonjour '+pr+' 🌿\n\nPetit point sur l\'avance de '+a.montant+' '+(a.devise||'€')+' que vous avez faite le '+fD(a.date)+' à '+c.nom+' '+(c.prenom||'')+(a.motif?' pour '+a.motif:'')+' : le remboursement est prévu le '+fD(a.echeance)+(avRendu(a)?' (déjà rendu : '+avRendu(a)+' '+(a.devise||'€')+', reste '+avReste(a)+' '+(a.devise||'€')+')':'')+'.\n\nJe vous tiens informé(e) dès que c\'est réglé. Merci pour votre confiance 🙏\n'+(PARTNER_NOM()||'L\'équipe WLHT')+' — Water Life High Tech';
+}
+function avParTel(a){if(a.parTel)return a.parTel;var pi=avParInfo(a.parRef||'');if(pi.tel)return pi.tel;var p=a.parId?OC.find(function(x){return x.id===a.parId;}):null;return p?(p.tel||''):'';}
 function oAvOpen(cid,aid){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
   var a=aid?(c.avances||[]).find(function(x){return x.id===aid;}):null;
@@ -4541,16 +4590,17 @@ function oAvOpen(cid,aid){
   document.getElementById('av-cid').value=cid;
   document.getElementById('av-id').value=a?a.id:'';
   document.getElementById('oavs-sub').innerHTML='Bénéficiaire : <b>'+esc(c.nom+' '+(c.prenom||''))+'</b>'+(c.tel?' · '+esc(c.tel):'');
-  var sel=document.getElementById('av-par'),groups={};
+  var groups={};
   avPayeurs(cid).forEach(function(o){(groups[o.g]=groups[o.g]||[]).push(o);});
-  sel.innerHTML=Object.keys(groups).map(function(g){return'<optgroup label="'+esc(g)+'">'+groups[g].map(function(o){return'<option value="'+esc(o.v)+'">'+esc(o.l)+'</option>';}).join('')+'</optgroup>';}).join('');
+  AV_OPTS=Object.keys(groups).map(function(g){return'<optgroup label="'+esc(g)+'">'+groups[g].map(function(o){return'<option value="'+esc(o.v)+'">'+esc(o.l)+'</option>';}).join('')+'</optgroup>';}).join('');
+  document.getElementById('av-type').value=a&&a.type==='don'?'don':'avance';
+  document.getElementById('av-lines').innerHTML='';
   var parV=a?(a.parRef||''):('u:'+(USER?USER.id:''));
   if(a&&!parV&&a.par){var m=avPayeurs(cid).find(function(o){return nmKey(avParName(o.v))===nmKey(a.par);});if(m)parV=m.v;}
-  sel.value=parV;if(sel.value!==parV&&a&&a.par){var og=document.createElement('option');og.value='n:'+a.par;og.textContent=a.par;sel.appendChild(og);sel.value='n:'+a.par;}
-  document.getElementById('av-montant').value=a?a.montant:'';
+  oAvLineAdd(a,parV);
+  document.getElementById('av-add-line').style.display=a?'none':'';
+  document.getElementById('av-lines-lbl').innerHTML=a?'Personne qui a '+(a.type==='don'?'donné':'avancé')+' l\'argent':'Qui a avancé / donné l\'argent ? <span class="oreq">*</span>';
   document.getElementById('av-devise').value=a?(a.devise||'€'):'€';
-  document.getElementById('av-date').value=a?(a.date||''):todayYMD();
-  document.getElementById('av-ech').value=a?(a.echeance||''):'';
   document.getElementById('av-motif').value=a?(a.motif||''):'';
   oAvType(a&&a.type==='don'?'don':'avance');
   if(AV_CUR&&AV_CUR.type!=='don')avRembRender();
@@ -4560,35 +4610,41 @@ function oAvClose(){oSheetClose('oavs');}
 function oAvSave(){
   var cid=document.getElementById('av-cid').value;
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
-  var type=val('av-type')||'avance',montant=parseFloat(val('av-montant')),ech=val('av-ech'),date=val('av-date'),parV=val('av-par');
-  if(!parV){oT('Indiquez qui a avancé / donné l\'argent','e');return;}
-  if(!montant||montant<=0){oT('Indiquez le montant','e');return;}
-  if(!date){oT('Indiquez la date','e');return;}
-  if(type==='avance'&&!ech){oT('Indiquez la date d\'échéance du remboursement','e');return;}
-  if(type==='avance'&&ech<date){oT('L\'échéance doit être après la date de l\'avance','e');return;}
+  var type=val('av-type')||'avance',devise=val('av-devise'),motif=val('av-motif').trim();
+  var lines=avLines();
+  for(var i=0;i<lines.length;i++){
+    var L=lines[i],n='Personne '+(i+1)+' : ';
+    if(!L.parV){oT(n+'indiquez qui a avancé / donné l\'argent','e');return;}
+    if(!L.montant||L.montant<=0){oT(n+'indiquez le montant','e');return;}
+    if(!L.date){oT(n+'indiquez la date','e');return;}
+    if(type==='avance'&&!L.ech){oT(n+'indiquez l\'échéance de remboursement','e');return;}
+    if(type==='avance'&&L.ech<L.date){oT(n+'l\'échéance doit être après la date de l\'avance','e');return;}
+  }
   var aid=document.getElementById('av-id').value;
   c.avances=c.avances||[];
-  var a=aid?c.avances.find(function(x){return x.id===aid;}):null;
-  var isNew=!a;
-  if(!a){a={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5),statut:'encours',saisiPar:PARTNER_NOM()};c.avances.push(a);}
-  var oldPar=a.parId;
-  a.type=type;a.montant=montant;a.devise=val('av-devise');a.date=date;a.motif=val('av-motif').trim();
-  a.echeance=type==='don'?'':ech;
-  a.parRef=parV;a.par=parV.indexOf('n:')===0?parV.slice(2):avParName(parV);
-  a.parId=parV.indexOf('c:')===0?parV.slice(2):'';
-  if(parV.indexOf('u:')===0){var pm=OC.find(function(x){return nmKey((x.nom||'')+' '+(x.prenom||''))===nmKey(a.par)||nmKey((x.prenom||'')+' '+(x.nom||''))===nmKey(a.par);});if(pm)a.parId=pm.id;}
-  a.rembs=(AV_CUR&&AV_CUR.rembs)||a.rembs||[];
-  if(type==='don')a.rembs=[];
-  avRecalc(a);if(isNew)a.sent={};
-  var lib=type==='don'?'🎁 Don':'💶 Avance';
-  jrnAdd(c,a.statut==='rembourse'?'fait':'note',lib+' '+(isNew?'enregistré'+(type==='don'?'':'e'):'mis'+(type==='don'?'':'e')+' à jour')+' : '+montant+' '+a.devise+(a.motif?' pour '+a.motif:'')+' — par '+a.par
-    +(type==='don'?'':' — remboursement prévu le '+fD(ech)+(avRendu(a)?' · rendu '+avRendu(a)+' '+a.devise+(a.statut==='rembourse'?' ✅ soldée':' (reste '+avReste(a)+' '+a.devise+')'):'')));
-  var changed=[c];
-  var payer=a.parId?OC.find(function(x){return x.id===a.parId;}):null;
-  if(payer&&payer.id!==c.id){jrnAdd(payer,'note',lib+(type==='don'?' consenti':' consentie')+' à '+c.nom+' '+(c.prenom||'')+' : '+montant+' '+a.devise+(a.motif?' ('+a.motif+')':'')+(type==='don'?'':a.statut==='rembourse'?' — ✅ entièrement remboursée':' — reste '+avReste(a)+' '+a.devise));changed.push(payer);}
+  var changed=[c],lib=type==='don'?'🎁 Don':'💶 Avance',lastA=null,nb=0;
+  lines.forEach(function(L,i){
+    var a=(aid&&i===0)?c.avances.find(function(x){return x.id===aid;}):null;
+    var isNew=!a;
+    if(!a){a={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5)+i,statut:'encours',saisiPar:PARTNER_NOM()};c.avances.push(a);}
+    a.type=type;a.montant=L.montant;a.devise=devise;a.date=L.date;a.motif=motif;
+    a.echeance=type==='don'?'':L.ech;
+    var pi=avParInfo(L.parV);
+    a.parRef=L.parV;a.par=pi.nom;a.parTel=pi.tel;a.parEmail=pi.email;
+    a.parId=L.parV.indexOf('c:')===0?L.parV.slice(2):'';
+    if(L.parV.indexOf('u:')===0){var pm=OC.find(function(x){return nmKey((x.nom||'')+' '+(x.prenom||''))===nmKey(a.par)||nmKey((x.prenom||'')+' '+(x.nom||''))===nmKey(a.par);});if(pm){a.parId=pm.id;if(!a.parTel)a.parTel=pm.tel||'';if(!a.parEmail)a.parEmail=pm.email||'';}}
+    a.rembs=(!isNew&&AV_CUR&&AV_CUR.rembs)||a.rembs||[];
+    if(type==='don')a.rembs=[];
+    avRecalc(a);if(isNew)a.sent={};
+    jrnAdd(c,a.statut==='rembourse'?'fait':'note',lib+' '+(isNew?'enregistré'+(type==='don'?'':'e'):'mis'+(type==='don'?'':'e')+' à jour')+' : '+a.montant+' '+devise+(motif?' pour '+motif:'')+' — par '+a.par
+      +(type==='don'?'':' — remboursement prévu le '+fD(a.echeance)+(avRendu(a)?' · rendu '+avRendu(a)+' '+devise+(a.statut==='rembourse'?' ✅ soldée':' (reste '+avReste(a)+' '+devise+')'):'')));
+    var payer=a.parId?OC.find(function(x){return x.id===a.parId;}):null;
+    if(payer&&payer.id!==c.id){jrnAdd(payer,'note',lib+(type==='don'?' consenti':' consentie')+' à '+c.nom+' '+(c.prenom||'')+' : '+a.montant+' '+devise+(motif?' ('+motif+')':'')+(type==='don'?'':a.statut==='rembourse'?' — ✅ entièrement remboursée':' — à récupérer le '+fD(a.echeance)+' · reste '+avReste(a)+' '+devise));if(changed.indexOf(payer)<0)changed.push(payer);}
+    lastA=a;nb++;
+  });
   oPush(changed);oAvClose();oOpenF(cid);
-  if(a.statut==='rembourse')emojiBurst(['✅','🎉','💰']);
-  oT(type==='don'?'🎁 Don enregistré':a.statut==='rembourse'?'✅ Avance soldée':'💶 Avance enregistrée — rappels automatiques programmés','s');
+  if(lastA&&lastA.statut==='rembourse')emojiBurst(['✅','🎉','💰']);
+  oT(type==='don'?'🎁 '+nb+' don'+(nb>1?'s':'')+' enregistré'+(nb>1?'s':''):(lastA&&lastA.statut==='rembourse')?'✅ Avance soldée':'💶 '+nb+' avance'+(nb>1?'s':'')+' enregistrée'+(nb>1?'s':'')+' — rappels programmés (bénéficiaire + '+(nb>1?'payeurs':'payeur')+')','s');
 }
 function oAvMark(cid,aid){oAvOpen(cid,aid);}
 function oAvDel(cid,aid){
