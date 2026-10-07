@@ -2,7 +2,7 @@
   "name": "CRM OlyLife — WLHT",
   "short_name": "CRM OlyLife",
   "description": "Suivi des contacts, rappels et équipe OlyLife — Water Life High Tech",
-  "id": "/crm-olylife/",
+  "id": "/",
   "start_url": "./index.html?source=pwa",
   "scope": "./",
   "display": "standalone",

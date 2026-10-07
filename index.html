@@ -791,7 +791,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <button class="ob bgold bfull" style="margin-top:12px" onclick="oSavePid()">Enregistrer</button>
 
       <div class="os-block-ttl" style="margin-top:24px">Mon code d'accès</div>
-      <div class="os-txt">Le même code vous connecte sur téléphone et ordinateur : <b>aviation-english-trainer.github.io/crm-olylife</b></div>
+      <div class="os-txt">Le même code vous connecte sur téléphone et ordinateur : <b>crm.team-waterlifehightech.com</b></div>
       <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
         <div id="os-code" style="flex:1;font-family:monospace;font-size:20px;letter-spacing:3px;font-weight:700;color:var(--gold);background:var(--goldp);border-radius:10px;padding:10px 14px;text-align:center">—</div>
         <button class="ob bgh" style="min-height:46px" onclick="oCopyCode()">📋 Copier</button>
@@ -1935,7 +1935,7 @@ function renderUsers(){
 function oInviteUser(i){
   var u=USERS[i];
   if(!u)return;
-  var appUrl='https://aviation-english-trainer.github.io/crm-olylife/';
+  var appUrl='https://crm.team-waterlifehightech.com/';
   var nom=u.nom||'';
   var code=u.code||'';
   var roleLib=u.role==='referent'?'Référent':u.role==='gestionnaire'?'Gestionnaire':'Admin';
@@ -2754,7 +2754,7 @@ function gcalUrl(c){
   var s=new Date(c.rappel.date+'T'+(c.rappel.heure||'10:00')+':00');var e=new Date(s.getTime()+30*60000);
   var f=function(x){return x.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z');};
   var txt='⏰ Rappel CRM : '+(c.nom||'')+' '+(c.prenom||'');
-  var det=(c.rappel.texte||'')+'\n'+(c.tel?'Tél : '+c.tel+'\n':'')+(c.rappel.pour?'Pour : '+c.rappel.pour+'\n':'')+'Ouvrir le CRM : https://aviation-english-trainer.github.io/crm-olylife/';
+  var det=(c.rappel.texte||'')+'\n'+(c.tel?'Tél : '+c.tel+'\n':'')+(c.rappel.pour?'Pour : '+c.rappel.pour+'\n':'')+'Ouvrir le CRM : https://crm.team-waterlifehightech.com/';
   return'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(txt)+'&dates='+f(s)+'/'+f(e)+'&details='+encodeURIComponent(det)+'&sf=true';
 }
 // Synchronisation serveur : événement dans l'agenda WLHT + invitations aux personnes concernées
