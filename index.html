@@ -1079,6 +1079,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
         <div id="eq-admin-tools" style="padding:10px 14px 12px;border-top:1px solid var(--bd);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
           <button class="ob bsm" style="background:var(--pu);color:#fff;border:none;min-height:40px" onclick="oOpenImport()">⇪ Importer des contacts</button>
           <button class="ob bsm" style="background:#C63E47;color:#fff;border:none;min-height:40px" onclick="oDedup(true)">🧹 Supprimer les doublons</button>
+          <button class="ob bsm" style="background:#E8A020;color:#fff;border:none;min-height:40px" onclick="oCleanupParasites()">🧽 Nettoyer les fiches d'import raté</button>
           <span style="font-size:11px;color:var(--t3);margin-left:auto" id="eq-version"></span>
         </div>
         <div id="eq-user-form" style="display:none;padding:14px 16px;border-top:1px solid var(--bd);background:var(--navy3)">
@@ -1628,7 +1629,7 @@ var DELAI_TEMOIGNAGE=30;
 var GAS_URL='',CODE='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.4 · 07/10';
+var APP_VERSION='v3.5 · 07/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -1718,7 +1719,7 @@ function oPull(){
       if(d.users)USERS=d.users;
       oSaveCache();oHideLogin();oSyncDot('ok');
       oT('Bonjour '+USER.nom+' — '+OC.length+' contact(s)','s');
-      applyRole();populateRefUI();oRefresh();oMergeSeedThierry();if(ROLE()==='admin')oDedup(false);
+      applyRole();populateRefUI();oRefresh();oMergeSeedThierry();if(ROLE()==='admin'){oDedup(false);var _np=fichesParasites().length;if(_np)oT('🧽 '+_np+' fiche(s) parasite(s) détectée(s) — Équipe → « Nettoyer les fiches d\'import raté »','w');}
     })
     .catch(function(){
       oSyncDot('err');oLoader(false);
@@ -2706,22 +2707,40 @@ function oDigestModal(userOrIndex){
 function oImpGo_lbl(){var inc=document.getElementById('oimp-inc').checked;var nbInc=IMP_PARSED.filter(function(it){return(!it.nom&&!it.prenom)||(!it.tel&&!it.email);}).length;document.getElementById('oimp-go').textContent='Importer '+(inc?IMP_PARSED.length:IMP_PARSED.length-nbInc)+' fiche(s)';}
 // ── NETTOYAGE : fiches parasites créées par un mauvais import ──────
 function fichesParasites(){
+  var LEX=/\b(INFORMATIONS?|LIVRAISON|COMMANDE|DESTINATAIRE|POSTAL|D[ÉE]TAILL[ÉE]E?|REMARQUES?|COURRIER|PRODUITS?|MEMBRE|EXP[ÉE]DITION|QUANTIT[ÉE]?|UNITAIRE|LOGISTIQUE|TRACKING|OP[ÉE]RATION|R[ÉE]GION|STATUT|MONTANT|BASIC|MAILING|DELIVERY|ORDER|RECIPIENT|REGISTRATION|SETTLED)\b/;
   return OC.filter(function(c){
+    // Protections absolues : fiche travaillée, squelette généalogie, ou porteuse de données métier
+    if(c.journal&&c.journal.some(function(e){return e.type!=='systeme';}))return false;
+    if(/^(EA|AF)\d{4,}$/i.test((c.nom||'').trim()))return false;
+    if(c.rappel||(c.rdvs&&c.rdvs.length)||(c.avances&&c.avances.length)||c.essaiOk)return false;
     var full=((c.nom||'')+' '+(c.prenom||'')).trim();
     var digits=(c.tel||'').replace(/\D/g,'');
     var sansContact=!digits&&!c.email;
-    var nomEstNumero=digits&&full.replace(/\D/g,'')===digits&&!/[a-z]{3,}/i.test(full);
     var sansPrenom=!(c.prenom||'').trim();
-    if(c.journal&&c.journal.length)return false; // une fiche travaillée n'est jamais un parasite
-    return(sansContact&&sansPrenom&&isLabelLine(full))||nomEstNumero||/[:：]$/.test(full)||(sansContact&&/^(informations?|image|id |produits|maison$|remarques|mode de|par courrier|code postal|num[ée]ro|adresse|pays|nom du|montant|type de|surnom|prix|quantit)/i.test(full));
+    // Un « nom » qui n'est que le numéro de téléphone
+    if(digits&&full.replace(/\D/g,'')===digits&&!/[a-z]{3,}/i.test(full))return true;
+    // Libellé se terminant par deux-points
+    if(/[:：]\s*$/.test(full))return true;
+    // N° de commande OlyLife en guise de nom
+    if(/^\d{8,}/.test(full))return true;
+    if(!sansContact)return false; // au-delà, on ne touche qu'aux fiches SANS téléphone ni email
+    if(sansPrenom&&isLabelLine(full))return true;
+    if(/^\+?[\d\s().,\/-]+$/.test(full))return true;                                    // que des chiffres (CP, tél, prix)
+    if(/\d/.test(full)&&/\b(rue|avenue|av|bd|boulevard|chemin|all[ée]e|impasse|place)\b/i.test(full))return true; // adresse
+    if(/\bOLY-[A-Z0-9]+/i.test(full))return true;                                       // ligne produit
+    if(/^(image|informations?|produits?\s|mode de|par courrier|nom du|pr[ée]nom|id\s|adresse|code postal|num[ée]ro|type de|montant|remarque|exp[ée]dition|destinataire|basic |member |mailing |delivery |order |recipient|unit price|tax identification|nickname|logo$|index$|language$)/i.test(full))return true;
+    if(/^(FRANCE|MAISON|SETTLED|BY MAIL|PAYS\s*\/?\s*R[ÉE]GION|FRANCE-EUROPE|EUROPE)$/i.test(full))return true;
+    // Phrase tout en majuscules contenant un mot du lexique BO (≠ un vrai NOM PRÉNOM)
+    if(full===full.toUpperCase()&&/[A-ZÀ-Ý]/.test(full)&&LEX.test(full))return true;
+    return false;
   });
 }
 function oCleanupParasites(){
   if(ROLE()==='referent'){oT('Réservé aux gestionnaires','e');return;}
   var l=fichesParasites();
-  if(!l.length){oT('Aucune fiche parasite détectée','s');return;}
-  var ap=l.slice(0,12).map(function(c){return'• '+(c.nom||'')+' '+(c.prenom||'');}).join('\n')+(l.length>12?'\n… et '+(l.length-12)+' autres':'');
-  if(!confirm(l.length+' fiche(s) parasite(s) issues d\'un import (libellés, numéros seuls…) :\n\n'+ap+'\n\nLes supprimer définitivement ?'))return;
+  if(!l.length){oT('✨ Aucune fiche parasite détectée — la base est propre','s');return;}
+  var ap=l.slice(0,25).map(function(c){return'• '+((c.nom||'')+' '+(c.prenom||'')).trim().slice(0,60);}).join('\n')+(l.length>25?'\n… et '+(l.length-25)+' autres':'');
+  if(!confirm('🧹 '+l.length+' fiche(s) parasite(s) détectée(s) (libellés, adresses, numéros issus d\'un import raté) :\n\n'+ap+'\n\nLes supprimer définitivement ?\n\n(Les fiches avec journal, téléphone, email, rappel, avance ou généalogie ne sont JAMAIS touchées.)'))return;
   var ids=l.map(function(c){return c.id;});
   OC=OC.filter(function(c){return ids.indexOf(c.id)<0;});
   oPushDel(ids);oRefresh();oT('🧹 '+ids.length+' fiche(s) parasite(s) supprimée(s)','s');
@@ -3335,8 +3354,13 @@ var LABEL_RX=/^(informations?\b|image\b|id\b|produits?\b|maison$|remarques?|mode
 function isLabelLine(s){s=(s||'').trim();return !s||/[:：]\s*$/.test(s)||LABEL_RX.test(s);}
 // Détecte un relevé de commande OlyLife (back-office FR ou EN : "Numéro de commande:" / "Order Number：")
 function looksOlyOrder(text){
-  return(/num[ée]ro de commande\s*[:：]/i.test(text)&&/id membre\s*[:：]/i.test(text))
-      ||(/order number\s*[:：]/i.test(text)&&/member id\s*[:：]/i.test(text));
+  if((/num[ée]ro de commande\s*[:：]/i.test(text)&&/id membre\s*[:：]/i.test(text))
+   ||(/order number\s*[:：]/i.test(text)&&/member id\s*[:：]/i.test(text)))return true;
+  var m=0;
+  [/adresse d[ée]taill[ée]e\s*[:：]/i,/nom du destinataire\s*[:：]/i,/mode de livraison\s*[:：]/i,/informations de (la commande|livraison)/i,/produits? command[ée]s/i,/id membre/i,
+   /detailed address\s*[:：]/i,/recipient'?s name\s*[:：]/i,/delivery method\s*[:：]/i,/product ordered/i,/member id/i,/\bOLY-[A-Z0-9]+\b/]
+  .forEach(function(r){if(r.test(text))m++;});
+  return m>=3; // page BO partielle (copiée sans l'en-tête) : on la traite quand même en UNE fiche
 }
 function deEnt(x){return String(x||'').replace(/&ccedil;/gi,'ç').replace(/&eacute;/gi,'é').replace(/&egrave;/gi,'è').replace(/&ecirc;/gi,'ê').replace(/&agrave;/gi,'à').replace(/&ocirc;/gi,'ô').replace(/&icirc;/gi,'î').replace(/&ugrave;/gi,'ù').replace(/&amp;/gi,'&').replace(/&#(\d+);/g,function(_,n){return String.fromCharCode(+n);});}
 var RANG_OLY={p1:'P1 - Starter',p2:'P2 - Builder',p3:'P3 - Leader',p4:'P4 - Supervisor',p5:'P5 - Pioneer',starter:'P1 - Starter',builder:'P2 - Builder',leader:'P3 - Leader',supervisor:'P4 - Supervisor',pioneer:'P5 - Pioneer'};
@@ -3349,6 +3373,7 @@ function parseOlyOrders(text){
     if(SPLIT.test(l)){cur=[];blocks.push(cur);}
     if(cur)cur.push(l);
   });
+  if(!blocks.length)blocks=[lines]; // page partielle : tout le collage = une seule commande
   function val(bl,labelRx){
     for(var i=0;i<bl.length;i++){
       var m=bl[i].match(/^(.+?)\s*[:：]\s*(.*)$/);
@@ -3408,6 +3433,9 @@ function parseOlyOrders(text){
     for(var i=0;i<segs.length;i++){if(/^\d{4,5}$/.test(segs[i])&&segs[i+1]&&!/^(france|belgique|suisse|maroc)$/i.test(segs[i+1])){ville=segs[i+1];break;}}
     if(!ville&&segs.length>=3)ville=segs[segs.length-2];
     if(!cp){var mcp=adr.match(/\b(\d{5})\b/);if(mcp)cp=mcp[1];}
+    if(!num){var mnum=bl.join(' ').match(/\b(20\d{14,})\b/);if(mnum)num=mnum[1];}
+    if(!member){var mea=bl.join(' ').match(/\b((?:EA|AF)\d{5,})\b/i);if(mea)member=mea[1];}
+    if(!nomC&&destinataire)nomC=destinataire;
     var dateCmd=/^\d{8}/.test(num)?num.slice(0,4)+'-'+num.slice(4,6)+'-'+num.slice(6,8):'';
     if(dLivr&&dLivr===dateCmd)dLivr='';
     var notes=['Commande OlyLife n°'+num+(dateCmd?' du '+fD(dateCmd):''),montant?'Montant : '+montant+' USD':'',type?'Type : '+type:'',stCmd?'Statut commande : '+stCmd:'',prodTxt.length?'Produits : '+prodTxt.join(', '):'',adr?'Livraison : '+adr:'',destinataire&&destinataire!==nomC?'Destinataire : '+destinataire:'',rem?'Remarque : '+rem:''].filter(Boolean).join('\n');
