@@ -240,12 +240,14 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .ocli-card.st-close{border-left:6px solid #6CCB8E;background:linear-gradient(90deg,rgba(108,203,142,.22),var(--navy2) 55%);}
 .ocli-card.st-reseau{border-left:6px solid #126A3C;background:linear-gradient(90deg,rgba(18,106,60,.20),var(--navy2) 55%);}
 .stbdg{display:inline-flex;align-items:center;gap:4px;border-radius:20px;padding:3px 9px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap;}
-.stbdg.afaire{background:#C63E47;}.stbdg.encours{background:#D9A400;}.stbdg.close{background:#4FB874;}.stbdg.reseau{background:#126A3C;}
-.st-pick{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;}
+.stbdg.afaire{background:#C63E47;}.stbdg.encours{background:#D9A400;}.stbdg.close{background:#4FB874;}.stbdg.reseau{background:#126A3C;}.stbdg.abandon{background:#5B6770;}
+.ocli-card.st-abandon{border-left:6px solid #5B6770;background:linear-gradient(90deg,rgba(91,103,112,.14),var(--navy2) 55%);opacity:.85;}
+.st-pick{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px;}
 .st-pick button{border:2px solid transparent;border-radius:12px;padding:9px 4px;font-family:Outfit,sans-serif;font-size:10.5px;font-weight:700;color:#fff;cursor:pointer;line-height:1.25;opacity:.55;transition:all .15s;-webkit-tap-highlight-color:transparent;}
 .st-pick button.on{opacity:1;border-color:var(--tx);transform:scale(1.04);box-shadow:0 3px 10px rgba(0,0,0,.18);}
 .st-pick button span{display:block;font-size:16px;margin-bottom:2px;}
-.st-pick .afaire{background:#C63E47;}.st-pick .encours{background:#D9A400;}.st-pick .close{background:#4FB874;}.st-pick .reseau{background:#126A3C;}
+.st-pick .afaire{background:#C63E47;}.st-pick .encours{background:#D9A400;}.st-pick .close{background:#4FB874;}.st-pick .reseau{background:#126A3C;}.st-pick .abandon{background:#5B6770;}
+.st-info{font-size:11.5px;color:var(--t2);margin:-6px 0 12px;line-height:1.5;}
 .ofilters.st-row .ofilter-chip.afaire.on{background:#C63E47;border-color:#C63E47;color:#fff;}
 .ofilters.st-row .ofilter-chip.encours.on{background:#D9A400;border-color:#D9A400;color:#fff;}
 .ofilters.st-row .ofilter-chip.close.on{background:#4FB874;border-color:#4FB874;color:#fff;}
@@ -462,7 +464,7 @@ textarea.ofc{resize:vertical;min-height:76px;}
    v3 — INTERFACE RESPONSIVE : téléphone (défaut) · tablette ≥760 · ordinateur ≥1200
    ═══════════════════════════════════════════════════════════════════ */
 .hide{display:none!important;}
-:root{--side-w:0px;--top-h:56px;--drawer-w:560px;--st-afaire:#C63E47;--st-encours:#D9A400;--st-close:#4FB874;--st-reseau:#126A3C;}
+:root{--side-w:0px;--top-h:56px;--drawer-w:560px;--st-afaire:#C63E47;--st-encours:#D9A400;--st-close:#4FB874;--st-reseau:#126A3C;--st-abandon:#5B6770;}
 
 /* ── Barre latérale (cachée sur téléphone) ───────────────────────── */
 #oside{display:none;}
@@ -574,7 +576,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 .ctbl input[type=checkbox]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer;}
 .tc{display:flex;align-items:center;gap:10px;min-width:180px;}
 .tav{width:32px;height:32px;border-radius:50%;color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.tav.st-afaire{background:var(--st-afaire);}.tav.st-encours{background:var(--st-encours);}.tav.st-close{background:var(--st-close);}.tav.st-reseau{background:var(--st-reseau);}
+.tav.st-afaire{background:var(--st-afaire);}.tav.st-encours{background:var(--st-encours);}.tav.st-close{background:var(--st-close);}.tav.st-reseau{background:var(--st-reseau);}.tav.st-abandon{background:var(--st-abandon);}
 .tc b{display:block;font-size:13px;font-weight:600;color:var(--tx);white-space:nowrap;}
 .tc small{display:block;font-size:11px;color:var(--t3);white-space:nowrap;}
 .t-last{max-width:280px;}
@@ -607,7 +609,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 .kb{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:8px;-webkit-overflow-scrolling:touch;}
 .kb-col{flex:0 0 86%;scroll-snap-align:start;background:rgba(255,255,255,.72);border:1px solid var(--bd);border-radius:14px;display:flex;flex-direction:column;min-height:240px;}
 .kb-hd{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;font-weight:700;font-size:13px;border-bottom:3px solid var(--gold);background:#fff;border-radius:14px 14px 0 0;}
-.kb-afaire .kb-hd{border-color:var(--st-afaire);}.kb-encours .kb-hd{border-color:var(--st-encours);}.kb-close .kb-hd{border-color:var(--st-close);}.kb-reseau .kb-hd{border-color:var(--st-reseau);}
+.kb-afaire .kb-hd{border-color:var(--st-afaire);}.kb-encours .kb-hd{border-color:var(--st-encours);}.kb-close .kb-hd{border-color:var(--st-close);}.kb-reseau .kb-hd{border-color:var(--st-reseau);}.kb-abandon .kb-hd{border-color:var(--st-abandon);}
 .kb-hd b{background:var(--navy3);border-radius:10px;padding:2px 9px;font-size:12px;}
 .kb-body{padding:10px;display:flex;flex-direction:column;gap:8px;flex:1;}
 .kb-col.drop .kb-body{background:rgba(18,106,60,.06);outline:2px dashed var(--gold);outline-offset:-6px;border-radius:0 0 14px 14px;}
@@ -695,7 +697,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
   .dk-v{font-size:34px;}
   .ctb{flex-direction:row;align-items:center;}
   .ctb .osearch{flex:1;min-width:220px;max-width:420px;}
-  .kb{display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));overflow-x:auto;scroll-snap-type:none;align-items:start;}
+  .kb{display:grid;grid-template-columns:repeat(5,minmax(200px,1fr));overflow-x:auto;scroll-snap-type:none;align-items:start;}
   .kb-col{max-height:calc(100vh - 190px);}
   .kb-body{overflow-y:auto;}
   .ag-tb{flex-direction:row;align-items:center;justify-content:space-between;}
@@ -755,7 +757,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
   #d-grid{grid-template-columns:minmax(0,1.55fr) minmax(340px,1fr);}
   body.drawer-open #oapp{margin-right:var(--drawer-w);}
   body.drawer-open #omo{box-shadow:-6px 0 24px rgba(18,60,35,.08);}
-  body.drawer-open .kb{grid-template-columns:repeat(4,minmax(200px,1fr));}
+  body.drawer-open .kb{grid-template-columns:repeat(5,minmax(180px,1fr));}
   #obulk{margin-left:calc(var(--side-w) / 2);}
 }
 @media (min-width:1600px){
@@ -1105,10 +1107,10 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
         <button class="ofilter-chip on" onclick="oChip(this,'')" data-val="">Tous</button>
         <button class="ofilter-chip" onclick="oChip(this,'Prospect')" data-val="Prospect">Prospects</button>
         <button class="ofilter-chip" onclick="oChip(this,'Relance en cours')" data-val="Relance en cours">Relance</button>
-        <button class="ofilter-chip" onclick="oChip(this,'Closing / Devis')" data-val="Closing / Devis">Closing</button>
-        <button class="ofilter-chip" onclick="oChip(this,'Client actif')" data-val="Client actif">Clients</button>
-        <button class="ofilter-chip" onclick="oChip(this,'Ambassadeur')" data-val="Ambassadeur">Ambassadeurs</button>
+        <button class="ofilter-chip" onclick="oChip(this,'Achat en cours')" data-val="Achat en cours">Achat en cours</button>
+        <button class="ofilter-chip" onclick="oChip(this,'Client')" data-val="Client">Clients</button>
         <button class="ofilter-chip" onclick="oChip(this,'Partenaire équipe')" data-val="Partenaire équipe">Équipe</button>
+        <button class="ofilter-chip" onclick="oChip(this,'Abandon')" data-val="Abandon">Abandon</button>
       </div>
         <div style="text-align:right;margin-top:8px"><a class="ob bgh bsm" onclick="oClearFilters()">Effacer tous les filtres</a></div>
       </div>
@@ -1371,9 +1373,8 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
             <div class="ofg">
               <div class="ofg1"><label class="ofl">Étape</label>
                 <select class="ofc" id="fc-etape">
-                  <option>Prospect</option><option>Relance en cours</option><option>Closing / Devis</option>
-                  <option>Client - Logistique</option><option>Client - Installation</option><option>Client actif</option>
-                  <option>Ambassadeur</option><option>Partenaire équipe</option><option>Inactif</option>
+                  <option>Prospect</option><option>Relance en cours</option><option>Achat en cours</option>
+                  <option>Client</option><option>Partenaire équipe</option><option>Abandon</option>
                 </select>
               </div>
               <div class="ofg1"><label class="ofl">Qualification</label>
@@ -1400,7 +1401,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
             <div class="ofg">
               <div class="ofg1"><label class="ofl">N° commande OlyLife</label><input type="text" class="ofc" id="fl-numcmd" placeholder="20260731040733959459"></div>
               <div class="ofg1"><label class="ofl">Member ID OlyLife du client</label><input type="text" class="ofc" id="fl-memberid" placeholder="EA260498"></div>
-              <div class="ofg1"><label class="ofl">Rang OlyLife</label><select class="ofc" id="fo-rang"><option value="">—</option><option>P1 - Starter</option><option>P2 - Builder</option><option>P3 - Leader</option><option>P4 - Supervisor</option><option>P5 - Pioneer</option></select></div>
+              <div class="ofg1"><label class="ofl">Rang OlyLife <span id="fo-rang-hint" style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--t3)"></span></label><select class="ofc" id="fo-rang"><option value="">—</option><option>P1 - Starter</option><option>P2 - Builder</option><option>P3 - Leader</option><option>P4 - Supervisor</option><option>P5 - Pioneer</option></select></div>
               <div class="ofg1"><label class="ofl">Commande passée sur le Back-Office de…</label><input type="text" class="ofc" id="fo-bo" list="bo-list" placeholder="Rechercher un nom ou EA…" autocomplete="off"><datalist id="bo-list"></datalist></div>
               <div class="ofg1"><label class="ofl">N° pièce d'identité (passeport / CNI)</label><input type="text" class="ofc" id="fl-idcard" placeholder="CJ2F2V566" autocomplete="off"></div>
               <div class="ofg1"><label class="ofl">Date de commande</label><input type="date" class="ofc" id="fl-datecmd"></div>
@@ -1450,7 +1451,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
         </div>
         <div style="display:flex;flex-direction:column;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--bd)">
           <button type="button" class="ob bgold bfull" id="obtn-save" onclick="oSave()">Enregistrer la fiche</button>
-          <button type="button" class="ob bgh bfull" onclick="oReset()">Annuler</button>
+          <div style="display:flex;gap:8px"><button type="button" class="ob bgh" style="flex:2" onclick="oCancelForm()">← Annuler et revenir</button><button type="button" class="ob bgh" style="flex:1" onclick="if(confirm('Vider tous les champs du formulaire ?'))oReset()">🧹 Vider</button></div>
         </div>
       </div>
     </div>
@@ -1888,8 +1889,8 @@ var LOGO_B64='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABWCAYAAAAwu5OI
 document.querySelectorAll('.wlht-logo').forEach(function(im){im.src=LOGO_B64;});
 
 // ── DONNÉES DE RÉFÉRENCE ─────────────────────────────────────────────
-var PRODUCTS=['Tera-P90+ (PEMF/Terahertz)','Frost Age (soin visage)','Revitaluxe (massage)','Shaken Massager (ceinture abdo)','Galaxy G-One (yeux)','Vitality Wand (douleurs ciblées)','Bama Air','SkyLine','SpringWater'];
-var ETAPE_BADGE={'Prospect':'bbl','Relance en cours':'bor','Closing / Devis':'bgo','Client - Logistique':'baq','Client - Installation':'baq','Client actif':'bgr','Ambassadeur':'bgo','Partenaire équipe':'bpu','Inactif':'bgy'};
+var PRODUCTS=['Tera-P90+ (PEMF/Terahertz)','Tera-P90 (PEMF/Terahertz)','Frost Age (soin visage)','Revitaluxe (massage)','Shaken Massager (ceinture abdo)','Galaxy G-One (yeux)','Vitality Wand (douleurs ciblées)','Bama Air','SkyLine','SpringWater'];
+var ETAPE_BADGE={'Prospect':'bbl','Relance en cours':'bor','Achat en cours':'bgo','Client':'bgr','Partenaire équipe':'bpu','Abandon':'bgy','Closing / Devis':'bgo','Client - Logistique':'baq','Client - Installation':'baq','Client actif':'bgr','Ambassadeur':'bgo','Inactif':'bgy'};
 var QUALIF_BADGE={'Chaud':'brd','Tiède':'bor','Froid':'bgy'};
 var RELANCE_STEPS=[{k:'j2',d:2,l:'J+2 — 1er rappel'},{k:'j5',d:5,l:'J+5 — 2e rappel'},{k:'j12',d:12,l:'J+12 — dernier rappel'}];
 var SEUIL_LOGISTIQUE=5;
@@ -1900,7 +1901,7 @@ var DELAI_TEMOIGNAGE=30;
 var GAS_URL='',CODE='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.10 · 08/10';
+var APP_VERSION='v3.11 · 09/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -1943,7 +1944,7 @@ function oSyncDot(s){var d=document.getElementById('osync-dot');if(!d)return;d.c
 
 // ── CACHE LOCAL (lecture hors ligne) ────────────────────────────────
 function cacheKey(){return'owlht2_cache_'+(CODE||'x');}
-function oLoadCache(){try{var s=localStorage.getItem(cacheKey());if(s){var d=JSON.parse(s);OC=d.contacts||[];USER=d.user||USER;CFG=d.config||CFG;USERS=d.users||USERS;}}catch(e){}}
+function oLoadCache(){try{var s=localStorage.getItem(cacheKey());if(s){var d=JSON.parse(s);OC=d.contacts||[];USER=d.user||USER;CFG=d.config||CFG;USERS=d.users||USERS;normAll();}}catch(e){}}
 function oSaveCache(){try{localStorage.setItem(cacheKey(),JSON.stringify({contacts:OC,user:USER,config:CFG,users:USERS}));}catch(e){}}
 
 // ── CONNEXION / LECTURE ─────────────────────────────────────────────
@@ -1985,7 +1986,7 @@ function oPull(){
         throw new Error(d.error||'?');
       }
       USER=d.user;
-      OC=d.contacts||[];OC.forEach(function(c){if(!c.actions)c.actions={};if(!c.produits)c.produits=[];});
+      OC=d.contacts||[];OC.forEach(function(c){if(!c.actions)c.actions={};if(!c.produits)c.produits=[];});normAll();
       CFG=d.config||{referents:[],suiveurs:[]};
       if(d.users)USERS=d.users;
       oSaveCache();oHideLogin();oSyncDot('ok');
@@ -2141,13 +2142,14 @@ function populateRefUI(){
   var refs=CFG.referents||[];
   var suiv=CFG.suiveurs||[];
   // select "Référé par" (+ membres équipe)
-  var allParrains=refs.slice();
-  USERS.forEach(function(u){if(u.nom&&allParrains.indexOf(u.nom)<0)allParrains.push(u.nom);});
+  var allParrains=parrainOptions();
   var refSel=document.getElementById('fc-ref');
   if(refSel){
+    var curRef=refSel.value;
     refSel.innerHTML='<option value="">— Choisir un parrain / une marraine —</option>'
       +allParrains.map(function(x){return'<option value="'+esc(x)+'">'+esc(x)+'</option>';}).join('')
       +'<option value="__autre__">✏️ Autre (saisir…)</option>';
+    keepRefValue(refSel,curRef);
   }
   // select suivi par (formulaire)
   var s=document.getElementById('fc-suivi');
@@ -2208,24 +2210,36 @@ function oRefSelectChange(sel){
     autreInp.value='';
   }
 }
+// Un parrain = une personne : le tag (ex. « DrThierry ») et l'accès CRM (« Dr Thierry Gil ») ne font qu'une entrée
+function userOfTag(tag){return USERS.find(function(u){return u.actif!==false&&(u.tags||[]).indexOf(tag)>=0;});}
+function parrainOptions(){
+  var out=[];
+  USERS.forEach(function(u){if(u.actif!==false&&u.nom&&out.indexOf(u.nom)<0)out.push(u.nom);});
+  (CFG.referents||[]).forEach(function(t){if(!userOfTag(t)&&out.indexOf(t)<0)out.push(t);});
+  return out;
+}
+function keepRefValue(sel,cur){
+  if(!cur)return;
+  for(var i=0;i<sel.options.length;i++){if(sel.options[i].value===cur){sel.value=cur;return;}}
+  var o=document.createElement('option');o.value=cur;o.textContent=cur;sel.insertBefore(o,sel.lastElementChild);sel.value=cur;
+}
 function updateRefListByTags(selTags){
   var sel=document.getElementById('fc-ref');
   if(!sel)return;
+  var cur=sel.value==='__autre__'?'':sel.value;
   var optBase='<option value="">— Choisir un parrain / une marraine —</option>';
   if(!selTags||!selTags.length){
-    // pas de tag sélectionné → liste complète
-    var refs=CFG.referents||[];
-    var allParrains=refs.slice();
-    USERS.forEach(function(u){if(u.nom&&allParrains.indexOf(u.nom)<0)allParrains.push(u.nom);});
-    sel.innerHTML=optBase+allParrains.map(function(x){return'<option value="'+esc(x)+'">'+esc(x)+'</option>';}).join('')+'<option value="__autre__">✏️ Autre (saisir…)</option>';
-    document.getElementById('fc-ref-autre').style.display='none';
+    sel.innerHTML=optBase+parrainOptions().map(function(x){return'<option value="'+esc(x)+'">'+esc(x)+'</option>';}).join('')+'<option value="__autre__">✏️ Autre (saisir…)</option>';
+    keepRefValue(sel,cur);
+    if(sel.value!=='__autre__')document.getElementById('fc-ref-autre').style.display='none';
     return;
   }
   // tag(s) sélectionné(s) → filtre sur les membres de cette équipe
   var membres=[];
   selTags.forEach(function(tag){
-    // le référent lui-même en premier
-    if(membres.indexOf(tag)<0)membres.push(tag);
+    // le référent lui-même en premier (sous son nom d'accès s'il en a un)
+    var ut=userOfTag(tag);var refNom=ut?ut.nom:tag;
+    if(membres.indexOf(refNom)<0)membres.push(refNom);
     // contacts déjà enregistrés avec ce tag (downline)
     OC.forEach(function(c){
       if(c.ctags&&c.ctags.indexOf(tag)>=0){
@@ -2243,8 +2257,8 @@ function updateRefListByTags(selTags){
     +membres.map(function(x){return'<option value="'+esc(x)+'">'+esc(x)+'</option>';}).join('')
     +'</optgroup>'
     +'<option value="__autre__">✏️ Autre (saisir…)</option>';
-  sel.value='';
-  document.getElementById('fc-ref-autre').style.display='none';
+  sel.value='';keepRefValue(sel,cur);
+  if(sel.value!=='__autre__')document.getElementById('fc-ref-autre').style.display='none';
 }
 
 // ── ADMIN : référents ───────────────────────────────────────────────
@@ -3130,12 +3144,26 @@ var STATUT_DEF={
   afaire:{l:'À contacter',ic:'🔴',ord:0},
   encours:{l:'En cours',ic:'🟡',ord:1},
   close:{l:'Prêt à closer',ic:'🟢',ord:2},
-  reseau:{l:'Dans le réseau',ic:'🌳',ord:3}
+  reseau:{l:'Dans le réseau',ic:'🌳',ord:3},
+  abandon:{l:'Abandon',ic:'⚫',ord:4}
 };
+// Étape pipeline ↔ statut de suivi (une seule logique, même couleur)
+var ST2ET={afaire:'Prospect',encours:'Relance en cours',close:'Achat en cours',reseau:'Client',abandon:'Abandon'};
+var ET2ST={'Prospect':'afaire','Relance en cours':'encours','Achat en cours':'close','Client':'reseau','Partenaire équipe':'reseau','Abandon':'abandon'};
+var ET_LEGACY={'Closing / Devis':'Achat en cours','Client - Logistique':'Client','Client - Installation':'Client','Client actif':'Client','Ambassadeur':'Client','Inactif':'Abandon','Client potentiel':'Prospect','Prospect réseau':'Prospect','Suivi':'Relance en cours','Relance':'Relance en cours'};
+function normEtape(e){e=e||'Prospect';return ET_LEGACY[e]||(ET2ST[e]?e:'Prospect');}
+function normAll(){OC.forEach(function(c){var ne=normEtape(c.etape);if(ne!==c.etape)c.etape=ne;if(!c.statut&&(ne==='Client'||ne==='Achat en cours'||ne==='Abandon'||ne==='Partenaire équipe'))c.statut=ET2ST[ne];});}
+function statutInfo(c){
+  var who=c.statutPar,when=c.statutLe;
+  if(!who){var e=(c.journal||[]).filter(function(x){return x.type==='statut';}).pop();if(e){who=e.auteur;when=e.ts;}}
+  if(!who)return'<div class="st-info">Statut par défaut — personne ne l\'a encore choisi. Touchez une couleur pour le fixer.</div>';
+  var d=new Date(when);return'<div class="st-info">'+STATUT_DEF[cStatut(c)].ic+' <b>'+esc(STATUT_DEF[cStatut(c)].l)+'</b> · étape « '+esc(c.etape||ST2ET[cStatut(c)])+' » — choisi par <b>'+esc(who)+'</b> le '+(isNaN(d)?esc(when||''):d.toLocaleDateString('fr-FR')+' à '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2))+'</div>';
+}
 // Statut effectif : rouge par défaut tant qu'aucune action n'a été validée
 function cStatut(c){
   if(c.statut&&STATUT_DEF[c.statut])return c.statut;
   if(c.estPartenaire||c.etape==='Partenaire équipe')return'reseau';
+  if(ET2ST[c.etape]&&c.etape!=='Prospect'&&c.etape!=='Relance en cours')return ET2ST[c.etape];
   if(c.journal&&c.journal.length)return'encours';
   return'afaire';
 }
@@ -3260,8 +3288,10 @@ function oSetStatut(id,st){
   var c=OC.find(function(x){return x.id===id;});if(!c||!STATUT_DEF[st])return;
   var old=cStatut(c);if(old===st)return;
   if(st==='afaire'&&!confirm('Remettre ce contact en « À contacter » ?'))return;
-  c.statut=st;jrnAdd(c,'statut','Statut : '+STATUT_DEF[old].l+' → '+STATUT_DEF[st].l);
-  if(st==='reseau'&&!c.estPartenaire){c.estPartenaire=true;c.etape='Partenaire équipe';}
+  c.statut=st;c.statutPar=PARTNER_NOM();c.statutLe=new Date().toISOString();
+  var newEt=(st==='reseau'&&(c.estPartenaire||c.etape==='Partenaire équipe'))?'Partenaire équipe':ST2ET[st];
+  jrnAdd(c,'statut','Statut : '+STATUT_DEF[old].l+' → '+STATUT_DEF[st].l+(newEt!==c.etape?' · étape '+newEt:''));
+  c.etape=newEt;
   oPush([c]);if(document.getElementById('omo').classList.contains('on'))oOpenF(id);oRefresh();oT(STATUT_DEF[st].ic+' '+STATUT_DEF[st].l,'s');
 }
 function oRappelDone(id){
@@ -3507,7 +3537,7 @@ function oOpenF(id){
     '<div style="background:linear-gradient(135deg,#FFFFFF,var(--navy3));border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:12px;display:flex;align-items:center;gap:14px">'
       +'<div class="om-av" title="Photo du contact" onclick="oContactPhoto(\''+id+'\')" style="width:52px;height:52px;border-radius:50%;background:var(--goldp);color:var(--gold);font-family:Cormorant Garamond,serif;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+cAv(c)+'<span class="cam">📷</span></div>'
       +'<div style="min-width:0"><div style="font-family:Cormorant Garamond,serif;font-size:18px;font-weight:700;color:var(--tx)">'+c.nom+' '+c.prenom+'</div>'
-      +'<div style="font-size:11px;color:var(--t3);margin-top:2px">'+(c.pays||'')+(c.ville?' · '+c.ville:'')+(c.memberIdOlyLife?' · '+esc(c.memberIdOlyLife):'')+'</div>'
+      +'<div style="font-size:11px;color:var(--t3);margin-top:2px">'+(c.pays||'')+(c.ville?' · '+c.ville:'')+(c.memberIdOlyLife?' · '+esc(c.memberIdOlyLife):'')+(c.refere?' · 🤝 parrain : <b style="color:var(--t2)">'+esc(c.refere)+'</b>':'')+(c.achatsUSD?' · 💵 '+esc(String(c.achatsUSD))+' USD d\'achats':'')+'</div>'
       +'<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px">'+eBdg(c.etape)+' '+qBdg(c.qualification)+rangBdg(c)+(c.essaiOk?'<span class="obdg baq">🗺️ essai possible</span>':'')+'</div></div>'
     +'</div>'
     +'<div style="display:flex;gap:8px;margin-bottom:14px">'
@@ -3518,7 +3548,7 @@ function oOpenF(id){
     +'</div>'
     +'<div class="od-section"><div class="od-sec-ttl">Suivi du contact</div><div style="padding:12px 16px">'
       +(isRef?'<div style="margin-bottom:12px">'+stBdg(c)+(c.suiviPar?' <span class="obdg baq">👤 suivi par '+esc(c.suiviPar)+'</span>':' <span class="obdg bgy">pas encore pris en charge</span>')+'</div>'
-             :'<div class="st-pick">'+Object.keys(STATUT_DEF).map(function(k){return'<button type="button" class="'+k+(cStatut(c)===k?' on':'')+'" onclick="oSetStatut(\''+id+'\',\''+k+'\')"><span>'+STATUT_DEF[k].ic+'</span>'+STATUT_DEF[k].l+'</button>';}).join('')+'</div>')
+             :'<div class="st-pick">'+Object.keys(STATUT_DEF).map(function(k){return'<button type="button" class="'+k+(cStatut(c)===k?' on':'')+'" onclick="oSetStatut(\''+id+'\',\''+k+'\')"><span>'+STATUT_DEF[k].ic+'</span>'+STATUT_DEF[k].l+'</button>';}).join('')+'</div>'+statutInfo(c))
       +rapBox(c,true)
       +rdvBox(c)
       +'<button class="ob bgold bfull" style="min-height:48px" onclick="oOpenSuivi(\''+id+'\')">📞 Valider un contact / ajouter une observation</button>'
@@ -3591,6 +3621,7 @@ function oEdit(id){
   document.getElementById('ft-autorise').checked=!!c.temoignageAutorise;
   document.getElementById('fe-partenaire').checked=!!c.estPartenaire;
   document.getElementById('fo-essai').checked=!!c.essaiOk;
+  var rh=document.getElementById('fo-rang-hint');if(rh){var est=rangFromUSD(c.achatsUSD||c.montantUSD);rh.textContent=est?'— estimé d\'après '+(c.achatsUSD||c.montantUSD)+' USD d\'achats : '+est:'';if(est&&!c.rangOly)document.getElementById('fo-rang').value=est;}
   oSetFact(!!(c.factAdresse||c.factCp||c.factVille||c.factPays));
   oTEQ();
   document.querySelectorAll('.oprd').forEach(function(p){var cb=p.querySelector('input');cb.checked=(c.produits||[]).indexOf(cb.value)>=0;p.classList.toggle('on',cb.checked);});
@@ -3607,7 +3638,7 @@ function oReset(){
   document.getElementById('fc-ctags').value='';renderCtagsChips();
   document.getElementById('fe-cote').value='';document.getElementById('fe-rang').value='';
   document.getElementById('fi-confirm').checked=false;document.getElementById('ft-autorise').checked=false;document.getElementById('fe-partenaire').checked=false;
-  document.getElementById('fo-essai').checked=false;document.getElementById('fo-rang').value='';
+  document.getElementById('fo-essai').checked=false;document.getElementById('fo-rang').value='';var rh0=document.getElementById('fo-rang-hint');if(rh0)rh0.textContent='';
   oSetFact(false);
   oTEQ();
   document.querySelectorAll('.oprd').forEach(function(p){p.classList.remove('on');p.querySelector('input').checked=false;});
@@ -3653,6 +3684,10 @@ function oSave(){
   };
   data.suiviPar=data.suivis.join(', ');
   if(!EID)data.createdBy=PARTNER_NOM();
+  var prevC=EID?OC.find(function(x){return x.id===EID;}):null;
+  if(!prevC||prevC.etape!==data.etape){data.statut=ET2ST[data.etape]||(prevC?prevC.statut:undefined);data.statutPar=PARTNER_NOM();data.statutLe=new Date().toISOString();}
+  // le parrain choisi est un membre de l'équipe avec un tag → la fiche rejoint son équipe
+  if(!data.ctags.length&&data.refere){var pu=USERS.find(function(u){return u.nom===data.refere&&u.tags&&u.tags.length;});if(pu)data.ctags=[pu.tags[0]];}
   var saved;
   var eid=document.getElementById('fc-eid').value;
   if(eid){var idx=OC.findIndex(function(x){return x.id===eid;});if(idx>=0){OC[idx]=Object.assign({},OC[idx],data);saved=OC[idx];oT(data.prenom+' '+data.nom+' mis à jour !','s');}}
@@ -3717,6 +3752,9 @@ function looksOlyOrder(text){
   return m>=3; // page BO partielle (copiée sans l'en-tête) : on la traite quand même en UNE fiche
 }
 function deEnt(x){return String(x||'').replace(/&ccedil;/gi,'ç').replace(/&eacute;/gi,'é').replace(/&egrave;/gi,'è').replace(/&ecirc;/gi,'ê').replace(/&agrave;/gi,'à').replace(/&ocirc;/gi,'ô').replace(/&icirc;/gi,'î').replace(/&ugrave;/gi,'ù').replace(/&amp;/gi,'&').replace(/&#(\d+);/g,function(_,n){return String.fromCharCode(+n);});}
+// Seuils OlyLife (achats cumulés, USD) : P2 Builder ≥ 500 · P3 Leader ≥ 1000 · P4 Supervisor ≥ 2000 · P5 Pioneer ≥ 6000 (P1 Starter non disponible)
+function rangFromUSD(u){u=+u||0;if(u>=6000)return'P5 - Pioneer';if(u>=2000)return'P4 - Supervisor';if(u>=1000)return'P3 - Leader';if(u>=500)return'P2 - Builder';if(u>0)return'P1 - Starter';return'';}
+function rangNum(r){var m=String(r||'').match(/P([1-5])/i);return m?+m[1]:0;}
 var RANG_OLY={p1:'P1 - Starter',p2:'P2 - Builder',p3:'P3 - Leader',p4:'P4 - Supervisor',p5:'P5 - Pioneer',starter:'P1 - Starter',builder:'P2 - Builder',leader:'P3 - Leader',supervisor:'P4 - Supervisor',pioneer:'P5 - Pioneer'};
 function parseOlyOrders(text){
   text=deEnt(text);
@@ -3763,8 +3801,8 @@ function parseOlyOrders(text){
       var name=m[2].replace(/^olylife\s*/i,'').replace(/^image\s+/i,'').trim();
       prodTxt.push(m[4]+'× '+name+' ('+m[3]+' USD)');
       var key=name.toLowerCase().replace(/[\s\-]/g,'');
-      PRODUCTS.forEach(function(P){var pk=P.toLowerCase().split('(')[0].replace(/[\s\-+]/g,'');if(pk&&(key.indexOf(pk)>=0||pk.indexOf(key)>=0)&&prods.indexOf(P)<0)prods.push(P);});
-      if(/p90/i.test(name)&&prods.indexOf(PRODUCTS[0])<0)prods.push(PRODUCTS[0]);
+      if(/p90/i.test(name)){var P90=/p90\s*\+|p90plus/i.test(name)?'Tera-P90+ (PEMF/Terahertz)':'Tera-P90 (PEMF/Terahertz)';if(prods.indexOf(P90)<0)prods.push(P90);}
+      else PRODUCTS.forEach(function(P){if(/p90/i.test(P))return;var pk=P.toLowerCase().split('(')[0].replace(/[\s\-+]/g,'');if(pk&&(key.indexOf(pk)>=0||pk.indexOf(key)>=0)&&prods.indexOf(P)<0)prods.push(P);});
     });
     // Transporteur + tracking + date de livraison (tableau « Delivery information »)
     var transporteur='',tracking=[],dLivr='';
@@ -3791,11 +3829,13 @@ function parseOlyOrders(text){
     if(!member){var mea=bl.join(' ').match(/\b((?:EA|AF)\d{5,})\b/i);if(mea)member=mea[1];}
     if(!nomC&&destinataire)nomC=destinataire;
     var dateCmd=/^\d{8}/.test(num)?num.slice(0,4)+'-'+num.slice(4,6)+'-'+num.slice(6,8):'';
+    var montantUSD=parseFloat(String(montant||'').replace(/[^\d.,]/g,'').replace(',','.'))||0;
+    if(!rang&&montantUSD)rang=rangFromUSD(montantUSD);
     if(dLivr&&dLivr===dateCmd)dLivr='';
     var notes=['Commande OlyLife n°'+num+(dateCmd?' du '+fD(dateCmd):''),montant?'Montant : '+montant+' USD':'',type?'Type : '+type:'',stCmd?'Statut commande : '+stCmd:'',prodTxt.length?'Produits : '+prodTxt.join(', '):'',adr?'Livraison : '+adr:'',destinataire&&destinataire!==nomC?'Destinataire : '+destinataire:'',rem?'Remarque : '+rem:''].filter(Boolean).join('\n');
     var livNom=(destinataire&&destinataire.replace(/\s+/g,' ').toLowerCase()!==nomC.replace(/\s+/g,' ').toLowerCase())?destinataire:'';
     var livTel=(recipTel&&normPhone(recipTel)!==normPhone(tel))?normPhone(recipTel):'';
-    return{nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,livNom:livNom,livTel:livTel,numCommande:num,memberIdOlyLife:(member||'').toUpperCase(),pieceId:idcard,dateCommande:dateCmd,transporteur:transporteur,tracking:tracking.join(' / '),dateLivraison:dLivr,rangOly:rang,produits:prods,etape:'Client - Logistique',qualification:'Chaud',statut:'close',notes:notes,_src:'olylife'};
+    return{nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,livNom:livNom,livTel:livTel,numCommande:num,memberIdOlyLife:(member||'').toUpperCase(),pieceId:idcard,dateCommande:dateCmd,transporteur:transporteur,tracking:tracking.join(' / '),dateLivraison:dLivr,rangOly:rang,montantUSD:montantUSD,achatsUSD:montantUSD,produits:prods,etape:'Client',qualification:'Chaud',statut:'reseau',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olylife'};
   }).filter(function(x){return x.nom||x.tel||x.numCommande;});
 }
 function parseCSV(text){
@@ -3833,7 +3873,7 @@ function impFindExisting(it){
 }
 var IMP_FLBL={tel:'téléphone',email:'e-mail',pays:'pays',ville:'ville',adresse:'adresse livraison',cp:'code postal',livNom:'destinataire livraison',livTel:'tél. livraison',factAdresse:'adresse facturation',numCommande:'n° commande',memberIdOlyLife:'ID membre',pieceId:'pièce d\'identité',tracking:'n° de tracking',transporteur:'transporteur',dateLivraison:'date de livraison',dateCommande:'date de commande',rangOly:'rang OlyLife',refere:'référent',suiviPar:'suivi par',produits:'produits',notes:'notes de commande',statut:'statut',etape:'étape'};
 var IMP_SKIP={id:1,createdAt:1,createdBy:1,journal:1,actions:1,rdvs:1,avances:1,suivis:1,geo:1,qualification:1,canal:1,registre:1,referentId:1,referentNom:1,_src:1,_state:1,_exid:1};
-var IMP_FORCE={tracking:1,transporteur:1,dateLivraison:1,rangOly:1,numCommande:1,dateCommande:1,memberIdOlyLife:1};
+var IMP_FORCE={tracking:1,transporteur:1,dateLivraison:1,numCommande:1,dateCommande:1,memberIdOlyLife:1,montantUSD:1};
 function impDiff(it,ex){
   var news=[],known=[];
   Object.keys(it).forEach(function(k){
@@ -3906,7 +3946,7 @@ function oImpGo(){
     delete item._src;delete item._state;
     var existing=impFindExisting(item);
     if(existing){
-      var adds=[];
+      var adds=[],prevNum=existing.numCommande;
       Object.keys(item).forEach(function(k){
         if(IMP_SKIP[k]||item[k]==null||item[k]==='')return;
         if(k==='notes'){
@@ -3922,6 +3962,11 @@ function oImpGo(){
         else if(IMP_FORCE[k]&&String(existing[k])!==String(item[k])){existing[k]=item[k];adds.push((IMP_FLBL[k]||k)+' (mis à jour)');}
       });
       if(!existing.actions)existing.actions={};if(!existing.produits)existing.produits=[];
+      if(item.numCommande){
+        if(item.montantUSD){var cum=(prevNum&&prevNum!==item.numCommande)?(+existing.achatsUSD||+existing.montantUSD||0)+item.montantUSD:Math.max(+existing.achatsUSD||0,item.montantUSD);if(cum!==existing.achatsUSD){existing.achatsUSD=cum;adds.push('achats cumulés');}
+          var rr=rangFromUSD(cum);if(rr&&rangNum(rr)>rangNum(existing.rangOly)){existing.rangOly=rr;adds.push('rang '+rr);}}
+        if(existing.statut!=='reseau'&&existing.etape!=='Partenaire équipe'){existing.statut='reseau';existing.etape='Client';existing.statutPar=PARTNER_NOM();existing.statutLe=new Date().toISOString();adds.push('statut → Dans le réseau (commande payée)');}
+      }
       if(adds.length){
         jrnAdd(existing,'systeme','Import : fiche complétée — '+adds.filter(function(v,i,a){return a.indexOf(v)===i;}).join(', '));
         changed.push(existing);updated++;
@@ -3977,6 +4022,7 @@ function rel(ts){
   if(s<86400*30)return'il y a '+Math.floor(s/86400)+' j';return fD(ts);
 }
 function oNew(){oReset();oSw('nouvelle');}
+function oCancelForm(){var id=EID;oReset();oSw('contacts');if(id){setTimeout(function(){oOpenF(id);},60);}}
 
 // ── Navigation ─────────────────────────────────────────────────────
 function oSw(v){
@@ -4161,7 +4207,7 @@ function renderNotifs(){
   return g;
 }
 function renderFunnel(n,tot){
-  var cols={afaire:'var(--st-afaire)',encours:'var(--st-encours)',close:'var(--st-close)',reseau:'var(--st-reseau)'};
+  var cols={afaire:'var(--st-afaire)',encours:'var(--st-encours)',close:'var(--st-close)',reseau:'var(--st-reseau)',abandon:'var(--st-abandon)'};
   var keys=['afaire','encours','close','reseau'];
   var traites=tot?Math.round((tot-n.afaire)/tot*100):0;
   document.getElementById('d-funnel-b').innerHTML=(tot?'<div class="fn-bar">'+keys.map(function(k){return n[k]?'<span style="width:'+(n[k]/tot*100)+'%;background:'+cols[k]+'" title="'+STATUT_DEF[k].l+' : '+n[k]+'"></span>':'';}).join('')+'</div>':'')
@@ -4381,7 +4427,7 @@ function oPipe(){
   document.querySelectorAll('#pvue button').forEach(function(b){b.classList.toggle('on',(b.getAttribute('data-v')||'')===ACTIVE_VUE);});
   document.getElementById('pvue').classList.toggle('hide',ROLE()==='referent');
   document.getElementById('kb-hint').textContent=ROLE()==='referent'?'Suivi de vos contacts par étape — touchez une carte pour voir le détail.':(isDesk()?'Glissez une carte d\'une colonne à l\'autre pour changer son statut · clic droit = menu rapide.':'Faites défiler les colonnes · appui long sur une carte = changer son statut.');
-  document.getElementById('kb').innerHTML=['afaire','encours','close','reseau'].map(function(st){
+  document.getElementById('kb').innerHTML=['afaire','encours','close','reseau','abandon'].map(function(st){
     var cs=l.filter(function(c){return cStatut(c)===st;}).sort(stSort);
     return'<div class="kb-col kb-'+st+'" data-st="'+st+'" ondragover="oKbOver(event,this)" ondragleave="this.classList.remove(\'drop\')" ondrop="oKbDrop(event,this)">'
       +'<div class="kb-hd"><span>'+STATUT_DEF[st].ic+' '+STATUT_DEF[st].l+'</span><b>'+cs.length+'</b></div>'
@@ -5016,7 +5062,7 @@ function oReqSend(kind){
     var ex=OC.find(function(c){return(t9&&t9.length>=9&&tel9(c.tel)===t9)||(nm&&(c.nom||'').trim().toUpperCase()===nm.toUpperCase()&&prem(c.prenom)===prem(pr));});
     if(ex){jrnAdd(ex,'note','📨 Demande d\'infos d\'inscription OlyLife envoyée');oPush([ex]);}
     else{
-      var nc={id:'c_'+Date.now(),createdAt:new Date().toISOString().split('T')[0],actions:{},produits:[],nom:(nm||'?').toUpperCase(),prenom:pr,tel:tel,etape:'Closing / Devis',qualification:'Chaud',canal:'WhatsApp',registre:'pro',statut:'encours',referentId:PARTNER_ID,referentNom:PARTNER_NOM(),createdBy:PARTNER_NOM()};
+      var nc={id:'c_'+Date.now(),createdAt:new Date().toISOString().split('T')[0],actions:{},produits:[],nom:(nm||'?').toUpperCase(),prenom:pr,tel:tel,etape:'Achat en cours / Devis',qualification:'Chaud',canal:'WhatsApp',registre:'pro',statut:'encours',referentId:PARTNER_ID,referentNom:PARTNER_NOM(),createdBy:PARTNER_NOM()};
       jrnAdd(nc,'note','📨 Demande d\'infos d\'inscription OlyLife envoyée');
       OC.unshift(nc);oPush([nc]);
     }
