@@ -401,6 +401,28 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .chk-list{display:flex;flex-wrap:wrap;gap:6px;}
 .chk-list label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--bd);border-radius:20px;padding:5px 10px;font-size:12px;background:#fff;cursor:pointer;}
 .chk-list label.on{border-color:var(--gold);background:var(--goldp);color:var(--gold);font-weight:600;}
+/* ── SÉCURITÉ (v3.12) : bandeau MAJ, verrou PIN, sessions ─────────── */
+#oupd{display:none;position:fixed;left:50%;bottom:calc(var(--bottom-nav,64px) + 12px);transform:translateX(-50%);z-index:9000;background:#1E2B23;color:#fff;border-radius:30px;padding:10px 16px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.3);align-items:center;gap:10px;max-width:calc(100vw - 24px);}
+#oupd.on{display:flex;}
+#oupd button{background:var(--gold);color:#fff;border:none;border-radius:20px;padding:7px 14px;font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap;}
+#olock{display:none;position:fixed;inset:0;z-index:9500;background:linear-gradient(160deg,#0F3B22,#1E6B3A);color:#fff;align-items:center;justify-content:center;padding:24px;}
+#olock.on{display:flex;}
+.lock-card{width:100%;max-width:340px;text-align:center;}
+.lock-card .big{font-size:44px;margin-bottom:8px;}
+.lock-dots{display:flex;justify-content:center;gap:12px;margin:18px 0;}
+.lock-dots i{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.7);display:block;}
+.lock-dots i.on{background:#fff;}
+.lock-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:260px;margin:0 auto;}
+.lock-pad button{height:58px;border-radius:16px;border:none;background:rgba(255,255,255,.12);color:#fff;font-size:22px;font-weight:600;cursor:pointer;}
+.lock-pad button:active{background:rgba(255,255,255,.3);}
+.lock-link{background:none;border:none;color:rgba(255,255,255,.75);font-size:12.5px;margin-top:16px;cursor:pointer;text-decoration:underline;}
+.sess-it{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd);font-size:12.5px;}
+.sess-it:last-child{border-bottom:none;}
+.sess-it .b{flex:1;min-width:0;}
+.sess-it small{display:block;color:var(--t3);font-size:11px;}
+.adm-log{font-size:12px;line-height:1.5;max-height:60vh;overflow:auto;}
+.adm-log div{padding:6px 0;border-bottom:1px dashed var(--bd);}
+.adm-log b{color:var(--gold);}
 /* ── FULL-SCREEN MODAL ───────────────────────────────────────────── */
 #omo,#oimp,#oavs,#oreq,#ostk{display:none;position:fixed;inset:0;background:rgba(246,250,246,.86);backdrop-filter:blur(3px);z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 #omo.on,#oimp.on,#oavs.on,#oreq.on,#ostk.on{display:block;}
@@ -920,7 +942,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
   <div class="os-card">
     <div class="os-hd">
       <div class="os-hd-ttl"><img class="wlht-logo" alt="" style="height:22px;width:auto;vertical-align:-4px;margin-right:6px"> CRM OlyLife — WLHT</div>
-      <div class="os-hd-sub">Connexion — chaque membre de l'équipe a son propre code d'accès <span style="opacity:.6;font-size:10px" id="ol-version"></span></div>
+      <div class="os-hd-sub">Connexion — chaque membre de l'équipe a son propre code d'accès. Il n'est demandé qu'une fois par appareil. <span style="opacity:.6;font-size:10px" id="ol-version"></span></div>
     </div>
     <div class="os-bd">
       <div id="ol-url-wrap">
@@ -1201,6 +1223,8 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
           <button class="ob bsm" style="background:var(--pu);color:#fff;border:none;min-height:40px" onclick="oOpenImport()">⇪ Importer des contacts</button>
           <button class="ob bsm" style="background:#C63E47;color:#fff;border:none;min-height:40px" onclick="oDedup(true)">🧹 Supprimer les doublons</button>
           <button class="ob bsm" style="background:#E8A020;color:#fff;border:none;min-height:40px" onclick="oCleanupParasites()">🧽 Nettoyer les fiches d'import raté</button>
+          <button class="ob bsm bgh" style="min-height:40px" onclick="oBackups()">💾 Sauvegardes / restauration</button>
+          <button class="ob bsm bgh" style="min-height:40px" onclick="oAdminLog()">📜 Journal d'administration</button>
           <span style="font-size:11px;color:var(--t3);margin-left:auto" id="eq-version"></span>
         </div>
         <div id="eq-user-form" style="display:none;padding:14px 16px;border-top:1px solid var(--bd);background:var(--navy3)">
@@ -1217,6 +1241,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
             </div>
             <div class="ofg2" style="gap:10px"><div><label class="ofl">Téléphone / WhatsApp</label><input type="tel" class="ofc" id="u-tel" placeholder="+33 6 00 00 00 00"></div><div><label class="ofl">E-mail (profil)</label><input type="email" class="ofc" id="u-email" placeholder="prenom@gmail.com"></div></div>
             <div class="ofg1"><label class="ofl">Tags référent associés (séparés par des virgules)</label><input type="text" class="ofc" id="u-tags" list="ref-list" placeholder="Sophie"></div>
+            <div class="ofg1" id="u-scope-wrap"><label class="ofl">Périmètre (gestionnaire)</label><select class="ofc" id="u-scope"><option value="all">Voit tous les contacts du CRM</option><option value="equipes">Voit seulement ses équipes (tags) et les contacts qu'il suit</option></select></div>
             <div class="ofg1"><label class="ofl">Code d'accès</label>
               <div style="display:flex;gap:8px"><input type="text" class="ofc" id="u-code" placeholder="A7K2MN" style="flex:1;font-family:monospace;letter-spacing:2px"><button class="ob bgh" onclick="oGenCode()" type="button">🎲</button></div>
             </div>
@@ -1738,6 +1763,13 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <div class="oinst-note" id="oprof-note" style="margin-top:10px"></div>
     <button class="ob bgold bfull" style="margin-top:14px;min-height:48px" onclick="oProfSave()">Enregistrer mon profil</button>
     <button class="ob bgh bfull" style="margin-top:8px" type="button" onclick="oProfClose();oShowSetup()">⚙️ Résumé quotidien · Calendly → Réglages</button>
+    <div style="margin-top:16px;padding:12px;background:var(--navy3);border-radius:12px;border:1px solid var(--bd)">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">🔐 Sécurité de cet appareil</div>
+      <div id="oprof-pin-row" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px"></div>
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin:12px 0 6px">📱 Mes appareils connectés</div>
+      <div id="oprof-sess"></div>
+      <div style="font-size:11px;color:var(--t3);margin-top:6px">Votre code d'accès n'est demandé qu'une fois par appareil ; une session expire après 30 jours sans utilisation. Téléphone perdu ? Déconnectez-le ici ou demandez à l'administrateur.</div>
+    </div>
   </div>
 </div>
 
@@ -1878,6 +1910,22 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 </div>
 
 <div id="otc"></div>
+<div id="oupd">🔄 Nouvelle version disponible<button onclick="oUpdateNow()">Mettre à jour</button></div>
+<div id="olock">
+  <div class="lock-card">
+    <div class="big">🔒</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700">CRM OlyLife</div>
+    <div style="font-size:13px;opacity:.8;margin-top:4px" id="olock-sub">Saisissez votre code PIN</div>
+    <div class="lock-dots" id="olock-dots"><i></i><i></i><i></i><i></i></div>
+    <div class="lock-pad">
+      <button onclick="oPinKey('1')">1</button><button onclick="oPinKey('2')">2</button><button onclick="oPinKey('3')">3</button>
+      <button onclick="oPinKey('4')">4</button><button onclick="oPinKey('5')">5</button><button onclick="oPinKey('6')">6</button>
+      <button onclick="oPinKey('7')">7</button><button onclick="oPinKey('8')">8</button><button onclick="oPinKey('9')">9</button>
+      <button onclick="oPinKey('⌫')" style="font-size:18px">⌫</button><button onclick="oPinKey('0')">0</button><button onclick="oPinKey('OK')" style="background:var(--gold)">OK</button>
+    </div>
+    <button class="lock-link" onclick="oPinForgot()">PIN oublié — se reconnecter avec mon code d'accès</button>
+  </div>
+</div>
 
 <script>
 // ═══════════════════════════════════════════════════════════════════
@@ -1900,10 +1948,10 @@ var DELAI_INSTALL=7;
 var DELAI_TEMOIGNAGE=30;
 
 // ── ÉTAT GLOBAL ──────────────────────────────────────────────────────
-var GAS_URL='',CODE='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
+var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.11.1 · 09/10';
+var APP_VERSION='v3.12 · 09/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -1932,20 +1980,28 @@ function oGetCfg(){
   try{
     GAS_URL=localStorage.getItem('owlht2_url')||DEFAULT_GAS_URL||'';
     CODE=localStorage.getItem('owlht2_code')||'';
+    TOKEN=localStorage.getItem('owlht2_token')||'';
     PARTNER_ID=localStorage.getItem('owlht_partner_id')||'';
   }catch(e){}
+}
+function deviceInfo(){
+  var id='';try{id=localStorage.getItem('owlht2_dev')||'';if(!id){id='d_'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);localStorage.setItem('owlht2_dev',id);}}catch(e){}
+  var ua=navigator.userAgent||'',os=/iPhone|iPad/.test(ua)?'iPhone':/Android/.test(ua)?'Android':/Mac/.test(ua)?'Mac':/Windows/.test(ua)?'Windows':'Appareil';
+  var nav=/EdgA?\//.test(ua)?'Edge':/SamsungBrowser/.test(ua)?'Samsung':/CriOS|Chrome/.test(ua)?'Chrome':/Firefox|FxiOS/.test(ua)?'Firefox':/Safari/.test(ua)?'Safari':'navigateur';
+  return{id:id,label:os+' · '+nav+(isStandalone()?' · app installée':'')};
 }
 function oSaveCfg(){
   try{
     localStorage.setItem('owlht2_url',GAS_URL||'');
     localStorage.setItem('owlht2_code',CODE||'');
+    localStorage.setItem('owlht2_token',TOKEN||'');
     localStorage.setItem('owlht_partner_id',PARTNER_ID||'');
   }catch(e){}
 }
 function oSyncDot(s){var d=document.getElementById('osync-dot');if(!d)return;d.className='osync-dot';if(s==='ok')d.classList.add('ok');else if(s==='err')d.classList.add('err');else if(s==='spin')d.classList.add('spin');}
 
 // ── CACHE LOCAL (lecture hors ligne) ────────────────────────────────
-function cacheKey(){return'owlht2_cache_'+(CODE||'x');}
+function cacheKey(){return'owlht2_cache_'+(TOKEN?TOKEN.slice(0,12):(CODE||'x'));}
 function oLoadCache(){try{var s=localStorage.getItem(cacheKey());if(s){var d=JSON.parse(s);OC=d.contacts||[];USER=d.user||USER;CFG=d.config||CFG;USERS=d.users||USERS;normAll();}}catch(e){}}
 function oSaveCache(){try{localStorage.setItem(cacheKey(),JSON.stringify({contacts:OC,user:USER,config:CFG,users:USERS}));}catch(e){}}
 
@@ -1967,26 +2023,29 @@ function oLogin(){
   if(!u||u.indexOf('script.google.com')<0||u.indexOf('/exec')<0){err.textContent='URL invalide — elle doit contenir script.google.com et se terminer par /exec.';err.style.display='block';return;}
   if(!c){err.textContent='Saisissez votre code d\'accès.';err.style.display='block';return;}
   err.style.display='none';
-  GAS_URL=u;CODE=c;oSaveCfg();
-  oPull();
+  GAS_URL=u;oSaveCfg();
+  oLoader(true,'Connexion…');
+  // v3.12 : connexion en POST → session par appareil (jeton) ; repli sur l'ancienne connexion si le script n'est pas à jour
+  fetch(GAS_URL,{method:'POST',body:JSON.stringify({op:'login',code:c,device:deviceInfo()})})
+    .then(function(r){return r.text();}).then(function(t){var d={};try{d=JSON.parse(t);}catch(e){}
+      if(d.ok&&d.token){TOKEN=d.token;CODE='';oSaveCfg();oApplyPayload(d);return;}
+      oLoader(false);
+      if(d.error==='op'||(d.ok&&!d.token)){CODE=c;TOKEN='';oSaveCfg();oPull();return;}   // ancien script : connexion par code
+      if(d.error==='tentatives'){oShowLogin('Trop de tentatives — réessayez dans '+(d.attente||10)+' minutes.');return;}
+      if(d.error==='auth'){oShowLogin('Code d\'accès refusé — vérifiez auprès de votre administrateur.');return;}
+      oShowLogin('Connexion impossible : '+(d.error||'serveur injoignable'));
+    }).catch(function(){oLoader(false);oShowLogin('Serveur injoignable. Vérifiez la connexion.');});
 }
 function oLogout(){
-  CODE='';USER=null;OC=[];USERS=[];
-  try{localStorage.removeItem('owlht2_code');}catch(e){}
+  if(TOKEN&&GAS_URL){try{fetch(GAS_URL,{method:'POST',body:JSON.stringify({op:'logout',token:TOKEN})});}catch(e){}}
+  try{localStorage.removeItem(cacheKey());}catch(e){}
+  CODE='';TOKEN='';USER=null;OC=[];USERS=[];
+  try{localStorage.removeItem('owlht2_code');localStorage.removeItem('owlht2_token');localStorage.removeItem('owlht2_pin');}catch(e){}
   oHideSetup();oSyncDot('');oShowLogin();
 }
-function oPull(){
-  if(!GAS_URL||!CODE){oShowLogin();return;}
-  oLoader(true,'Synchronisation...');oSyncDot('spin');
-  fetch(GAS_URL+(GAS_URL.indexOf('?')>=0?'&':'?')+'code='+encodeURIComponent(CODE)+'&t='+Date.now(),{cache:'no-store'})
-    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
-    .then(function(txt){
-      var d=JSON.parse(txt);
+function oSessionLost(msg){TOKEN='';CODE='';USER=null;try{localStorage.removeItem('owlht2_code');localStorage.removeItem('owlht2_token');}catch(e){}oSyncDot('err');oLoader(false);oShowLogin(msg||'Session expirée ou révoquée — reconnectez-vous avec votre code.');}
+function oApplyPayload(d){
       oLoader(false);
-      if(!d.ok){
-        if(d.error==='auth'){oSyncDot('err');oShowLogin('Code d\'accès refusé — vérifiez auprès de votre administrateur.');return;}
-        throw new Error(d.error||'?');
-      }
       USER=d.user;
       OC=d.contacts||[];OC.forEach(function(c){if(!c.actions)c.actions={};if(!c.produits)c.produits=[];});normAll();
       CFG=d.config||{referents:[],suiveurs:[]};
@@ -1994,18 +2053,45 @@ function oPull(){
       oSaveCache();oHideLogin();oSyncDot('ok');
       oT('Bonjour '+USER.nom+' — '+OC.length+' contact(s)','s');
       applyRole();populateRefUI();oRefresh();oMergeSeedThierry();if(ROLE()==='admin'){oDedup(false);var _np=fichesParasites().length;if(_np)oT('🧽 '+_np+' fiche(s) parasite(s) détectée(s) — Équipe → « Nettoyer les fiches d\'import raté »','w');}
+}
+function oPullOffline(){
+  oSyncDot('err');oLoader(false);
+  if(USER){oT('Mode hors ligne — données en cache','w');oRefresh();}
+  else{oLoadCache();if(USER){oT('Mode hors ligne — données en cache','w');oHideLogin();applyRole();populateRefUI();oRefresh();}else{oShowLogin('Serveur injoignable. Vérifiez la connexion et l\'URL.');}}
+}
+function oPull(){
+  if(!GAS_URL||(!TOKEN&&!CODE)){oShowLogin();return;}
+  oLoader(true,'Synchronisation...');oSyncDot('spin');
+  if(TOKEN){
+    fetch(GAS_URL,{method:'POST',body:JSON.stringify({op:'pull',token:TOKEN})})
+      .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
+      .then(function(txt){var d=JSON.parse(txt);if(!d.ok){if(d.error==='session'||d.error==='auth'){oSessionLost();return;}throw new Error(d.error||'?');}oApplyPayload(d);})
+      .catch(oPullOffline);
+    return;
+  }
+  // Ancienne connexion par code (script < v3.7) — on tente d'obtenir une session dès que le script le permet
+  fetch(GAS_URL+(GAS_URL.indexOf('?')>=0?'&':'?')+'code='+encodeURIComponent(CODE)+'&t='+Date.now(),{cache:'no-store'})
+    .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.text();})
+    .then(function(txt){
+      var d=JSON.parse(txt);
+      if(!d.ok){
+        if(d.error==='auth'){oSyncDot('err');oLoader(false);oShowLogin('Code d\'accès refusé — vérifiez auprès de votre administrateur.');return;}
+        throw new Error(d.error||'?');
+      }
+      oApplyPayload(d);
+      oMigrateSession();
     })
-    .catch(function(){
-      oSyncDot('err');oLoader(false);
-      if(USER){oT('Mode hors ligne — données en cache','w');oRefresh();}
-      else{oLoadCache();if(USER){oT('Mode hors ligne — données en cache','w');oHideLogin();applyRole();populateRefUI();oRefresh();}else{oShowLogin('Serveur injoignable. Vérifiez la connexion et l\'URL.');}}
-    });
+    .catch(oPullOffline);
+}
+function oMigrateSession(){
+  if(TOKEN||!CODE)return;
+  fetch(GAS_URL,{method:'POST',body:JSON.stringify({op:'login',code:CODE,device:deviceInfo()})}).then(function(r){return r.text();}).then(function(t){var d={};try{d=JSON.parse(t);}catch(e){}if(d.ok&&d.token){TOKEN=d.token;CODE='';oSaveCfg();oSaveCache();}}).catch(function(){});
 }
 
 // ── ÉCRITURE (opérations) ───────────────────────────────────────────
 function oPost_(payload,silent){
-  if(!GAS_URL||!CODE)return;
-  payload.code=CODE;
+  if(!GAS_URL||(!TOKEN&&!CODE))return;
+  if(TOKEN)payload.token=TOKEN;else payload.code=CODE;
   oSyncDot('spin');
   fetch(GAS_URL,{method:'POST',body:JSON.stringify(payload)})
     .then(function(r){return r.text();})
@@ -2014,7 +2100,7 @@ function oPost_(payload,silent){
       if(d.ok){oSyncDot('ok');}
       else{
         oSyncDot('err');
-        if(d.error==='auth'){oShowLogin('Session expirée — reconnectez-vous.');}
+        if(d.error==='auth'||d.error==='session'){oSessionLost();}
         else if(d.error==='busy'){if(!silent)oT('Serveur occupé — réessayez dans un instant','w');}
         else if(d.error==='op'){if(!silent)oT('Le script Google n\'est pas à jour — collez la dernière version (Réglages → aide)','e');}
         else if(!silent)oT('Écriture refusée : '+(d.error||'?'),'e');
@@ -2024,8 +2110,8 @@ function oPost_(payload,silent){
 }
 function oPush(list){oSaveCache();oPost_({op:'upsert',contacts:list});}
 function oPostAsync_(payload){
-  if(!GAS_URL||!CODE)return Promise.reject('offline');
-  payload.code=CODE;oSyncDot('spin');
+  if(!GAS_URL||(!TOKEN&&!CODE))return Promise.reject('offline');
+  if(TOKEN)payload.token=TOKEN;else payload.code=CODE;oSyncDot('spin');
   return fetch(GAS_URL,{method:'POST',body:JSON.stringify(payload)}).then(function(r){return r.text();}).then(function(t){var d={};try{d=JSON.parse(t);}catch(e){}oSyncDot(d.ok?'ok':'err');return d;}).catch(function(e){oSyncDot('err');throw e;});
 }
 function resSave(){CFG.ressources=CFG.ressources||{};oSaveCache();oPost_({op:'saveRessources',ressources:CFG.ressources});}
@@ -2311,6 +2397,7 @@ function renderUsers(){
         +(isAdm?'<span class="ouser-code">'+esc(u.code||'—')+'</span>':'')
         +(u.tel||u.email?'<span>'+(u.tel?'📱 '+esc(u.tel):'')+(u.tel&&u.email?' · ':'')+(u.email?'✉️ '+esc(u.email):'')+'</span>':'')
         +(hasTag?'<span>🏷 '+esc(u.tags.join(', '))+' · <b>'+nbC+'</b> contact'+(nbC>1?'s':'')+'</span>':'')
+        +(u.role==='gestionnaire'&&u.scope==='equipes'?'<span class="obdg bor">périmètre : ses équipes</span>':'')
         +(hasDigest?'<span class="ouser-digest-pill" title="'+esc(u.digestEmail)+'">📧 Résumé à '+esc(u.digestHeure)+' → '+esc(u.digestEmail)+'</span>':'<span style="color:var(--t3)">📭 résumé quotidien non configuré</span>')
         +(pend?'<span class="obdg bor">⏳ En attente d\'approbation'+(u.proposePar?' · proposé par '+esc(u.proposePar):'')+'</span>':(u.actif===false?'<span style="color:#C0392B;font-weight:600">⏸ Désactivé</span>':''))
       +'</div>'
@@ -2322,6 +2409,7 @@ function renderUsers(){
         +(isAdm?'<button class="oua d'+(hasDigest?'':' off')+'" onclick="oDigestModal('+i+')"><span>📧</span>Digest</button>':'')
         +(isAdm||u.tel?'<button class="oua w" onclick="oInviteUser('+i+')"><span>📲</span>Inviter</button>':'')
         +(isAdm?'<button class="oua e" onclick="oUserEdit('+i+')"><span>✏️</span>Modifier</button>':'')
+        +(isAdm?'<button class="oua v" onclick="oUserSessions('+i+')"><span>📱</span>'+(u.sessions?u.sessions+' appareil'+(u.sessions>1?'s':''):'Appareils')+'</button>':'')
         +(isAdm?'<button class="oua x" onclick="oUserDel('+i+')"><span>🗑</span>Retirer</button>':'')
       +'</div>'
     +'</div>';
@@ -2368,6 +2456,7 @@ function oUserNew(){
   document.getElementById('u-nom').value='';
   document.getElementById('u-role').value='referent';
   document.getElementById('u-tel').value='';document.getElementById('u-email').value='';
+  document.getElementById('u-scope').value='all';
   document.getElementById('u-tags').value='';
   document.getElementById('u-code').value=genCode();
   document.getElementById('u-actif').checked=true;
@@ -2382,6 +2471,7 @@ function oUserEdit(i){
   document.getElementById('u-nom').value=u.nom||'';
   document.getElementById('u-role').value=u.role||'referent';
   document.getElementById('u-tel').value=u.tel||'';document.getElementById('u-email').value=u.email||'';
+  document.getElementById('u-scope').value=u.scope||'all';
   document.getElementById('u-tags').value=(u.tags||[]).join(', ');
   document.getElementById('u-code').value=u.code||'';
   document.getElementById('u-actif').checked=u.actif!==false;
@@ -2413,7 +2503,7 @@ function oUserSave(){
     id:document.getElementById('u-id').value||('u_'+Date.now()),
     nom:nom,role:role,tags:tags,code:code,tel:tel,
     actif:document.getElementById('u-actif').checked,
-    digestEmail:digestEmail,digestHeure:digestHeure,email:uEmail,
+    digestEmail:digestEmail,digestHeure:digestHeure,email:uEmail,scope:document.getElementById('u-scope').value||'all',
     photo:document.getElementById('u-photo').value||''
   };
   var idx=USERS.findIndex(function(u){return u.id===obj.id;});
@@ -2446,7 +2536,7 @@ function oApproveUser(i){
 }
 function genCode(){
   var A='ABCDEFGHJKMNPQRSTUVWXYZ23456789',s='';
-  for(var i=0;i<6;i++)s+=A.charAt(Math.floor(Math.random()*A.length));
+  for(var i=0;i<10;i++)s+=A.charAt(Math.floor(Math.random()*A.length));
   return s;
 }
 function oGenCode(){document.getElementById('u-code').value=genCode();}
@@ -3579,7 +3669,7 @@ function oOpenF(id){
       '<div class="od-row"><span class="od-lbl">ID membre</span><span class="od-val">'+esc(c.memberIdOlyLife||'—')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">Rang</span><span class="od-val">'+esc(c.rangOly||'—')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">Commande sur le BO de</span><span class="od-val">'+esc(c.boCompte||'—')+'</span></div>'
-      +(c.pieceId?'<div class="od-row"><span class="od-lbl">Pièce d\'identité</span><span class="od-val">'+esc(c.pieceId)+'</span></div>':'')
+      +(c.pieceId?'<div class="od-row"><span class="od-lbl">Pièce d\'identité</span><span class="od-val">'+esc(maskIdView(c.pieceId))+'</span></div>':'')
       +(c.numCommande?'<div class="od-row"><span class="od-lbl">N° commande</span><span class="od-val">'+c.numCommande+'</span></div>'
         +'<div class="od-row"><span class="od-lbl">Date</span><span class="od-val">'+fD(c.dateCommande)+'</span></div>'
         +'<div class="od-row"><span class="od-lbl">Transporteur</span><span class="od-val">'+(c.transporteur||'—')+'</span></div>'
@@ -4690,7 +4780,7 @@ if('serviceWorker' in navigator){
       reg.addEventListener('updatefound',function(){
         var nw=reg.installing;if(!nw)return;
         nw.addEventListener('statechange',function(){
-          if(nw.state==='installed'&&navigator.serviceWorker.controller)oT('🔄 Nouvelle version disponible — rechargez l\'application','i');
+          if(nw.state==='installed'&&navigator.serviceWorker.controller)oShowUpdate();
         });
       });
     }).catch(function(){});
@@ -5471,6 +5561,74 @@ function accHtml(c){
   return'<div class="od-section"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">🌿 Accompagnement — précautions · fiche conseils · témoignage</div><div class="od-bd">'+rows+'</div></div>';
 }
 
+// ── Mise à jour de l'app sans vider les données (v3.12) ─────────────
+var UPD_READY=false;
+function oShowUpdate(){UPD_READY=true;var b=document.getElementById('oupd');if(b)b.classList.add('on');}
+function oUpdateNow(){var b=document.getElementById('oupd');if(b)b.classList.remove('on');try{if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration){navigator.serviceWorker.getRegistration().then(function(r){if(r&&r.waiting)r.waiting.postMessage('skipWaiting');setTimeout(function(){location.reload();},150);});return;}}catch(e){}location.reload();}
+try{if(navigator.serviceWorker){var _first=!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener('controllerchange',function(){if(!_first)oShowUpdate();_first=false;});}}catch(e){}
+
+// ── Verrou PIN par appareil (v3.12) ──────────────────────────────────
+var PIN_BUF='',PIN_MODE='check',PIN_TMP='',PIN_HIDDEN_AT=0;
+function pinHash(p){var h=5381;for(var i=0;i<p.length;i++)h=((h<<5)+h+p.charCodeAt(i))|0;return'p'+(h>>>0).toString(36)+'_'+p.length;}
+function pinStored(){try{return localStorage.getItem('owlht2_pin')||'';}catch(e){return'';}}
+function oPinGate(){if(pinStored()){PIN_MODE='check';PIN_BUF='';oPinRender('Saisissez votre code PIN');document.getElementById('olock').classList.add('on');}}
+function oPinRender(sub){document.getElementById('olock-sub').textContent=sub;var d=document.getElementById('olock-dots');d.innerHTML='';for(var i=0;i<Math.max(4,PIN_BUF.length);i++)d.innerHTML+='<i class="'+(i<PIN_BUF.length?'on':'')+'"></i>';}
+function oPinKey(k){
+  if(k==='⌫'){PIN_BUF=PIN_BUF.slice(0,-1);oPinRender(document.getElementById('olock-sub').textContent);return;}
+  if(k==='OK'){oPinSubmit();return;}
+  if(PIN_BUF.length>=6)return;PIN_BUF+=k;oPinRender(document.getElementById('olock-sub').textContent);
+  if(PIN_MODE==='check'&&PIN_BUF.length>=4&&pinHash(PIN_BUF)===pinStored())oPinSubmit();
+}
+function oPinSubmit(){
+  if(PIN_BUF.length<4){oPinRender('4 à 6 chiffres');return;}
+  if(PIN_MODE==='check'){if(pinHash(PIN_BUF)===pinStored()){document.getElementById('olock').classList.remove('on');PIN_BUF='';}else{PIN_BUF='';oPinRender('PIN incorrect — réessayez');}return;}
+  if(PIN_MODE==='set1'){PIN_TMP=PIN_BUF;PIN_BUF='';PIN_MODE='set2';oPinRender('Confirmez le code PIN');return;}
+  if(PIN_MODE==='set2'){if(PIN_BUF===PIN_TMP){try{localStorage.setItem('owlht2_pin',pinHash(PIN_BUF));}catch(e){}document.getElementById('olock').classList.remove('on');PIN_BUF='';PIN_TMP='';PIN_MODE='check';oT('🔒 Verrou PIN activé sur cet appareil','s');oProfOpen();}else{PIN_BUF='';PIN_TMP='';PIN_MODE='set1';oPinRender('Les deux codes diffèrent — recommencez');}}
+}
+function oPinSet(){PIN_MODE='set1';PIN_BUF='';oPinRender('Choisissez un code PIN (4 à 6 chiffres)');document.getElementById('olock').classList.add('on');}
+function oPinRemove(){try{localStorage.removeItem('owlht2_pin');}catch(e){}oT('Verrou PIN retiré','s');oProfOpen();}
+function oPinForgot(){if(confirm('Vous serez déconnecté de cet appareil ; il faudra ressaisir votre code d\'accès.'))oLogout();document.getElementById('olock').classList.remove('on');}
+document.addEventListener('visibilitychange',function(){if(document.hidden){PIN_HIDDEN_AT=Date.now();}else if(pinStored()&&USER&&PIN_HIDDEN_AT&&Date.now()-PIN_HIDDEN_AT>120000){oPinGate();}});
+
+// ── Sessions / appareils connectés (v3.12) ──────────────────────────
+function sessHtml(list,mine){
+  if(!list.length)return'<div style="font-size:12px;color:var(--t3)">Aucun appareil connecté.</div>';
+  return list.map(function(s){var cur=mine&&s.token===undefined&&false;return'<div class="sess-it"><span>📱</span><div class="b"><b>'+esc(s.device&&s.device.label||'Appareil')+'</b>'+(mine?'':' — '+esc(s.nom||''))+'<small>connecté le '+fD(s.created)+' · vu le '+fD(s.last)+' · expire le '+fD(s.exp)+'</small></div><button class="ob bgh bsm" onclick="oSessRevoke(\''+esc(s.id)+'\')">Déconnecter</button></div>';}).join('');
+}
+function oSessList(userId,boxId){
+  var box=document.getElementById(boxId);if(!box)return;box.innerHTML='<div style="font-size:12px;color:var(--t3)">Chargement…</div>';
+  oPostAsync_({op:'sessions',userId:userId||''}).then(function(d){
+    if(!d.ok){box.innerHTML='<div style="font-size:12px;color:var(--t3)">'+(d.error==='op'?'Script Google à mettre à jour (v3.7) pour voir les appareils.':'Indisponible')+'</div>';return;}
+    box.innerHTML=sessHtml(d.sessions||[],!userId||userId===(USER&&USER.id));
+  }).catch(function(){box.innerHTML='<div style="font-size:12px;color:var(--t3)">Hors ligne</div>';});
+}
+function oSessRevoke(id){if(!confirm('Déconnecter cet appareil ? La personne devra ressaisir son code.'))return;oPostAsync_({op:'revokeSession',id:id}).then(function(){oT('Appareil déconnecté','s');var pb=document.getElementById('oprof-sess');if(pb&&document.getElementById('oprof').classList.contains('on'))oSessList('', 'oprof-sess');var ab=document.getElementById('sess-admin-box');if(ab)oSessList(ab.getAttribute('data-uid'),'sess-admin-box');});}
+function oUserSessions(i){
+  var u=USERS[i];if(!u)return;
+  var modal=document.createElement('div');modal.style.cssText='position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px';modal.onclick=function(e){if(e.target===modal)modal.remove();};
+  modal.innerHTML='<div style="background:#fff;border-radius:16px;padding:18px;max-width:520px;width:100%;max-height:80vh;overflow:auto"><div style="font-weight:700;margin-bottom:10px">📱 Appareils connectés — '+esc(u.nom)+'</div><div id="sess-admin-box" data-uid="'+esc(u.id)+'"></div><button class="ob bgh bfull" style="margin-top:12px" onclick="this.closest(\'div[style*=fixed]\').remove()">Fermer</button></div>';
+  document.body.appendChild(modal);oSessList(u.id,'sess-admin-box');
+}
+function oAdminLog(){
+  var modal=document.createElement('div');modal.style.cssText='position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px';modal.onclick=function(e){if(e.target===modal)modal.remove();};
+  modal.innerHTML='<div style="background:#fff;border-radius:16px;padding:18px;max-width:640px;width:100%"><div style="font-weight:700;margin-bottom:10px">📜 Journal d\'administration</div><div class="adm-log" id="adm-log-box">Chargement…</div><button class="ob bgh bfull" style="margin-top:12px" onclick="this.closest(\'div[style*=fixed]\').remove()">Fermer</button></div>';
+  document.body.appendChild(modal);
+  oPostAsync_({op:'adminLog',n:300}).then(function(d){var b=document.getElementById('adm-log-box');if(!d.ok){b.textContent=d.error==='op'?'Script Google à mettre à jour (v3.7).':'Indisponible';return;}b.innerHTML=(d.log||[]).length?d.log.map(function(e){var dt=new Date(e.ts);return'<div>'+(isNaN(dt)?'':dt.toLocaleDateString('fr-FR')+' '+('0'+dt.getHours()).slice(-2)+':'+('0'+dt.getMinutes()).slice(-2))+' · <b>'+esc(e.par)+'</b> — '+esc(e.action)+(e.detail?' : '+esc(e.detail):'')+'</div>';}).join(''):'Aucune entrée pour l\'instant.';}).catch(function(){var b=document.getElementById('adm-log-box');if(b)b.textContent='Hors ligne';});
+}
+function oBackups(){
+  var modal=document.createElement('div');modal.style.cssText='position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px';modal.onclick=function(e){if(e.target===modal)modal.remove();};
+  modal.innerHTML='<div style="background:#fff;border-radius:16px;padding:18px;max-width:560px;width:100%;max-height:85vh;overflow:auto"><div style="font-weight:700;margin-bottom:6px">💾 Sauvegardes Drive</div><div style="font-size:12px;color:var(--t2);margin-bottom:10px">Une sauvegarde automatique est faite chaque nuit à 3h (60 conservées). Restaurer remplace toutes les données par celles de la sauvegarde choisie — l\'état actuel est d\'abord mis de côté.</div><button class="ob bgold bsm" onclick="oBackupNow()">💾 Sauvegarder maintenant</button><div id="bk-box" style="margin-top:10px;font-size:12.5px">Chargement…</div><button class="ob bgh bfull" style="margin-top:12px" onclick="this.closest(\'div[style*=fixed]\').remove()">Fermer</button></div>';
+  document.body.appendChild(modal);oBackupsLoad();
+}
+function oBackupsLoad(){oPostAsync_({op:'listBackups'}).then(function(d){var b=document.getElementById('bk-box');if(!b)return;if(!d.ok){b.textContent=d.error==='op'?'Script Google à mettre à jour (v3.7).':'Indisponible';return;}b.innerHTML=(d.backups||[]).map(function(f){var dt=new Date(f.date);return'<div class="sess-it"><span>🗂</span><div class="b"><b>'+esc(f.name.replace('CRM_OlyLife_','').replace('.json',''))+'</b><small>'+dt.toLocaleDateString('fr-FR')+' '+('0'+dt.getHours()).slice(-2)+':'+('0'+dt.getMinutes()).slice(-2)+' · '+Math.round(f.size/1024)+' Ko</small></div><button class="ob bgh bsm" onclick="oRestore(\''+esc(f.id)+'\',\''+esc(f.name)+'\')">Restaurer</button></div>';}).join('')||'Aucune sauvegarde trouvée.';}).catch(function(){});}
+function oBackupNow(){oPostAsync_({op:'backupNow'}).then(function(d){oT(d.ok?'💾 Sauvegarde créée':'Impossible : '+(d.error||'?'),d.ok?'s':'e');oBackupsLoad();});}
+function oRestore(id,name){
+  if(!confirm('Restaurer « '+name+' » ?\n\nToutes les données actuelles seront remplacées par cette sauvegarde (l\'état actuel est conservé dans une sauvegarde « avant-restauration »).'))return;
+  if(prompt('Pour confirmer, tapez RESTAURER :')!=='RESTAURER')return;
+  oPostAsync_({op:'restoreBackup',id:id}).then(function(d){if(d.ok){oT('✅ Restauration effectuée — '+d.contacts+' contacts','s');setTimeout(function(){location.reload();},900);}else oT('Échec : '+(d.error||'?'),'e');});
+}
+function maskIdView(v){if(!v)return'';if(ROLE()==='admin')return v;return/^••••/.test(v)?v:'••••'+String(v).slice(-4);}
+
 // ── Photos de profil · Mon profil · émojis (v3.6) ───────────────────
 function pickPhoto(cb,size){
   size=size||128;
@@ -5521,6 +5679,8 @@ function oProfOpen(){
   document.getElementById('oprof-note').innerHTML=USER.id==='root'
     ?'Votre nom d\'affichage est défini dans le script Google (ADMIN_NOM). Les accès de l\'équipe (noms, rôles, codes, photos) se gèrent dans l\'onglet <b>Équipe</b>.'
     :'Pour changer votre nom affiché ou votre rôle, demandez à l\'administrateur (onglet Équipe).';
+  var pr=document.getElementById('oprof-pin-row');if(pr)pr.innerHTML=pinStored()?'<span>🔒 Verrou PIN actif à l\'ouverture</span><button class="ob bgh bsm" type="button" onclick="oPinSet()">Changer</button><button class="ob bgh bsm" type="button" onclick="oPinRemove()">Retirer</button>':'<span>Pas de verrou PIN — conseillé si votre téléphone n\'est pas verrouillé</span><button class="ob bgh bsm" type="button" onclick="oPinSet()">🔒 Activer un PIN</button>';
+  oSessList('', 'oprof-sess');
   oSheetOpen('oprof');
 }
 function oProfClose(){oSheetClose('oprof');}
@@ -5645,7 +5805,7 @@ oBuildProductGrid();
 oBuildBoList();
 oGetCfg();
 (function(){var v=document.getElementById('ol-version');if(v)v.textContent='· '+APP_VERSION;})();
-if(GAS_URL&&CODE){oLoadCache();if(USER){applyRole();populateRefUI();oRefresh();}oPull();}
+if(GAS_URL&&(TOKEN||CODE)){oLoadCache();if(USER){applyRole();populateRefUI();oRefresh();}oPinGate();oPull();}
 else{oShowLogin();}
 </script>
 </body>
