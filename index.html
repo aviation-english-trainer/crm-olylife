@@ -401,6 +401,32 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .chk-list{display:flex;flex-wrap:wrap;gap:6px;}
 .chk-list label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--bd);border-radius:20px;padding:5px 10px;font-size:12px;background:#fff;cursor:pointer;}
 .chk-list label.on{border-color:var(--gold);background:var(--goldp);color:var(--gold);font-weight:600;}
+/* ── ADMINISTRATION (v3.13) ───────────────────────────────────────── */
+.adm-tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;margin-bottom:12px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.adm-tabs::-webkit-scrollbar{display:none;}
+.adm-tab{flex:0 0 auto;border:1px solid var(--bd);background:#fff;color:var(--t2);border-radius:20px;padding:8px 14px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+.adm-tab.on{background:#1E6B3A;color:#fff;border-color:#1E6B3A;}
+.adm-tab .n{background:var(--gold);color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;}
+.adm-pane{display:none;}.adm-pane.on{display:block;animation:ovin .2s ease;}
+.adm-sec{padding:14px 16px;}
+.adm-sec+.adm-sec{border-top:1px solid var(--bd);}
+.adm-sec h4{margin:0 0 4px;font-size:13.5px;color:var(--tx);}
+.adm-sec .hint{font-size:12px;color:var(--t3);line-height:1.5;margin-bottom:10px;}
+.adm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;}
+.adm-f label{display:block;font-size:11px;font-weight:700;color:var(--t2);margin-bottom:4px;}
+.adm-f input,.adm-f select,.adm-f textarea{width:100%;box-sizing:border-box;border:1px solid var(--bd);border-radius:10px;padding:9px 10px;font-size:13px;font-family:inherit;background:#fff;min-height:40px;}
+.adm-f textarea{min-height:120px;line-height:1.5;resize:vertical;}
+.adm-stat{display:flex;flex-wrap:wrap;gap:8px;}
+.adm-stat span{background:var(--navy3);border:1px solid var(--bd);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--t2);}
+.adm-stat span b{color:#1E6B3A;font-size:15px;margin-right:4px;}
+.adm-btns{display:flex;flex-wrap:wrap;gap:8px;}
+.adm-btns .ob{min-height:42px;}
+.adm-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd);font-size:12.5px;}
+.adm-row:last-child{border-bottom:none;}
+.adm-row .b{flex:1;min-width:0;}
+.adm-row small{display:block;color:var(--t3);font-size:11px;}
+.adm-save{position:sticky;bottom:calc(var(--bottom-nav,64px) + 8px);display:flex;justify-content:flex-end;padding:8px 0;z-index:5;}
+.adm-save .ob{box-shadow:0 8px 20px rgba(0,0,0,.18);}
 /* ── SÉCURITÉ (v3.12) : bandeau MAJ, verrou PIN, sessions ─────────── */
 #oupd{display:none;position:fixed;left:50%;bottom:calc(var(--bottom-nav,64px) + 12px);transform:translateX(-50%);z-index:9000;background:#1E2B23;color:#fff;border-radius:30px;padding:10px 16px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.3);align-items:center;gap:10px;max-width:calc(100vw - 24px);}
 #oupd.on{display:flex;}
@@ -1031,6 +1057,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <button class="sd-it" data-nav="temoignages" onclick="oSw('temoignages')" title="Témoignages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg><em>Témoignages</em></button>
       <button class="sd-it" data-nav="protocoles" onclick="oSw('protocoles')" title="Fiches conseils de soins (comité scientifique)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6v4l4 9a3 3 0 0 1-2.7 4H7.7A3 3 0 0 1 5 16l4-9z"/><path d="M8 14h8"/></svg><em>Fiches conseils</em></button>
       <button class="sd-it" data-nav="precautions" onclick="oSw('precautions')" title="Utilisations & précautions des appareils"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M12 7v4m0 3h.01"/></svg><em>Précautions</em></button>
+      <button class="sd-it hide" data-nav="admin" id="sd-admin" onclick="oSw('admin')" title="Administration"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 3v6c0 5.25-3.4 9.6-8 11-4.6-1.4-8-5.75-8-11V5l8-3z"/><circle cx="12" cy="11" r="2.5"/><path d="M12 13.5v3"/></svg><em>Admin</em></button>
       <button class="sd-it" data-nav="genea" onclick="oSw('genea')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2.5" width="6" height="5" rx="1.5"/><rect x="2.5" y="16.5" width="6" height="5" rx="1.5"/><rect x="15.5" y="16.5" width="6" height="5" rx="1.5"/><path d="M12 7.5v4m0 0H5.5v5m6.5-5h6.5v5"/></svg><em>Généalogie</em></button>
     </nav>
     <div class="sd-foot">
@@ -1542,6 +1569,133 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <div id="prec-body"></div>
     </div>
 
+    <!-- ADMINISTRATION (v3.13) -->
+    <div class="ov" id="ov-admin">
+      <div class="adm-tabs" id="adm-tabs">
+        <button class="adm-tab on" data-tab="equipe" onclick="admTab('equipe')">👥 Équipe & accès<span class="n" id="adm-n-equipe" style="display:none"></span></button>
+        <button class="adm-tab" data-tab="refs" onclick="admTab('refs')">🏷️ Référents & tags</button>
+        <button class="adm-tab" data-tab="catalogue" onclick="admTab('catalogue')">📦 Catalogue</button>
+        <button class="adm-tab" data-tab="relances" onclick="admTab('relances')">🔔 Relances & automatismes</button>
+        <button class="adm-tab" data-tab="liens" onclick="admTab('liens')">🔗 Liens & intégrations</button>
+        <button class="adm-tab" data-tab="donnees" onclick="admTab('donnees')">🗄️ Données & maintenance</button>
+        <button class="adm-tab" data-tab="ressources" onclick="admTab('ressources')">📚 Ressources à valider<span class="n" id="adm-n-res" style="display:none"></span></button>
+        <button class="adm-tab" data-tab="journal" onclick="admTab('journal')">📜 Journal</button>
+      </div>
+
+      <div class="adm-pane on" id="adm-equipe">
+        <div class="ocard" style="margin-bottom:14px"><div class="adm-sec"><h4>Vue d'ensemble</h4><div class="adm-stat" id="adm-eq-stat"></div></div></div>
+        <div id="adm-eq-host"></div>
+      </div>
+
+      <div class="adm-pane" id="adm-refs">
+        <div id="adm-refs-host"></div>
+        <div class="ocard" style="margin-bottom:14px">
+          <div class="adm-sec"><h4>Fusionner deux tags / référents</h4>
+            <div class="hint">Utile quand le même référent existe sous deux orthographes (ex. « DrThierry » et « Dr Thierry Gil »). Toutes les fiches, les accès et la liste des référents passent sur le tag conservé.</div>
+            <div class="adm-grid">
+              <div class="adm-f"><label>Tag à supprimer</label><select id="adm-merge-from"></select></div>
+              <div class="adm-f"><label>Tag conservé</label><select id="adm-merge-to"></select></div>
+            </div>
+            <button class="ob bgold" style="margin-top:10px;min-height:42px" onclick="admMergeTags()">🔀 Fusionner</button>
+          </div>
+          <div class="adm-sec"><h4>Répartition des contacts par référent</h4><div id="adm-refs-stat" class="adm-stat"></div></div>
+        </div>
+      </div>
+
+      <div class="adm-pane" id="adm-catalogue">
+        <div class="ocard" style="margin-bottom:14px">
+          <div class="adm-sec"><h4>Produits proposés dans les fiches</h4><div class="hint">Un produit par ligne. Le nom avant la parenthèse sert à reconnaître les commandes importées du BO OlyLife (ex. « Tera-P90+ »).</div>
+            <div class="adm-f"><textarea id="adm-produits"></textarea></div></div>
+          <div class="adm-sec"><h4>Thèmes bien-être (témoignages & fiches conseils)</h4><div class="hint">Un thème par ligne.</div>
+            <div class="adm-f"><textarea id="adm-themes" style="min-height:90px"></textarea></div></div>
+          <div class="adm-sec"><h4>Seuils de rang OlyLife (achats cumulés en USD)</h4><div class="hint">Grille des packs : P2 Builder, P3 Leader, P4 Supervisor, P5 Pioneer. En dessous de P2 → P1 Starter.</div>
+            <div class="adm-grid">
+              <div class="adm-f"><label>P2 — Builder à partir de</label><input type="number" id="adm-r-p2" min="0"></div>
+              <div class="adm-f"><label>P3 — Leader à partir de</label><input type="number" id="adm-r-p3" min="0"></div>
+              <div class="adm-f"><label>P4 — Supervisor à partir de</label><input type="number" id="adm-r-p4" min="0"></div>
+              <div class="adm-f"><label>P5 — Pioneer à partir de</label><input type="number" id="adm-r-p5" min="0"></div>
+            </div></div>
+          <div class="adm-sec"><h4>Stock de machines</h4><div class="hint">Le stock (qui détient quoi) se gère dans l'onglet Équipe, visible aussi par les gestionnaires.</div>
+            <button class="ob bgh" style="min-height:42px" onclick="oSw('equipe');setTimeout(function(){var k=document.getElementById('eq-stock-card');if(k)k.scrollIntoView({behavior:'smooth'});},150)">📦 Ouvrir le stock</button></div>
+        </div>
+        <div class="adm-save"><button class="ob bgold" style="min-height:46px" onclick="admSaveParams()">💾 Enregistrer le catalogue</button></div>
+      </div>
+
+      <div class="adm-pane" id="adm-relances">
+        <div class="ocard" style="margin-bottom:14px">
+          <div class="adm-sec"><h4>Relances prospects (jours après le 1er contact)</h4><div class="hint">Trois rappels proposés dans « Actions » tant que le prospect est « En cours » et qu'aucune activité n'a eu lieu depuis.</div>
+            <div class="adm-grid">
+              <div class="adm-f"><label>1er rappel — J+</label><input type="number" id="adm-j1" min="1"></div>
+              <div class="adm-f"><label>2e rappel — J+</label><input type="number" id="adm-j2" min="1"></div>
+              <div class="adm-f"><label>Dernier rappel — J+</label><input type="number" id="adm-j3" min="1"></div>
+            </div></div>
+          <div class="adm-sec"><h4>Logistique, installation, témoignage</h4>
+            <div class="adm-grid">
+              <div class="adm-f"><label>Alerte « sans tracking » après (jours)</label><input type="number" id="adm-logi" min="1"></div>
+              <div class="adm-f"><label>Suivi installation après livraison (jours)</label><input type="number" id="adm-inst" min="1"></div>
+              <div class="adm-f"><label>Demande de témoignage après installation (jours)</label><input type="number" id="adm-tem" min="1"></div>
+            </div></div>
+          <div class="adm-sec"><h4>Points de suivi des fiches conseils de soins</h4>
+            <div class="adm-grid">
+              <div class="adm-f"><label>1er point — J+</label><input type="number" id="adm-pp1" min="1"></div>
+              <div class="adm-f"><label>2e point — J+</label><input type="number" id="adm-pp2" min="1"></div>
+            </div></div>
+          <div class="adm-sec"><h4>Signature des messages</h4><div class="hint">Ajoutée après le prénom de l'expéditeur dans les messages WhatsApp / e-mail en registre professionnel (ex. « Jean-Charles — OlyLife / WLHT »).</div>
+            <div class="adm-f"><input type="text" id="adm-sign" placeholder="OlyLife / WLHT"></div></div>
+          <div class="adm-sec"><h4>Automatismes côté serveur (script Google)</h4>
+            <div class="hint">Sauvegarde Drive chaque nuit à <b>3h</b> · résumé quotidien par e-mail à <b>7h</b> (heure propre à chaque membre dans son profil) · rappels d'avances à <b>8h</b>. Ces horaires se changent dans Apps Script (fonction <code>installerDeclencheurs</code>).</div></div>
+        </div>
+        <div class="adm-save"><button class="ob bgold" style="min-height:46px" onclick="admSaveParams()">💾 Enregistrer les relances</button></div>
+      </div>
+
+      <div class="adm-pane" id="adm-liens">
+        <div class="ocard" style="margin-bottom:14px">
+          <div class="adm-sec"><h4>Liens de l'équipe</h4><div class="hint">Boutons « BO Office », « BO OlyLife » et « App Tunnels » de la barre latérale et du menu.</div>
+            <div class="adm-grid" style="grid-template-columns:1fr">
+              <div class="adm-f"><label>BO Office WaterLifeHighTech (formations)</label><input type="url" id="adm-l-boffice"></div>
+              <div class="adm-f"><label>Back-office OlyLife</label><input type="url" id="adm-l-boly"></div>
+              <div class="adm-f"><label>App Tunnels — Un lien, un client</label><input type="url" id="adm-l-tunnels"></div>
+              <div class="adm-f"><label>Chaîne YouTube WaterLifeHighTech (témoignages vidéo)</label><input type="url" id="adm-l-youtube" placeholder="https://www.youtube.com/@…"></div>
+            </div></div>
+          <div class="adm-sec"><h4>Intégrations</h4>
+            <div class="hint" id="adm-integ"></div></div>
+        </div>
+        <div class="adm-save"><button class="ob bgold" style="min-height:46px" onclick="admSaveParams()">💾 Enregistrer les liens</button></div>
+      </div>
+
+      <div class="adm-pane" id="adm-donnees">
+        <div class="ocard" style="margin-bottom:14px">
+          <div class="adm-sec"><h4>État de la base</h4><div class="adm-stat" id="adm-data-stat"></div></div>
+          <div class="adm-sec"><h4>Import & nettoyage</h4>
+            <div class="adm-btns">
+              <button class="ob" style="background:var(--pu);color:#fff;border:none" onclick="oOpenImport()">⇪ Importer des contacts</button>
+              <button class="ob" style="background:#C63E47;color:#fff;border:none" onclick="oDedup(true)">🧹 Supprimer les doublons</button>
+              <button class="ob" style="background:#E8A020;color:#fff;border:none" onclick="oCleanupParasites()">🧽 Nettoyer les fiches d'import raté</button>
+              <button class="ob baqua" onclick="oGeoRun()">📍 Géolocaliser les adresses manquantes</button>
+            </div></div>
+          <div class="adm-sec"><h4>Export & sauvegardes</h4>
+            <div class="adm-btns">
+              <button class="ob baqua" onclick="oExportCSV()">📊 Exporter tous les contacts (CSV)</button>
+              <button class="ob bgold" onclick="oBackupDownload()">💾 Télécharger une sauvegarde complète</button>
+              <button class="ob bgh" onclick="document.getElementById('adm-restore-file').click()">♻️ Restaurer depuis un fichier</button>
+              <input type="file" id="adm-restore-file" accept=".json,application/json" style="display:none" onchange="oBackupRestore(this)">
+              <button class="ob bgh" onclick="oBackups()">🗂 Sauvegardes Drive (nuit) / restauration</button>
+            </div></div>
+        </div>
+      </div>
+
+      <div class="adm-pane" id="adm-ressources">
+        <div class="ocard" style="margin-bottom:14px">
+          <div class="adm-sec"><h4>Fiches conseils de soins en brouillon</h4><div class="hint">Rédigées par le comité scientifique ; visibles par toute l'équipe une fois validées.</div><div id="adm-res-proto"></div></div>
+          <div class="adm-sec"><h4>Témoignages à valider</h4><div class="hint">Vérifier le consentement et l'absence d'allégation de santé avant publication.</div><div id="adm-res-tem"></div></div>
+        </div>
+      </div>
+
+      <div class="adm-pane" id="adm-journal">
+        <div class="ocard" style="margin-bottom:14px"><div class="adm-sec"><h4>Journal d'administration</h4><div class="hint">Qui a fait quoi : accès créés, codes régénérés, rôles, paramètres, sauvegardes, restaurations. Conservé côté serveur (500 dernières entrées).</div><div class="adm-log" id="adm-journal-box">Chargement…</div></div></div>
+      </div>
+    </div>
+
   </div><!-- /ocont -->
 
   <div id="odrawer">
@@ -1569,6 +1723,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <button class="odr-it" onclick="oDrawerClose();oBOffice()"><span class="em">🏢</span>BO Office WaterLifeHighTech — formations</button>
       <button class="odr-it" onclick="oDrawerClose();oBOlylife()"><span class="em">🟢</span>BO OlyLife — olylife.com</button>
       <button class="odr-it" onclick="oDrawerClose();oTunnels()"><span class="em">🔗</span>App Tunnels — Un lien, un client</button>
+      <button class="odr-it" id="odr-admin" data-dnav="admin" style="display:none" onclick="oDrGo('admin')"><span class="em">🛡️</span>Administration</button>
       <button class="odr-it" onclick="oDrawerClose();oShowSetup()"><span class="em">⚙️</span>Réglages</button>
       <button class="odr-it" onclick="oDrawerClose();oLogout()"><span class="em">🚪</span>Se déconnecter</button>
       <div class="odr-ver" id="odr-ver"></div>
@@ -1946,12 +2101,31 @@ var RELANCE_STEPS=[{k:'j2',d:2,l:'J+2 — 1er rappel'},{k:'j5',d:5,l:'J+5 — 2e
 var SEUIL_LOGISTIQUE=5;
 var DELAI_INSTALL=7;
 var DELAI_TEMOIGNAGE=30;
+var PROTO_POINTS=[7,30];
+var RANG_SEUILS={p2:500,p3:1000,p4:2000,p5:6000};
+var SIGN_SUFFIX='OlyLife / WLHT';
+var YOUTUBE_URL='';
+var DEFAULT_PRODUCTS=PRODUCTS.slice();
+// v3.13 — paramètres administrables (CFG.params), appliqués au chargement et après enregistrement
+function applyParams(){
+  var P=(CFG&&CFG.params)||{};
+  if(P.relances){var d=[P.relances.j1,P.relances.j2,P.relances.j3];RELANCE_STEPS.forEach(function(st,i){if(+d[i]>0){st.d=+d[i];st.l='J+'+st.d+' — '+(i===0?'1er rappel':i===1?'2e rappel':'dernier rappel');}});}
+  if(+P.logistique>0)SEUIL_LOGISTIQUE=+P.logistique;
+  if(+P.install>0)DELAI_INSTALL=+P.install;
+  if(+P.temoignage>0)DELAI_TEMOIGNAGE=+P.temoignage;
+  if(P.protoPoints&&+P.protoPoints[0]>0&&+P.protoPoints[1]>0)PROTO_POINTS=[+P.protoPoints[0],+P.protoPoints[1]];
+  if(P.rangs){['p2','p3','p4','p5'].forEach(function(k){if(+P.rangs[k]>0)RANG_SEUILS[k]=+P.rangs[k];});}
+  if(typeof P.signature==='string'&&P.signature.trim())SIGN_SUFFIX=P.signature.trim();
+  if(P.produits&&P.produits.length&&P.produits.join('|')!==PRODUCTS.join('|')){PRODUCTS=P.produits.slice();try{oBuildProductGrid();}catch(e){}}
+  if(P.themes&&P.themes.length)THEMES=P.themes.slice();
+  if(P.liens){if(P.liens.boffice)BOFFICE_URL=P.liens.boffice;if(P.liens.boly)BOLY_URL=P.liens.boly;if(P.liens.tunnels)TUNNELS_URL=P.liens.tunnels;if(P.liens.youtube)YOUTUBE_URL=P.liens.youtube;}
+}
 
 // ── ÉTAT GLOBAL ──────────────────────────────────────────────────────
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.12 · 09/10';
+var APP_VERSION='v3.13 · 09/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -2047,6 +2221,7 @@ function oSessionLost(msg){TOKEN='';CODE='';USER=null;try{localStorage.removeIte
 function oApplyPayload(d){
       oLoader(false);
       USER=d.user;
+      try{if(d.config&&d.config.params){CFG.params=d.config.params;}applyParams();}catch(e){}
       OC=d.contacts||[];OC.forEach(function(c){if(!c.actions)c.actions={};if(!c.produits)c.produits=[];});normAll();
       CFG=d.config||{referents:[],suiveurs:[]};
       if(d.users)USERS=d.users;
@@ -2195,6 +2370,9 @@ function applyRole(){
   var isAdmin=(r==='admin');
   // Navigation
   document.querySelectorAll('[data-nav="actions"],[data-nav="equipe"]').forEach(function(b){b.classList.toggle('hide',isRef);});
+  var sa=document.getElementById('sd-admin');if(sa)sa.classList.toggle('hide',!isAdmin);
+  var da=document.getElementById('odr-admin');if(da)da.style.display=isAdmin?'':'none';
+  if(!isAdmin&&CUR_VIEW==='admin')oSw('dashboard');
   var sun=document.getElementById('sd-un');if(sun){sun.textContent=USER.nom||'—';document.getElementById('sd-ur').textContent=roleLabel(r)+(VIEW_AS_NOM?' · vue '+VIEW_AS_NOM:'');setAv('sd-av',USER.photo,ini(USER.nom||'?'));sun.innerHTML=esc(USER.nom||'—')+'<span class="vpill">'+esc(APP_VERSION.split(' ')[0])+'</span>';}
   // Dashboard
   document.getElementById('d-refhello').classList.toggle('hide',!isRef);
@@ -2589,7 +2767,7 @@ function sign(lang,tone){
   var nom=PARTNER_NOM()||(lang==='en'?'The WLHT Team':'L\'équipe WLHT');
   if(tone==='chaleureux')return'\n\n'+nom+' 😊';
   if(tone==='equipe')return'\n\n'+nom+' — WLHT';
-  return'\n\n'+nom+' — OlyLife / WLHT';
+  return'\n\n'+nom+' — '+SIGN_SUFFIX;
 }
 
 function msgRelance(c,k,lang,tone){
@@ -2739,7 +2917,7 @@ function computeActions(){
     // v3.9 — suivi des protocoles assignés (J+7, J+30)
     (c.protocoles||[]).forEach(function(pa){
       var pr=protoById(pa.protoId);if(!pr||pa.termine)return;
-      [[7,'j7'],[30,'j30']].forEach(function(st){
+      [[PROTO_POINTS[0],'j7'],[PROTO_POINTS[1],'j30']].forEach(function(st){
         if(pa.sent&&pa.sent[st[1]])return;
         var diff=diffD(addD(pa.debut,st[0]));
         if(diff!==null&&diff<=0)items.push({c:c,key:'proto_'+pa.id+'_'+st[1],type:'Fiche conseils',label:'🧭 Point J+'+st[0]+' — '+pr.titre,diff:diff,msg:protoSuiviMsg(c,pr,st[0]),tel:c.tel});
@@ -3845,7 +4023,7 @@ function looksOlyOrder(text){
 }
 function deEnt(x){return String(x||'').replace(/&ccedil;/gi,'ç').replace(/&eacute;/gi,'é').replace(/&egrave;/gi,'è').replace(/&ecirc;/gi,'ê').replace(/&agrave;/gi,'à').replace(/&ocirc;/gi,'ô').replace(/&icirc;/gi,'î').replace(/&ugrave;/gi,'ù').replace(/&amp;/gi,'&').replace(/&#(\d+);/g,function(_,n){return String.fromCharCode(+n);});}
 // Seuils OlyLife (achats cumulés, USD) : P2 Builder ≥ 500 · P3 Leader ≥ 1000 · P4 Supervisor ≥ 2000 · P5 Pioneer ≥ 6000 (P1 Starter non disponible)
-function rangFromUSD(u){u=+u||0;if(u>=6000)return'P5 - Pioneer';if(u>=2000)return'P4 - Supervisor';if(u>=1000)return'P3 - Leader';if(u>=500)return'P2 - Builder';if(u>0)return'P1 - Starter';return'';}
+function rangFromUSD(u){u=+u||0;var R=RANG_SEUILS;if(u>=R.p5)return'P5 - Pioneer';if(u>=R.p4)return'P4 - Supervisor';if(u>=R.p3)return'P3 - Leader';if(u>=R.p2)return'P2 - Builder';if(u>0)return'P1 - Starter';return'';}
 function rangNum(r){var m=String(r||'').match(/P([1-5])/i);return m?+m[1]:0;}
 var RANG_OLY={p1:'P1 - Starter',p2:'P2 - Builder',p3:'P3 - Leader',p4:'P4 - Supervisor',p5:'P5 - Pioneer',starter:'P1 - Starter',builder:'P2 - Builder',leader:'P3 - Leader',supervisor:'P4 - Supervisor',pioneer:'P5 - Pioneer'};
 function parseOlyOrders(text){
@@ -4097,7 +4275,7 @@ function oClearFiltersSilent(){
 // v3 — INTERFACE RESPONSIVE : navigation · accueil · contacts (tableau,
 // sélection multiple) · pipeline · agenda · Calendly · raccourcis clavier
 // ═══════════════════════════════════════════════════════════════════
-var VIEW_T={dashboard:'Tableau de bord',contacts:'Contacts',pipeline:'Pipeline',agenda:'Agenda',actions:'Actions',equipe:'Équipe',nouvelle:'Nouveau contact',carte:'Carte des essais',genea:'Généalogie',temoignages:'Témoignages',protocoles:'Fiches conseils de soins',precautions:'Utilisations & précautions'};
+var VIEW_T={admin:'Administration',dashboard:'Tableau de bord',contacts:'Contacts',pipeline:'Pipeline',agenda:'Agenda',actions:'Actions',equipe:'Équipe',nouvelle:'Nouveau contact',carte:'Carte des essais',genea:'Généalogie',temoignages:'Témoignages',protocoles:'Fiches conseils de soins',precautions:'Utilisations & précautions'};
 var CUR_VIEW='dashboard',CUR_LIST=[],SORT={k:'statut',d:1},SEL={},SEL_MODE=false,ACTIVE_ID=null,LIST_LIMIT=150;
 function mq(q){try{return window.matchMedia(q).matches;}catch(e){return false;}}
 function isDesk(){return mq('(min-width:760px)');}
@@ -4134,7 +4312,8 @@ function oRefreshView(v){
   if(!USER){return;}
   if(v==='dashboard')oDash();else if(v==='contacts')oCli();else if(v==='pipeline')oPipe();
   else if(v==='agenda')oAgenda();else if(v==='actions')oAct();
-  else if(v==='equipe'){oEq();oLoadMyDigest();var ve=document.getElementById('eq-version');if(ve)ve.textContent=APP_VERSION;}
+  else if(v==='equipe'){admBackCards();oEq();oLoadMyDigest();var ve=document.getElementById('eq-version');if(ve)ve.textContent=APP_VERSION;}
+  else if(v==='admin'){if(ROLE()!=='admin'){oSw('dashboard');return;}oAdmin();}
   else if(v==='carte')oCarte();else if(v==='genea')oGenea();
   else if(v==='temoignages')oTemView();else if(v==='protocoles')oProtoView();else if(v==='precautions')oPrecView();
   navBadges();
@@ -5561,6 +5740,91 @@ function accHtml(c){
   return'<div class="od-section"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">🌿 Accompagnement — précautions · fiche conseils · témoignage</div><div class="od-bd">'+rows+'</div></div>';
 }
 
+// ── ADMINISTRATION (v3.13) ──────────────────────────────────────────
+var ADM_TAB='equipe';
+function admMove(id,hostId){var el=document.getElementById(id),host=document.getElementById(hostId);if(!el||!host)return;if(!el._ph){el._ph=document.createElement('span');el._ph.style.display='none';el.parentNode.insertBefore(el._ph,el);}if(el.parentNode!==host)host.appendChild(el);el.classList.remove('hide');}
+function admBackCards(){['eq-users-card','eq-refs-card'].forEach(function(id){var el=document.getElementById(id);if(el&&el._ph&&el.parentNode!==el._ph.parentNode)el._ph.parentNode.insertBefore(el,el._ph);});}
+function admTab(t){ADM_TAB=t;document.querySelectorAll('#adm-tabs .adm-tab').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-tab')===t);});document.querySelectorAll('#ov-admin .adm-pane').forEach(function(p){p.classList.toggle('on',p.id==='adm-'+t);});admRenderTab(t);}
+function oAdmin(){
+  admMove('eq-users-card','adm-eq-host');admMove('eq-refs-card','adm-refs-host');
+  renderUsers();renderRefChips();
+  var pend=USERS.filter(function(u){return u.pending;}).length;var ne=document.getElementById('adm-n-equipe');ne.textContent=pend;ne.style.display=pend?'':'none';
+  var nres=admResPending();var nr=document.getElementById('adm-n-res');nr.textContent=nres;nr.style.display=nres?'':'none';
+  admTab(ADM_TAB);
+}
+function admResPending(){var r=resGet();return r.protocoles.filter(function(p){return p.statut!=='valide';}).length+temAll().filter(function(x){return x.t.statut==='avalider';}).length;}
+function admRenderTab(t){
+  var P=CFG.params||{};
+  if(t==='equipe'){
+    var by={};USERS.forEach(function(u){by[u.role]=(by[u.role]||0)+1;});
+    var inact=USERS.filter(function(u){return u.actif===false;}).length,pend=USERS.filter(function(u){return u.pending;}).length,sess=USERS.reduce(function(a,u){return a+(u.sessions||0);},0);
+    document.getElementById('adm-eq-stat').innerHTML='<span><b>'+USERS.length+'</b>accès</span><span><b>'+(by.admin||0)+'</b>admin</span><span><b>'+(by.gestionnaire||0)+'</b>gestionnaires</span><span><b>'+(by.referent||0)+'</b>référents</span><span><b>'+(by.comite||0)+'</b>comité</span>'+(pend?'<span style="border-color:var(--gold)"><b>'+pend+'</b>proposition(s) à valider</span>':'')+(inact?'<span><b>'+inact+'</b>désactivé(s)</span>':'')+'<span><b>'+sess+'</b>appareils connectés</span>';
+  }
+  if(t==='refs'){
+    var tags=admAllTags();
+    var opts=tags.map(function(x){return'<option value="'+esc(x)+'">'+esc(x)+'</option>';}).join('');
+    document.getElementById('adm-merge-from').innerHTML='<option value="">— choisir —</option>'+opts;document.getElementById('adm-merge-to').innerHTML='<option value="">— choisir —</option>'+opts;
+    var cnt={};OC.forEach(function(c){var seen={};(c.ctags||[]).concat(c.refere?[c.refere]:[]).forEach(function(x){if(x&&!seen[x]){seen[x]=1;cnt[x]=(cnt[x]||0)+1;}});});
+    var keys=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];});
+    document.getElementById('adm-refs-stat').innerHTML=keys.length?keys.map(function(k){return'<span><b>'+cnt[k]+'</b>'+esc(k)+(CFG.referents.indexOf(k)<0?' <small style="color:var(--orwtx)">(hors liste)</small>':'')+'</span>';}).join(''):'<span>Aucun contact tagué</span>';
+  }
+  if(t==='catalogue'){
+    document.getElementById('adm-produits').value=PRODUCTS.join('\n');document.getElementById('adm-themes').value=THEMES.join('\n');
+    ['p2','p3','p4','p5'].forEach(function(k){document.getElementById('adm-r-'+k).value=RANG_SEUILS[k];});
+  }
+  if(t==='relances'){
+    document.getElementById('adm-j1').value=RELANCE_STEPS[0].d;document.getElementById('adm-j2').value=RELANCE_STEPS[1].d;document.getElementById('adm-j3').value=RELANCE_STEPS[2].d;
+    document.getElementById('adm-logi').value=SEUIL_LOGISTIQUE;document.getElementById('adm-inst').value=DELAI_INSTALL;document.getElementById('adm-tem').value=DELAI_TEMOIGNAGE;
+    document.getElementById('adm-pp1').value=PROTO_POINTS[0];document.getElementById('adm-pp2').value=PROTO_POINTS[1];document.getElementById('adm-sign').value=SIGN_SUFFIX;
+  }
+  if(t==='liens'){
+    document.getElementById('adm-l-boffice').value=BOFFICE_URL;document.getElementById('adm-l-boly').value=BOLY_URL;document.getElementById('adm-l-tunnels').value=TUNNELS_URL;document.getElementById('adm-l-youtube').value=YOUTUBE_URL;
+    var cal=USERS.filter(function(u){return u.calendlyUrl;}).length;
+    document.getElementById('adm-integ').innerHTML='📅 <b>Calendly</b> : '+cal+' membre(s) avec un lien de prise de RDV (chacun le renseigne dans Réglages ; la synchronisation des RDV se fait côté script toutes les heures).<br>🗺️ <b>Carte</b> : géolocalisation des adresses via OpenStreetMap (gratuit, sans clé).<br>📧 <b>Résumé quotidien</b> : envoyé par le script Google avec l\'adresse e-mail du profil de chaque membre.<br>🔐 <b>Serveur</b> : <span style="word-break:break-all">'+esc(GAS_URL)+'</span>';
+  }
+  if(t==='donnees'){
+    var st={};OC.forEach(function(c){var k=cStatut(c);st[k]=(st[k]||0)+1;});
+    var noTel=OC.filter(function(c){return!c.tel;}).length,noGeo=OC.filter(function(c){return(c.adresse||c.ville)&&!c.geo;}).length,noRef=OC.filter(function(c){return!c.refere&&!(c.ctags&&c.ctags.length);}).length;
+    var size=0;try{size=(localStorage.getItem(cacheKey())||'').length;}catch(e){}
+    document.getElementById('adm-data-stat').innerHTML='<span><b>'+OC.length+'</b>contacts</span>'+Object.keys(STATUT_DEF).map(function(k){return'<span><b>'+(st[k]||0)+'</b>'+STATUT_DEF[k].l+'</span>';}).join('')+'<span><b>'+noTel+'</b>sans téléphone</span><span><b>'+noGeo+'</b>adresse non géolocalisée</span><span><b>'+noRef+'</b>sans parrain ni tag</span><span><b>'+Math.round(size/1024)+' Ko</b>cache local</span>';
+  }
+  if(t==='ressources'){
+    var r=resGet();var pr=r.protocoles.filter(function(p){return p.statut!=='valide';});
+    document.getElementById('adm-res-proto').innerHTML=pr.length?pr.map(function(p){return'<div class="adm-row"><span>🧭</span><div class="b"><b>'+esc(p.titre)+'</b><small>'+esc(p.theme||'')+(p.majPar?' · '+esc(p.majPar)+' · '+fD(p.majLe):'')+'</small></div><button class="ob bgh bsm" onclick="oProtoOpen(\''+p.id+'\')">👁 Lire</button><button class="ob bgold bsm" onclick="admProtoValide(\''+p.id+'\')">✅ Valider</button></div>';}).join(''):'<div style="font-size:12px;color:var(--t3)">Aucune fiche en attente.</div>';
+    var tm=temAll().filter(function(x){return x.t.statut==='avalider';});
+    document.getElementById('adm-res-tem').innerHTML=tm.length?tm.map(function(x){var c=x.c,t=x.t;return'<div class="adm-row"><span>'+temIcon(t.type)+'</span><div class="b"><b>'+esc(c.prenom+' '+c.nom)+'</b><small>'+(t.appareil?esc(t.appareil.split('(')[0].trim())+' · ':'')+(t.consent?'consentement ✅':'<span style="color:#C63E47">sans consentement</span>')+(t.texte?' · « '+esc(t.texte.slice(0,70))+(t.texte.length>70?'…':'')+' »':'')+'</small></div><button class="ob bgh bsm" onclick="oTemOpen(\''+c.id+'\',\''+t.id+'\')">✏️ Ouvrir</button></div>';}).join(''):'<div style="font-size:12px;color:var(--t3)">Aucun témoignage en attente.</div>';
+  }
+  if(t==='journal'){admJournalLoad();}
+}
+function admProtoValide(id){var p=protoById(id);if(!p)return;if(confCheck([p.titre,p.objectif,p.programme,p.conseils,p.precautions].join(' ')).length&&!confirm('Des termes sensibles sont présents dans cette fiche. Valider quand même ?'))return;p.statut='valide';p.majLe=todayYMD();p.majPar=PARTNER_NOM();resSave();oT('✅ Fiche validée — visible par toute l\'équipe','s');oAdmin();}
+function admJournalLoad(){
+  var b=document.getElementById('adm-journal-box');b.textContent='Chargement…';
+  oPostAsync_({op:'adminLog',n:300}).then(function(d){if(!d.ok){b.textContent=d.error==='op'?'Script Google à mettre à jour (v3.7+).':'Indisponible';return;}b.innerHTML=(d.log||[]).length?d.log.map(function(e){var dt=new Date(e.ts);return'<div>'+(isNaN(dt)?'':dt.toLocaleDateString('fr-FR')+' '+('0'+dt.getHours()).slice(-2)+':'+('0'+dt.getMinutes()).slice(-2))+' · <b>'+esc(e.par)+'</b> — '+esc(e.action)+(e.detail?' : '+esc(e.detail):'')+'</div>';}).join(''):'Aucune entrée pour l\'instant.';}).catch(function(){b.textContent='Hors ligne';});
+}
+function admAllTags(){var set={};(CFG.referents||[]).forEach(function(x){set[x]=1;});USERS.forEach(function(u){(u.tags||[]).forEach(function(x){set[x]=1;});});OC.forEach(function(c){(c.ctags||[]).forEach(function(x){set[x]=1;});if(c.refere)set[c.refere]=1;});return Object.keys(set).sort(function(a,b){return a.localeCompare(b,'fr');});}
+function admMergeTags(){
+  var from=document.getElementById('adm-merge-from').value,to=document.getElementById('adm-merge-to').value;
+  if(!from||!to){oT('Choisissez les deux tags','w');return;}if(from===to){oT('Les deux tags sont identiques','w');return;}
+  var touched=[];
+  OC.forEach(function(c){var ch=false;if(c.ctags&&c.ctags.indexOf(from)>=0){c.ctags=c.ctags.filter(function(x){return x!==from;});if(c.ctags.indexOf(to)<0)c.ctags.push(to);ch=true;}if(c.refere===from){c.refere=to;ch=true;}if(ch)touched.push(c);});
+  if(!confirm('Fusionner « '+from+' » dans « '+to+' » ?\n\n'+touched.length+' fiche(s) seront mises à jour, ainsi que les accès et la liste des référents.'))return;
+  USERS.forEach(function(u){if(u.tags&&u.tags.indexOf(from)>=0){u.tags=u.tags.filter(function(x){return x!==from;});if(u.tags.indexOf(to)<0)u.tags.push(to);}});
+  CFG.referents=(CFG.referents||[]).filter(function(x){return x!==from;});if(CFG.referents.indexOf(to)<0)CFG.referents.push(to);
+  if(touched.length)oPush(touched);oPushUsers();oPushCfg();populateRefUI();
+  oT('🔀 « '+from+' » fusionné dans « '+to+' » — '+touched.length+' fiche(s)','s');oAdmin();
+}
+function admSaveParams(){
+  var P=CFG.params||{};
+  var n=function(id){var v=+document.getElementById(id).value;return v>0?v:0;};
+  var lines=function(id){return document.getElementById(id).value.split('\n').map(function(x){return x.trim();}).filter(Boolean);};
+  if(ADM_TAB==='catalogue'){var pr=lines('adm-produits'),th=lines('adm-themes');if(!pr.length){oT('Il faut au moins un produit','w');return;}P.produits=pr;P.themes=th.length?th:THEMES;P.rangs={p2:n('adm-r-p2'),p3:n('adm-r-p3'),p4:n('adm-r-p4'),p5:n('adm-r-p5')};if(!(P.rangs.p2<P.rangs.p3&&P.rangs.p3<P.rangs.p4&&P.rangs.p4<P.rangs.p5)){oT('Les seuils de rang doivent être croissants','w');return;}}
+  if(ADM_TAB==='relances'){P.relances={j1:n('adm-j1'),j2:n('adm-j2'),j3:n('adm-j3')};if(!(P.relances.j1<P.relances.j2&&P.relances.j2<P.relances.j3)){oT('Les rappels doivent être croissants (ex. 2, 5, 12)','w');return;}P.logistique=n('adm-logi');P.install=n('adm-inst');P.temoignage=n('adm-tem');P.protoPoints=[n('adm-pp1'),n('adm-pp2')];P.signature=document.getElementById('adm-sign').value.trim()||'OlyLife / WLHT';}
+  if(ADM_TAB==='liens'){P.liens={boffice:document.getElementById('adm-l-boffice').value.trim(),boly:document.getElementById('adm-l-boly').value.trim(),tunnels:document.getElementById('adm-l-tunnels').value.trim(),youtube:document.getElementById('adm-l-youtube').value.trim()};}
+  CFG.params=P;applyParams();oSaveCache();
+  oPost_({op:'saveConfig',config:{params:P}});
+  oT('💾 Paramètres enregistrés','s');admRenderTab(ADM_TAB);
+}
+
 // ── Mise à jour de l'app sans vider les données (v3.12) ─────────────
 var UPD_READY=false;
 function oShowUpdate(){UPD_READY=true;var b=document.getElementById('oupd');if(b)b.classList.add('on');}
@@ -5805,7 +6069,7 @@ oBuildProductGrid();
 oBuildBoList();
 oGetCfg();
 (function(){var v=document.getElementById('ol-version');if(v)v.textContent='· '+APP_VERSION;})();
-if(GAS_URL&&(TOKEN||CODE)){oLoadCache();if(USER){applyRole();populateRefUI();oRefresh();}oPinGate();oPull();}
+if(GAS_URL&&(TOKEN||CODE)){oLoadCache();if(USER){try{applyParams();}catch(e){}applyRole();populateRefUI();oRefresh();}oPinGate();oPull();}
 else{oShowLogin();}
 </script>
 </body>
