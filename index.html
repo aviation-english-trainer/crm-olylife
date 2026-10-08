@@ -1053,6 +1053,8 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <div class="ocard ucbar" style="margin-bottom:14px">
         <div class="ochd" style="cursor:pointer" onclick="this.parentElement.classList.toggle('oc-open')"><span class="oct">📇 Contacts utiles</span><span style="font-size:11px;color:var(--t3)">toucher pour ouvrir</span></div>
         <div style="padding:12px 16px;display:none" class="oc-body">
+          <div style="font-size:10px;font-weight:700;color:var(--aqua);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Équipe WLHT — admin & gestionnaires</div>
+          <div id="uc-equipe" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;font-size:12px"></div>
           <div style="font-size:10px;font-weight:700;color:var(--aqua);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Services OlyLife</div>
           <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;font-size:12px">
             <div>📦 Logistique (colis, tracking) — <a href="https://wa.me/6581395926" target="_blank" style="color:var(--aqua)">WhatsApp</a> · <a href="mailto:logisticcs@olylifeint.com" style="color:var(--aqua)">logisticcs@olylifeint.com</a></div>
@@ -1901,7 +1903,7 @@ var DELAI_TEMOIGNAGE=30;
 var GAS_URL='',CODE='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.11 · 09/10';
+var APP_VERSION='v3.11.1 · 09/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -4103,7 +4105,28 @@ function avsHtml(c){
 }
 
 // ═════════════════ ACCUEIL ═════════════════
+// Contacts utiles : admin + gestionnaires (liste « equipe » fournie par le script Google à tous les rôles, repli sur USERS)
+function equipeContacts(){
+  var list=(CFG.equipe&&CFG.equipe.length)?CFG.equipe.slice():[];
+  if(!list.length){
+    if(USER&&ROLE()==='admin')list.push({nom:USER.nom,role:'admin',tel:USER.tel||'',email:USER.email||'',photo:USER.photo||''});
+    USERS.forEach(function(u){if(u.actif!==false&&!u.pending&&(u.role==='admin'||u.role==='gestionnaire'))list.push({nom:u.nom,role:u.role,tel:u.tel||'',email:u.email||'',photo:u.photo||''});});
+  }
+  if(USER&&USER.id!=='root'&&(ROLE()==='admin'||ROLE()==='gestionnaire')&&!list.some(function(x){return x.nom===USER.nom;}))list.push({nom:USER.nom,role:ROLE(),tel:USER.tel||'',email:USER.email||'',photo:USER.photo||''});
+  var seen={};return list.filter(function(x){if(!x.nom||seen[x.nom])return false;seen[x.nom]=1;return true;}).sort(function(a,b){return(a.role==='admin'?0:1)-(b.role==='admin'?0:1)||a.nom.localeCompare(b.nom);});
+}
+function renderEquipeUtiles(){
+  var box=document.getElementById('uc-equipe');if(!box)return;
+  var l=equipeContacts();
+  if(!l.length){box.innerHTML='<div style="color:var(--t3)">Aucun gestionnaire renseigné pour l\'instant.</div>';return;}
+  box.innerHTML=l.map(function(u){var tel=(u.tel||'').replace(/\D/g,'');
+    return'<div style="display:flex;align-items:center;gap:10px"><span class="ouser-av" style="width:30px;height:30px;font-size:11px">'+avOf(u.photo,ini(u.nom))+'</span><div style="flex:1;min-width:0"><b>'+esc(u.nom)+'</b> <span class="obdg '+(u.role==='admin'?'bgo':'baq')+'">'+roleLabel(u.role)+'</span><div style="color:var(--t2)">'
+      +(u.tel?'<a href="tel:'+esc(u.tel)+'" style="color:var(--aqua)">'+esc(u.tel)+'</a>'+(tel?' · <a href="https://wa.me/'+telE164(u.tel).replace('+','')+'" target="_blank" rel="noopener" style="color:var(--aqua)">WhatsApp</a>':''):'<span style="color:var(--t3)">téléphone non renseigné</span>')
+      +(u.email?' · <a href="mailto:'+esc(u.email)+'" style="color:var(--aqua)">'+esc(u.email)+'</a>':'')+'</div></div></div>';}).join('')
+    +'<div style="font-size:11px;color:var(--t3)">Chacun complète son téléphone et son e-mail dans <b>Mon profil</b> (carte en haut du menu).</div>';
+}
 function oDash(){
+  renderEquipeUtiles();
   if(!USER)return;
   var isRef=ROLE()==='referent',sc=scopeContacts(),all=dScope()==='all';
   var h=new Date().getHours();
