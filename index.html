@@ -338,6 +338,67 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .ouser-top .ouser-av{margin-right:2px;}
 .uphoto-row{display:flex;align-items:center;gap:12px;margin-top:10px;}
 .uphoto-row .ouser-av{width:52px;height:52px;font-size:17px;}
+/* ── RESSOURCES (v3.9) ───────────────────────────────────────────── */
+.rs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+.rs-card{background:var(--navy2);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:14px;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden;}
+.rs-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.08);}
+.rs-card .rs-hd{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.rs-card .rs-ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;background:var(--navy3);overflow:hidden;}
+.rs-card .rs-ic img{width:100%;height:100%;object-fit:cover;}
+.rs-card .rs-t{font-weight:700;font-size:14px;color:var(--tx);line-height:1.25;}
+.rs-card .rs-s{font-size:11.5px;color:var(--t3);}
+.rs-card .rs-x{font-size:12.5px;color:var(--t2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.rs-card .rs-ft{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
+.rs-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
+.rs-empty{padding:28px 16px;text-align:center;color:var(--t3);font-size:13px;line-height:1.6;}
+.rs-kpi{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.rs-kpi div{flex:1;min-width:90px;background:var(--navy2);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;text-align:center;}
+.rs-kpi b{display:block;font-size:20px;color:var(--gold);font-family:'Cormorant Garamond',serif;}
+.rs-kpi small{font-size:10.5px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;}
+.tem-type{display:inline-flex;align-items:center;gap:4px;}
+.tem-media{margin-top:10px;border-radius:12px;overflow:hidden;border:1px solid var(--bd);background:#000;}
+.tem-media iframe{width:100%;aspect-ratio:16/9;border:0;display:block;}
+.tem-media.audio iframe{aspect-ratio:auto;height:80px;background:#fff;}
+.tem-quote{font-family:'Cormorant Garamond',serif;font-size:16.5px;line-height:1.5;color:var(--tx);padding:12px 14px;background:var(--navy3);border-left:3px solid var(--gold);border-radius:0 12px 12px 0;white-space:pre-wrap;}
+.conf-box{margin-top:8px;padding:10px 12px;border-radius:10px;font-size:12px;line-height:1.5;}
+.conf-box.ok{background:#E6F4EA;color:#1E6B3A;border:1px solid #BFE3CB;}
+.conf-box.warn{background:#FFF4E0;color:#7A4B00;border:1px solid #F3D9A4;}
+.conf-box mark{background:#FFD6D6;color:#8A1C1C;border-radius:3px;padding:0 2px;}
+.rec-btn{min-height:48px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.rec-btn.on{background:#C63E47!important;color:#fff!important;animation:recPulse 1.2s ease-in-out infinite;}
+@keyframes recPulse{0%,100%{box-shadow:0 0 0 0 rgba(198,62,71,.45)}50%{box-shadow:0 0 0 10px rgba(198,62,71,0)}}
+.prec-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:10px;-webkit-overflow-scrolling:touch;}
+.prec-tabs button{flex-shrink:0;}
+.prec-sec{border:1px solid var(--bd);border-radius:12px;margin-bottom:10px;overflow:hidden;background:var(--navy2);}
+.prec-sec .ttl{display:flex;align-items:center;gap:8px;padding:10px 14px;font-weight:700;font-size:13px;color:var(--tx);background:var(--navy3);cursor:pointer;}
+.prec-sec .ttl .em{font-size:16px;}
+.prec-sec .ttl .arr{margin-left:auto;color:var(--t3);transition:transform .2s;}
+.prec-sec.clps .arr{transform:rotate(-90deg);}
+.prec-sec .bd{padding:10px 14px 12px;font-size:13px;line-height:1.65;color:var(--t2);white-space:pre-wrap;}
+.prec-sec.clps .bd{display:none;}
+.prec-sec.danger .ttl{background:#FDECEC;color:#8A1C1C;}
+.prec-sec.warn .ttl{background:#FFF4E0;color:#7A4B00;}
+.prec-sec .bd textarea{width:100%;min-height:140px;font:inherit;font-size:13px;border:1px solid var(--bd);border-radius:10px;padding:10px;background:#fff;color:var(--tx);}
+.prec-src{font-size:11px;color:var(--t3);padding:8px 2px 0;line-height:1.5;}
+.proto-lvl{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;display:inline-block;}
+.proto-lvl.etabli{background:#E6F4EA;color:#1E6B3A;}
+.proto-lvl.recherche{background:#E8F1FB;color:#1F4E8C;}
+.proto-lvl.fabricant{background:#FFF4E0;color:#7A4B00;}
+.proto-field{display:flex;gap:10px;padding:8px 0;border-bottom:1px dashed var(--bd);font-size:13px;}
+.proto-field b{flex:0 0 130px;color:var(--t3);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;padding-top:2px;}
+.proto-field span{flex:1;color:var(--tx);white-space:pre-wrap;line-height:1.5;}
+.disclaimer{font-size:11.5px;color:var(--t2);background:var(--navy3);border:1px dashed var(--bd);border-radius:10px;padding:10px 12px;line-height:1.5;margin-top:10px;}
+.acc-row{display:flex;align-items:flex-start;gap:10px;padding:10px 16px;border-bottom:1px solid var(--bd);}
+.acc-row:last-child{border-bottom:none;}
+.acc-row .em{font-size:18px;flex-shrink:0;width:26px;text-align:center;}
+.acc-row .b{flex:1;min-width:0;font-size:13px;line-height:1.5;color:var(--tx);}
+.acc-row .b small{display:block;color:var(--t3);font-size:11.5px;}
+.acc-row .acts{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+#otem,#oproto,#oprec{display:none;position:fixed;inset:0;background:rgba(246,250,246,.86);backdrop-filter:blur(3px);z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+#otem.on,#oproto.on,#oprec.on{display:block;}
+.chk-list{display:flex;flex-wrap:wrap;gap:6px;}
+.chk-list label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--bd);border-radius:20px;padding:5px 10px;font-size:12px;background:#fff;cursor:pointer;}
+.chk-list label.on{border-color:var(--gold);background:var(--goldp);color:var(--gold);font-weight:600;}
 /* ── FULL-SCREEN MODAL ───────────────────────────────────────────── */
 #omo,#oimp,#oavs,#oreq,#ostk{display:none;position:fixed;inset:0;background:rgba(246,250,246,.86);backdrop-filter:blur(3px);z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 #omo.on,#oimp.on,#oavs.on,#oreq.on,#ostk.on{display:block;}
@@ -943,6 +1004,9 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <button class="sd-it" data-nav="actions" onclick="oSw('actions')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><em>Actions</em><i class="nbdg" data-b="actions"></i></button>
       <button class="sd-it" data-nav="equipe" onclick="oSw('equipe')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v5m0 0L6.5 17m5.5-4.5L17.5 17"/></svg><em>Équipe</em><i class="nbdg" data-b="equipe"></i></button>
       <button class="sd-it" data-nav="carte" onclick="oSw('carte')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.6-7-11a7 7 0 0 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg><em>Carte</em></button>
+      <button class="sd-it" data-nav="temoignages" onclick="oSw('temoignages')" title="Témoignages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg><em>Témoignages</em></button>
+      <button class="sd-it" data-nav="protocoles" onclick="oSw('protocoles')" title="Protocoles du comité scientifique"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6v4l4 9a3 3 0 0 1-2.7 4H7.7A3 3 0 0 1 5 16l4-9z"/><path d="M8 14h8"/></svg><em>Protocoles</em></button>
+      <button class="sd-it" data-nav="precautions" onclick="oSw('precautions')" title="Utilisations & précautions des appareils"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M12 7v4m0 3h.01"/></svg><em>Précautions</em></button>
       <button class="sd-it" data-nav="genea" onclick="oSw('genea')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2.5" width="6" height="5" rx="1.5"/><rect x="2.5" y="16.5" width="6" height="5" rx="1.5"/><rect x="15.5" y="16.5" width="6" height="5" rx="1.5"/><path d="M12 7.5v4m0 0H5.5v5m6.5-5h6.5v5"/></svg><em>Généalogie</em></button>
     </nav>
     <div class="sd-foot">
@@ -1143,6 +1207,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
                 <option value="referent">Référent — voit uniquement ses contacts référés</option>
                 <option value="gestionnaire">Gestionnaire — gère les contacts attribués</option>
                 <option value="admin">Admin — accès complet</option>
+                <option value="comite">Comité scientifique — rédige les protocoles et précautions, voit ses contacts</option>
               </select>
             </div>
             <div class="ofg1"><label class="ofl">Téléphone / WhatsApp</label><input type="tel" class="ofc" id="u-tel" placeholder="+33 6 00 00 00 00"></div>
@@ -1414,6 +1479,40 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <div class="ocard mt-scroll" id="genea-tree"></div>
     </div>
 
+    <!-- RESSOURCES : TÉMOIGNAGES -->
+    <div class="ov" id="ov-temoignages">
+      <div class="ocard" style="padding:14px 16px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px;font-size:13px;color:var(--t2);line-height:1.6">🎙 <b>Témoignages de nos membres</b> — écrits, audio ou vidéo, recueillis avec leur consentement. Un témoignage est une <b>expérience personnelle</b> : il ne remplace jamais un avis médical.</div>
+          <button class="ob bgh bsm" onclick="oTemConsent()">📝 Formulaire de consentement</button>
+        </div>
+      </div>
+      <div class="rs-kpi" id="tem-kpi"></div>
+      <div class="rs-chips" id="tem-filters"></div>
+      <div id="tem-list" class="rs-grid"></div>
+    </div>
+
+    <!-- RESSOURCES : PROTOCOLES -->
+    <div class="ov" id="ov-protocoles">
+      <div class="ocard" style="padding:14px 16px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px;font-size:13px;color:var(--t2);line-height:1.6">🧭 <b>Protocoles d'accompagnement</b> validés par le comité scientifique. Chaque fiche indique l'appareil, le programme, la fréquence, les précautions et le <b>niveau de preuve</b>. Ils accompagnent le bien-être et ne se substituent ni à un traitement ni à un avis médical.</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap" id="proto-tools"></div>
+        </div>
+      </div>
+      <div class="rs-chips" id="proto-filters"></div>
+      <div id="proto-list" class="rs-grid"></div>
+    </div>
+
+    <!-- RESSOURCES : UTILISATIONS & PRÉCAUTIONS -->
+    <div class="ov" id="ov-precautions">
+      <div class="ocard" style="padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:13px;color:var(--t2);line-height:1.6">📖 <b>Utilisations & précautions</b> — contenu issu <b>exclusivement des manuels officiels OlyLife</b>. Les informations manquantes dans les manuels sont signalées, jamais inventées. La notice de sécurité prime toujours sur la brochure commerciale.</div>
+      </div>
+      <div class="prec-tabs" id="prec-tabs"></div>
+      <div id="prec-body"></div>
+    </div>
+
   </div><!-- /ocont -->
 
   <div id="odrawer">
@@ -1430,6 +1529,10 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <button class="odr-it" data-dnav="equipe" onclick="oDrGo('equipe')"><span class="em">🤝</span>Équipe</button>
       <button class="odr-it" data-dnav="carte" onclick="oDrGo('carte')"><span class="em">🗺️</span>Carte des essais</button>
       <button class="odr-it" data-dnav="genea" onclick="oDrGo('genea')"><span class="em">🧬</span>Généalogie</button>
+      <div class="odr-sec">Ressources</div>
+      <button class="odr-it" data-dnav="temoignages" onclick="oDrGo('temoignages')"><span class="em">🎙</span>Témoignages</button>
+      <button class="odr-it" data-dnav="protocoles" onclick="oDrGo('protocoles')"><span class="em">🧭</span>Protocoles du comité</button>
+      <button class="odr-it" data-dnav="precautions" onclick="oDrGo('precautions')"><span class="em">📖</span>Utilisations & précautions</button>
       <div class="odr-sec">Outils</div>
       <button class="odr-it" onclick="oDrawerClose();oNew()"><span class="em">➕</span>Nouveau contact</button>
       <button class="odr-it" id="odr-req" onclick="oDrawerClose();oReqOpen()"><span class="em">📨</span>Demander les infos d'inscription</button>
@@ -1531,6 +1634,78 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     </div>
     <div class="os-note" style="margin-top:12px;font-size:11.5px" id="av-note">⏰ Rappels automatiques par <b>e-mail</b> 3 jours avant, la veille et le jour J (aux gestionnaires du contact et à l'admin). Le message <b>WhatsApp</b> pré-rempli est à un clic depuis la fiche et depuis l'écran Actions.</div>
     <button class="ob bgold bfull" style="margin-top:14px;min-height:48px" id="av-save-btn" onclick="oAvSave()">Enregistrer l'avance</button>
+  </div>
+</div>
+
+<!-- FEUILLE : TÉMOIGNAGE -->
+<div id="otem">
+  <div class="omo-hd">
+    <button class="omo-back" onclick="oTemClose()">←</button>
+    <div class="omo-ttl">🎙 Témoignage</div>
+  </div>
+  <div class="omo-body">
+    <div class="os-note" style="margin-bottom:14px" id="otem-sub">—</div>
+    <input type="hidden" id="tem-cid"><input type="hidden" id="tem-id"><input type="hidden" id="tem-url"><input type="hidden" id="tem-media">
+    <div class="av-seg" id="tem-types">
+      <button type="button" data-t="ecrit" class="on" onclick="oTemType('ecrit')">✍️ Écrit</button>
+      <button type="button" data-t="audio" onclick="oTemType('audio')">🎙 Audio</button>
+      <button type="button" data-t="video" onclick="oTemType('video')">🎬 Vidéo</button>
+    </div>
+    <div class="ofg">
+      <div class="ofg2" style="gap:10px">
+        <div><label class="ofl">Appareil</label><select class="ofc" id="tem-app"></select></div>
+        <div><label class="ofl">Thème</label><select class="ofc" id="tem-theme"></select></div>
+      </div>
+      <div class="ofg1"><label class="ofl">Date</label><input type="date" class="ofc" id="tem-date"></div>
+      <div class="ofg1" id="tem-video-wrap" style="display:none"><label class="ofl">Lien vidéo (YouTube non répertorié, Vimeo ou Drive)</label><input type="url" class="ofc" id="tem-video" placeholder="https://youtu.be/…" oninput="oTemPreview()"><div id="tem-video-prev"></div></div>
+      <div class="ofg1" id="tem-audio-wrap" style="display:none">
+        <label class="ofl">Enregistrement audio (3 min max)</label>
+        <button type="button" class="ob bgh bfull rec-btn" id="tem-rec" onclick="oTemRec()">🎙 Démarrer l'enregistrement</button>
+        <div id="tem-audio-prev" style="margin-top:8px"></div>
+      </div>
+      <div class="ofg1"><label class="ofl" id="tem-txt-lbl">Texte du témoignage</label><textarea class="ofc" id="tem-txt" rows="6" placeholder="Avec ses mots, tel qu'il l'a dit ou écrit…" oninput="oTemConf()"></textarea><div id="tem-conf"></div></div>
+    </div>
+    <div style="margin-top:14px;padding:12px;background:var(--navy3);border-radius:12px;border:1px solid var(--bd)">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px">🔐 Consentement</div>
+      <label class="ochk-row"><input type="checkbox" id="tem-consent"><span>La personne accepte que son témoignage soit partagé</span></label>
+      <div class="ofg2" style="gap:10px;margin-top:6px">
+        <div><label class="ofl">Affichage</label><select class="ofc" id="tem-affich"><option value="prenom">Prénom + ville</option><option value="initiales">Initiales</option><option value="anonyme">Anonyme</option></select></div>
+        <div><label class="ofl">Date du consentement</label><input type="date" class="ofc" id="tem-consent-date"></div>
+      </div>
+      <label class="ochk-row" style="margin-top:6px"><input type="checkbox" id="tem-visage"><span>Autorise l'usage de son image (photo / visage sur la vidéo)</span></label>
+      <div style="font-size:11px;color:var(--t3);margin-top:6px">Sans autorisation écrite, un témoignage avec visage identifiable reste <b>interne</b> (non publié). Le formulaire de consentement est accessible depuis l'écran Témoignages.</div>
+    </div>
+    <div class="ofg1" style="margin-top:12px"><label class="ofl">Statut</label><select class="ofc" id="tem-statut"><option value="brouillon">Brouillon</option><option value="avalider">À valider (admin)</option><option value="publie">Publié — utilisable auprès des prospects</option></select></div>
+    <button class="ob bgold bfull" style="margin-top:14px;min-height:48px" onclick="oTemSave()">Enregistrer le témoignage</button>
+    <button class="ob bgh bfull" style="margin-top:8px" id="tem-del" onclick="oTemDel()">🗑 Supprimer</button>
+  </div>
+</div>
+
+<!-- FEUILLE : PROTOCOLE -->
+<div id="oproto">
+  <div class="omo-hd">
+    <button class="omo-back" onclick="oProtoClose()">←</button>
+    <div class="omo-ttl" id="oproto-ttl">🧭 Protocole</div>
+  </div>
+  <div class="omo-body" id="oproto-body"></div>
+</div>
+
+<!-- FEUILLE : TRANSMETTRE LES PRÉCAUTIONS -->
+<div id="oprec" onclick="if(event.target===this)oPrecClose()">
+  <div class="osv-card">
+    <div class="osv-grab"></div>
+    <div class="osv-ttl">📖 Transmettre les précautions</div>
+    <div class="osv-sub" id="oprec-sub">—</div>
+    <input type="hidden" id="oprec-cid">
+    <div class="ofl" style="margin-bottom:6px">Appareil</div>
+    <select class="ofc" id="oprec-app" onchange="oPrecMsgPrev()"></select>
+    <textarea class="ofc" id="oprec-msg" rows="9" style="margin-top:10px;font-size:12.5px"></textarea>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="ob bgh" type="button" style="flex:1" onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('oprec-msg').value).then(function(){oT('Message copié','s');})">📋 Copier</button>
+      <button class="ob bwa" type="button" style="flex:2;min-height:46px" onclick="oPrecSend()">💬 Envoyer sur WhatsApp</button>
+    </div>
+    <button class="ob bgold bfull" type="button" style="margin-top:8px" onclick="oPrecMark()">✅ Transmises de vive voix — enregistrer</button>
+    <div class="oinst-note" style="margin-top:10px">Une entrée datée « précautions transmises » est ajoutée au journal de la fiche : c'est votre trace écrite.</div>
   </div>
 </div>
 
@@ -1720,7 +1895,7 @@ var DELAI_TEMOIGNAGE=30;
 var GAS_URL='',CODE='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.8.1 · 08/10';
+var APP_VERSION='v3.9 · 08/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -1840,6 +2015,12 @@ function oPost_(payload,silent){
     .catch(function(){oSyncDot('err');if(!silent)oT('Hors ligne — modification non synchronisée','w');});
 }
 function oPush(list){oSaveCache();oPost_({op:'upsert',contacts:list});}
+function oPostAsync_(payload){
+  if(!GAS_URL||!CODE)return Promise.reject('offline');
+  payload.code=CODE;oSyncDot('spin');
+  return fetch(GAS_URL,{method:'POST',body:JSON.stringify(payload)}).then(function(r){return r.text();}).then(function(t){var d={};try{d=JSON.parse(t);}catch(e){}oSyncDot(d.ok?'ok':'err');return d;}).catch(function(e){oSyncDot('err');throw e;});
+}
+function resSave(){CFG.ressources=CFG.ressources||{};oSaveCache();oPost_({op:'saveRessources',ressources:CFG.ressources});}
 function oPushDel(ids){oSaveCache();oPost_({op:'delete',ids:ids});}
 function oPushUsers(){oSaveCache();oPost_({op:'saveUsers',users:USERS});}
 function oPushCfg(){oSaveCache();oPost_({op:'saveConfig',config:{referents:CFG.referents}});}
@@ -1910,12 +2091,13 @@ function oBackupRestore(input){
 }
 function oHideSetup(){oSheetClose('osetup');}
 function oSavePid(){PARTNER_ID=document.getElementById('o-setup-pid').value.trim();oSaveCfg();oT('ID Partenaire enregistré','s');}
-function roleLabel(r){return r==='admin'?'Admin':r==='gestionnaire'?'Gestionnaire':'Référent';}
+function roleLabel(r){return r==='admin'?'Admin':r==='gestionnaire'?'Gestionnaire':r==='comite'?'Comité scientifique':'Référent';}
+function canEditRes(){var r=ROLE();return r==='admin'||r==='comite';}
 
 // ── RÔLES → INTERFACE ───────────────────────────────────────────────
 function applyRole(){
   var r=ROLE();
-  var isRef=(r==='referent');
+  var isRef=(r==='referent'||r==='comite');
   var isAdmin=(r==='admin');
   // Navigation
   document.querySelectorAll('[data-nav="actions"],[data-nav="equipe"]').forEach(function(b){b.classList.toggle('hide',isRef);});
@@ -2092,7 +2274,7 @@ function renderUsers(){
   if(!box)return;
   if(!USERS.length){box.innerHTML='<div style="padding:14px 16px;font-size:12px;color:var(--t3)">Aucun accès créé. Ajoutez vos gestionnaires et référents ici.</div>';return;}
   box.innerHTML=USERS.map(function(u,i){
-    var rb=u.role==='admin'?'bgo':u.role==='gestionnaire'?'baq':'bpu';
+    var rb=u.role==='admin'?'bgo':u.role==='gestionnaire'?'baq':u.role==='comite'?'bgr':'bpu';
     var hasTag=u.tags&&u.tags.length;
     var firstTag=hasTag?u.tags[0]:'';
     var nbC=hasTag?oContactsRef(firstTag).length:0;
@@ -2436,6 +2618,20 @@ function computeActions(){
         if(diff!==null&&diff<=3)items.push({c:c,key:'temoignage',type:'Témoignage',label:'Demande de témoignage',diff:diff,msg:msgTemoin(c,'fr')});
       }
     }
+    // v3.9 — précautions non transmises pour un appareil livré/installé
+    if(c.produits&&c.produits.length&&(c.installConfirm||c.dateLivraison||c.dateInstall)){
+      c.produits.forEach(function(pn){var k=precKeyOf(pn);if(!k)return;if(c.precTransmis&&c.precTransmis[k])return;
+        items.push({c:c,key:'prec_'+k,type:'Précautions',label:'📖 Transmettre les précautions — '+PREC_DB[k].nom,diff:0,msg:precMsg(c,k),tel:c.tel});});
+    }
+    // v3.9 — suivi des protocoles assignés (J+7, J+30)
+    (c.protocoles||[]).forEach(function(pa){
+      var pr=protoById(pa.protoId);if(!pr||pa.termine)return;
+      [[7,'j7'],[30,'j30']].forEach(function(st){
+        if(pa.sent&&pa.sent[st[1]])return;
+        var diff=diffD(addD(pa.debut,st[0]));
+        if(diff!==null&&diff<=0)items.push({c:c,key:'proto_'+pa.id+'_'+st[1],type:'Protocole',label:'🧭 Point J+'+st[0]+' — '+pr.titre,diff:diff,msg:protoSuiviMsg(c,pr,st[0]),tel:c.tel});
+      });
+    });
     (c.avances||[]).forEach(function(a){
       if(a.type==='don'||a.statut==='rembourse'||!a.echeance)return;
       var diff=diffD(a.echeance);
@@ -2448,6 +2644,14 @@ function computeActions(){
 }
 function oDone(cid,key){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  if(key&&key.indexOf('prec_')===0){
+    var pk=key.slice(5);c.precTransmis=c.precTransmis||{};c.precTransmis[pk]={date:todayYMD(),par:PARTNER_NOM()};
+    jrnAdd(c,'fait','📖 Précautions d\'utilisation transmises — '+(PREC_DB[pk]?PREC_DB[pk].nom:pk));oPush([c]);oT('📖 Précautions notées comme transmises','s');oRefresh();return;
+  }
+  if(key&&key.indexOf('proto_')===0){
+    var pm=key.match(/^proto_(.+)_(j7|j30)$/);
+    if(pm){var pa=(c.protocoles||[]).find(function(x){return x.id===pm[1];});if(pa){pa.sent=pa.sent||{};pa.sent[pm[2]]=todayYMD();var prx=protoById(pa.protoId);jrnAdd(c,'fait','🧭 Point '+pm[2].toUpperCase().replace('J','J+')+' effectué — '+(prx?prx.titre:''));oPush([c]);oT('✅ Point protocole noté','s');oRefresh();return;}}
+  }
   if(key&&key.indexOf('avp_')===0){
     var ap=(c.avances||[]).find(function(x){return'avp_'+x.id===key;});
     if(ap){ap.sent=ap.sent||{};ap.sent.payeurWa=todayYMD();jrnAdd(c,'fait','📣 '+ap.par+' informé(e) de l\'échéance de son avance');oPush([c]);oT('📣 Payeur informé','s');oRefresh();return;}
@@ -2502,7 +2706,7 @@ function oAct(){
     }
     return'<div class="oacc '+cls+'">'
       +'<div class="oacc-hd" onclick="oAccTog(\''+uid+'\')">'
-        +'<span class="obdg '+(a.type==='Relance'?'bbl':a.type==='Logistique'?'brd':a.type==='Installation'?'baq':'bgo')+'">'+a.type+'</span>'
+        +'<span class="obdg '+(a.type==='Relance'?'bbl':a.type==='Logistique'?'brd':a.type==='Installation'?'baq':a.type==='Précautions'?'bpu':a.type==='Protocole'?'bgr':'bgo')+'">'+a.type+'</span>'
         +'<div class="oacc-info"><div class="oacc-name">'+a.c.nom+' '+a.c.prenom+'</div><div class="oacc-sub">'+a.label+' — <span style="'+lateCol+';font-weight:700">'+lateTxt+'</span></div></div>'
         +'<span class="oacc-arr" id="aca-'+uid+'">▼</span>'
       +'</div>'
@@ -3313,6 +3517,7 @@ function oOpenF(id){
       +'<button class="ob bgold bfull" style="min-height:48px" onclick="oOpenSuivi(\''+id+'\')">📞 Valider un contact / ajouter une observation</button>'
       +(ROLE()==='admin'&&stkList().some(function(x){return(+x.qte||0)>0;})?'<button class="ob baqua bfull" style="min-height:44px;margin-top:8px" onclick="oStkOpen(\''+id+'\')">📦 Remise immédiate depuis un stock</button>':'')
     +'</div></div>'
+    +accHtml(c)
     +odSec('Journal des actions ('+((c.journal||[]).length)+')',jrnHtml(c),true)
     +((c.avances&&c.avances.length)||!isRef?odSec('💶 Avances / dons reçus'+((c.avances||[]).length?' ('+c.avances.length+')':''),avListHtml(c),avanceEnCours(c)):'')
     +avDonneesHtml(c)
@@ -3747,7 +3952,7 @@ function oClearFiltersSilent(){
 // v3 — INTERFACE RESPONSIVE : navigation · accueil · contacts (tableau,
 // sélection multiple) · pipeline · agenda · Calendly · raccourcis clavier
 // ═══════════════════════════════════════════════════════════════════
-var VIEW_T={dashboard:'Tableau de bord',contacts:'Contacts',pipeline:'Pipeline',agenda:'Agenda',actions:'Actions',equipe:'Équipe',nouvelle:'Nouveau contact',carte:'Carte des essais',genea:'Généalogie'};
+var VIEW_T={dashboard:'Tableau de bord',contacts:'Contacts',pipeline:'Pipeline',agenda:'Agenda',actions:'Actions',equipe:'Équipe',nouvelle:'Nouveau contact',carte:'Carte des essais',genea:'Généalogie',temoignages:'Témoignages',protocoles:'Protocoles',precautions:'Utilisations & précautions'};
 var CUR_VIEW='dashboard',CUR_LIST=[],SORT={k:'statut',d:1},SEL={},SEL_MODE=false,ACTIVE_ID=null,LIST_LIMIT=150;
 function mq(q){try{return window.matchMedia(q).matches;}catch(e){return false;}}
 function isDesk(){return mq('(min-width:760px)');}
@@ -3785,6 +3990,7 @@ function oRefreshView(v){
   else if(v==='agenda')oAgenda();else if(v==='actions')oAct();
   else if(v==='equipe'){oEq();oLoadMyDigest();var ve=document.getElementById('eq-version');if(ve)ve.textContent=APP_VERSION;}
   else if(v==='carte')oCarte();else if(v==='genea')oGenea();
+  else if(v==='temoignages')oTemView();else if(v==='protocoles')oProtoView();else if(v==='precautions')oPrecView();
   navBadges();
 }
 function oRefresh(){var v=document.querySelector('.ov.on');if(v)oRefreshView(v.id.replace('ov-',''));}
@@ -4360,7 +4566,7 @@ document.addEventListener('keydown',function(e){
   var t=e.target,tag=(t&&t.tagName||'').toLowerCase(),typing=tag==='input'||tag==='textarea'||tag==='select'||(t&&t.isContentEditable);
   if((e.ctrlKey||e.metaKey)&&(e.key==='k'||e.key==='K')){e.preventDefault();oSearchFocus();return;}
   if(e.key==='Escape'){
-    var order=[['odrawer',oDrawerClose],['oprof',oProfClose],['ostk',oStkClose],['oavs',oAvClose],['oreq',oReqClose],['ocal',oCalClose],['octx',oCtxClose],['osv',oCloseSuivi],['oimp',oCloseImport],['omo',oClose],['osetup',oHideSetup]];
+    var order=[['odrawer',oDrawerClose],['otem',oTemClose],['oproto',oProtoClose],['oprec',oPrecClose],['oprof',oProfClose],['ostk',oStkClose],['oavs',oAvClose],['oreq',oReqClose],['ocal',oCalClose],['octx',oCtxClose],['osv',oCloseSuivi],['oimp',oCloseImport],['omo',oClose],['osetup',oHideSetup]];
     for(var i=0;i<order.length;i++){var el=document.getElementById(order[i][0]);if(el&&el.classList.contains('on')){order[i][1]();e.preventDefault();return;}}
     if(Object.keys(SEL).length){SEL={};oSelMode(false);}
     if(typing&&t.blur)t.blur();
@@ -4380,7 +4586,7 @@ document.addEventListener('keydown',function(e){
 })();
 
 // ── FEUILLES & MODALES : bouton « retour » du téléphone les ferme ──
-var HIST_OPEN=0,IGNORE_POP=false,SHEET_ORDER=['odrawer','oprof','ostk','oavs','oreq','ocal','octx','osv','omo','oimp','osetup'];
+var HIST_OPEN=0,IGNORE_POP=false,SHEET_ORDER=['odrawer','otem','oproto','oprec','oprof','ostk','oavs','oreq','ocal','octx','osv','omo','oimp','osetup'];
 function oSheetOpen(id){
   var el=document.getElementById(id);if(!el)return;
   if(!el.classList.contains('on')){el.classList.add('on');try{history.pushState({sheet:id},'');HIST_OPEN++;}catch(e){}}
@@ -4810,6 +5016,351 @@ function oReqSend(kind){
     else prompt('Message :',msg);
   }
   oRefresh();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// v3.9 — RESSOURCES : témoignages · protocoles · utilisations & précautions
+// ══════════════════════════════════════════════════════════════════
+var THEMES=['Énergie & vitalité','Sommeil & récupération','Confort articulaire & musculaire','Récupération & performance sportive','Soutien de l\'immunité','Circulation & jambes légères','Détente & gestion du stress','Accompagnement des personnes fragilisées','Beauté & peau','Confort digestif','Confort féminin','Qualité de l\'air & environnement','Autre'];
+var RES_DISCLAIMER='Les appareils OlyLife ne sont pas des dispositifs médicaux. Ces contenus accompagnent le bien-être et ne se substituent ni à un traitement, ni à un diagnostic, ni à l\'avis d\'un professionnel de santé.';
+// Mots à surveiller (conformité : 4 verbes interdits + vocabulaire médical)
+var CONF_RX=/\b(diagnosti\w*|trait(?:e|er|ement|ements|ée?s?)|gu[ée]ri\w*|pr[ée]ven\w*|soign\w*|cancer\w*|diab[èe]t\w*|parkinson|alzheimer|scl[ée]rose\w*|fibromyalg\w*|arthrose|arthrite|polyarthrite|tumeur\w*|d[ée]pression|hypertension|infarctus|avc|maladies?|pathologi\w*|sympt[ôo]me\w*|m[ée]dicament\w*|th[ée]rapie\w*|th[ée]rapeutique\w*|m[ée]dical\w*|cicatris\w*|inflammat\w*)\b/gi;
+function confCheck(txt){var found={};String(txt||'').replace(CONF_RX,function(m){found[m.toLowerCase()]=1;return m;});return Object.keys(found);}
+function confHtml(txt){var f=confCheck(txt);if(!f.length)return'<div class="conf-box ok">✅ Aucun terme sensible détecté. Rappel : un témoignage décrit un ressenti personnel, jamais un effet médical.</div>';
+  var hl=esc(txt).replace(CONF_RX,function(m){return'<mark>'+m+'</mark>';});
+  return'<div class="conf-box warn">⚠️ <b>Termes à reformuler avant publication</b> (vocabulaire médical ou verbes interdits : diagnostiquer, traiter, guérir, prévenir) : '+f.map(function(x){return'<mark>'+esc(x)+'</mark>';}).join(' ')+'<div style="margin-top:6px;font-size:11.5px">'+hl+'</div></div>';}
+function resGet(){CFG.ressources=CFG.ressources||{};CFG.ressources.protocoles=CFG.ressources.protocoles||[];CFG.ressources.prec=CFG.ressources.prec||{};return CFG.ressources;}
+
+// ── Appareils : utilisations & précautions (source : manuels officiels OlyLife) ──
+function precKeyOf(pn){var n=String(pn||'').toLowerCase();for(var k in PREC_DB){if(PREC_DB[k].rx.test(n))return k;}return'';}
+var PREC_DB={
+ p90:{nom:'THz Tera-P90 / P90+',em:'🦶',rx:/p90|tera/,source:'OlyLife THz Tera-P90+ — Manuel d\'utilisation (traduction FR) · OlyLife_P90Plus_Manuel_Francais.pdf',
+  sec:[
+   {k:'interdits',t:'Utilisateurs interdits',em:'⛔',cls:'danger',x:'Le manuel interdit l\'utilisation aux personnes suivantes :\n• Femmes enceintes et nourrissons.\n• Personnes présentant des troubles de la fonction pulmonaire.\n• Personnes dont la conscience est altérée.\n• Personnes dont la température corporelle dépasse 37 °C.\n• Utilisateurs de dispositifs de maintien des fonctions vitales (cœur artificiel, machine cœur-poumon).\n• Personnes en récupération postopératoire ou ayant tendance aux saignements (ex. fibromes utérins, menstruations).\n• Personnes ayant une faible sensibilité thermique.\n• Personnes portant un stimulateur cardiaque ou d\'autres implants métalliques.\n• Personnes diabétiques ou présentant des ulcères aux pieds.\n• Personnes souffrant de graves affections cardiaques, d\'hypertension sévère ou de troubles pulmonaires sévères.'},
+   {k:'usage',t:'Mise en route & utilisation',em:'▶️',x:'1. Vérifier l\'appareil et la tension secteur ; éviter les pièces très humides (salle de bain).\n2. Brancher, interrupteur principal sur ON (bip + voyants), puis Marche/Arrêt : écran LCD + message vocal. Réglage par défaut : 20 minutes, intensité 0.\n3. Régler l\'intensité avec + / − (20 niveaux). La durée de 20 min n\'est pas modifiable.\n4. Placer les deux pieds en même temps : pied gauche sur la plaque gauche, pied droit sur la plaque droite. Ne jamais toucher les plaques avec les doigts ou les orteils isolément, ni mettre un seul pied sur les deux plaques (risque de choc électrique).\n5. Le boîtier principal et la poignée peuvent être utilisés ensemble ou séparément.\n6. À la fin du compte à rebours : trois bips, arrêt, retour en veille. Se reposer quelques minutes avant de se lever.'},
+   {k:'duree',t:'Durée & fréquence',em:'⏱',x:'• 20 minutes maximum par séance.\n• Pour une même personne : au maximum 2 séances par jour, avec au moins 4 heures d\'intervalle.\n• Commencer à une intensité confortable, basse pour une première utilisation ; éviter les réglages élevés. Les personnes âgées ne devraient pas dépasser le niveau 8 (manuel).\n• Éviter l\'intensité maximale pendant plus de 20 minutes.'},
+   {k:'precautions',t:'Précautions de sécurité',em:'⚠️',cls:'warn',x:'• Pieds et mains secs ; pas de chaussettes pendant la séance ; les callosités épaisses réduisent l\'efficacité indiquée.\n• Ne pas toucher les plaques avec coudes, genoux, doigts, orteils ou objets métalliques ; ne pas laisser les jambes se toucher.\n• Arrêter immédiatement en cas de sensation inhabituelle.\n• Ne pas utiliser si la température corporelle dépasse 37 °C.\n• Ne pas utiliser simultanément avec d\'autres appareils d\'électrothérapie.\n• Interdit aux enfants et aux personnes aux capacités sensorielles/cognitives réduites.\n• Jamais dans une salle de bain, pendant le bain ou en environnement très humide.\n• Après un traitement esthétique ou clinique récent (rougeur, gonflement), consulter un médecin avant utilisation.\n• Fumée ou odeur inhabituelle : débrancher et contacter le service client. Panne de courant : couper l\'interrupteur principal.\n• Débrancher après chaque séance. Ne pas utiliser pour se réchauffer.'},
+   {k:'entretien',t:'Entretien',em:'🧽',x:'• Débrancher avant nettoyage ; chiffon propre ; pas de solvants corrosifs (alcool) sur les plaques.\n• Appareil mouillé : débrancher et faire vérifier par un professionnel avant réutilisation.\n• Stockage à l\'abri de la poussière et de l\'humidité (−40 à 55 °C, humidité ≤ 90 %). Après un long stockage ou en milieu humide : préchauffer environ 3 minutes.\n• Garantie 1 an (carte de garantie tamponnée + reçu à conserver). Réparations par professionnels autorisés uniquement.'}
+  ]},
+ galaxy:{nom:'Galaxy G-One (masseur oculaire)',em:'👁',rx:/galaxy|g-one|gone/,source:'GALAXY G-ONE — Manuel d\'utilisation (traduction FR) · Galaxy_GOne_Manuel_Francais.pdf',
+  sec:[
+   {k:'interdits',t:'Personnes / situations non adaptées',em:'⛔',cls:'danger',x:'• Personnes à qui un médecin a déconseillé l\'exercice ou les étirements.\n• Atteinte sévère des nerfs périphériques liée au diabète ; lésions cutanées ; engourdissement facile des mains/pieds.\n• Troubles respiratoires ; symptômes aigus de maladies viscérales (gastrite, hépatite, entérite…) ; troubles vasculaires ; utilisateurs de dispositifs de rééducation.\n• La surface chauffe : prudence chez les personnes peu sensibles à la chaleur.\n• Après une chirurgie oculaire : suivre l\'avis du médecin.'},
+   {k:'prudence',t:'À utiliser avec prudence (avis médical)',em:'⚠️',cls:'warn',x:'• Traitements esthétiques ou cliniques récents nécessitant une récupération.\n• Stimulateur cardiaque, cœur artificiel ou autre dispositif implanté ; inflammation/congestion de la tête ; chirurgie cérébrale.\n• Maladie cardiaque, thrombose cérébrale sévère, AVC, hypertension ou hypotension, traitement médical en cours.\n• Troubles sanguins ou tendance aux saignements, ostéoporose, maladies des tissus mous, tumeur maligne, maladie aiguë.\n• Grossesse ou menstruations.\n• Mobilité réduite, handicap physique, mental ou intellectuel.\n• Inflammation, blessure ou brûlure de la peau ou de la tête.\n• Douleur, vertiges, vomissements, palpitations ou réaction anormale : arrêter immédiatement.'},
+   {k:'usage',t:'Mode d\'utilisation',em:'▶️',x:'1. Maintenir Marche/Arrêt enfoncé pour allumer : démarrage en « massage toutes fonctions ».\n2. Appui bref sur Marche/Arrêt pour faire défiler : toutes fonctions · pétrissage + chaleur · pétrissage + vibration · vibration + chaleur · pétrissage · vibration · chaleur.\n3. Bouton langue : appui bref = chinois/anglais ; appui long = annonces vocales on/off.\n4. Maintenir Marche/Arrêt pour éteindre (annonce de fin de séance).\n5. Recharge : chargeur 5 V/1 A ou 5 V/2 A, port USB ou batterie externe uniquement. Voyant vert clignotant = en charge ; fixe = chargé. L\'appareil ne fonctionne pas pendant la charge.\n6. Durée de séance par défaut : valeur illisible dans le manuel source (minuterie automatique).'},
+   {k:'precautions',t:'Précautions d\'utilisation',em:'🛡',x:'• Ne pas utiliser si le produit est endommagé ; arrêter en cas de vertiges, maux de tête ou inconfort.\n• Cordon et fiche au sec, loin des sources de chaleur ; pas de manipulation avec les mains mouillées.\n• Pas d\'utilisation par des enfants sans surveillance ; une seule personne à la fois.\n• Pas immédiatement après un repas, en état d\'ébriété ou en cas de malaise.\n• Ne pas couvrir l\'appareil, ne rien insérer dans les ouvertures, ne pas démonter.\n• Pas près d\'une baignoire, douche ou lavabo ; pas en conduisant ; pas en forte chaleur ou humidité ; pas en présence d\'aérosols ou d\'oxygène.\n• Pas sur une peau gonflée, contusionnée ou enflammée.'},
+   {k:'entretien',t:'Entretien & stockage',em:'🧽',x:'• Éteindre et débrancher avant nettoyage ; chiffon doux et sec (ou légèrement humide, eau ou détergent neutre, bien essoré). Ni acétone ni abrasifs.\n• Stocker au sec, ventilé, sans soleil direct ; dans sa boîte si inutilisé plus d\'un mois ; hors de portée des enfants.\n• Batterie lithium : recyclage en centre qualifié, démontage réservé aux professionnels.\n• Garantie 1 an (carte + facture).'}
+  ]},
+ wand:{nom:'Vitality Wand',em:'🌬',rx:/wand/,source:'OlyLife VITALITY WAND — Manuel d\'utilisation FR · Vitality_Wand_Manuel_Francais.pdf',
+  sec:[
+   {k:'cadre',t:'Cadre d\'usage (manuel)',em:'ℹ️',x:'Le manuel précise que le Vitality Wand est un appareil de bien-être, « non destiné à prévenir, diagnostiquer ou traiter une maladie ». Il est fourni avec un support intelligent dédié (voir manuel du Smart Tripod).'},
+   {k:'usage',t:'Avant & pendant l\'utilisation',em:'▶️',x:'• Vérifier l\'appareil à réception ; conserver la boîte d\'origine (envoi en maintenance).\n• Souffler directement sur la peau ou à travers des vêtements légers et amples.\n• Tension prévue uniquement ; jamais en environnement humide ni avec les mains mouillées.\n• Commande : maintenir 3 s = marche/arrêt ; appui bref = niveaux 0 / 1 / 2 / 3 (trois modes de température).\n• Hydratation : boire 500 à 1000 ml d\'eau avant et après.\n• Appliquer le flux d\'air sur les zones d\'inconfort (le manuel illustre tête/cou, épaules, dos, poitrine, taille, zone reproductive).\n• Garder plus de 20 cm entre la sortie d\'air et la peau pour éviter les brûlures.'},
+   {k:'duree',t:'Durée & fréquence',em:'⏱',x:'• Durée recommandée : 40 à 45 minutes.\n• L\'appareil fonctionne 45 minutes puis s\'arrête automatiquement ; l\'auto-nettoyage redémarre brièvement l\'appareil à l\'arrêt (normal).\n• Fréquence quotidienne : non précisée dans le manuel.'},
+   {k:'precautions',t:'Précautions de sécurité',em:'⚠️',cls:'warn',x:'• Jamais près d\'une baignoire, douche, lavabo ou récipient d\'eau ; dans une salle de bain, débrancher après usage (risque même éteint). Le manuel recommande un disjoncteur différentiel ≤ 30 mA sur le circuit de la salle de bain.\n• Non destiné aux personnes (enfants compris) aux capacités réduites ou sans expérience, sauf surveillance/instructions ; surveiller les enfants.\n• Objet tombé à l\'intérieur, éclaboussure, odeur/fumée, bruit anormal, câble abîmé : débrancher et contacter le service client.\n• Ne pas démonter ; cordon endommagé remplacé uniquement par le fabricant ou un professionnel qualifié.\n• Débrancher après chaque utilisation.\n• Contre-indications personnelles : non listées dans le manuel — à compléter par le comité scientifique.'},
+   {k:'entretien',t:'Garantie',em:'🧽',x:'Garantie limitée 1 an. Exclusions : modification non autorisée, numéro de série altéré, dommages esthétiques, mauvaise utilisation, accessoires non autorisés, surtensions, non-respect des instructions.'}
+  ]},
+ shaken:{nom:'Shaken Massager SK-M3 (ceinture)',em:'💫',rx:/shaken|ceinture|sk-?m3/,source:'Shaken Massager SK-M3 — Manuel d\'utilisation (traduction FR) · SKM3_Shaken_Massager_Manuel_Francais.pdf',
+  sec:[
+   {k:'interdits',t:'Ne pas utiliser dans les cas suivants',em:'⛔',cls:'danger',x:'• Médecin ayant déconseillé l\'activité physique ou les étirements.\n• Thrombose, anévrisme sévère, varices aiguës, inflammation ou infection cutanée.\n• Dispositif implanté (stimulateur cardiaque, cœur artificiel) ; gonflement/inflammation/ecchymose de la tête ; chirurgie cérébrale.\n• Maladie cardiaque, thrombose sévère ou hémorragie cérébrale (sauf avis médical) ; après un AVC ; hypertension ou hypotension ; traitement médical en cours ; mauvaise condition physique.\n• Tendance aux saignements, maladie du sang, ostéoporose, affection des tissus mous, tumeur maligne, maladie aiguë.\n• Grossesse, post-partum et autres périodes physiologiques particulières.\n• Mobilité limitée, handicap physique ou mental, déficience intellectuelle ; non recommandé aux enfants.\n• Fièvre (seuil illisible dans le manuel source) ; forte sensibilité à la chaleur (ne pas utiliser la fonction chauffante) ; inflammation, plaie ouverte, brûlure.\n• Fatigue physique, après consommation d\'alcool, juste avant/après les repas.'},
+   {k:'prudence',t:'À utiliser avec précaution (consulter un médecin ou kiné)',em:'⚠️',cls:'warn',x:'Troubles sévères des nerfs périphériques (diabète) · blessures ou plaies cutanées · engourdissements fréquents · difficultés respiratoires · affections aiguës des organes internes · troubles vasculaires · appareils de réadaptation · sensibilité réduite à la chaleur (la surface chauffe).\nAvertissement du manuel : produit de bien-être et de relaxation, ce n\'est pas un dispositif médical.'},
+   {k:'usage',t:'Fonctionnement',em:'▶️',x:'1. Maintenir Marche/Arrêt 2 s : allumage (Bluetooth automatique). Mode par défaut : Body Sculpting.\n2. Appui bref Marche/Arrêt : niveau Chaleur + RF + Vibration — N1 : 38 ± 3 °C faible · N2 : 40 ± 3 °C moyen · N3 : 42 ± 3 °C élevé (réglage mémorisé).\n3. Bouton M : modes Body Sculpting (PEMF, lumière rouge, chaleur, RF, ultrasons, compression d\'air, vibration) · Massage (PEMF, RF, chaleur, compression, vibration) · Heat Therapy (PEMF + chaleur).\n4. M maintenu 5 s : choix de la langue (8 langues).\n5. Placer l\'appareil directement contre la peau, sangle A (courte) ou B (longue) autour du dos, fermeture auto-agrippante.\n6. OLY-Watch : allumer l\'unité, puis la montre ; sélectionner « Shaken Massager » en Bluetooth ; le mode AI ne s\'active que montre au poignet.'},
+   {k:'duree',t:'Durée & fréquence',em:'⏱',x:'• Séance : 20 minutes (arrêt automatique). Ne pas dépasser 20 minutes en continu.\n• Pas plus de 2 fois par jour sur la même zone ; intervalle entre séances : chiffre illisible dans le manuel source. Après arrêt automatique, attendre 30 minutes avant de redémarrer (dépannage).\n• Température : régler à un niveau confortable pour éviter les brûlures.'},
+   {k:'precautions',t:'Précautions d\'utilisation',em:'🛡',x:'• Produit endommagé : ne pas utiliser ; arrêter en cas d\'inconfort (douleur dorsale, vertiges, nausées, palpitations).\n• Cordon/fiche au sec ; pas de manipulation mains mouillées ; cordon abîmé remplacé par le fabricant ou un professionnel.\n• Hors de portée des enfants ; usage individuel ; ne pas démonter.\n• Ne pas immerger ni laver les sangles ; pas d\'essence, diluant ou insecticide.\n• Ne pas laisser fonctionner sans surveillance ; ne pas fumer pendant l\'utilisation ; pas sur peau gonflée, contusionnée, enflammée ni si l\'appareil a été mouillé.'},
+   {k:'entretien',t:'Entretien & batterie',em:'🧽',x:'• Lieu frais, ventilé, sans humidité ni soleil direct. Recharger après chaque utilisation ; en stockage prolongé, recharger tous les 3 mois.\n• Housse textile : lavage à la main, détergent doux (sac à linge si machine). Sangles : chiffon doux et nettoyant neutre, jamais immergées.\n• Batterie 3000 mAh : retrait et recyclage selon la réglementation. Garantie 1 an (carte + facture).'}
+  ]},
+ bama:{nom:'A9 Smart Anion BamaAir',em:'🌿',rx:/bama|a9/,source:'OlyLife A9 Smart Anion BamaAir — Manuel du produit FR · OlyLife_A9_Manuel_Francais.pdf',
+  sec:[
+   {k:'usage',t:'Mise en route & fonctions',em:'▶️',x:'• Brancher l\'adaptateur fourni (12 V CC, 1 A) : l\'horloge s\'allume (12:00 par défaut), température/humidité en alternance.\n• Marche/Arrêt : démarrage vitesse 2, ions négatifs et éclairage multicolore activés.\n• Mode : Auto · Sommeil · Anti-moustiques · Vent 1 · 2 · 3.\n• Musique : mélodies intégrées ; appui 2 s = Bluetooth avec le téléphone. Éclairage : 10 positions (appui 2 s = éteint). Wi-Fi : maintenir Mode 5 s, application « Smart Life » (routeur 2,4 GHz).\n• Surface conseillée : 10–20 m². Placer à au moins 1 m des autres appareils électriques, prise indépendante recommandée.'},
+   {k:'precautions',t:'Précautions',em:'⚠️',cls:'warn',x:'• Ne pas toucher les brosses ioniques (côté et dessous) : risque de choc électrique. Ne toucher aucun objet conducteur à moins de 1 m (décharge électrostatique).\n• Pas sur surface métallique, couverture, couette ou matériau combustible/conducteur.\n• Pas en lieu chaud, corrosif, humide ou inflammable ; interdit là où les réseaux sans fil sont interdits (stations-service…).\n• Enfants de 8 ans et plus et personnes aux capacités réduites : uniquement sous surveillance ou après instructions. Ce n\'est pas un jouet.\n• Éteindre avant de débrancher ; jamais les mains mouillées. Bruit, odeur, échauffement, anomalie : débrancher et contacter le service client.\n• Ne pas démonter, ne rien insérer ; éviter tout liquide.'},
+   {k:'entretien',t:'Entretien',em:'🧽',x:'• Éteindre, puis chiffon doux et sec. Nettoyer régulièrement l\'adaptateur.\n• Grincement : poussière sur l\'émetteur d\'ions → brosser après débranchement.\n• Baisse d\'efficacité : réduire l\'espace, éliminer la source de pollution, remplacer le filtre HEPA en fin de vie.'}
+  ]},
+ revitaluxe:{nom:'Revitaluxe & Frost Age',em:'✨',rx:/revitaluxe|frost|visage/,source:'OlyLife — Manuel d\'instructions Masseur Revitaluxe / Appareil de beauté Frost Age · Manuel_Revitaluxe_FrostAge_FR_v3.pdf',
+  sec:[
+   {k:'interdits',t:'Personnes qui ne doivent pas utiliser',em:'⛔',cls:'danger',x:'• Danger : proximité de dispositifs médicaux électroniques (stimulateur cardiaque, électrocardiographe, pompe à perfusion…).\n• Maladies cardiaques ; lésions du nerf facial ; diabète ; troubles de la coagulation, hémophilie, anomalies sanguines ; hypertension ; radiothérapie.\n• Décollement de la rétine (ou antécédents) ; forte myopie (−6 D ou plus) ; implants faciaux (métal, silicone, plastique) ; séquelles de blessures tête/yeux ; chirurgie oculaire (LASIK : avis du médecin).\n• Nourrissons, enfants, personnes ne pouvant exprimer leur volonté.\n• Constitution allergique, maladies de peau, dermatite allergique, peau sensible.\n• Grossesse, menstruations, post-accouchement.\n• Sensation thermique retardée ou sensibilité cutanée altérée (brûlures).\n• Ne pas utiliser : en cas de malaise, sous alcool/médicaments, fatigue importante ; sur plaies, eczéma, gonflements, dermatite, coup de soleil ; zones épilées le jour même ; zones de chirurgie plastique ; lèvres, globes oculaires, paupières supérieures, oreilles, cou.\n• Avis médical préalable : maladie grave de longue durée, phase aiguë, fièvre, maladie infectieuse, cancer, soins esthétiques/cliniques du dernier mois.'},
+   {k:'usage',t:'Utilisation',em:'▶️',x:'• Test cutané obligatoire avant la première utilisation (face interne du bras, gel dédié, attendre 48 h).\n• Peau propre (démaquillée). Retirer les bijoux. Gel OptiRelax = Revitaluxe (corps) ; gel Youthful Glow = Frost Age (visage). Le gel OptiRelax ne va pas sur le visage.\n• Frost Age : réservé aux joues, contour du visage et front. Modes RF / EMS, 3 intensités, 20 minutes par défaut. Commencer à intensité faible.\n• Revitaluxe : 20 minutes (non modifiable) ; température 38 / 45 / 53 °C ; EMS 5 niveaux ; massage 3 niveaux ; lumière rouge on/off. Éviter toute exposition directe des yeux.'},
+   {k:'duree',t:'Durée & fréquence (avis d\'utilisation)',em:'⏱',x:'• Frost Age mode EMS : 1 fois par jour, 20 minutes au total.\n• Frost Age mode RF : au moins une fois tous les deux jours, jusqu\'à 3 fois par semaine, 20 minutes maximum. Ne pas insister longtemps sur la même zone en RF.\n• Revitaluxe : séance de 20 minutes ; fréquence non précisée dans le manuel.'},
+   {k:'precautions',t:'Précautions',em:'⚠️',cls:'warn',x:'• Douleur ou sensation anormale : arrêter immédiatement. Anomalie (déformation, surchauffe, odeur de brûlé, bruit) : débrancher.\n• Ne pas brancher/débrancher les mains mouillées ; ne pas immerger ; pas en salle de bain ni près d\'un lavabo.\n• Ne pas mettre les électrodes en contact avec du métal (brûlures) ; vérifier la sonde (fissures) avant usage.\n• Ne pas modifier, réparer ni démonter. Hors de portée des enfants (emballage compris).'},
+   {k:'entretien',t:'Stockage & garantie',em:'🧽',x:'Stockage −40 à 55 °C, intérieur ventilé sans gaz corrosifs. Garantie 1 an (carte tamponnée + reçu).'}
+  ]},
+ skyline:{nom:'SkyLine (serviette hygiénique)',em:'🌸',rx:/skyline/,source:'Brochure OlyLife SkyLine SL-6 (document commercial). Aucune notice de sécurité officielle dans les documents disponibles.',
+  sec:[
+   {k:'usage',t:'Utilisation',em:'▶️',x:'Serviette hygiénique jetable à usage unique, emballage individuel scellé. Pose et retrait comme une serviette classique (adhésif de qualité alimentaire selon la brochure).'},
+   {k:'precautions',t:'Précautions',em:'⚠️',cls:'warn',x:'Aucune précaution ni contre-indication n\'est indiquée dans les documents officiels disponibles. ➜ À compléter par le comité scientifique (ex. irritation, allergie connue aux composants, port prolongé).'}
+  ]},
+ spring:{nom:'SpringWater (filtration)',em:'💧',rx:/spring|water/,source:'Brochure OlyLife SpringWater (document commercial). Aucune notice d\'installation ou d\'entretien officielle dans les documents disponibles.',
+  sec:[
+   {k:'usage',t:'Utilisation',em:'▶️',x:'Remplacement du filtre d\'une seule main en ouvrant le couvercle ; une alerte sonore signale quand la cartouche doit être remplacée (brochure).'},
+   {k:'precautions',t:'Précautions & entretien',em:'⚠️',cls:'warn',x:'Fréquence de remplacement, consignes d\'installation et précautions : non disponibles dans les documents officiels. ➜ À compléter dès réception du manuel.'}
+  ]}
+};
+function precText(k,sk){var o=resGet().prec[k];if(o&&o[sk]!==undefined&&o[sk]!=='')return o[sk];var d=PREC_DB[k];var sec=d&&d.sec.find(function(x){return x.k===sk;});return sec?sec.x:'';}
+var PREC_CUR='';
+function oPrecView(){
+  var tabs=document.getElementById('prec-tabs');if(!tabs)return;
+  var keys=Object.keys(PREC_DB);if(!PREC_CUR||!PREC_DB[PREC_CUR])PREC_CUR=keys[0];
+  tabs.innerHTML=keys.map(function(k){return'<button class="ofilter-chip'+(k===PREC_CUR?' on':'')+'" onclick="PREC_CUR=\''+k+'\';oPrecView()">'+PREC_DB[k].em+' '+esc(PREC_DB[k].nom)+'</button>';}).join('');
+  var d=PREC_DB[PREC_CUR],edit=canEditRes();
+  var modified=resGet().prec[PREC_CUR]||{};
+  document.getElementById('prec-body').innerHTML=
+    '<div class="ocard" style="padding:14px 16px"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><div style="font-size:28px">'+d.em+'</div><div style="flex:1;min-width:160px"><div style="font-family:Cormorant Garamond,serif;font-size:20px;font-weight:700;color:var(--tx)">'+esc(d.nom)+'</div><div class="prec-src">Source : '+esc(d.source)+'</div></div>'
+    +'<button class="ob bgh bsm" onclick="oPrecOpenPick(\''+PREC_CUR+'\')">💬 Transmettre à un contact</button>'+(edit?'<button class="ob bgh bsm" id="prec-edit-btn" onclick="oPrecEditToggle()">✏️ Modifier</button>':'')+'</div></div>'
+    +d.sec.map(function(sec){var ov=modified[sec.k]!==undefined&&modified[sec.k]!=='';return'<div class="prec-sec '+(sec.cls||'')+'" data-k="'+sec.k+'"><div class="ttl" onclick="this.parentElement.classList.toggle(\'clps\')"><span class="em">'+sec.em+'</span>'+esc(sec.t)+(ov?' <span class="obdg baq" style="margin-left:6px">complété par WLHT</span>':'')+'<span class="arr">▾</span></div><div class="bd"><div class="prec-txt">'+esc(precText(PREC_CUR,sec.k))+'</div><div class="prec-ed" style="display:none"><textarea data-sk="'+sec.k+'">'+esc(precText(PREC_CUR,sec.k))+'</textarea><div style="font-size:11px;color:var(--t3);margin-top:4px">Laisser vide pour revenir au texte du manuel.</div></div></div></div>';}).join('')
+    +'<div class="disclaimer">'+RES_DISCLAIMER+' Contenu interne destiné aux distributeurs ; les précautions sont transmises au client en conversation et notées dans sa fiche.</div>'
+    +(edit?'<div id="prec-save-row" style="display:none;gap:8px;margin-top:10px"><button class="ob bgold" style="flex:1;min-height:46px" onclick="oPrecSave()">Enregistrer les modifications</button><button class="ob bgh" onclick="oPrecEditToggle()">Annuler</button></div>':'');
+}
+function oPrecEditToggle(){var on=document.getElementById('prec-save-row').style.display==='none';document.querySelectorAll('#prec-body .prec-txt').forEach(function(e){e.style.display=on?'none':'';});document.querySelectorAll('#prec-body .prec-ed').forEach(function(e){e.style.display=on?'':'none';});document.querySelectorAll('#prec-body .prec-sec').forEach(function(e){e.classList.remove('clps');});document.getElementById('prec-save-row').style.display=on?'flex':'none';}
+function oPrecSave(){
+  if(!canEditRes())return;
+  var r=resGet(),o=r.prec[PREC_CUR]={};var d=PREC_DB[PREC_CUR];
+  document.querySelectorAll('#prec-body textarea[data-sk]').forEach(function(t){var sk=t.getAttribute('data-sk'),v=t.value.trim();var def=(d.sec.find(function(x){return x.k===sk;})||{}).x;if(v&&v!==def)o[sk]=v;});
+  o._maj={date:todayYMD(),par:PARTNER_NOM()};
+  resSave();oPrecView();oT('📖 Fiche appareil enregistrée','s');
+}
+function precMsg(c,k){
+  var d=PREC_DB[k];if(!d)return'';
+  var pr=c.prenom||'';
+  var inter=precText(k,'interdits')||precText(k,'prudence');
+  var dur=precText(k,'duree');
+  var pre=precText(k,'precautions');
+  function short(t,n){t=String(t||'').replace(/\n/g,'\n').trim();if(!t)return'';var lines=t.split('\n').filter(Boolean).slice(0,n);return lines.join('\n');}
+  return'Bonjour '+pr+' 🌿\n\nComme promis, voici les points essentiels d\'utilisation et de sécurité de votre '+d.nom+', issus du manuel officiel OlyLife :\n\n'
+    +(inter?'⛔ *Ne pas utiliser / demander un avis médical si :*\n'+short(inter,8)+'\n\n':'')
+    +(dur?'⏱ *Durée & fréquence :*\n'+short(dur,4)+'\n\n':'')
+    +(pre?'⚠️ *Précautions :*\n'+short(pre,6)+'\n\n':'')
+    +'📄 La notice complète est dans la boîte — gardez-la à portée de main. Au moindre doute, parlez-en à votre médecin : les appareils OlyLife ne sont pas des dispositifs médicaux et ne remplacent pas un avis médical.\n\nJe reste disponible pour toute question 🙏\n'+(PARTNER_NOM()||'L\'équipe WLHT')+' — Water Life High Tech';
+}
+function oPrecOpen(cid,k){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  document.getElementById('oprec-cid').value=cid;
+  document.getElementById('oprec-sub').textContent='Pour '+c.nom+' '+(c.prenom||'')+(c.tel?' · '+c.tel:'');
+  var keys=[];(c.produits||[]).forEach(function(pn){var kk=precKeyOf(pn);if(kk&&keys.indexOf(kk)<0)keys.push(kk);});
+  Object.keys(PREC_DB).forEach(function(kk){if(keys.indexOf(kk)<0)keys.push(kk);});
+  var sel=document.getElementById('oprec-app');sel.innerHTML=keys.map(function(kk){return'<option value="'+kk+'">'+PREC_DB[kk].em+' '+esc(PREC_DB[kk].nom)+((c.precTransmis||{})[kk]?' — déjà transmises le '+fD(c.precTransmis[kk].date):'')+'</option>';}).join('');
+  if(k)sel.value=k;
+  oPrecMsgPrev();oSheetOpen('oprec');
+}
+function oPrecOpenPick(k){
+  var list=OC.filter(function(c){return!mtEstEA(c);}).sort(function(a,b){return(a.nom||'').localeCompare(b.nom||'');});
+  var who=prompt('Nom du contact à qui transmettre les précautions ('+PREC_DB[k].nom+') :');if(!who)return;
+  var q=nmKey(who);var c=list.find(function(x){return nmKey((x.nom||'')+' '+(x.prenom||'')).indexOf(q)>=0||nmKey((x.prenom||'')+' '+(x.nom||'')).indexOf(q)>=0;});
+  if(!c){oT('Contact introuvable — ouvrez sa fiche et utilisez le bloc Accompagnement','w');return;}
+  oPrecOpen(c.id,k);
+}
+function oPrecMsgPrev(){var cid=val('oprec-cid'),c=OC.find(function(x){return x.id===cid;});if(!c)return;document.getElementById('oprec-msg').value=precMsg(c,val('oprec-app'));}
+function oPrecClose(){oSheetClose('oprec');}
+function oPrecMark(){
+  var cid=val('oprec-cid'),k=val('oprec-app'),c=OC.find(function(x){return x.id===cid;});if(!c||!k)return;
+  c.precTransmis=c.precTransmis||{};c.precTransmis[k]={date:todayYMD(),par:PARTNER_NOM()};
+  jrnAdd(c,'fait','📖 Précautions d\'utilisation transmises — '+PREC_DB[k].nom+' (manuel officiel OlyLife)');
+  oPush([c]);oPrecClose();oOpenF(cid);emojiBurst(['📖','✅','🌿']);oT('📖 Précautions transmises — trace ajoutée au journal','s');
+}
+function oPrecSend(){var cid=val('oprec-cid'),c=OC.find(function(x){return x.id===cid;});if(!c)return;if(c.tel)window.open(mkWA(c.tel,val('oprec-msg')),'_blank');else{navigator.clipboard&&navigator.clipboard.writeText(val('oprec-msg'));oT('Pas de téléphone — message copié','w');}oPrecMark();}
+
+// ── Protocoles du comité scientifique ─────────────────────────────
+var PROTO_FILTER='',PROTO_EDIT=null;
+function protoById(id){return resGet().protocoles.find(function(p){return p.id===id;});}
+function lvlLbl(l){return l==='etabli'?'Science établie':l==='recherche'?'Recherche en cours':'Communication fabricant';}
+function oProtoView(){
+  var r=resGet(),box=document.getElementById('proto-list');if(!box)return;
+  var edit=canEditRes();
+  document.getElementById('proto-tools').innerHTML=(edit?'<button class="ob bgold bsm" onclick="oProtoNew()">➕ Nouveau protocole</button>':'')+'<button class="ob bgh bsm" onclick="oProtoGrille()">📋 Grille de saisie (comité)</button>';
+  var themes=[];r.protocoles.forEach(function(p){if(p.theme&&themes.indexOf(p.theme)<0)themes.push(p.theme);});
+  document.getElementById('proto-filters').innerHTML='<button class="ofilter-chip'+(PROTO_FILTER===''?' on':'')+'" onclick="PROTO_FILTER=\'\';oProtoView()">Tous</button>'+themes.map(function(t){return'<button class="ofilter-chip'+(PROTO_FILTER===t?' on':'')+'" onclick="PROTO_FILTER=\''+esc(t)+'\';oProtoView()">'+esc(t)+'</button>';}).join('');
+  var list=r.protocoles.filter(function(p){return(!PROTO_FILTER||p.theme===PROTO_FILTER)&&(edit||p.statut==='valide');});
+  if(!list.length){box.innerHTML='<div class="rs-empty" style="grid-column:1/-1">'+(r.protocoles.length?'Aucun protocole validé dans cette catégorie pour l\'instant.':'🧭 Aucun protocole pour l\'instant.<br>Les protocoles sont rédigés avec le comité scientifique (rôle « Comité » dans Équipe) puis validés avant d\'apparaître ici.'+(edit?'<br><br><button class="ob bgold" onclick="oProtoNew()">➕ Créer le premier protocole</button>':''))+'</div>';return;}
+  box.innerHTML=list.map(function(p){var nb=OC.filter(function(c){return(c.protocoles||[]).some(function(x){return x.protoId===p.id&&!x.termine;});}).length;
+    return'<div class="rs-card" onclick="oProtoOpen(\''+p.id+'\')"><div class="rs-hd"><div class="rs-ic">🧭</div><div style="min-width:0"><div class="rs-t">'+esc(p.titre)+'</div><div class="rs-s">'+esc(p.theme||'')+(p.version?' · v'+esc(p.version):'')+'</div></div></div>'
+      +'<div class="rs-x">'+esc(p.objectif||p.programme||'')+'</div>'
+      +'<div class="rs-ft"><span class="proto-lvl '+(p.niveau||'fabricant')+'">'+lvlLbl(p.niveau)+'</span>'+(p.appareils||[]).map(function(a){return'<span class="obdg baq">'+esc(a.split('(')[0].trim())+'</span>';}).join('')+(p.statut!=='valide'?'<span class="obdg bor">brouillon</span>':'')+(nb?'<span class="obdg bgr">👥 '+nb+' en cours</span>':'')+'</div></div>';}).join('');
+}
+function protoFormHtml(p){
+  p=p||{};
+  return'<div class="ofg">'
+    +'<div class="ofg1"><label class="ofl">Titre <span class="oreq">*</span></label><input class="ofc" id="pf-titre" value="'+esc(p.titre||'')+'" placeholder="Ex. Récupération après effort — Tera-P90+"></div>'
+    +'<div class="ofg2" style="gap:10px"><div><label class="ofl">Thème (bien-être)</label><select class="ofc" id="pf-theme">'+THEMES.map(function(t){return'<option'+(p.theme===t?' selected':'')+'>'+esc(t)+'</option>';}).join('')+'</select></div>'
+    +'<div><label class="ofl">Niveau de preuve</label><select class="ofc" id="pf-niveau"><option value="etabli"'+(p.niveau==='etabli'?' selected':'')+'>Science établie</option><option value="recherche"'+(p.niveau==='recherche'?' selected':'')+'>Recherche en cours</option><option value="fabricant"'+(!p.niveau||p.niveau==='fabricant'?' selected':'')+'>Communication fabricant</option></select></div></div>'
+    +'<div class="ofg1"><label class="ofl">Appareil(s)</label><div class="chk-list" id="pf-apps">'+PRODUCTS.map(function(a){var on=(p.appareils||[]).indexOf(a)>=0;return'<label class="'+(on?'on':'')+'" onclick="this.classList.toggle(\'on\')"><input type="checkbox" value="'+esc(a)+'"'+(on?' checked':'')+' style="display:none">'+esc(a.split('(')[0].trim())+'</label>';}).join('')+'</div></div>'
+    +'<div class="ofg1"><label class="ofl">Objectif d\'accompagnement</label><textarea class="ofc" id="pf-objectif" rows="2" placeholder="Ce que le protocole vise, formulé en termes de bien-être (jamais de traitement)">'+esc(p.objectif||'')+'</textarea></div>'
+    +'<div class="ofg1"><label class="ofl">Pour qui / situation</label><textarea class="ofc" id="pf-public" rows="2" placeholder="Ex. sportifs en phase de récupération, personnes fatiguées…">'+esc(p.public||'')+'</textarea></div>'
+    +'<div class="ofg2" style="gap:10px"><div><label class="ofl">Zone / position</label><input class="ofc" id="pf-zone" value="'+esc(p.zone||'')+'" placeholder="Pieds sur les plaques, ventre…"></div><div><label class="ofl">Programme / intensité</label><input class="ofc" id="pf-programme" value="'+esc(p.programme||'')+'" placeholder="Niveau 6 → 10 progressif"></div></div>'
+    +'<div class="ofg2" style="gap:10px"><div><label class="ofl">Durée de séance</label><input class="ofc" id="pf-duree" value="'+esc(p.duree||'')+'" placeholder="20 min"></div><div><label class="ofl">Fréquence</label><input class="ofc" id="pf-freq" value="'+esc(p.frequence||'')+'" placeholder="1 à 2 fois par jour, 4 h d\'écart"></div></div>'
+    +'<div class="ofg1"><label class="ofl">Durée de cure & progression</label><textarea class="ofc" id="pf-cure" rows="2" placeholder="Semaine 1 : … · Semaine 2-4 : …">'+esc(p.cure||'')+'</textarea></div>'
+    +'<div class="ofg1"><label class="ofl">Conseils associés (hydratation, repos…)</label><textarea class="ofc" id="pf-conseils" rows="2">'+esc(p.conseils||'')+'</textarea></div>'
+    +'<div class="ofg1"><label class="ofl">Précautions spécifiques (en plus de la notice officielle)</label><textarea class="ofc" id="pf-precautions" rows="3">'+esc(p.precautions||'')+'</textarea></div>'
+    +'<div class="ofg1"><label class="ofl">Références / sources</label><textarea class="ofc" id="pf-sources" rows="2" placeholder="Études, manuel, position du comité…">'+esc(p.sources||'')+'</textarea></div>'
+    +'<div class="ofg2" style="gap:10px"><div><label class="ofl">Auteur(s)</label><input class="ofc" id="pf-auteur" value="'+esc(p.auteur||'')+'" placeholder="Dr … (comité scientifique)"></div><div><label class="ofl">Version</label><input class="ofc" id="pf-version" value="'+esc(p.version||'1.0')+'"></div></div>'
+    +'<div class="ofg1"><label class="ofl">Statut</label><select class="ofc" id="pf-statut"><option value="brouillon"'+(p.statut!=='valide'?' selected':'')+'>Brouillon — visible par l\'admin et le comité</option><option value="valide"'+(p.statut==='valide'?' selected':'')+'>Validé par le comité — visible par toute l\'équipe</option></select></div>'
+    +'<div id="pf-conf"></div>'
+    +'</div>';
+}
+function oProtoNew(){if(!canEditRes())return;PROTO_EDIT={id:''};document.getElementById('oproto-ttl').textContent='🧭 Nouveau protocole';document.getElementById('oproto-body').innerHTML=protoFormHtml({})+'<button class="ob bgold bfull" style="margin-top:14px;min-height:48px" onclick="oProtoSave()">Enregistrer le protocole</button>';oSheetOpen('oproto');}
+function oProtoEdit(id){var p=protoById(id);if(!p||!canEditRes())return;PROTO_EDIT=p;document.getElementById('oproto-ttl').textContent='✏️ '+p.titre;document.getElementById('oproto-body').innerHTML=protoFormHtml(p)+'<button class="ob bgold bfull" style="margin-top:14px;min-height:48px" onclick="oProtoSave()">Enregistrer</button><button class="ob bgh bfull" style="margin-top:8px" onclick="oProtoDel(\''+id+'\')">🗑 Supprimer ce protocole</button>';}
+function oProtoSave(){
+  if(!canEditRes())return;
+  var titre=val('pf-titre').trim();if(!titre){oT('Indiquez un titre','e');return;}
+  var apps=Array.prototype.map.call(document.querySelectorAll('#pf-apps input:checked'),function(i){return i.value;});
+  var txt=[val('pf-titre'),val('pf-objectif'),val('pf-public'),val('pf-cure'),val('pf-conseils')].join(' ');
+  var bad=confCheck(txt).filter(function(w){return/^(diagnosti|trait|gu[ée]ri|pr[ée]ven|soign)/i.test(w);});
+  if(bad.length&&!confirm('Vocabulaire interdit détecté : '+bad.join(', ')+'.\nLes protocoles doivent être formulés en termes de bien-être (jamais « traiter », « guérir », « prévenir », « diagnostiquer »).\n\nEnregistrer quand même en BROUILLON ?')){return;}
+  var r=resGet();var p=PROTO_EDIT&&PROTO_EDIT.id?protoById(PROTO_EDIT.id):null;var isNew=!p;
+  if(!p){p={id:'pr_'+Date.now().toString(36),creeLe:todayYMD(),creePar:PARTNER_NOM()};r.protocoles.push(p);}
+  p.titre=titre;p.theme=val('pf-theme');p.niveau=val('pf-niveau');p.appareils=apps;p.objectif=val('pf-objectif').trim();p.public=val('pf-public').trim();
+  p.zone=val('pf-zone').trim();p.programme=val('pf-programme').trim();p.duree=val('pf-duree').trim();p.frequence=val('pf-freq').trim();p.cure=val('pf-cure').trim();p.conseils=val('pf-conseils').trim();
+  p.precautions=val('pf-precautions').trim();p.sources=val('pf-sources').trim();p.auteur=val('pf-auteur').trim();p.version=val('pf-version').trim()||'1.0';
+  p.statut=bad.length?'brouillon':val('pf-statut');p.majLe=todayYMD();p.majPar=PARTNER_NOM();
+  resSave();oProtoClose();oProtoView();emojiBurst(['🧭','✨']);oT(isNew?'🧭 Protocole créé':'🧭 Protocole mis à jour','s');
+}
+function oProtoDel(id){if(!canEditRes()||!confirm('Supprimer ce protocole ?'))return;var r=resGet();r.protocoles=r.protocoles.filter(function(p){return p.id!==id;});resSave();oProtoClose();oProtoView();}
+function protoDetailHtml(p){
+  function f(l,v){return v?'<div class="proto-field"><b>'+l+'</b><span>'+esc(v)+'</span></div>':'';}
+  return'<div class="ocard" style="padding:14px 16px"><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px"><span class="proto-lvl '+(p.niveau||'fabricant')+'">'+lvlLbl(p.niveau)+'</span><span class="obdg bgo">'+esc(p.theme||'')+'</span>'+(p.statut!=='valide'?'<span class="obdg bor">brouillon</span>':'<span class="obdg bgr">✅ validé comité</span>')+'</div>'
+    +f('Appareil(s)',(p.appareils||[]).join(', '))+f('Objectif',p.objectif)+f('Pour qui',p.public)+f('Zone / position',p.zone)+f('Programme',p.programme)+f('Durée de séance',p.duree)+f('Fréquence',p.frequence)+f('Cure & progression',p.cure)+f('Conseils',p.conseils)+f('Précautions',p.precautions)+f('Sources',p.sources)+f('Auteur · version',(p.auteur||'')+(p.version?' · v'+p.version:'')+(p.majLe?' · '+fD(p.majLe):''))
+    +'<div class="disclaimer">'+RES_DISCLAIMER+' Les précautions officielles de l\'appareil s\'appliquent toujours (voir Utilisations & précautions).</div></div>';
+}
+function oProtoOpen(id,cid){
+  var p=protoById(id);if(!p)return;PROTO_EDIT=null;
+  document.getElementById('oproto-ttl').textContent='🧭 '+p.titre;
+  var pick='<div class="ocard" style="padding:12px 16px"><div class="ofl">Assigner ce protocole à un contact</div><select class="ofc" id="proto-assign-c">'+OC.filter(function(c){return!mtEstEA(c);}).sort(function(a,b){return(a.nom||'').localeCompare(b.nom||'');}).map(function(c){return'<option value="'+c.id+'"'+(c.id===cid?' selected':'')+'>'+esc((c.nom||'')+' '+(c.prenom||''))+'</option>';}).join('')+'</select><div class="ofg2" style="gap:10px;margin-top:8px"><div><label class="ofl">Début</label><input type="date" class="ofc" id="proto-assign-d" value="'+todayYMD()+'"></div><div><label class="ofl">&nbsp;</label><button class="ob bgold bfull" style="min-height:44px" onclick="oProtoAssign(\''+id+'\')">▶️ Démarrer le suivi</button></div></div><div style="font-size:11px;color:var(--t3);margin-top:6px">Des points de suivi apparaîtront dans Actions à J+7 et J+30, puis la demande de témoignage.</div></div>';
+  document.getElementById('oproto-body').innerHTML=protoDetailHtml(p)+(ROLE()==='referent'?'':pick)
+    +'<button class="ob bgh bfull" onclick="oProtoShare(\''+id+'\')">📋 Copier le protocole (texte)</button>'
+    +(canEditRes()?'<button class="ob bgh bfull" style="margin-top:8px" onclick="oProtoEdit(\''+id+'\')">✏️ Modifier</button>':'');
+  oSheetOpen('oproto');
+}
+function oProtoClose(){oSheetClose('oproto');}
+function oProtoAssign(id){
+  var p=protoById(id),cid=val('proto-assign-c'),d=val('proto-assign-d')||todayYMD();var c=OC.find(function(x){return x.id===cid;});if(!p||!c)return;
+  c.protocoles=c.protocoles||[];c.protocoles.push({id:'pa_'+Date.now().toString(36),protoId:id,debut:d,par:PARTNER_NOM(),sent:{}});
+  jrnAdd(c,'note','🧭 Protocole démarré le '+fD(d)+' : '+p.titre+(p.duree||p.frequence?' ('+[p.duree,p.frequence].filter(Boolean).join(' · ')+')':''));
+  oPush([c]);oProtoClose();oOpenF(cid);emojiBurst(['🧭','🌿','✨']);oT('🧭 Protocole assigné — suivi J+7 / J+30 programmé','s');
+}
+function oProtoTermine(cid,paId){var c=OC.find(function(x){return x.id===cid;});if(!c)return;var pa=(c.protocoles||[]).find(function(x){return x.id===paId;});if(!pa)return;pa.termine=todayYMD();var p=protoById(pa.protoId);jrnAdd(c,'fait','🧭 Protocole terminé : '+(p?p.titre:''));oPush([c]);oOpenF(cid);}
+function protoSuiviMsg(c,p,j){return'Bonjour '+(c.prenom||'')+' 🌿\n\nPetit point après '+j+' jours de votre programme « '+p.titre+' » : comment vous sentez-vous ? Les séances se passent bien ('+[p.duree,p.frequence].filter(Boolean).join(', ')+') ?\n\nN\'hésitez pas à me dire ce que vous ressentez, je suis là pour ajuster avec vous 🙏\n'+(PARTNER_NOM()||'L\'équipe WLHT')+' — Water Life High Tech';}
+function oProtoShare(id){var p=protoById(id);if(!p)return;var t='🧭 '+p.titre+'\n'+(p.theme||'')+' · '+lvlLbl(p.niveau)+'\n\n'+[['Appareil',(p.appareils||[]).join(', ')],['Objectif',p.objectif],['Pour qui',p.public],['Zone',p.zone],['Programme',p.programme],['Durée',p.duree],['Fréquence',p.frequence],['Cure',p.cure],['Conseils',p.conseils],['Précautions',p.precautions]].filter(function(x){return x[1];}).map(function(x){return x[0]+' : '+x[1];}).join('\n')+'\n\n'+RES_DISCLAIMER;navigator.clipboard&&navigator.clipboard.writeText(t).then(function(){oT('Protocole copié','s');});}
+function oProtoGrille(){
+  var t='GRILLE DE SAISIE — PROTOCOLE D\'ACCOMPAGNEMENT WLHT / OLYLIFE (comité scientifique)\n\n1. Titre :\n2. Thème bien-être ('+THEMES.join(' / ')+') :\n3. Appareil(s) :\n4. Objectif d\'accompagnement (formulé en bien-être — jamais traiter / guérir / prévenir / diagnostiquer) :\n5. Pour qui / situation :\n6. Zone / position :\n7. Programme / intensité :\n8. Durée de séance :\n9. Fréquence :\n10. Durée de cure & progression :\n11. Conseils associés :\n12. Précautions spécifiques (en plus de la notice officielle) :\n13. Niveau de preuve : science établie / recherche en cours / communication fabricant\n14. Références / sources :\n15. Auteur(s) · date · version :\n\nRappel : '+RES_DISCLAIMER;
+  navigator.clipboard&&navigator.clipboard.writeText(t).then(function(){oT('📋 Grille copiée — à envoyer au comité','s');});
+}
+
+// ── Témoignages ───────────────────────────────────────────────────
+var TEM_F={type:'',app:'',theme:'',statut:''},TEM_REC=null,TEM_CHUNKS=[],TEM_TIMER=null;
+function temAll(){var out=[];OC.forEach(function(c){(c.temoignages||[]).forEach(function(t){out.push({c:c,t:t});});});out.sort(function(a,b){return(a.t.date||'')<(b.t.date||'')?1:-1;});return out;}
+function temIcon(t){return t==='audio'?'🎙':t==='video'?'🎬':'✍️';}
+function temNom(c,t){var m=t.affich||'prenom';if(m==='anonyme')return'Membre OlyLife';if(m==='initiales')return((c.prenom||'').charAt(0)+'. '+(c.nom||'').charAt(0)+'.').toUpperCase();return(c.prenom||c.nom||'')+(c.ville?' ('+c.ville+')':'');}
+function temPublishable(t){return t.statut==='publie'&&t.consent&&!(t.type==='video'&&!t.visage);}
+function temEmbed(t){
+  var u=String(t.url||'').trim();if(!u)return'';
+  var yt=u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{6,})/);
+  if(yt)return'<div class="tem-media"><iframe src="https://www.youtube.com/embed/'+yt[1]+'" allow="autoplay; encrypted-media" allowfullscreen loading="lazy"></iframe></div>';
+  var vm=u.match(/vimeo\.com\/(\d+)/);
+  if(vm)return'<div class="tem-media"><iframe src="https://player.vimeo.com/video/'+vm[1]+'" allow="autoplay; fullscreen" allowfullscreen loading="lazy"></iframe></div>';
+  var dr=u.match(/drive\.google\.com\/file\/d\/([\w-]+)/)||u.match(/[?&]id=([\w-]+)/);
+  if(dr)return'<div class="tem-media'+(t.type==='audio'?' audio':'')+'"><iframe src="https://drive.google.com/file/d/'+dr[1]+'/preview" allow="autoplay" loading="lazy"></iframe></div>';
+  return'<a class="ob bgh bsm" href="'+esc(u)+'" target="_blank" rel="noopener" style="margin-top:8px">🔗 Ouvrir le média</a>';
+}
+function oTemView(){
+  var all=temAll(),box=document.getElementById('tem-list');if(!box)return;
+  var pub=all.filter(function(x){return temPublishable(x.t);}).length,av=all.filter(function(x){return x.t.statut==='avalider';}).length;
+  document.getElementById('tem-kpi').innerHTML='<div><b>'+all.length+'</b><small>témoignages</small></div><div><b>'+pub+'</b><small>publiés</small></div><div><b>'+av+'</b><small>à valider</small></div><div><b>'+all.filter(function(x){return x.t.type==='video';}).length+'</b><small>vidéos</small></div>';
+  var chips=function(key,opts,lbl){return'<select class="ofc" style="width:auto;min-height:36px;padding:6px 28px 6px 10px;font-size:12px" onchange="TEM_F.'+key+'=this.value;oTemView()"><option value="">'+lbl+'</option>'+opts.map(function(o){return'<option value="'+esc(o[0])+'"'+(TEM_F[key]===o[0]?' selected':'')+'>'+esc(o[1])+'</option>';}).join('')+'</select>';};
+  document.getElementById('tem-filters').innerHTML=chips('type',[['ecrit','✍️ Écrits'],['audio','🎙 Audio'],['video','🎬 Vidéos']],'Tous types')+chips('app',PRODUCTS.map(function(p){return[p,p.split('(')[0].trim()];}),'Tous appareils')+chips('theme',THEMES.map(function(t){return[t,t];}),'Tous thèmes')+chips('statut',[['publie','Publiés'],['avalider','À valider'],['brouillon','Brouillons']],'Tous statuts');
+  var list=all.filter(function(x){var t=x.t;return(!TEM_F.type||t.type===TEM_F.type)&&(!TEM_F.app||t.appareil===TEM_F.app)&&(!TEM_F.theme||t.theme===TEM_F.theme)&&(!TEM_F.statut||t.statut===TEM_F.statut);});
+  if(!list.length){box.innerHTML='<div class="rs-empty" style="grid-column:1/-1">🎙 Aucun témoignage'+(all.length?' pour ces filtres':' pour l\'instant')+'.<br>Depuis la fiche d\'un client : bloc <b>Accompagnement → ➕ Témoignage</b> (écrit, audio enregistré dans l\'app, ou lien vidéo YouTube).</div>';return;}
+  box.innerHTML=list.map(function(x){var c=x.c,t=x.t;var st=t.statut==='publie'?(temPublishable(t)?'<span class="obdg bgr">✅ publié</span>':'<span class="obdg bor">⚠️ publié sans consentement complet</span>'):t.statut==='avalider'?'<span class="obdg bor">⏳ à valider</span>':'<span class="obdg bgy">brouillon</span>';
+    return'<div class="rs-card" onclick="oTemOpen(\''+c.id+'\',\''+t.id+'\')"><div class="rs-hd"><div class="rs-ic">'+(c.photo&&t.visage?'<img src="'+c.photo+'" alt="">':temIcon(t.type))+'</div><div style="min-width:0"><div class="rs-t">'+esc(temNom(c,t))+'</div><div class="rs-s">'+temIcon(t.type)+' '+esc((t.appareil||'').split('(')[0].trim())+(t.theme?' · '+esc(t.theme):'')+' · '+fD(t.date)+'</div></div></div>'
+      +(t.texte?'<div class="rs-x">« '+esc(t.texte)+' »</div>':'<div class="rs-x" style="color:var(--t3)">'+(t.type==='video'?'Vidéo':'Audio')+(t.url?' disponible':' — média manquant')+'</div>')
+      +'<div class="rs-ft">'+st+(confCheck(t.texte).length?'<span class="obdg brd">⚠️ vocabulaire à revoir</span>':'')+'</div></div>';}).join('');
+}
+function oTemType(t){document.getElementById('tem-types').querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===t);});document.getElementById('tem-video-wrap').style.display=t==='video'?'':'none';document.getElementById('tem-audio-wrap').style.display=t==='audio'?'':'none';document.getElementById('tem-txt-lbl').textContent=t==='ecrit'?'Texte du témoignage':'Transcription / résumé (facultatif mais recommandé)';}
+function temType(){var b=document.querySelector('#tem-types button.on');return b?b.getAttribute('data-t'):'ecrit';}
+function oTemConf(){document.getElementById('tem-conf').innerHTML=val('tem-txt').trim()?confHtml(val('tem-txt')):'';}
+function oTemPreview(){document.getElementById('tem-video-prev').innerHTML=temEmbed({url:val('tem-video'),type:'video'});}
+function oTemOpen(cid,tid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var t=tid?(c.temoignages||[]).find(function(x){return x.id===tid;}):null;
+  document.getElementById('tem-cid').value=cid;document.getElementById('tem-id').value=t?t.id:'';
+  document.getElementById('otem-sub').innerHTML='Témoignage de <b>'+esc(c.nom+' '+(c.prenom||''))+'</b>'+(c.ville?' · '+esc(c.ville):'');
+  var apps=(c.produits&&c.produits.length?c.produits:PRODUCTS);document.getElementById('tem-app').innerHTML=apps.map(function(a){return'<option'+(t&&t.appareil===a?' selected':'')+'>'+esc(a)+'</option>';}).join('')+(c.produits&&c.produits.length?'<option disabled>──</option>'+PRODUCTS.filter(function(a){return apps.indexOf(a)<0;}).map(function(a){return'<option'+(t&&t.appareil===a?' selected':'')+'>'+esc(a)+'</option>';}).join(''):'');
+  document.getElementById('tem-theme').innerHTML=THEMES.map(function(th){return'<option'+(t&&t.theme===th?' selected':'')+'>'+esc(th)+'</option>';}).join('');
+  document.getElementById('tem-date').value=t?(t.date||''):todayYMD();
+  document.getElementById('tem-txt').value=t?(t.texte||''):(c.temoignageTexte&&!(c.temoignages||[]).length?c.temoignageTexte:'');
+  document.getElementById('tem-video').value=t&&t.type==='video'?(t.url||''):'';
+  document.getElementById('tem-url').value=t?(t.url||''):'';document.getElementById('tem-media').value=t?(t.media||''):'';
+  document.getElementById('tem-consent').checked=!!(t&&t.consent);document.getElementById('tem-affich').value=t?(t.affich||'prenom'):'prenom';
+  document.getElementById('tem-consent-date').value=t?(t.consentDate||''):'';document.getElementById('tem-visage').checked=!!(t&&t.visage);
+  document.getElementById('tem-statut').value=t?(t.statut||'brouillon'):'brouillon';
+  document.getElementById('tem-statut').querySelector('[value=publie]').disabled=ROLE()==='referent';
+  document.getElementById('tem-del').style.display=t?'':'none';
+  document.getElementById('tem-audio-prev').innerHTML=t&&t.type==='audio'&&t.url?temEmbed(t):'';
+  oTemType(t?t.type:'ecrit');oTemConf();oTemPreview();
+  oSheetOpen('otem');
+}
+function oTemClose(){if(TEM_REC&&TEM_REC.state==='recording'){TEM_REC.stop();}oSheetClose('otem');}
+function oTemSave(){
+  var cid=val('tem-cid'),c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var type=temType(),txt=val('tem-txt').trim(),url=type==='video'?val('tem-video').trim():val('tem-url');
+  if(type==='ecrit'&&!txt){oT('Saisissez le texte du témoignage','e');return;}
+  if(type==='video'&&!url){oT('Indiquez le lien de la vidéo','e');return;}
+  if(type==='audio'&&!url){oT('Enregistrez l\'audio (ou passez en témoignage écrit)','e');return;}
+  var statut=val('tem-statut'),consent=document.getElementById('tem-consent').checked;
+  if(statut==='publie'&&!consent){oT('Impossible de publier sans consentement — enregistré « à valider »','w');statut='avalider';}
+  if(statut==='publie'&&confCheck(txt).length&&!confirm('Des termes sensibles sont surlignés. Publier quand même ?\n(Conseil : reformuler en ressenti personnel.)')){statut='avalider';}
+  c.temoignages=c.temoignages||[];var tid=val('tem-id');var t=tid?c.temoignages.find(function(x){return x.id===tid;}):null;var isNew=!t;
+  if(!t){t={id:'tm_'+Date.now().toString(36),creePar:PARTNER_NOM()};c.temoignages.push(t);}
+  t.type=type;t.appareil=val('tem-app');t.theme=val('tem-theme');t.date=val('tem-date')||todayYMD();t.texte=txt;t.url=url;t.media=type==='audio'?(val('tem-media')||'drive'):(type==='video'?'lien':'');
+  t.consent=consent;t.affich=val('tem-affich');t.consentDate=consent?(val('tem-consent-date')||todayYMD()):'';t.visage=document.getElementById('tem-visage').checked;t.statut=statut;t.majLe=todayYMD();t.majPar=PARTNER_NOM();
+  if(type==='ecrit'&&txt&&!c.temoignageTexte){c.temoignageTexte=txt;c.temoignageAutorise=consent;}
+  jrnAdd(c,'note',temIcon(type)+' Témoignage '+(isNew?'recueilli':'mis à jour')+(t.appareil?' — '+t.appareil.split('(')[0].trim():'')+' · '+(statut==='publie'?'publié':statut==='avalider'?'à valider':'brouillon')+(consent?' · consentement OK':' · sans consentement'));
+  oPush([c]);oTemClose();oOpenF(cid);emojiBurst(['🎙','💚','✨','🌿']);oT('🎙 Témoignage enregistré','s');
+}
+function oTemDel(){var cid=val('tem-cid'),tid=val('tem-id'),c=OC.find(function(x){return x.id===cid;});if(!c||!tid||!confirm('Supprimer ce témoignage ?'))return;c.temoignages=(c.temoignages||[]).filter(function(x){return x.id!==tid;});oPush([c]);oTemClose();oOpenF(cid);}
+function oTemRec(){
+  var btn=document.getElementById('tem-rec');
+  if(TEM_REC&&TEM_REC.state==='recording'){TEM_REC.stop();return;}
+  if(!navigator.mediaDevices||!window.MediaRecorder){oT('Enregistrement non disponible sur ce navigateur — collez un lien audio (Drive) ou passez en écrit','e');return;}
+  navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+    var mime=MediaRecorder.isTypeSupported('audio/webm')?'audio/webm':(MediaRecorder.isTypeSupported('audio/mp4')?'audio/mp4':'');
+    TEM_CHUNKS=[];TEM_REC=new MediaRecorder(stream,mime?{mimeType:mime}:undefined);
+    var t0=Date.now();btn.classList.add('on');btn.textContent='⏹ Arrêter (0:00)';
+    TEM_TIMER=setInterval(function(){var s=Math.floor((Date.now()-t0)/1000);btn.textContent='⏹ Arrêter ('+Math.floor(s/60)+':'+('0'+s%60).slice(-2)+')';if(s>=180)TEM_REC.stop();},500);
+    TEM_REC.ondataavailable=function(e){if(e.data&&e.data.size)TEM_CHUNKS.push(e.data);};
+    TEM_REC.onstop=function(){
+      clearInterval(TEM_TIMER);stream.getTracks().forEach(function(tr){tr.stop();});btn.classList.remove('on');btn.textContent='⏫ Envoi vers Drive…';btn.disabled=true;
+      var blob=new Blob(TEM_CHUNKS,{type:TEM_REC.mimeType||'audio/webm'});
+      var cid=val('tem-cid'),c=OC.find(function(x){return x.id===cid;});
+      var rd=new FileReader();rd.onload=function(){
+        var b64=String(rd.result).split(',')[1];
+        oPostAsync_({op:'uploadMedia',name:'temoignage_'+(c?(c.nom+'_'+(c.prenom||'')).replace(/[^\w-]+/g,'_'):'audio')+'_'+todayYMD()+(blob.type.indexOf('mp4')>=0?'.m4a':'.webm'),mime:blob.type,data:b64})
+          .then(function(d){btn.disabled=false;btn.textContent='🎙 Réenregistrer';if(d&&d.ok&&d.url){document.getElementById('tem-url').value=d.url;document.getElementById('tem-media').value='drive';document.getElementById('tem-audio-prev').innerHTML=temEmbed({url:d.url,type:'audio'});emojiBurst(['🎙','✅']);oT('🎙 Audio enregistré sur Drive','s');}else{oT(d&&d.error==='op'?'Le script Google n\'est pas à jour (v3.6) — audio non envoyé':'Envoi impossible : '+((d&&d.error)||'?'),'e');}})
+          .catch(function(){btn.disabled=false;btn.textContent='🎙 Réessayer';oT('Hors ligne — audio non envoyé','e');});
+      };rd.readAsDataURL(blob);
+    };
+    TEM_REC.start();
+  }).catch(function(){oT('Micro refusé ou indisponible','e');});
+}
+function temShareText(c,t){return'🌿 Témoignage'+(t.appareil?' — '+t.appareil.split('(')[0].trim():'')+'\n'+temNom(c,t)+(t.date?' · '+fD(t.date):'')+'\n\n'+(t.texte?'« '+t.texte+' »':'')+(t.url?'\n▶️ '+t.url:'')+'\n\nExpérience personnelle partagée avec son accord — elle ne remplace pas un avis médical. Les appareils OlyLife ne sont pas des dispositifs médicaux.';}
+function oTemShare(cid,tid){var c=OC.find(function(x){return x.id===cid;});var t=c&&(c.temoignages||[]).find(function(x){return x.id===tid;});if(!t)return;if(!temPublishable(t)){oT('Témoignage non publiable (statut ou consentement)','w');return;}var txt=temShareText(c,t);navigator.clipboard&&navigator.clipboard.writeText(txt);window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');}
+function temSimilaires(c){var apps=(c.produits||[]).map(function(a){return a.split('(')[0].trim().toLowerCase();});return temAll().filter(function(x){return x.c.id!==c.id&&temPublishable(x.t)&&(!apps.length||apps.indexOf((x.t.appareil||'').split('(')[0].trim().toLowerCase())>=0);});}
+function oTemConsent(){
+  var t='AUTORISATION DE TÉMOIGNAGE — Water Life High Tech / OlyLife\n\nJe soussigné(e) ………………………………, demeurant à ……………………………,\n\nautorise l\'association Water Life High Tech et ses distributeurs partenaires à recueillir et diffuser mon témoignage concernant mon expérience personnelle avec l\'appareil : ……………………………\n\nForme du témoignage : ☐ écrit ☐ audio ☐ vidéo\nAffichage : ☐ prénom + ville ☐ initiales ☐ anonyme\n☐ J\'autorise l\'utilisation de mon image (photo / vidéo où je suis reconnaissable)\nSupports : ☐ messages WhatsApp aux prospects ☐ site et réseaux sociaux WLHT ☐ formations internes\n\nJe comprends que mon témoignage relate un ressenti personnel, qu\'il ne constitue pas une allégation médicale, et que je peux retirer cette autorisation à tout moment par simple message à l\'association.\n\nFait à ……………………… le …… / …… / ……\nSignature :';
+  navigator.clipboard&&navigator.clipboard.writeText(t).then(function(){oT('📝 Formulaire de consentement copié — à envoyer ou à faire signer (JotForm à venir)','s');});
+}
+
+// ── Fiche : bloc Accompagnement ───────────────────────────────────
+function accHtml(c){
+  var isRef=(ROLE()==='referent');
+  var rows='';
+  var devs=[];(c.produits||[]).forEach(function(pn){var k=precKeyOf(pn);if(k&&devs.indexOf(k)<0)devs.push(k);});
+  if(devs.length){rows+=devs.map(function(k){var pt=(c.precTransmis||{})[k];return'<div class="acc-row"><span class="em">📖</span><div class="b">Précautions — '+esc(PREC_DB[k].nom)+(pt?'<small>✅ transmises le '+fD(pt.date)+(pt.par?' par '+esc(pt.par):'')+'</small>':'<small style="color:#C0392B">⚠️ non encore transmises</small>')+'</div><div class="acts">'+(isRef?'':'<button class="ob bgh bsm" onclick="oPrecOpen(\''+c.id+'\',\''+k+'\')">'+(pt?'↻ Renvoyer':'💬 Transmettre')+'</button>')+'<button class="ob bgh bsm" onclick="PREC_CUR=\''+k+'\';oClose();oSw(\'precautions\')">📖</button></div></div>';}).join('');}
+  else rows+='<div class="acc-row"><span class="em">📖</span><div class="b" style="color:var(--t3)">Aucun appareil renseigné dans la fiche (Produits) — les précautions à transmettre apparaîtront ici.</div></div>';
+  var r=resGet();
+  var pas=(c.protocoles||[]);
+  rows+=pas.map(function(pa){var p=protoById(pa.protoId);if(!p)return'';var j=diffD(pa.debut);return'<div class="acc-row"><span class="em">🧭</span><div class="b">'+esc(p.titre)+'<small>'+(pa.termine?'✅ terminé le '+fD(pa.termine):'démarré le '+fD(pa.debut)+(j!==null?' · J'+(j<=0?'+'+Math.abs(j):'−'+j):'')+(pa.sent&&pa.sent.j7?' · point J+7 ✅':'')+(pa.sent&&pa.sent.j30?' · point J+30 ✅':''))+'</small></div><div class="acts"><button class="ob bgh bsm" onclick="oProtoOpen(\''+p.id+'\',\''+c.id+'\')">👁</button>'+(!pa.termine&&!isRef?'<button class="ob bgh bsm" onclick="oProtoTermine(\''+c.id+'\',\''+pa.id+'\')">✅ Terminer</button>':'')+'</div></div>';}).join('');
+  var nbProt=r.protocoles.filter(function(p){return p.statut==='valide';}).length;
+  if(!isRef)rows+='<div class="acc-row"><span class="em">🧭</span><div class="b" style="color:var(--t3)">'+(nbProt?nbProt+' protocole'+(nbProt>1?'s':'')+' validé'+(nbProt>1?'s':'')+' par le comité':'Aucun protocole validé pour l\'instant')+'</div><div class="acts">'+(nbProt?'<button class="ob bgh bsm" onclick="oClose();oSw(\'protocoles\')">➕ Assigner</button>':'')+'</div></div>';
+  var tems=c.temoignages||[];
+  rows+=tems.map(function(t){return'<div class="acc-row"><span class="em">'+temIcon(t.type)+'</span><div class="b">'+(t.texte?'« '+esc(t.texte.length>120?t.texte.slice(0,120)+'…':t.texte)+' »':(t.type==='video'?'Vidéo':'Audio')+(t.url?'':' — média manquant'))+'<small>'+fD(t.date)+' · '+esc((t.appareil||'').split('(')[0].trim())+' · '+(t.statut==='publie'?(temPublishable(t)?'✅ publié':'⚠️ consentement incomplet'):t.statut==='avalider'?'⏳ à valider':'brouillon')+'</small></div><div class="acts"><button class="ob bgh bsm" onclick="oTemOpen(\''+c.id+'\',\''+t.id+'\')">✏️</button>'+(temPublishable(t)?'<button class="ob bwa bsm" onclick="oTemShare(\''+c.id+'\',\''+t.id+'\')">💬 Partager</button>':'')+'</div></div>';}).join('');
+  var sim=temSimilaires(c);
+  rows+='<div class="acc-row"><span class="em">🎙</span><div class="b" style="color:var(--t3)">'+(tems.length?'':'Aucun témoignage recueilli pour l\'instant. ')+(sim.length?'<b style="color:var(--tx)">'+sim.length+' témoignage'+(sim.length>1?'s':'')+' publié'+(sim.length>1?'s':'')+'</b> d\'autres membres sur le même appareil — utile pour un prospect.':'')+'</div><div class="acts"><button class="ob bgh bsm" onclick="oTemOpen(\''+c.id+'\')">➕ Témoignage</button>'+(sim.length?'<button class="ob bgh bsm" onclick="TEM_F={type:\'\',app:\''+esc((c.produits||[])[0]||'')+'\',theme:\'\',statut:\'publie\'};oClose();oSw(\'temoignages\')">👀 Voir</button>':'')+'</div></div>';
+  return'<div class="od-section"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">🌿 Accompagnement — précautions · protocole · témoignage</div><div class="od-bd">'+rows+'</div></div>';
 }
 
 // ── Photos de profil · Mon profil · émojis (v3.6) ───────────────────
