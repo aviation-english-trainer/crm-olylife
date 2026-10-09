@@ -406,6 +406,22 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .rq-sugg button:last-child{border-bottom:none;}
 .rq-sugg button:hover{background:var(--navy3);}
 .rq-sugg small{display:block;color:var(--t3);font-size:11px;}
+/* ── DEMANDES REÇUES / QR (v3.16) ─────────────────────────────────── */
+.ld-card{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--sh);}
+.ld-card.done{opacity:.6;}
+.ld-hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.ld-hd b{font-size:15px;}
+.ld-hd small{color:var(--t3);font-size:11.5px;}
+.ld-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px 14px;font-size:12.5px;margin:10px 0;color:var(--t2);}
+.ld-grid span b{color:var(--tx);font-weight:600;}
+.ld-acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.ld-acts select{min-height:40px;border:1px solid var(--bd);border-radius:10px;padding:6px 10px;font-family:inherit;font-size:12.5px;}
+.qr-box{text-align:center;background:#fff;border:1px solid var(--bd);border-radius:14px;padding:14px;}
+.qr-box svg{width:200px;height:200px;max-width:100%;}
+.qr-link{font-size:11px;color:var(--t3);word-break:break-all;margin:8px 0;}
+.imp-shots{border:1.5px dashed var(--bd2);border-radius:14px;padding:12px 14px;margin:0 0 12px;background:var(--navy3);display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.imp-shots .t{flex:1;min-width:200px;font-size:12.5px;color:var(--t2);line-height:1.5;}
+.imp-shots .t b{color:var(--tx);}
 /* ── ADMINISTRATION (v3.13) ───────────────────────────────────────── */
 .adm-tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;margin-bottom:12px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .adm-tabs::-webkit-scrollbar{display:none;}
@@ -1077,6 +1093,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
         <button class="sd-it" data-nav="pipeline" onclick="oSw('pipeline')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg><em>Pipeline</em><i class="nbdg" data-b="pipeline"></i></button>
         <button class="sd-it" data-nav="agenda" onclick="oSw('agenda')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><em>Agenda</em><i class="nbdg" data-b="agenda"></i></button>
         <button class="sd-it" data-nav="actions" onclick="oSw('actions')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><em>Actions</em><i class="nbdg" data-b="actions"></i></button>
+        <button class="sd-it" data-nav="demandes" onclick="oSw('demandes')" title="Demandes d'inscription reçues via les QR codes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v12H8l-4 4z"/><path d="M8 9h8M8 12h5"/></svg><em>Demandes</em><i class="nbdg" data-b="demandes"></i></button>
       </div></div>
       <div class="sd-grp" data-grp="equipe"><button class="sd-gh" type="button" onclick="navGrp('equipe')" title="Équipe"><span>Équipe</span><i></i></button><div class="sd-gi">
         <button class="sd-it" data-nav="equipe" onclick="oSw('equipe')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v5m0 0L6.5 17m5.5-4.5L17.5 17"/></svg><em>Équipe</em><i class="nbdg" data-b="equipe"></i></button>
@@ -1605,6 +1622,15 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <div id="prec-body"></div>
     </div>
 
+    <!-- DEMANDES REÇUES (QR) (v3.16) -->
+    <div class="ov" id="ov-demandes">
+      <div class="ocard" style="padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:13px;color:var(--t2);line-height:1.6">📥 Les personnes qui scannent <b>votre QR code d'inscription</b> remplissent elles-mêmes le formulaire (identité passeport, pièce, adresses, e-mail, téléphone, mot de passe souhaité) : leurs demandes arrivent ici, déjà rattachées à la personne qui a transmis le QR code. <b>Créer la fiche</b> l'intègre dans les contacts ; le mot de passe n'est consultable qu'ici, le temps de créer le compte OlyLife, puis il est effacé.</div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="ob bgold bsm" style="min-height:40px" onclick="oMyQr()">📲 Mon QR code d'inscription</button><button class="ob bgh bsm" style="min-height:40px" onclick="oLeads(true)">🔄 Actualiser</button><label class="ochk-row" style="margin-left:auto;font-size:12px"><input type="checkbox" id="ld-showdone" onchange="oLeadsRender()"><span>Afficher les demandes déjà intégrées</span></label></div>
+      </div>
+      <div id="ld-list"><div class="oemp"><div class="oemp-i">📥</div><div class="oemp-t">Chargement…</div></div></div>
+    </div>
+
     <!-- ADMINISTRATION (v3.13) -->
     <div class="ov" id="ov-admin">
       <div class="adm-tabs" id="adm-tabs">
@@ -1769,6 +1795,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
         <button class="odr-it" data-dnav="pipeline" onclick="oDrGo('pipeline')"><span class="em">📊</span>Pipeline</button>
         <button class="odr-it" data-dnav="agenda" onclick="oDrGo('agenda')"><span class="em">📅</span>Agenda<span class="nbdg" data-b="agenda"></span></button>
         <button class="odr-it" data-dnav="actions" onclick="oDrGo('actions')"><span class="em">🔔</span>Actions<span class="nbdg" data-b="actions"></span></button>
+        <button class="odr-it" data-dnav="demandes" onclick="oDrGo('demandes')"><span class="em">📥</span>Demandes reçues<span class="nbdg" data-b="demandes"></span></button>
       </div></div>
       <div class="odr-grp" data-grp="equipe"><button class="odr-sec odr-gh" type="button" onclick="navGrp('equipe')"><span>Équipe</span><i></i></button><div class="odr-gi">
         <button class="odr-it" data-dnav="equipe" onclick="oDrGo('equipe')"><span class="em">🤝</span>Équipe</button>
@@ -1840,6 +1867,12 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
   </div>
   <div class="omo-body">
     <div class="os-note" style="margin-bottom:14px">Collez <b>n'importe quoi</b> : des lignes en vrac (nom, téléphone, email mélangés), un tableau CSV/Excel, un bloc JSON préparé par Claude, ou <b>la page complète d'une commande du Back-Office OlyLife</b> ou <b>le formulaire « Commande d'inscription d'un membre »</b> une fois rempli (le mot de passe est ignoré) (français ou anglais — Ctrl+A puis Ctrl+C sur la page, et collez tout ici). L'application détecte le format toute seule, repère les doublons et vous montre ce qui est déjà connu et ce qui est nouveau avant d'importer.</div>
+    <div class="imp-shots">
+      <div class="t"><b>📷 Depuis une ou plusieurs captures d'écran</b><br>Formulaire d'inscription OlyLife, page d'une commande, liste « My Membership Order », liste WhatsApp… Le texte est lu automatiquement (OCR), puis vérifié ci-dessous avant import. Les images ne sont pas conservées.</div>
+      <input type="file" id="oimp-shots" accept="image/*" multiple style="display:none" onchange="oImpShots(this)">
+      <button class="ob bgold" type="button" style="min-height:44px" onclick="document.getElementById('oimp-shots').click()">📷 Choisir des captures</button>
+    </div>
+    <div id="oimp-shots-st" style="display:none;font-size:12px;color:var(--t2);margin:-6px 0 10px"></div>
     <textarea class="ofc" id="oimp-ta" rows="8" style="font-family:monospace;font-size:12px" placeholder="Exemples acceptés :&#10;&#10;Marie DUPONT 06 12 34 56 78 marie@gmail.com&#10;KOUASSI Jean +225 07 08 09 10 11 envoyé par Sophie&#10;&#10;— ou un CSV avec en-têtes nom;prenom;tel;email&#10;— ou un tableau JSON [{...}]"></textarea>
     <div class="ofilter-row" id="oimp-def-row" style="margin-top:12px">
       <select id="oimp-defref"><option value="">Référé par (défaut)…</option></select>
@@ -1989,6 +2022,9 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <div style="margin-top:16px;padding:12px;background:var(--navy3);border-radius:12px;border:1px solid var(--bd)">
       <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">🔐 Sécurité de cet appareil</div>
       <div id="oprof-pin-row" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px"></div>
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin:12px 0 6px">📲 Mon QR code d'inscription</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.5;margin-bottom:8px">À imprimer, afficher ou envoyer : la personne remplit le formulaire d'inscription OlyLife sur son téléphone et sa demande arrive dans « Demandes reçues », rattachée à vous.</div>
+      <button class="ob bgh bsm" type="button" onclick="oMyQr()">📲 Afficher mon QR code</button>
       <div style="font-size:12px;font-weight:700;color:var(--gold);margin:12px 0 6px">📱 Mes appareils connectés</div>
       <div id="oprof-sess"></div>
       <div style="font-size:11px;color:var(--t3);margin-top:6px">Votre code d'accès n'est demandé qu'une fois par appareil ; une session expire après 30 jours sans utilisation. Téléphone perdu ? Déconnectez-le ici ou demandez à l'administrateur.</div>
@@ -2197,7 +2233,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.15 · 09/10';
+var APP_VERSION='v3.16 · 09/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -2294,6 +2330,7 @@ function oApplyPayload(d){
       oLoader(false);
       USER=d.user;
       try{if(d.config&&d.config.params){CFG.params=d.config.params;}applyParams();}catch(e){}
+      if(d.config&&typeof d.config.leadsNew==='number'){LEADS_NEW=d.config.leadsNew;}
       OC=d.contacts||[];OC.forEach(function(c){if(!c.actions)c.actions={};if(!c.produits)c.produits=[];});normAll();
       CFG=d.config||{referents:[],suiveurs:[]};
       if(d.users)USERS=d.users;
@@ -2661,6 +2698,7 @@ function renderUsers(){
         +(isAdm||u.tel?'<button class="oua w" onclick="oInviteUser('+i+')"><span>📲</span>Inviter</button>':'')
         +(isAdm?'<button class="oua e" onclick="oUserEdit('+i+')"><span>✏️</span>Modifier</button>':'')
         +(isAdm?'<button class="oua v" onclick="oUserSessions('+i+')"><span>📱</span>'+(u.sessions?u.sessions+' appareil'+(u.sessions>1?'s':''):'Appareils')+'</button>':'')
+        +(isAdm?'<button class="oua e" onclick="oUserQr('+i+')"><span>📲</span>QR code</button>':'')
         +(isAdm?'<button class="oua x" onclick="oUserDel('+i+')"><span>🗑</span>Retirer</button>':'')
       +'</div>'
     +'</div>';
@@ -4125,6 +4163,21 @@ function parseOlyReg(text){
   var full=(text.match(/(?:full address|adresse compl[èe]te)\s*[:：]\s*(.+)/i)||[])[1]||'';
   if(full){var segs=full.split(',').map(function(x){return x.trim();}).filter(Boolean);if(!adr)adr=segs[0]||'';segs.forEach(function(sg,i){if(/^\d{4,5}$/.test(sg)){if(!cp)cp=sg;if(!ville&&segs[i+1])ville=segs[i+1];}});if(!pays&&segs.length)pays=segs[segs.length-1];}
   var member=(text.match(/(?:id membre correspondant|corresponding member id|member id)[^A-Z0-9]{0,4}(?:est|is)?[^A-Z0-9]{0,8}((?:EA|AF)\d{5,})/i)||[])[1]||'';
+  // ── repli OCR : libellés et valeurs séparés par la mise en page ──
+  placement=ocrClean(placement);sponsor=ocrClean(sponsor);nomC=ocrClean(nomC);pieceId=ocrClean(pieceId);email=ocrClean(email);tel=ocrClean(tel);adr=ocrClean(adr);cp=ocrClean(cp);ville=ocrClean(ville);pays=ocrClean(pays);rangTxt=ocrClean(rangTxt);position=ocrClean(position);
+  if(!/^[A-Z]$/.test(position))position='';
+  var LBL=/^(num[ée]ro|adresse|address|sexe|gender|nom|name|pays|country|e-?mail|t[ée]l[ée]phone|phone|mot de passe|password|informations?|code postal|city|ville|full|search|apt)/i;
+  if(!/@/.test(email))email='';if(!/^[A-Z0-9]{5,}$/i.test(pieceId))pieceId='';if(!/^\d{4,5}$/.test(cp))cp='';if(LBL.test(nomC)||/^other countries$/i.test(nomC))nomC='';if(LBL.test(ville))ville='';if(LBL.test(adr))adr='';if(LBL.test(pays)||/^other countries$/i.test(pays))pays='';
+  if(!email)email=(text.match(/[\w.+-]+@[\w-]+\.[\w.-]+/)||[])[0]||'';
+  if(!/^\+?\d{8,}$/.test(tel.replace(/[\s().-]/g,''))){var mt=text.match(/[+$]\s?(\d{1,3})\s?(\d{6,12})\b/)||text.match(/\b(0[1-9])\s?(\d{2}\s?\d{2}\s?\d{2}\s?\d{2})\b/);tel=mt?(mt[0].charAt(0)==='0'?mt[1]+mt[2]:'+'+mt[1]+mt[2]):tel;}
+  var noAddr=/\b(CHEMIN|RUE|AVENUE|AV\.|BOULEVARD|BD|ALLEE|ALLÉE|IMPASSE|PLACE|ROUTE|QUARTIER|LOT|RESIDENCE|RÉSIDENCE|FRANCE|BELGIQUE|SUISSE|ADDRESS|ADRESSE|FULL|NAME|COUNTRY|REGION|PHONE|CITY|CODE|POSTAL|SEARCH|AUTOFILL)\b/;
+  if(!nomC||nomC.split(/\s+/).length<2){var cands=lines.map(ocrClean).filter(function(l){return/^[A-ZÀ-Ý][A-ZÀ-Ý'\-]+(\s+[A-ZÀ-Ý][A-ZÀ-Ý'\-]+)+$/.test(l)&&!noAddr.test(l)&&l.length>=6;}).sort(function(a,b){return b.length-a.length;});if(cands.length)nomC=cands[0];}
+  if(!pieceId){var toks=text.split(/[\s:|]+/).filter(function(t){return/^(?=.*\d)(?=.*[A-Z])[A-Z0-9]{7,12}$/.test(t)&&!/^(EA|AF|OLY)\d*/.test(t)&&!/^P\d/.test(t);});if(toks.length)pieceId=toks[0];}
+  if(!cp||!ville){var mcv=text.match(/\b(\d{5})\s+([A-ZÀ-Ý][A-ZÀ-Ý'\- ]{1,40}?)(?=\s*(?:[@®]|$|\n|,))/m);if(mcv){if(!cp)cp=mcv[1];if(!ville)ville=ocrClean(mcv[2]);}}
+  if(!adr){var ma=lines.map(ocrClean).filter(function(l){return/^\d{1,4}\s?(BIS|TER)?\s+[A-ZÀ-Ý][A-ZÀ-Ý'\- ]{4,}$/.test(l)&&/\b(CHEMIN|RUE|AVENUE|AV|BOULEVARD|BD|ALLEE|ALLÉE|IMPASSE|PLACE|ROUTE|QUARTIER|LOT|RESIDENCE|RÉSIDENCE|VOIE|COURS|QUAI|SQUARE|HAMEAU|LIEU)\b/.test(l);});if(ma.length)adr=ma[0];}
+  if(!pays){var mp=text.match(/\b(France|Belgique|Suisse|Luxembourg|Maroc|C[oô]te d'Ivoire|S[ée]n[ée]gal|Cameroun|B[ée]nin|Togo|Gabon|Congo|Mali|Burkina Faso|Guin[ée]e|Madagascar|Maurice|R[ée]union|Guadeloupe|Martinique|Canada|Espagne|Italie|Portugal|Allemagne|Royaume-Uni|Monaco|Tunisie|Alg[ée]rie)\b/i);if(mp)pays=mp[1];}
+  if(!rangTxt){var mr2=text.match(/\bP([1-5])\b\s*[-–]?\s*(Starter|Builder|Leader|Supervisor|Pioneer)?/i);if(mr2)rangTxt=mr2[0];}
+  if(!placement||!sponsor){var allIds=(text.match(/\b(?:EA|AF)\d{5,}\b/g)||[]).filter(function(id){return id!==member;});if(!placement&&allIds[0])placement=allIds[0];if(!sponsor&&allIds[1])sponsor=allIds[1];}
   var statusTxt=find(/^(statut de la commande|order status)$/i);
   var paid=/settled|pay[ée]e?|paid|r[ée]gl[ée]e?/i.test(statusTxt);
   var rang='';var mr=rangTxt.match(/\b(P[1-5])\b/i)||rangTxt.match(/\b(Starter|Builder|Leader|Supervisor|Pioneer)\b/i);if(mr)rang=RANG_OLY[mr[1].toLowerCase()]||'';
@@ -4136,6 +4189,46 @@ function parseOlyReg(text){
   var out={nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',adresse:adr,cp:cp,ville:ville,pieceId:pieceId,memberIdOlyLife:member.toUpperCase(),sponsor:sponsor,placement:placement,cote:position,rangOly:rang,qualification:'Chaud',canal:'WhatsApp',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olyreg'};
   if(paid){out.etape='Client';out.statut='reseau';}else{out.etape='Achat en cours';out.statut='close';}
   return[out];
+}
+// v3.16 — nettoyage d'une valeur lue par OCR (icônes, flèches, « v » de liste déroulante, barres)
+function ocrClean(v){return String(v||'').replace(/[|¦]/g,' ').replace(/\s*[@®©]\S*/g,'').replace(/(\s+(v|y|ey|Qo|~|-|—))+$/,'').replace(/[\s~]+$/,'').trim();}
+// Liste « My Membership Order » / tableau de membres : une ligne par membre avec un ID EA…
+function looksOlyRows(text){var n=(deEnt(text).match(/\b(EA|AF)\d{5,}\b/g)||[]).length;return n>=2&&/[A-ZÀ-Ý]{2,}\s+[A-ZÀ-Ý]{2,}/.test(text);}
+function parseOlyRows(text){
+  text=deEnt(text);var lines=text.split(/\r?\n/).map(function(l){return l.trim();}).filter(Boolean);
+  var cnt={};lines.forEach(function(l){(l.match(/\b(?:EA|AF)\d{5,}\b/g)||[]).forEach(function(id){cnt[id]=(cnt[id]||0)+1;});});
+  var ids=Object.keys(cnt);var common=ids.filter(function(id){return cnt[id]>=2&&cnt[id]>=ids.length/2;});  // l'ID présent partout = parrain / placement de la liste
+  var out=[];
+  lines.forEach(function(l){
+    var all=l.match(/\b(?:EA|AF)\d{5,}\b/g)||[];if(!all.length)return;
+    var member=all.filter(function(id){return common.indexOf(id)<0;})[0]||'';var sponsor=all.filter(function(id){return common.indexOf(id)>=0;})[0]||'';
+    var num=(l.match(/\b(20\d{14,})\b/)||[])[1]||'';var date=(l.match(/\b(20\d{2}-\d{2}-\d{2})\b/)||[])[1]||'';
+    var mr=l.match(/\bP([1-5])\b/i)||l.match(/\b(Starter|Builder|Leader|Supervisor|Pioneer)\b/i);var rang=mr?(RANG_OLY[(mr[1]||mr[0]).toLowerCase()]||RANG_OLY['p'+mr[1]]||''):'';
+    var mAmt=l.match(/(?:USD\$?|US\$|\$)\s*([\d.,]+)/)||l.match(/\b(\d{3,5}(?:\.\d{2}))\b/);var montant=mAmt?parseFloat(mAmt[1].replace(',','.'))||0:0;
+    var paid=/settled|paid|pay[ée]|r[ée]gl[ée]/i.test(l);
+    var nm=(l.replace(/\b(?:EA|AF)\d{5,}\b/g,' ').match(/\b([A-ZÀ-Ý][A-ZÀ-Ý'\-]+(?:\s+[A-ZÀ-Ý][A-ZÀ-Ý'\-]+)+)\b/g)||[]).filter(function(x){return!/^(USD|EUR|SETTLED|UNPAID|PAID|MEMBER|ORDER|ID|STATUS|AMOUNT|DATE|NAME|RANK|SPONSOR|PLACEMENT)\b/.test(x);}).sort(function(a,b){return b.length-a.length;})[0]||'';
+    if(!member&&!nm)return;
+    var parts=nm.split(/\s+/),nom=parts.shift()||'',prenom=parts.map(function(w){return w.charAt(0)+w.slice(1).toLowerCase();}).join(' ');
+    var o={nom:nom,prenom:prenom,memberIdOlyLife:member,sponsor:sponsor,numCommande:num,dateCommande:date||(/^\d{8}/.test(num)?num.slice(0,4)+'-'+num.slice(4,6)+'-'+num.slice(6,8):''),rangOly:rang||(montant?rangFromUSD(montant):''),montantUSD:montant,achatsUSD:montant,qualification:'Chaud',canal:'WhatsApp',notes:'Ligne « Membership Order » OlyLife'+(num?' n°'+num:'')+(montant?' · '+montant+' USD':'')+(paid?' · réglée':''),_src:'olyrows'};
+    if(paid||num){o.etape='Client';o.statut='reseau';o.statutPar=PARTNER_NOM();o.statutLe=new Date().toISOString();}
+    out.push(o);
+  });
+  return out;
+}
+// Captures multiples : « --- capture n --- » sépare les blocs ; un bloc sans marqueur de début (adresse, écran de succès…) complète le précédent
+function impParseGroups(raw){
+  var parts=raw.split(/^--- capture \d+ ---$/m).map(function(x){return x.trim();}).filter(Boolean);
+  var groups=[];
+  parts.forEach(function(t){
+    var starts=looksOlyOrder(t)||looksOlyReg(t)||looksOlyRows(t);
+    if(starts||!groups.length)groups.push(t);else groups[groups.length-1]+='\n'+t;
+  });
+  var items=[];
+  groups.forEach(function(t){
+    var its=looksOlyOrder(t)?parseOlyOrders(t):looksOlyReg(t)?parseOlyReg(t):looksOlyRows(t)?parseOlyRows(t):parseVrac(t);
+    its.forEach(function(it){items.push(it);});
+  });
+  return items;
 }
 function looksOlyOrder(text){
   if((/num[ée]ro de commande\s*[:：]/i.test(text)&&/id membre\s*[:：]/i.test(text))
@@ -4290,10 +4383,17 @@ function oImpAnalyse(){
   }else{
     var firstLine=raw.split('\n')[0].toLowerCase();
     var looksCSV=raw.indexOf('\t')>=0||((firstLine.split(';').length>2||firstLine.split(',').length>2)&&/nom|pr[ée]nom|tel|mail|email|phone/.test(firstLine));
-    var isReg=!looksOlyOrder(raw)&&looksOlyReg(raw);
-    items=looksOlyOrder(raw)?parseOlyOrders(raw):isReg?parseOlyReg(raw):(looksCSV?parseCSV(raw):parseVrac(raw));
-    if(looksOlyOrder(raw))oT('📦 Relevé de commande OlyLife reconnu — '+items.length+' client(s)','s');
-    if(isReg)oT(items.length?'📝 Formulaire d\'inscription OlyLife reconnu — 1 fiche (le mot de passe n\'est jamais enregistré)':'📝 Formulaire d\'inscription reconnu mais nom / téléphone introuvables','s');
+    if(/^--- capture \d+ ---$/m.test(raw)){
+      items=impParseGroups(raw);
+      oT('📷 '+items.length+' fiche(s) lue(s) dans les captures — vérifiez avant d\'importer','s');
+    }else{
+      var isReg=!looksOlyOrder(raw)&&looksOlyReg(raw);
+      var isRows=!looksOlyOrder(raw)&&!isReg&&!looksCSV&&looksOlyRows(raw);
+      items=looksOlyOrder(raw)?parseOlyOrders(raw):isReg?parseOlyReg(raw):isRows?parseOlyRows(raw):(looksCSV?parseCSV(raw):parseVrac(raw));
+      if(looksOlyOrder(raw))oT('📦 Relevé de commande OlyLife reconnu — '+items.length+' client(s)','s');
+      if(isReg)oT(items.length?'📝 Formulaire d\'inscription OlyLife reconnu — 1 fiche (le mot de passe n\'est jamais enregistré)':'📝 Formulaire d\'inscription reconnu mais nom / téléphone introuvables','s');
+      if(isRows)oT('📋 Liste de membres OlyLife reconnue — '+items.length+' ligne(s)','s');
+    }
   }
   var defRef=document.getElementById('oimp-defref').value;
   var defSuivi=document.getElementById('oimp-defsuivi').value;
@@ -4402,7 +4502,7 @@ function oClearFiltersSilent(){
 // v3 — INTERFACE RESPONSIVE : navigation · accueil · contacts (tableau,
 // sélection multiple) · pipeline · agenda · Calendly · raccourcis clavier
 // ═══════════════════════════════════════════════════════════════════
-var VIEW_T={admin:'Administration',dashboard:'Tableau de bord',contacts:'Contacts',pipeline:'Pipeline',agenda:'Agenda',actions:'Actions',equipe:'Équipe',nouvelle:'Nouveau contact',carte:'Carte des essais',genea:'Généalogie',temoignages:'Témoignages',protocoles:'Fiches conseils de soins',precautions:'Utilisations & précautions'};
+var VIEW_T={admin:'Administration',demandes:'Demandes reçues',dashboard:'Tableau de bord',contacts:'Contacts',pipeline:'Pipeline',agenda:'Agenda',actions:'Actions',equipe:'Équipe',nouvelle:'Nouveau contact',carte:'Carte des essais',genea:'Généalogie',temoignages:'Témoignages',protocoles:'Fiches conseils de soins',precautions:'Utilisations & précautions'};
 var CUR_VIEW='dashboard',CUR_LIST=[],SORT={k:'statut',d:1},SEL={},SEL_MODE=false,ACTIVE_ID=null,LIST_LIMIT=150;
 function mq(q){try{return window.matchMedia(q).matches;}catch(e){return false;}}
 function isDesk(){return mq('(min-width:760px)');}
@@ -4442,6 +4542,7 @@ function oRefreshView(v){
   else if(v==='agenda')oAgenda();else if(v==='actions')oAct();
   else if(v==='equipe'){admBackCards();oEq();oLoadMyDigest();var ve=document.getElementById('eq-version');if(ve)ve.textContent=APP_VERSION;}
   else if(v==='admin'){if(ROLE()!=='admin'){oSw('dashboard');return;}oAdmin();}
+  else if(v==='demandes'){oLeads();}
   else if(v==='carte')oCarte();else if(v==='genea')oGenea();
   else if(v==='temoignages')oTemView();else if(v==='protocoles')oProtoView();else if(v==='precautions')oPrecView();
   navBadges();
@@ -4454,7 +4555,7 @@ function navBadges(){
   var ag=agendaEvents(false).filter(function(e){return(e.type==='rappel'&&e.date<=td)||(e.type==='rdv'&&e.date===td);}).length;
   var act=0;if(ROLE()!=='referent'){try{act=computeActions().filter(function(a){return a.diff<=0;}).length;}catch(e){}}
   var nt=0;try{var seenC={};mesNotifs().forEach(function(x){seenC[x.c.id]=1;});nt=Object.keys(seenC).length;}catch(e){}
-  setB('contacts',red);setB('agenda',ag);setB('actions',act);setB('dashboard',nt);
+  setB('contacts',red);setB('agenda',ag);setB('actions',act);setB('dashboard',nt);setB('demandes',LEADS_NEW);
   function setB(k,n){document.querySelectorAll('[data-b="'+k+'"]').forEach(function(el){el.textContent=n>99?'99+':n;el.classList.toggle('on',n>0);});}
 }
 function oSearchFocus(){
@@ -5906,6 +6007,144 @@ function accHtml(c){
   return'<div class="od-section"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">🌿 Accompagnement — précautions · fiche conseils · témoignage</div><div class="od-bd">'+rows+'</div></div>';
 }
 
+// ── DEMANDES REÇUES (QR) & QR CODES (v3.16) ─────────────────────────
+var LEADS=[],LEADS_NEW=0,LEADS_LOADED=false;
+function oLeads(force){
+  var box=document.getElementById('ld-list');if(!box)return;
+  if(!LEADS_LOADED||force)box.innerHTML='<div class="oemp"><div class="oemp-i">📥</div><div class="oemp-t">Chargement…</div></div>';
+  oPostAsync_({op:'leads'}).then(function(d){
+    if(!d.ok){box.innerHTML='<div class="oemp"><div class="oemp-i">⚠️</div><div class="oemp-t">'+(d.error==='op'?'Script Google à mettre à jour (v3.9) pour recevoir les demandes.':'Indisponible')+'</div></div>';return;}
+    LEADS=d.leads||[];LEADS_LOADED=true;LEADS_NEW=LEADS.filter(function(l){return l.statut!=='traite';}).length;navBadges();oLeadsRender();
+  }).catch(function(){box.innerHTML='<div class="oemp"><div class="oemp-i">📡</div><div class="oemp-t">Hors ligne — réessayez plus tard.</div></div>';});
+}
+function leadById(id){return LEADS.find(function(l){return l.id===id;});}
+function oLeadsRender(){
+  var box=document.getElementById('ld-list');if(!box)return;
+  var showDone=document.getElementById('ld-showdone').checked;
+  var list=LEADS.filter(function(l){return showDone||l.statut!=='traite';});
+  if(!list.length){box.innerHTML='<div class="oemp"><div class="oemp-i">📭</div><div class="oemp-t">Aucune demande pour l\'instant</div><div style="font-size:12px;color:var(--t3);margin-top:6px">Partagez votre QR code : les demandes apparaîtront ici dès qu\'une personne aura rempli le formulaire.</div></div>';return;}
+  var canAssign=ROLE()==='admin'||ROLE()==='gestionnaire';
+  box.innerHTML=list.map(function(l){
+    var ex=impFindExisting({tel:l.tel,email:l.email,nom:l.nom,prenom:l.prenom});
+    var dt=new Date(l.ts);var when=isNaN(dt)?'':dt.toLocaleDateString('fr-FR')+' '+('0'+dt.getHours()).slice(-2)+':'+('0'+dt.getMinutes()).slice(-2);
+    return'<div class="ld-card'+(l.statut==='traite'?' done':'')+'">'
+      +'<div class="ld-hd"><span style="font-size:22px">'+(l.statut==='traite'?'✅':'🆕')+'</span><div><b>'+esc(l.prenom+' '+l.nom)+'</b><br><small>reçue le '+when+' · via le QR de <b>'+esc(l.userNom||'')+'</b>'+(l.statut==='traite'?' · intégrée par '+esc(l.traitePar||'')+' le '+fD((l.traiteLe||'').slice(0,10)):'')+'</small></div>'
+      +(ex?'<span class="obdg bor" title="Un contact avec ce téléphone / e-mail / nom existe déjà">fiche existante : '+esc((ex.prenom||'')+' '+(ex.nom||''))+'</span>':'')+'</div>'
+      +'<div class="ld-grid">'
+        +'<span>📞 <b>'+esc(l.tel||'—')+'</b></span><span>✉️ <b>'+esc(l.email||'—')+'</b></span>'
+        +'<span>🪪 '+esc(l.pieceType||'Pièce')+' <b>'+esc(l.pieceId||'—')+'</b></span>'
+        +'<span>📦 <b>'+esc([l.adresse,l.cp,l.ville,l.pays].filter(Boolean).join(', ')||'—')+'</b></span>'
+        +(l.factAdresse?'<span>🧾 <b>'+esc([l.factAdresse,l.factCp,l.factVille,l.factPays].filter(Boolean).join(', '))+'</b></span>':'')
+        +(l.message?'<span style="grid-column:1/-1">💬 '+esc(l.message)+'</span>':'')
+        +'<span>'+(l.consent?'✅ consentement donné':'<span style="color:var(--rd)">⚠️ sans consentement</span>')+'</span>'
+      +'</div>'
+      +'<div class="ld-acts">'
+        +(l.statut!=='traite'?(canAssign?'<select id="ld-suivi-'+l.id+'"><option value="">Suivi par… (facultatif)</option>'+(CFG.suiveurs||[]).map(function(x){return'<option>'+esc(x)+'</option>';}).join('')+'</select>':'')
+          +'<button class="ob bgold bsm" style="min-height:40px" onclick="oLeadCreate(\''+l.id+'\')">'+(ex?'🔗 Compléter la fiche':'➕ Créer la fiche')+'</button>'
+          +'<button class="ob bgh bsm" style="min-height:40px" onclick="oLeadMdp(\''+l.id+'\')">🔑 Mot de passe & pièce</button>':'')
+        +(l.tel?'<a class="ob bwa bsm" style="min-height:40px;text-decoration:none" target="_blank" href="'+mkWA(l.tel,'Bonjour '+(l.prenom||'').split(' ')[0]+' 🌿 J\'ai bien reçu vos informations d\'inscription OlyLife, je m\'en occupe et reviens vers vous très vite.\n'+rqSignature())+'">💬 WhatsApp</a>':'')
+        +(ex?'<button class="ob bgh bsm" style="min-height:40px" onclick="oOpenF(\''+ex.id+'\')">👁 Voir la fiche</button>':'')
+        +'<button class="ob bsm" style="min-height:40px;background:var(--rdp);color:var(--rd);border:none;margin-left:auto" onclick="oLeadDel(\''+l.id+'\')">🗑</button>'
+      +'</div></div>';
+  }).join('');
+}
+function oLeadCreate(id){
+  var l=leadById(id);if(!l)return;
+  var sel=document.getElementById('ld-suivi-'+id);var suivi=sel?sel.value:'';
+  var owner=USERS.find(function(u){return u.id===l.userId;});var tag=l.tag||(owner&&owner.tags&&owner.tags[0])||l.userNom||'';
+  var item={nom:(l.nom||'').toUpperCase(),prenom:l.prenom||'',tel:normPhone(l.tel),email:l.email||'',pays:l.pays||'France',adresse:l.adresse||'',cp:l.cp||'',ville:l.ville||'',factAdresse:l.factAdresse||'',factCp:l.factCp||'',factVille:l.factVille||'',factPays:l.factPays||'',refere:tag,ctags:tag?[tag]:[],canal:'QR code',qualification:'Chaud',etape:'Achat en cours',statut:'close',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:'Demande d\'inscription reçue via le QR code de '+(l.userNom||'')+' le '+fD((l.ts||'').slice(0,10))+(l.pieceType?' · '+l.pieceType:'')+(l.message?'\nMessage : '+l.message:'')};
+  if(suivi)item.suiviPar=suivi;
+  var ex=impFindExisting(item),c;
+  if(ex){
+    c=ex;var adds=[];
+    Object.keys(item).forEach(function(k){if(k==='notes'||k==='statut'||k==='etape'||k==='statutPar'||k==='statutLe')return;if(Array.isArray(item[k])){c[k]=c[k]||[];item[k].forEach(function(v){if(c[k].indexOf(v)<0){c[k].push(v);adds.push(k);}});return;}if(item[k]&&!c[k]){c[k]=item[k];adds.push(k);}});
+    c.notes=(c.notes?c.notes+'\n\n':'')+item.notes;
+    jrnAdd(c,'note','📥 Demande d\'inscription QR intégrée'+(adds.length?' — complété : '+adds.join(', '):''));
+  }else{
+    c=Object.assign({id:'c_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),createdAt:new Date().toISOString().split('T')[0],actions:{},produits:[],registre:'pro',referentId:PARTNER_ID,referentNom:l.userNom||PARTNER_NOM(),createdBy:PARTNER_NOM()},item);
+    jrnAdd(c,'note','📥 Fiche créée depuis une demande d\'inscription QR ('+(l.userNom||'')+')');
+    OC.unshift(c);
+  }
+  oPush([c]);
+  oPostAsync_({op:'leadDone',id:id,action:'traite'}).then(function(){l.statut='traite';l.traitePar=PARTNER_NOM();l.traiteLe=new Date().toISOString();LEADS_NEW=LEADS.filter(function(x){return x.statut!=='traite';}).length;navBadges();oLeadsRender();}).catch(function(){});
+  emojiBurst(['📥','✨']);oT(ex?'🔗 Fiche complétée — pensez à récupérer le mot de passe avant de créer le compte OlyLife':'➕ Fiche créée — pensez à récupérer le mot de passe avant de créer le compte OlyLife','s');
+  oRefresh();oOpenF(c.id);
+}
+function oLeadMdp(id){
+  var l=leadById(id);if(!l)return;
+  oPostAsync_({op:'leadMdp',id:id}).then(function(d){
+    if(!d.ok){oT('Indisponible : '+(d.error||'?'),'e');return;}
+    var modal=document.createElement('div');modal.style.cssText='position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px';modal.onclick=function(e){if(e.target===modal)modal.remove();};
+    modal.innerHTML='<div style="background:#fff;border-radius:16px;padding:18px;max-width:420px;width:100%"><div style="font-weight:700;margin-bottom:6px">🔑 '+esc(l.prenom+' '+l.nom)+'</div><div style="font-size:12px;color:var(--t2);margin-bottom:12px">À recopier dans le formulaire d\'inscription du BO OlyLife. Ces informations sont effacées dès que la fiche est intégrée ; la consultation est tracée.</div>'
+      +'<div style="font-size:11px;font-weight:700;color:var(--t2)">PIÈCE D\'IDENTITÉ ('+esc(l.pieceType||'')+')</div><div style="font-family:monospace;font-size:18px;background:var(--navy3);border-radius:10px;padding:10px 12px;margin:4px 0 12px;display:flex;justify-content:space-between;align-items:center"><span>'+esc(d.pieceId||l.pieceId||'—')+'</span><button class="ob bgh bsm" onclick="navigator.clipboard&&navigator.clipboard.writeText(\''+esc(d.pieceId||'')+'\').then(function(){oT(\'Copié\',\'s\')})">📋</button></div>'
+      +'<div style="font-size:11px;font-weight:700;color:var(--t2)">MOT DE PASSE SOUHAITÉ</div><div style="font-family:monospace;font-size:18px;background:var(--navy3);border-radius:10px;padding:10px 12px;margin:4px 0 12px;display:flex;justify-content:space-between;align-items:center"><span>'+esc(d.mdp||'—')+'</span><button class="ob bgh bsm" onclick="navigator.clipboard&&navigator.clipboard.writeText(\''+esc(d.mdp||'')+'\').then(function(){oT(\'Copié\',\'s\')})">📋</button></div>'
+      +'<button class="ob bgh bfull" onclick="this.closest(\'div[style*=fixed]\').remove()">Fermer</button></div>';
+    document.body.appendChild(modal);
+  }).catch(function(){oT('Hors ligne','e');});
+}
+function oLeadDel(id){var l=leadById(id);if(!l||!confirm('Supprimer définitivement la demande de '+l.prenom+' '+l.nom+' ?'))return;oPostAsync_({op:'leadDone',id:id,action:'supprime'}).then(function(){LEADS=LEADS.filter(function(x){return x.id!==id;});LEADS_NEW=LEADS.filter(function(x){return x.statut!=='traite';}).length;navBadges();oLeadsRender();oT('Demande supprimée','s');});}
+// QR codes
+function qrSvg(url){try{if(typeof qrcode!=='function')return'';var q=qrcode(0,'M');q.addData(url);q.make();return q.createSvgTag({cellSize:4,margin:2,scalable:true});}catch(e){return'';}}
+function qrModal(title,url,who){
+  var modal=document.createElement('div');modal.style.cssText='position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px';modal.onclick=function(e){if(e.target===modal)modal.remove();};
+  var svg=qrSvg(url);
+  modal.innerHTML='<div style="background:#fff;border-radius:16px;padding:18px;max-width:380px;width:100%;text-align:center"><div style="font-weight:700;margin-bottom:4px">'+esc(title)+'</div><div style="font-size:12px;color:var(--t2);margin-bottom:10px">Les personnes qui le scannent remplissent le formulaire d\'inscription OlyLife ; leur demande arrive dans « Demandes reçues », rattachée à '+esc(who)+'.</div>'
+    +'<div class="qr-box" id="qr-box">'+(svg||'<div style="font-size:12px;color:var(--t3);padding:20px">QR indisponible hors ligne — le lien ci-dessous fonctionne.</div>')+'<div class="qr-link">'+esc(url)+'</div></div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="ob bgold" style="flex:1;min-height:42px" onclick="navigator.clipboard&&navigator.clipboard.writeText(\''+esc(url)+'\').then(function(){oT(\'Lien copié\',\'s\')})">📋 Copier le lien</button>'
+    +(navigator.share?'<button class="ob bgh" style="flex:1;min-height:42px" onclick="navigator.share({title:\'Inscription OlyLife\',text:\'Formulaire d\\\'inscription OlyLife — Water Life High Tech\',url:\''+esc(url)+'\'}).catch(function(){})">📤 Partager</button>':'')
+    +(svg?'<button class="ob bgh" style="flex:1;min-height:42px" onclick="qrDownload(\''+esc(who)+'\')">⬇️ Image PNG</button>':'')
+    +'<a class="ob bwa" style="flex:1;min-height:42px;text-decoration:none" target="_blank" href="https://wa.me/?text='+encodeURIComponent('Bonjour 🌿 Voici le formulaire pour préparer votre inscription OlyLife (2 minutes, sur votre téléphone) : '+url)+'">💬 Envoyer</a></div>'
+    +'<button class="ob bgh bfull" style="margin-top:8px" onclick="this.closest(\'div[style*=fixed]\').remove()">Fermer</button></div>';
+  document.body.appendChild(modal);
+}
+function qrDownload(who){
+  var svg=document.querySelector('#qr-box svg');if(!svg)return;
+  var xml=new XMLSerializer().serializeToString(svg);var img=new Image();
+  img.onload=function(){var cv=document.createElement('canvas');cv.width=720;cv.height=820;var x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,720,820);x.drawImage(img,60,40,600,600);x.fillStyle='#126A3C';x.font='bold 30px Outfit,Arial';x.textAlign='center';x.fillText('Inscription OlyLife',360,690);x.fillStyle='#5A6E61';x.font='22px Outfit,Arial';x.fillText('Water Life High Tech · '+who,360,730);x.font='18px Outfit,Arial';x.fillText('Scannez pour remplir le formulaire',360,770);var a=document.createElement('a');a.download='QR-inscription-'+who.replace(/\s+/g,'_')+'.png';a.href=cv.toDataURL('image/png');a.click();};
+  img.src='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(xml)));
+}
+function oMyQr(){oPostAsync_({op:'myQr'}).then(function(d){if(!d.ok){oT(d.error==='op'?'Script Google à mettre à jour (v3.9)':'Indisponible','e');return;}qrModal('📲 Mon QR code d\'inscription',d.url,USER.nom);}).catch(function(){oT('Hors ligne','e');});}
+function oUserQr(i){var u=USERS[i];if(!u)return;oPostAsync_({op:'userQr',userId:u.id}).then(function(d){if(!d.ok){oT(d.error==='op'?'Script Google à mettre à jour (v3.9)':'Indisponible','e');return;}qrModal('📲 QR code d\'inscription — '+u.nom,d.url,u.nom);}).catch(function(){oT('Hors ligne','e');});}
+
+// ── IMPORT PAR CAPTURES D'ÉCRAN (OCR) (v3.16) ───────────────────────
+function imgToJpegB64(file,max){
+  return new Promise(function(res,rej){
+    var url=URL.createObjectURL(file);var img=new Image();
+    img.onload=function(){var w=img.naturalWidth,h=img.naturalHeight,sc=Math.min(1,max/Math.max(w,h));var cv=document.createElement('canvas');cv.width=Math.round(w*sc);cv.height=Math.round(h*sc);var x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.drawImage(img,0,0,cv.width,cv.height);URL.revokeObjectURL(url);res(cv.toDataURL('image/jpeg',0.88).split(',')[1]);};
+    img.onerror=function(){URL.revokeObjectURL(url);rej('image');};img.src=url;
+  });
+}
+var OCR_LOCAL=null;
+function ocrLocal(file){
+  // repli : OCR dans le navigateur (Tesseract.js) si le script Google n'a pas l'API Drive activée
+  return new Promise(function(res,rej){
+    var go=function(){window.Tesseract.recognize(file,'fra+eng',{logger:function(){}}).then(function(r){res((r&&r.data&&r.data.text)||'');}).catch(rej);};
+    if(window.Tesseract){go();return;}
+    var sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';sc.onload=go;sc.onerror=function(){rej('tesseract');};document.head.appendChild(sc);
+  });
+}
+function oImpShots(input){
+  var files=Array.prototype.slice.call(input.files||[]);input.value='';if(!files.length)return;
+  var st=document.getElementById('oimp-shots-st');st.style.display='block';
+  var texts=[],i=0,useLocal=false;
+  var next=function(){
+    if(i>=files.length){
+      st.textContent='✅ '+files.length+' capture(s) lue(s) — vérifiez le texte puis « Analyser ».';
+      var ta=document.getElementById('oimp-ta');
+      ta.value=texts.map(function(t,k){return'--- capture '+(k+1)+' ---\n'+t.trim();}).join('\n\n');
+      oImpAnalyse();return;
+    }
+    var f=files[i];st.textContent='🔎 Lecture de la capture '+(i+1)+' / '+files.length+'…'+(useLocal?' (OCR dans le navigateur)':'');
+    var p=useLocal?ocrLocal(f):imgToJpegB64(f,1800).then(function(b64){return oPostAsync_({op:'ocr',data:b64,mime:'image/jpeg',name:f.name||'capture.jpg'});}).then(function(d){
+      if(d&&d.ok)return d.text||'';
+      if(d&&(d.error==='ocr_service'||d.error==='op')){useLocal=true;oT('ℹ️ OCR Google non activé (Apps Script → Services + → Drive API) — lecture dans le navigateur','w');return ocrLocal(f);}
+      throw new Error((d&&d.error)||'ocr');
+    });
+    p.then(function(t){texts.push(t||'');i++;next();}).catch(function(e){texts.push('');i++;st.textContent='⚠️ Capture '+i+' illisible ('+(e&&e.message||e)+')';setTimeout(next,600);});
+  };
+  next();
+}
+
 // ── ADMINISTRATION (v3.13) ──────────────────────────────────────────
 var ADM_TAB='equipe';
 function admMove(id,hostId){var el=document.getElementById(id),host=document.getElementById(hostId);if(!el||!host)return;if(!el._ph){el._ph=document.createElement('span');el._ph.style.display='none';el.parentNode.insertBefore(el._ph,el);}if(el.parentNode!==host)host.appendChild(el);el.classList.remove('hide');}
@@ -6300,5 +6539,6 @@ oGetCfg();
 if(GAS_URL&&(TOKEN||CODE)){oLoadCache();if(USER){try{applyParams();}catch(e){}applyRole();populateRefUI();oRefresh();}oPinGate();oPull();}
 else{oShowLogin();}
 </script>
+<script src="qr.js"></script>
 </body>
 </html>
