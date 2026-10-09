@@ -411,6 +411,7 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .snd-grid button:hover,.snd-grid a:hover{background:var(--navy3);}
 .snd-grid .ic{font-size:24px;line-height:1;}
 .snd-grid .wa{background:#25D366;color:#fff;border-color:#25D366;grid-column:1/-1;flex-direction:row;font-size:14px;min-height:52px;}
+.snd-att .ofilter-chip.on{background:var(--gold);color:#fff;border-color:var(--gold);}
 .snd-prev{font-size:12px;color:var(--t2);background:var(--navy3);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;max-height:120px;overflow:auto;white-space:pre-wrap;line-height:1.5;margin-top:8px;}
 /* ── DEMANDES REÇUES / QR (v3.16) ─────────────────────────────────── */
 .ld-card{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--sh);}
@@ -1532,6 +1533,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
             <div class="osec">Installation &amp; usage</div>
             <div class="ofg">
               <label class="ochk-row"><input type="checkbox" id="fi-confirm"><span>Installation confirmée par le client</span></label>
+              <div class="ofg1"><label class="ofl">Appareil reçu le</label><input type="date" class="ofc" id="fi-recu"></div>
               <div class="ofg1"><label class="ofl">Date d'installation</label><input type="date" class="ofc" id="fi-date"></div>
               <div class="ofg1"><label class="ofl">Notes d'usage / protocole</label><textarea class="ofc" id="fi-notes" placeholder="Fréquence, mode utilisé, retours..."></textarea></div>
             </div>
@@ -2245,7 +2247,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.17 · 09/10';
+var APP_VERSION='v3.18 · 09/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -2948,10 +2950,12 @@ var MSG_DEFAULTS={};
     t:'Bonjour {prenom} 🌿\n\nComme promis, voici les points essentiels d\'utilisation et de sécurité de votre {appareil}, issus du manuel officiel OlyLife :\n\n{?interdits:⛔ *Ne pas utiliser / demander un avis médical si :*\n{interdits}\n\n}{?duree:⏱ *Durée & fréquence :*\n{duree}\n\n}{?precautions:⚠️ *Précautions :*\n{precautions}\n\n}📄 La notice complète est dans la boîte — gardez-la à portée de main. Au moindre doute, parlez-en à votre médecin : les appareils OlyLife ne sont pas des dispositifs médicaux et ne remplacent pas un avis médical.\n\nJe reste disponible pour toute question 🙏\n{moi} — Water Life High Tech'};
   MSG_DEFAULTS.equipe_invitation={g:'Équipe',l:'Invitation d\'un membre de l\'équipe (code d\'accès)',vars:['nom','lienApp','code','role','moi'],
     t:'Bonjour {nom} 👋\n\nJe t\'invite à rejoindre notre CRM OlyLife — WLHT, l\'outil de suivi partagé de notre équipe.\n\n📲 *Accéder à l\'application :*\n{lienApp}\n\n🔑 *Ton code d\'accès :* {code}\n👤 *Ton rôle :* {role}\n\n📥 *Pour installer l\'app sur ton téléphone :*\n• *Android (Chrome) :* Ouvre le lien → 3 points en haut à droite → « Ajouter à l\'écran d\'accueil »\n• *iPhone (Safari) :* Ouvre le lien → icône Partager ↑ → « Sur l\'écran d\'accueil »\n\nL\'app fonctionne comme une vraie appli, sans téléchargement depuis les stores. 🌿\n\nÀ bientôt,\n{moi}'};
+  MSG_DEFAULTS.bienvenue_kit={g:'Réception de l\'appareil',l:'Félicitations + kit de bienvenue (notice FR, vidéo, page)',vars:['prenom','appareil','lienKit','lienNotice','lienVideo','reglesOr','moi','role','telMoi'],
+    t:'🎉 Félicitations {prenom} ! Votre {appareil} est bien arrivé 🌿\n\nVoici votre kit de démarrage en français :{?lienVideo:\n🎬 Vidéo de prise en main : {lienVideo}}{?lienNotice:\n📖 Notice en français : {lienNotice}}{?lienKit:\n🧭 Votre page de bienvenue (premiers pas, règles d\'or, entretien) : {lienKit}}{?reglesOr:\n\n{reglesOr}}\n\nJe vous appelle dans les prochains jours pour la mise en route, et je reste disponible dès maintenant pour toute question 🙏\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
   MSG_DEFAULTS.inscription_infos={g:'Inscription OlyLife',l:'Demande des informations d\'inscription',vars:['nomComplet','prenom','nom','moi','role','telMoi'],
     t:'Bonjour {nomComplet} 👋\n\nPour créer votre compte OlyLife et passer votre commande, merci de me renvoyer EN UN SEUL MESSAGE les informations suivantes :\n\n1️⃣ Votre identité EXACTEMENT comme sur votre PASSEPORT (tous les noms et tous les prénoms) + le numéro du passeport.\n   ➡️ Pas de passeport ? La carte nationale d\'identité est acceptée. (Permis de conduire et autres cartes refusés — sauf carte de résident pour les personnes étrangères.)\n2️⃣ Votre adresse postale complète de livraison — et l\'adresse de facturation si elle est différente.\n3️⃣ Votre adresse e-mail.\n4️⃣ Un mot de passe d\'au moins 8 caractères (lettres et chiffres ; symboles possibles mais non obligatoires) — vous pourrez le modifier ensuite.\n\n💳 *Paiement* : la commande se règle en dollars US auprès d\'OlyLife (plateforme à l\'étranger). Il arrive que la banque émettrice bloque la carte par sécurité. Si c\'est le cas, dites-le-moi simplement : je vous transmets une autre méthode via notre association Water Life High Tech (compte français), par carte bancaire ou virement.\n\n🔒 Ces informations restent strictement confidentielles : elles servent uniquement à votre enregistrement officiel OlyLife.\n\nMerci beaucoup, à très vite !\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
 })();
-var MSG_VAR_HELP={nomComplet:'prénom + nom (ou seulement ce qui est rempli)',role:'votre rôle (admin, gestionnaire, référent…)',telMoi:'votre téléphone (Mon profil)',prenom:'prénom du contact',nom:'nom',numCommande:'n° de commande',logistique:'Service Logistique OlyLife',transporteur:'transporteur',tracking:'n° de suivi',lienSuivi:'lien de suivi du colis',tipLivraison:'numéros utiles DHL / Colissimo (France)',sav:'Service Après-Vente OlyLife',savEmail:'e-mail du SAV',montant:'montant',devise:'devise',date:'date de l\'avance',motif:'motif',rendu:'déjà remboursé',reste:'reste à rembourser',echeance:'date d\'échéance',payeur:'prénom de la personne qui a avancé',client:'nom du client',moi:'votre nom (expéditeur)',jours:'nombre de jours',programme:'titre de la fiche conseils',rythme:'durée, fréquence',appareil:'nom de l\'appareil',interdits:'contre-indications (manuel)',duree:'durée & fréquence (manuel)',precautions:'précautions (manuel)',lienApp:'lien de l\'application',code:'code d\'accès',role:'rôle'};
+var MSG_VAR_HELP={appareil:'nom de l\'appareil reçu',lienKit:'page de bienvenue (vidéo, premiers pas, règles d\'or)',lienNotice:'notice en français (PDF)',lienVideo:'vidéo de prise en main (YouTube)',reglesOr:'règles d\'or de l\'appareil (texte)',nomComplet:'prénom + nom (ou seulement ce qui est rempli)',role:'votre rôle (admin, gestionnaire, référent…)',telMoi:'votre téléphone (Mon profil)',prenom:'prénom du contact',nom:'nom',numCommande:'n° de commande',logistique:'Service Logistique OlyLife',transporteur:'transporteur',tracking:'n° de suivi',lienSuivi:'lien de suivi du colis',tipLivraison:'numéros utiles DHL / Colissimo (France)',sav:'Service Après-Vente OlyLife',savEmail:'e-mail du SAV',montant:'montant',devise:'devise',date:'date de l\'avance',motif:'motif',rendu:'déjà remboursé',reste:'reste à rembourser',echeance:'date d\'échéance',payeur:'prénom de la personne qui a avancé',client:'nom du client',moi:'votre nom (expéditeur)',jours:'nombre de jours',programme:'titre de la fiche conseils',rythme:'durée, fréquence',appareil:'nom de l\'appareil',interdits:'contre-indications (manuel)',duree:'durée & fréquence (manuel)',precautions:'précautions (manuel)',lienApp:'lien de l\'application',code:'code d\'accès',role:'rôle'};
 function renderTpl(t,v){
   v=v||{};
   return String(t||'').replace(/\{\?(\w+):((?:[^{}]|\{\w+\})*)\}/g,function(m,k,inner){return v[k]?inner.replace(/\{(\w+)\}/g,function(_,n){return v[n]!=null?v[n]:'';}):'';})
@@ -2983,6 +2987,7 @@ function buildMsgFor(item,lang,tone){
   if(item.key==='trackingEnvoye')return msgLogOk(item.c,lang,tone);
   if(item.type==='Installation')return msgInstall(item.c,lang,tone);
   if(item.type==='Témoignage')return msgTemoin(item.c,lang,tone);
+  if(item.type==='Bienvenue')return msgBienvenue(item.c);
   return item.msg;
 }
 
@@ -3033,6 +3038,11 @@ function computeActions(){
         var diff=diffD(addD(c.dateInstall,DELAI_TEMOIGNAGE));
         if(diff!==null&&diff<=3)items.push({c:c,key:'temoignage',type:'Témoignage',label:'Demande de témoignage',diff:diff,msg:msgTemoin(c,'fr')});
       }
+    }
+    // v3.18 — appareil reçu → féliciter + kit de bienvenue
+    var rec=dateRecu(c);
+    if(rec&&!(c.actions&&c.actions.bienvenue&&c.actions.bienvenue.done)){
+      var dB=diffD(rec);if(dB!==null)items.push({c:c,key:'bienvenue',type:'Bienvenue',label:'🎁 Féliciter & envoyer le kit de bienvenue — appareil reçu le '+fD(rec),diff:Math.min(dB,0),msg:msgBienvenue(c)});
     }
     // v3.9 — précautions non transmises pour un appareil livré/installé
     if(c.produits&&c.produits.length&&(c.installConfirm||c.dateLivraison||c.dateInstall)){
@@ -3120,9 +3130,10 @@ function oAct(){
       var mailBody='Bonjour,\n\nMerci de me communiquer le statut d\'expédition de la commande n°'+(a.c.numCommande||'')+' (Member ID '+(a.c.memberIdOlyLife||'')+').\n\nCordialement,\n'+(PARTNER_NOM()||'');
       extraBtn='<div class="brow"><a class="ob bgh" href="'+olySvcWA('logistics',waMsg)+'" target="_blank" rel="noopener">📨 WhatsApp Logistique OlyLife</a><a class="ob bgh" href="'+olySvcMail('logistics',mailSubj,mailBody)+'">✉️ Email Logistique</a></div>';
     }
+    if(a.key==='bienvenue'){var KL=kitLinks(a.c);extraBtn='<div class="brow"><button type="button" class="ob" style="background:var(--blp);color:var(--bl);border:none" onclick="oKitMail(\''+a.c.id+'\')">✉️ E-mail de bienvenue'+(a.c.email?'':' (pas d\'adresse)')+'</button>'+(KL.lienKit?'<a class="ob bgh" href="'+esc(KL.lienKit)+'" target="_blank" rel="noopener">🧭 Page du kit</a>':'')+'</div>';}
     return'<div class="oacc '+cls+'">'
       +'<div class="oacc-hd" onclick="oAccTog(\''+uid+'\')">'
-        +'<span class="obdg '+(a.type==='Relance'?'bbl':a.type==='Logistique'?'brd':a.type==='Installation'?'baq':a.type==='Précautions'?'bpu':a.type==='Fiche conseils'?'bgr':'bgo')+'">'+a.type+'</span>'
+        +'<span class="obdg '+(a.type==='Relance'?'bbl':a.type==='Logistique'?'brd':a.type==='Installation'?'baq':a.type==='Précautions'?'bpu':a.type==='Fiche conseils'?'bgr':a.type==='Bienvenue'?'bor':'bgo')+'">'+a.type+'</span>'
         +'<div class="oacc-info"><div class="oacc-name">'+a.c.nom+' '+a.c.prenom+'</div><div class="oacc-sub">'+a.label+' — <span style="'+lateCol+';font-weight:700">'+lateTxt+'</span></div></div>'
         +'<span class="oacc-arr" id="aca-'+uid+'">▼</span>'
       +'</div>'
@@ -3949,6 +3960,7 @@ function oOpenF(id){
       +'<button class="ob bgold bfull" style="min-height:48px" onclick="oOpenSuivi(\''+id+'\')">📞 Valider un contact / ajouter une observation</button>'
       +(ROLE()==='admin'&&stkList().some(function(x){return(+x.qte||0)>0;})?'<button class="ob baqua bfull" style="min-height:44px;margin-top:8px" onclick="oStkOpen(\''+id+'\')">📦 Remise immédiate depuis un stock</button>':'')
     +'</div></div>'
+    +kitHtml(c)
     +logiHtml(c)
     +accHtml(c)
     +odSec('Journal des actions ('+((c.journal||[]).length)+')',jrnHtml(c),true)
@@ -4008,7 +4020,7 @@ function oEdit(id){
   document.getElementById('obtn-save').textContent='Enregistrer les modifications';
   document.getElementById('fc-eid').value=id;
   oBuildBoList();
-  var map={'fc-nm':c.nom,'fc-pr':c.prenom,'fc-tel':c.tel,'fc-em':c.email,'fc-pays':c.pays,'fc-vil':c.ville,'fc-adr':c.adresse,'fc-cp':c.cp,'fo-rang':c.rangOly,'fo-bo':c.boCompte,'fl-idcard':c.pieceId,'liv-nm':c.livNom,'liv-pr':c.livPrenom,'liv-tel':c.livTel,'liv-em':c.livEmail,'fact-adr':c.factAdresse,'fact-cp':c.factCp,'fact-vil':c.factVille,'fact-pays':c.factPays,'fc-ref':c.refere,'fc-suivi':c.suiviPar,'fc-etape':c.etape,'fc-qualif':c.qualification,'fc-canal':c.canal,'fc-registre':c.registre,'fc-obj':c.objectifs,'fl-numcmd':c.numCommande,'fl-memberid':c.memberIdOlyLife,'fl-datecmd':c.dateCommande,'fl-transp':c.transporteur,'fl-tracking':c.tracking,'fl-datelivr':c.dateLivraison,'fi-date':c.dateInstall,'fi-notes':c.notesUsage,'ft-texte':c.temoignageTexte,'fe-sponsor':c.sponsor,'fe-placement':c.placement,'fe-cote':c.cote,'fe-gen':c.generation,'fe-rang':c.rang,'fc-notes':c.notes};
+  var map={'fc-nm':c.nom,'fc-pr':c.prenom,'fc-tel':c.tel,'fc-em':c.email,'fc-pays':c.pays,'fc-vil':c.ville,'fc-adr':c.adresse,'fc-cp':c.cp,'fo-rang':c.rangOly,'fo-bo':c.boCompte,'fl-idcard':c.pieceId,'liv-nm':c.livNom,'liv-pr':c.livPrenom,'liv-tel':c.livTel,'liv-em':c.livEmail,'fact-adr':c.factAdresse,'fact-cp':c.factCp,'fact-vil':c.factVille,'fact-pays':c.factPays,'fc-ref':c.refere,'fc-suivi':c.suiviPar,'fc-etape':c.etape,'fc-qualif':c.qualification,'fc-canal':c.canal,'fc-registre':c.registre,'fc-obj':c.objectifs,'fl-numcmd':c.numCommande,'fl-memberid':c.memberIdOlyLife,'fl-datecmd':c.dateCommande,'fl-transp':c.transporteur,'fl-tracking':c.tracking,'fl-datelivr':c.dateLivraison,'fi-date':c.dateInstall,'fi-recu':c.dateReception,'fi-notes':c.notesUsage,'ft-texte':c.temoignageTexte,'fe-sponsor':c.sponsor,'fe-placement':c.placement,'fe-cote':c.cote,'fe-gen':c.generation,'fe-rang':c.rang,'fc-notes':c.notes};
   Object.keys(map).forEach(function(k){var el=document.getElementById(k);if(!el)return;if(k==='fc-ref'){var refVal=map[k]||'';var found=false;for(var i=0;i<el.options.length;i++){if(el.options[i].value===refVal){el.value=refVal;found=true;break;}}if(!found&&refVal){var opt=document.createElement('option');opt.value=refVal;opt.textContent=refVal;el.insertBefore(opt,el.options[el.options.length-1]);el.value=refVal;}document.getElementById('fc-ref-autre').style.display='none';}else{el.value=map[k]||'';}});
   document.getElementById('fc-ctags').value=(c.ctags||[]).join(', ');renderCtagsChips();updateRefListByTags((c.ctags||[]));
   var cs=suivisDe(c);document.querySelectorAll('.fc-sui').forEach(function(x){x.checked=cs.indexOf(x.value)>=0;x.parentNode.classList.toggle('on',x.checked);});
@@ -4071,7 +4083,7 @@ function oSave(){
     etape:document.getElementById('fc-etape').value,qualification:document.getElementById('fc-qualif').value,canal:document.getElementById('fc-canal').value,registre:document.getElementById('fc-registre').value,objectifs:document.getElementById('fc-obj').value,
     produits:prods,
     numCommande:document.getElementById('fl-numcmd').value,memberIdOlyLife:document.getElementById('fl-memberid').value,dateCommande:document.getElementById('fl-datecmd').value,transporteur:document.getElementById('fl-transp').value,tracking:document.getElementById('fl-tracking').value,dateLivraison:document.getElementById('fl-datelivr').value,
-    installConfirm:document.getElementById('fi-confirm').checked,dateInstall:document.getElementById('fi-date').value,notesUsage:document.getElementById('fi-notes').value,
+    installConfirm:document.getElementById('fi-confirm').checked,dateInstall:document.getElementById('fi-date').value,dateReception:document.getElementById('fi-recu').value,notesUsage:document.getElementById('fi-notes').value,
     temoignageTexte:document.getElementById('ft-texte').value,temoignageAutorise:document.getElementById('ft-autorise').checked,
     estPartenaire:document.getElementById('fe-partenaire').checked,sponsor:document.getElementById('fe-sponsor').value,placement:document.getElementById('fe-placement').value,cote:document.getElementById('fe-cote').value,generation:document.getElementById('fe-gen').value,rang:document.getElementById('fe-rang').value,
     notes:document.getElementById('fc-notes').value,
@@ -4897,6 +4909,7 @@ function renderBulk(){
   b.innerHTML='<b>'+n+' sélectionné'+(n>1?'s':'')+'</b>'
     +(isRef?'':'<span class="bk-sep"></span>'+['afaire','encours','close','reseau'].map(function(k){return'<button class="bk-st" title="Passer en « '+STATUT_DEF[k].l+' »" onclick="oBulkStatut(\''+k+'\')">'+STATUT_DEF[k].ic+'</button>';}).join('')
       +'<span class="bk-sep"></span><button onclick="oBulkPanel(\'sui\')">👤 Gestionnaires</button><button onclick="oBulkPanel(\'tag\')">🏷 Tag</button>')
+    +'<button onclick="oBulkMsg()">📨 Message</button>'
     +'<button onclick="oExportCSV(selContacts())">⬇︎ CSV</button>'
     +(isRef?'':'<button onclick="oBulkDel()" style="background:rgba(198,62,71,.5)">🗑</button>')
     +'<button onclick="SEL={};oSelMode(false)" title="Annuler la sélection">✕</button>';
@@ -6021,6 +6034,118 @@ function accHtml(c){
   return'<div class="od-section"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">🌿 Accompagnement — précautions · fiche conseils · témoignage</div><div class="od-bd">'+rows+'</div></div>';
 }
 
+// ── KIT DE BIENVENUE (v3.18) ────────────────────────────────────────
+var SITE_URL='https://crm.team-waterlifehightech.com/';
+var KITS={
+  p90plus:{rx:/p90\s*\+|p90plus/i,nom:'THz Tera-P90+',page:'bienvenue.html?p=p90plus',notice:'docs/Notice_Tera-P90plus_FR.pdf',pres:'docs/Presentation_Tera-P90plus_FR.pdf',video:'https://youtu.be/MgDooCuq148',hero:'img/p90plus-hero.jpg',box:'img/p90plus-colis.jpg',prec:'p90',
+    regles:'Les 3 règles d\'or : 20 minutes maximum par séance (2 séances par jour au plus, à 4 h d\'intervalle) · les deux pieds bien à plat sur les plaques, sans chaussettes · intensité progressive, en commençant bas.'},
+  p90:{rx:/p90/i,nom:'THz Tera-P90',page:'bienvenue.html?p=p90',notice:'docs/Notice_Tera-P90plus_FR.pdf',pres:'docs/Presentation_Tera-P90plus_FR.pdf',video:'https://youtu.be/MgDooCuq148',hero:'img/p90plus-hero.jpg',box:'img/p90plus-colis.jpg',prec:'p90',
+    regles:'Les 3 règles d\'or : 20 minutes maximum par séance (2 séances par jour au plus, à 4 h d\'intervalle) · les deux pieds bien à plat sur les plaques, sans chaussettes · intensité progressive, en commençant bas.'}
+};
+function kitOf(c){var prods=(c&&c.produits)||[];for(var i=0;i<prods.length;i++){if(KITS.p90plus.rx.test(prods[i]))return KITS.p90plus;}for(var j=0;j<prods.length;j++){if(KITS.p90.rx.test(prods[j]))return KITS.p90;}return null;}
+function kitLinks(c){
+  var k=kitOf(c),tok=(USER&&USER.pubToken)||'';
+  var appareil=k?k.nom:((c.produits&&c.produits[0])?c.produits[0].split('(')[0].trim():'appareil OlyLife');
+  return{kit:k,appareil:appareil,lienKit:k?SITE_URL+k.page+(tok?'&r='+encodeURIComponent(tok):'')+(c.prenom?'&n='+encodeURIComponent(c.prenom):''):'',lienNotice:k?SITE_URL+k.notice:'',lienPres:k?SITE_URL+k.pres:'',lienVideo:k?k.video:'',reglesOr:k?k.regles:''};
+}
+function dateRecu(c){return c.dateReception||c.dateInstall||'';}
+function msgBienvenue(c){var L=kitLinks(c),v=tplVars(c,'fr');v.appareil=L.appareil;v.lienKit=L.lienKit;v.lienNotice=L.lienNotice;v.lienVideo=L.lienVideo;v.reglesOr=L.reglesOr;return renderTpl(tplText('bienvenue_kit'),v);}
+function oRecu(cid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var d=prompt('Date de réception de l\'appareil (AAAA-MM-JJ) :',todayYMD());if(!d)return;if(!/^\d{4}-\d{2}-\d{2}$/.test(d)){oT('Format attendu : AAAA-MM-JJ','e');return;}
+  c.dateReception=d;jrnAdd(c,'fait','📦 Appareil reçu le '+fD(d)+' — kit de bienvenue à envoyer');oPush([c]);emojiBurst(['📦','🎉']);oT('📦 Réception notée — le rappel « Bienvenue » est dans Actions','s');oRefresh();oOpenF(cid);
+}
+function kitHtml(c){
+  if(!(c.produits&&c.produits.length)&&!c.numCommande&&!c.tracking)return'';
+  var rec=dateRecu(c),L=kitLinks(c),done=c.actions&&c.actions.bienvenue&&c.actions.bienvenue.done,mail=c.actions&&c.actions.bienvenueMail&&c.actions.bienvenueMail.done;
+  var rows='';
+  if(!rec){
+    rows+='<div class="acc-row"><span class="em">📦</span><div class="b">Appareil pas encore marqué comme reçu<small>'+(c.tracking?'expédié'+(c.transporteur?' par '+esc(c.transporteur):'')+' — dès que le client confirme la réception, notez-la ici':'notez la réception dès que le client a son appareil')+'</small></div><div class="acts"><button class="ob bgold bsm" onclick="oRecu(\''+c.id+'\')">📦 Appareil reçu</button></div></div>';
+  }else{
+    rows+='<div class="acc-row"><span class="em">📦</span><div class="b">Appareil reçu le '+fD(rec)+(L.kit?' · <b>'+esc(L.kit.nom)+'</b>':'')+'<small>'+(done?'🎉 félicitations & kit envoyés le '+fD((c.actions.bienvenue.doneAt||'').slice(0,10))+(c.actions.bienvenue.par?' par '+esc(c.actions.bienvenue.par):''):'à faire : féliciter, reprendre contact, envoyer la notice en français et la vidéo')+(mail?' · ✉️ e-mail envoyé le '+fD((c.actions.bienvenueMail.doneAt||'').slice(0,10)):'')+'</small></div>'
+      +'<div class="acts">'+(c.tel?'<a class="ob bwa bsm" href="'+mkWA(c.tel,msgBienvenue(c))+'" target="_blank" rel="noopener" onclick="oDone(\''+c.id+'\',\'bienvenue\')">🎁 Message de bienvenue</a>':'')
+      +'<button class="ob bsm" style="background:var(--blp);color:var(--bl);border:none" onclick="oKitMail(\''+c.id+'\')">✉️ E-mail de bienvenue</button>'
+      +(L.lienKit?'<a class="ob bgh bsm" href="'+esc(L.lienKit)+'" target="_blank" rel="noopener">🧭 Page du kit</a>':'')+(L.lienNotice?'<a class="ob bgh bsm" href="'+esc(L.lienNotice)+'" target="_blank" rel="noopener">📖 Notice FR</a>':'')
+      +(!done?'<button class="ob bgh bsm" onclick="oDone(\''+c.id+'\',\'bienvenue\')">✅ Fait</button>':'')+'</div></div>';
+  }
+  return'<div class="od-section'+(done?' clps':'')+'"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">🎁 Réception & kit de bienvenue</div><div class="od-bd">'+rows+'</div></div>';
+}
+function kitEmailHtml(c){
+  var L=kitLinks(c),k=L.kit,pr=esc(c.prenom||''),me=esc(PARTNER_NOM()||'L\'équipe WLHT'),role=esc(roleLabel(ROLE())),tel=esc((USER&&USER.tel)||''),waMe=(USER&&USER.tel)?'https://wa.me/'+String(USER.tel).replace(/\D/g,''):'';
+  var G='#126A3C',GOLD='#C9A84C',TX='#20362A',T2='#5A6E61';
+  var btn=function(href,label,bg,col){return'<a href="'+href+'" style="display:inline-block;background:'+bg+';color:'+col+';text-decoration:none;font-weight:700;padding:13px 20px;border-radius:12px;font-size:15px">'+label+'</a>';};
+  var sec=function(title,body){return'<tr><td style="padding:22px 26px 6px"><div style="font-family:Georgia,serif;font-size:21px;color:'+G+';font-weight:700">'+title+'</div></td></tr><tr><td style="padding:0 26px 10px;font-size:14.5px;line-height:1.65;color:'+T2+'">'+body+'</td></tr>';};
+  var ytId=k?(k.video.split('/').pop()):'';
+  var html='<!doctype html><html lang="fr"><body style="margin:0;background:#F3F8F4;font-family:Helvetica,Arial,sans-serif;color:'+TX+'"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#F3F8F4"><tr><td align="center" style="padding:20px 10px">'
+    +'<table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;width:100%;background:#fff;border-radius:18px;overflow:hidden;border:1px solid #D7E6DB">'
+    +'<tr><td style="background:'+G+';background-image:linear-gradient(160deg,#0F3B22,#1E6B3A);color:#fff;padding:30px 26px;text-align:center"><div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;opacity:.85">Water Life High Tech · OlyLife</div><div style="font-family:Georgia,serif;font-size:30px;font-weight:700;margin:10px 0 6px">🎉 Félicitations '+pr+' !</div><div style="font-size:15px;line-height:1.5;opacity:.95">Votre '+esc(L.appareil)+' est arrivé. Voici votre kit de démarrage en français.</div></td></tr>'
+    +(k?'<tr><td><img src="'+SITE_URL+k.hero+'" alt="'+esc(k.nom)+'" width="600" style="display:block;width:100%;height:auto"></td></tr>':'')
+    +(k?sec('🎬 La vidéo de prise en main','<a href="'+k.video+'" style="display:block;text-decoration:none"><img src="https://img.youtube.com/vi/'+ytId+'/hqdefault.jpg" alt="Vidéo" width="548" style="display:block;width:100%;height:auto;border-radius:12px"></a><div style="margin-top:12px">'+btn(k.video,'▶️ Regarder la vidéo','#C63E47','#fff')+'</div>'):'')
+    +(k?sec('📖 Votre notice en français','La notice officielle traduite, à garder sur votre téléphone.<br><br>'+btn(L.lienNotice,'📖 Notice d\'utilisation (PDF)',G,'#fff')+' &nbsp; '+btn(L.lienPres,'📘 Présentation complète','#fff',G)):'')
+    +(k?'<tr><td><img src="'+SITE_URL+k.box+'" alt="Contenu du colis" width="600" style="display:block;width:100%;height:auto"></td></tr>':'')
+    +(k?sec('🧭 Les règles d\'or','<table role="presentation" cellspacing="0" cellpadding="0" width="100%"><tr><td style="background:#FBF6E9;border:1px solid #EBDDB0;border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.6"><b style="color:#6F5A1C">⏱️ 20 minutes maximum</b> par séance, 2 séances par jour au plus, espacées de 4 h.<br><b style="color:#6F5A1C">🦶 Pieds nus, bien à plat</b> — un pied par plaque, mains et pieds secs.<br><b style="color:#6F5A1C">📈 Intensité progressive</b> — commencez bas ; les personnes âgées ne dépassent pas le niveau 8.<br><b style="color:#6F5A1C">🚿 Jamais dans la salle de bain</b> ni avec un autre appareil d\'électrothérapie.</td></tr></table><div style="margin-top:12px">'+btn(L.lienKit,'🧭 Ouvrir ma page de bienvenue (premiers pas, entretien, contre-indications)','#C9A84C','#1E2B10')+'</div>'):sec('🧭 Bien démarrer','Je vous appelle dans les prochains jours pour la mise en route. En attendant, gardez la notice de la boîte à portée de main et commencez en douceur.'))
+    +'<tr><td style="padding:22px 26px"><table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="background:#F3F8F4;border-radius:14px"><tr><td style="padding:16px"><div style="font-size:12px;color:'+T2+';text-transform:uppercase;letter-spacing:.5px">Votre référent</div><div style="font-size:17px;font-weight:700;margin:4px 0">'+me+'</div><div style="font-size:13px;color:'+T2+'">'+role+' · Water Life High Tech'+(tel?' · '+tel:'')+'</div>'+(waMe?'<div style="margin-top:10px">'+btn(waMe,'💬 Me répondre sur WhatsApp','#25D366','#fff')+'</div>':'')+'</td></tr></table></td></tr>'
+    +'<tr><td style="padding:0 26px 26px;font-size:11.5px;line-height:1.55;color:#7F9186;text-align:center">Les appareils OlyLife ne sont pas des dispositifs médicaux. Ces contenus accompagnent le bien-être et ne se substituent ni à un traitement, ni à un diagnostic, ni à l\'avis d\'un professionnel de santé. Informations issues des manuels officiels OlyLife.<br>Water Life High Tech — Groupe d\'entraide et de partage pour une énergie de vie augmentée.</td></tr>'
+    +'</table></td></tr></table></body></html>';
+  return html;
+}
+function oKitMail(cid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  if(!c.email){oT('Ce contact n\'a pas d\'adresse e-mail — ajoutez-la dans la fiche','w');return;}
+  var html=kitEmailHtml(c),subj='🎉 Félicitations '+(c.prenom||'')+' — votre kit de démarrage '+kitLinks(c).appareil;
+  var modal=document.createElement('div');modal.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:14px';modal.onclick=function(e){if(e.target===modal)modal.remove();};
+  modal.innerHTML='<div style="background:#fff;border-radius:16px;width:100%;max-width:680px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden"><div style="padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;flex-wrap:wrap"><b>✉️ E-mail de bienvenue → '+esc(c.email)+'</b><span style="font-size:12px;color:var(--t3)">envoyé par le CRM au nom de '+esc(PARTNER_NOM())+', réponses vers '+esc((USER&&(USER.email||USER.digestEmail))||'l\'association')+'</span></div>'
+    +'<div style="padding:10px 16px;border-bottom:1px solid var(--bd)"><input class="ofc" id="km-subj" value="'+esc(subj)+'"></div>'
+    +'<iframe id="km-prev" style="flex:1;border:0;min-height:52vh;background:#F3F8F4"></iframe>'
+    +'<div style="padding:12px 16px;display:flex;gap:8px;flex-wrap:wrap"><button class="ob bgold" style="flex:1;min-height:46px" onclick="oKitMailSend(\''+c.id+'\')">📨 Envoyer l\'e-mail</button><button class="ob bgh" style="min-height:46px" onclick="sendCopy(document.getElementById(\'km-prev\').contentDocument.body.innerText,\'Texte copié\')">📋 Copier le texte</button><button class="ob bgh" style="min-height:46px" onclick="this.closest(\'div[style*=fixed]\').remove()">Fermer</button></div></div>';
+  document.body.appendChild(modal);
+  var fr=document.getElementById('km-prev');fr.srcdoc=html;
+}
+function oKitMailSend(cid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var btn=event&&event.target;if(btn){btn.disabled=true;btn.textContent='Envoi…';}
+  var html=kitEmailHtml(c),fr=document.getElementById('km-prev'),text=fr&&fr.contentDocument?fr.contentDocument.body.innerText:'';
+  oPostAsync_({op:'sendMail',to:c.email,subject:val('km-subj'),html:html,text:text,fromName:PARTNER_NOM()}).then(function(d){
+    if(!d.ok){if(btn){btn.disabled=false;btn.textContent='📨 Envoyer l\'e-mail';}oT(d.error==='op'?'Script Google à mettre à jour (v3.10) pour envoyer des e-mails':d.error==='quota'?'Quota d\'e-mails atteint pour aujourd\'hui':'Échec : '+(d.error||'?'),'e');return;}
+    c.actions=c.actions||{};c.actions.bienvenueMail={done:true,doneAt:new Date().toISOString(),par:PARTNER_NOM()};
+    jrnAdd(c,'fait','✉️ E-mail de bienvenue (kit de démarrage) envoyé à '+c.email);oPush([c]);
+    var m=document.querySelector('div[style*="z-index:2100"],div[style*="z-index: 2100"]');if(m)m.remove();
+    emojiBurst(['✉️','🎉']);oT('✉️ E-mail envoyé'+(typeof d.reste==='number'?' ('+d.reste+' restants aujourd\'hui)':''),'s');oRefresh();if(document.getElementById('omo').classList.contains('on'))oOpenF(cid);
+  }).catch(function(){if(btn){btn.disabled=false;btn.textContent='📨 Envoyer l\'e-mail';}oT('Hors ligne','e');});
+}
+
+// ── ENVOI GROUPÉ (v3.18) ────────────────────────────────────────────
+var BULK_SENT={};
+function oBulkMsg(){
+  var list=selContacts();if(!list.length)return;
+  var m=document.createElement('div');m.id='obulkmsg';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:14px';m.onclick=function(e){if(e.target===m)m.remove();};
+  m.innerHTML='<div style="background:#fff;border-radius:16px;width:100%;max-width:720px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden"><div style="padding:12px 16px;border-bottom:1px solid var(--bd)"><b>📨 Message groupé — '+list.length+' contact'+(list.length>1?'s':'')+'</b><div style="font-size:12px;color:var(--t3)">Chaque message est personnalisé ({prenom}, {nom}…). Les applications de messagerie n\'autorisent pas l\'envoi automatique : envoyez-les un par un, ils se cochent au fur et à mesure.</div></div>'
+    +'<div style="padding:10px 16px;border-bottom:1px solid var(--bd);display:grid;grid-template-columns:1fr 1fr;gap:8px"><select class="ofc" id="bm-tpl" onchange="oBulkMsgRender()"><option value="relance_j2">Relance — 1er rappel</option><option value="relance_j5">Relance — 2e rappel</option><option value="relance_j12">Relance — dernier rappel</option><option value="temoin">Demande de témoignage</option><option value="install">Suivi installation</option><option value="bienvenue">🎁 Kit de bienvenue</option><option value="custom">✏️ Message libre…</option></select>'
+    +'<select class="ofc" id="bm-canal"><option value="wa">💬 WhatsApp</option><option value="tg">✈️ Telegram</option><option value="signal">🔒 Signal</option><option value="sms">📱 SMS</option><option value="copy">📋 Copier</option></select>'
+    +'<textarea class="ofc" id="bm-custom" style="grid-column:1/-1;display:none;min-height:90px" placeholder="Bonjour {prenom}, …" oninput="oBulkMsgRender()"></textarea></div>'
+    +'<div id="bm-list" style="flex:1;overflow:auto;padding:6px 16px"></div>'
+    +'<div style="padding:10px 16px;display:flex;gap:8px"><button class="ob bgh" style="min-height:44px" onclick="oBulkMsgCopyAll()">📋 Tout copier</button><button class="ob bgh" style="margin-left:auto;min-height:44px" onclick="document.getElementById(\'obulkmsg\').remove()">Fermer</button></div></div>';
+  document.body.appendChild(m);BULK_SENT={};oBulkMsgRender();
+}
+function bulkMsgFor(c){
+  var k=val('bm-tpl');
+  if(k==='custom')return renderTpl(val('bm-custom'),tplVars(c,'fr'));
+  if(k==='bienvenue')return msgBienvenue(c);
+  if(k.indexOf('relance_')===0)return msgRelance(c,k.replace('relance_',''),'fr',c.registre||'pro');
+  if(k==='temoin')return msgTemoin(c,'fr');if(k==='install')return msgInstall(c,'fr');return'';
+}
+function oBulkMsgRender(){
+  var box=document.getElementById('bm-list');if(!box)return;var k=val('bm-tpl');document.getElementById('bm-custom').style.display=k==='custom'?'block':'none';
+  box.innerHTML=selContacts().map(function(c){var msg=bulkMsgFor(c);return'<div class="adm-row" id="bm-'+c.id+'"><span>'+(BULK_SENT[c.id]?'✅':'📨')+'</span><div class="b"><b>'+esc((c.prenom||'')+' '+(c.nom||''))+'</b><small>'+esc(c.tel||'sans téléphone')+' · '+esc(msg.slice(0,90).replace(/\n/g,' '))+'…</small></div><button class="ob bgold bsm" '+(c.tel?'':'disabled ')+'onclick="oBulkMsgSend(\''+c.id+'\')">Envoyer</button></div>';}).join('');
+}
+function oBulkMsgSend(cid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;var canal=val('bm-canal'),msg=bulkMsgFor(c);
+  sendVia(canal,String(c.tel||'').replace(/\D/g,'').replace(/^0/,'33'),msg,c.email);
+  BULK_SENT[cid]=true;sendLogContact(c,canal,msg);
+  var row=document.getElementById('bm-'+cid);if(row)row.querySelector('span').textContent='✅';
+}
+function oBulkMsgCopyAll(){sendCopy(selContacts().map(function(c){return'— '+(c.prenom||'')+' '+(c.nom||'')+' ('+(c.tel||'')+')\n'+bulkMsgFor(c);}).join('\n\n'),'📋 Tous les messages copiés');}
+
 // ── ENVOI MULTI-CANAL (v3.17) : WhatsApp · Telegram · Signal · SMS · e-mail · copier · partager ──
 var SEND_DIRECT=false;
 function sendPref(){try{return localStorage.getItem('owlht2_canal')||'';}catch(e){return'';}}
@@ -6028,6 +6153,18 @@ function sendPrefSet(v){try{if(v)localStorage.setItem('owlht2_canal',v);else loc
 function sendParse(u){var m=String(u||'').match(/^https:\/\/wa\.me\/(\d*)\?text=(.*)$/);if(!m)return null;var t='';try{t=decodeURIComponent(m[2]);}catch(e){t=m[2];}return{num:m[1],text:t};}
 function sendOpen(url){SEND_DIRECT=true;try{window.open(url,'_blank');}finally{setTimeout(function(){SEND_DIRECT=false;},50);}}
 function sendCopy(t,msg){var done=function(){oT(msg||'📋 Message copié','s');};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){prompt('Message :',t);});else prompt('Message :',t);}
+var CANAL_LBL={wa:'WhatsApp',tg:'Telegram',signal:'Signal',sms:'SMS',mail:'e-mail',copy:'copie',share:'partage'};
+function sendContactFor(num){if(!num)return null;var t9=String(num).replace(/\D/g,'').slice(-9);if(t9.length<9)return null;return OC.find(function(x){return x.tel&&tel9(x.tel)===t9;})||null;}
+function sendLogContact(c,canal,text){if(!c||!text)return;try{jrnAdd(c,'note','📨 Message envoyé par '+(CANAL_LBL[canal]||canal)+' : « '+String(text).replace(/\s+/g,' ').slice(0,80)+(text.length>80?'…':'')+' »');oPush([c]);}catch(e){}}
+function sendAttachOpts(num){
+  var c=sendContactFor(num);if(!c)return[];var L=kitLinks(c),out=[];
+  if(L.lienVideo)out.push({k:'video',l:'🎬 Vidéo de prise en main',t:'🎬 Vidéo de prise en main : '+L.lienVideo});
+  if(L.lienNotice)out.push({k:'notice',l:'📖 Notice en français (PDF)',t:'📖 Notice en français : '+L.lienNotice});
+  if(L.lienKit)out.push({k:'kit',l:'🧭 Page de bienvenue',t:'🧭 Votre page de bienvenue : '+L.lienKit});
+  var pk=L.kit?L.kit.prec:(c.produits&&c.produits[0]?precKeyOf(c.produits[0]):'');if(pk&&PREC_DB[pk])out.push({k:'prec',l:'📋 Précautions (texte)',t:precText(pk,'interdits')?'⛔ À ne pas faire / avis médical si :\n'+String(precText(pk,'interdits')).split('\n').filter(Boolean).slice(0,6).join('\n'):''});
+  return out.filter(function(o){return o.t;});
+}
+function sendAttachToggle(k){var m=document.getElementById('osend');if(!m)return;var opt=(m._att||[]).find(function(o){return o.k===k;});if(!opt)return;var on=m._on=m._on||{};on[k]=!on[k];var extra=(m._att||[]).filter(function(o){return on[o.k];}).map(function(o){return o.t;}).join('\n');m._p.text=m._base+(extra?'\n\n'+extra:'');m.querySelector('.snd-prev').textContent=m._p.text;m.querySelectorAll('.snd-att button').forEach(function(b){b.classList.toggle('on',!!on[b.getAttribute('data-k')]);});}
 function sendVia(canal,num,text,email){
   var plus=num?'+'+num:'';
   if(canal==='wa'){sendOpen('https://wa.me/'+num+'?text='+encodeURIComponent(text));}
@@ -6040,20 +6177,21 @@ function sendVia(canal,num,text,email){
 }
 function oSendSheet(url){
   var p=sendParse(url);if(!p){sendOpen(url);return;}
-  var pref=sendPref();if(pref){sendVia(pref,p.num,p.text,sendEmailFor(p.num));return;}
-  var email=sendEmailFor(p.num);
+  var pref=sendPref();if(pref){sendVia(pref,p.num,p.text,sendEmailFor(p.num));sendLogContact(sendContactFor(p.num),pref,p.text);return;}
+  var email=sendEmailFor(p.num),att=sendAttachOpts(p.num);
   var old=document.getElementById('osend');if(old)old.remove();
   var m=document.createElement('div');m.id='osend';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
   var B=function(c,ic,l,cls){return'<button type="button" class="'+(cls||'')+'" onclick="sendGo(\''+c+'\')"><span class="ic">'+ic+'</span>'+l+'</button>';};
   m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:520px;max-height:88vh;overflow:auto">'
     +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">Envoyer le message</b><span style="font-size:12px;color:var(--t3)">'+(p.num?'→ +'+esc(p.num):'')+'</span><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'osend\').remove()">✕</button></div>'
     +'<div class="snd-prev">'+esc(p.text)+'</div>'
+    +(att.length?'<div class="snd-att" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"><span style="font-size:11px;color:var(--t3);align-self:center">📎 Joindre :</span>'+att.map(function(o){return'<button type="button" class="ofilter-chip" data-k="'+o.k+'" onclick="sendAttachToggle(\''+o.k+'\')">'+o.l+'</button>';}).join('')+'</div>':'')
     +'<div class="snd-grid">'+B('wa','💬','WhatsApp','wa')+B('tg','✈️','Telegram')+B('signal','🔒','Signal')+B('sms','📱','SMS')+B('mail','✉️',email?'E-mail':'E-mail (sans adresse)')+B('copy','📋','Copier')+(navigator.share?B('share','📤','Partager…'):'')+'</div>'
     +'<label class="ochk-row" style="margin-top:12px;font-size:12px"><input type="checkbox" id="snd-remember"><span>Toujours utiliser ce canal sans me demander (modifiable dans Mon profil)</span></label>'
     +'<div style="font-size:11px;color:var(--t3);margin-top:6px">Telegram et Signal n\'acceptent pas de message pré-rempli vers un numéro : le texte est copié, il suffit de le coller dans la conversation.</div></div>';
-  m._p=p;m._email=email;document.body.appendChild(m);
+  m._p=p;m._email=email;m._att=att;m._base=p.text;document.body.appendChild(m);
 }
-function sendGo(canal){var m=document.getElementById('osend');if(!m)return;var p=m._p,email=m._email;var rem=document.getElementById('snd-remember');if(rem&&rem.checked)sendPrefSet(canal);m.remove();sendVia(canal,p.num,p.text,email);}
+function sendGo(canal){var m=document.getElementById('osend');if(!m)return;var p=m._p,email=m._email;var rem=document.getElementById('snd-remember');if(rem&&rem.checked)sendPrefSet(canal);m.remove();sendVia(canal,p.num,p.text,email);if(canal!=='copy'&&canal!=='share')sendLogContact(sendContactFor(p.num),canal,p.text);}
 function sendEmailFor(num){if(!num)return'';var t9=String(num).slice(-9);var c=OC.find(function(x){return x.tel&&tel9(x.tel)===t9&&x.email;});if(c)return c.email;var u=USERS.find(function(x){return x.tel&&tel9(x.tel)===t9&&x.email;});return u?u.email:'';}
 // interception : window.open(...) vers wa.me avec texte, et liens <a href="https://wa.me/…?text=…">
 (function(){
@@ -6285,7 +6423,7 @@ function admMsgSample(key){
   var d=MSG_DEFAULTS[key]||{};var lang=/_en_/.test(key)?'en':'fr',tone=/_chaleureux$/.test(key)?'chaleureux':/_equipe$/.test(key)?'equipe':'pro';
   var c={prenom:'Marie',nom:'DUPONT',pays:'France',numCommande:'20261008120000000001',transporteur:'DHL Parcel',tracking:'JD014600012345678',registre:tone};
   var v=tplVars(c,lang);
-  var ex={montant:'500',devise:'€',date:'12/09/2026',motif:'Tera-P90+',rendu:'',reste:'500',echeance:'12/10/2026',payeur:'Eddie',client:'DUPONT Marie',jours:'7',programme:'Sommeil & récupération',rythme:'20 min, 2 fois par jour',appareil:'Tera-P90+',interdits:'• Stimulateur cardiaque ou implant électronique\n• Grossesse',duree:'• 20 à 30 min par séance\n• 1 à 2 séances par jour',precautions:'• Ne pas utiliser sur une peau lésée\n• Retirer bijoux et objets métalliques',lienApp:'https://crm.team-waterlifehightech.com/',code:'AB7KM3PQ2X',nomComplet:'Marie DUPONT'};
+  var ex={montant:'500',devise:'€',date:'12/09/2026',motif:'Tera-P90+',rendu:'',reste:'500',echeance:'12/10/2026',payeur:'Eddie',client:'DUPONT Marie',jours:'7',programme:'Sommeil & récupération',rythme:'20 min, 2 fois par jour',appareil:'Tera-P90+',interdits:'• Stimulateur cardiaque ou implant électronique\n• Grossesse',duree:'• 20 à 30 min par séance\n• 1 à 2 séances par jour',precautions:'• Ne pas utiliser sur une peau lésée\n• Retirer bijoux et objets métalliques',lienApp:'https://crm.team-waterlifehightech.com/',code:'AB7KM3PQ2X',nomComplet:'Marie DUPONT',appareil:'THz Tera-P90+',lienKit:'https://crm.team-waterlifehightech.com/bienvenue.html?p=p90plus',lienNotice:'https://crm.team-waterlifehightech.com/docs/Notice_Tera-P90plus_FR.pdf',lienVideo:'https://youtu.be/MgDooCuq148',reglesOr:KITS.p90plus.regles};
   for(var k in ex)v[k]=ex[k];
   return{v:v,sig:d.sig?sign(lang,tone):''};
 }

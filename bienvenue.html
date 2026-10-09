@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Bienvenue — votre kit de démarrage OlyLife · Water Life High Tech</title>
+<link rel="icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Cormorant+Garamond:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--g:#126A3C;--g2:#0F3B22;--gold:#C9A84C;--bg:#F3F8F4;--bd:#D7E6DB;--tx:#20362A;--t2:#5A6E61;--t3:#7F9186;--rd:#C63E47;--or:#C2701F;}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:Outfit,system-ui,sans-serif;-webkit-text-size-adjust:100%}
+.hero{background:linear-gradient(160deg,#0F3B22,#1E6B3A);color:#fff;padding:26px 18px 90px;text-align:center}
+.hero .tag{display:inline-block;background:rgba(255,255,255,.14);border-radius:20px;padding:6px 12px;font-size:12px;letter-spacing:.5px;text-transform:uppercase}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:34px;margin:12px 0 6px;font-weight:700;line-height:1.1}
+.hero p{margin:0 auto;font-size:15px;opacity:.9;max-width:520px;line-height:1.5}
+.wrap{max-width:720px;margin:-70px auto 40px;padding:0 14px}
+.card{background:#fff;border:1px solid var(--bd);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 8px 24px rgba(18,106,60,.07)}
+.card h2{font-family:'Cormorant Garamond',serif;font-size:24px;margin:0 0 10px;color:var(--g);display:flex;align-items:center;gap:10px}
+.card h2 .n{font-family:Outfit;width:30px;height:30px;border-radius:50%;background:var(--g);color:#fff;font-size:14px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.card p{font-size:14px;line-height:1.6;color:var(--t2);margin:0 0 10px}
+.img{width:100%;border-radius:14px;display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.item{background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;font-size:13px;display:flex;gap:8px;align-items:center}
+.item b{display:block;font-size:13px}
+.item small{color:var(--t3);font-size:11.5px}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+.steps li{position:relative;padding:10px 0 10px 42px;border-bottom:1px solid var(--bd);font-size:14px;line-height:1.5}
+.steps li:last-child{border-bottom:none}
+.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:10px;width:30px;height:30px;border-radius:50%;background:var(--gold);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:13px}
+.rules{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.rule{background:#FBF6E9;border:1px solid #EBDDB0;border-radius:14px;padding:12px;font-size:13.5px;line-height:1.45}
+.rule .ic{font-size:24px;display:block;margin-bottom:4px}
+.rule b{display:block;color:#6F5A1C;margin-bottom:2px}
+.warn{background:#FBEBEC;border:1px solid #F0C4C8;border-radius:14px;padding:12px 14px}
+.warn ul{margin:6px 0 0;padding-left:18px;font-size:13.5px;line-height:1.55;color:#6B2A30}
+.video{position:relative;padding-top:56.25%;border-radius:14px;overflow:hidden;background:#000}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:14px;background:linear-gradient(120deg,#C9A84C,#B38F35);color:#1E2B10;font:inherit;font-weight:700;font-size:15px;padding:14px;cursor:pointer;text-decoration:none;min-height:50px}
+.btn.g{background:var(--g);color:#fff}
+.btn.wa{background:#25D366;color:#fff}
+.btn.tg{background:#229ED9;color:#fff}
+.btn.lt{background:#fff;border:1.5px solid var(--bd);color:var(--tx)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ref{display:flex;align-items:center;gap:12px}
+.ref .av{width:52px;height:52px;border-radius:50%;background:var(--g);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0}
+.ref b{font-size:16px;display:block}
+.ref small{color:var(--t3)}
+.foot{text-align:center;font-size:11.5px;color:var(--t3);margin:18px 0 0;line-height:1.55;padding:0 10px}
+.ent{font-size:13.5px;line-height:1.6;color:var(--t2);padding-left:18px;margin:0}
+.hidden{display:none}
+@media (max-width:520px){.row{grid-template-columns:1fr}.hero h1{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <img src="icon-192.png" alt="" style="width:56px;height:56px;border-radius:14px;background:#fff;padding:4px">
+  <div style="margin-top:10px"><span class="tag">Water Life High Tech · OlyLife</span></div>
+  <h1 id="h-ttl">Bienvenue dans votre Tera-P90+</h1>
+  <p id="h-sub">Félicitations <span id="h-prenom"></span> ! Votre appareil est arrivé. Voici tout ce qu'il faut pour bien démarrer, en français : la vidéo de prise en main, la notice complète et les règles d'or.</p>
+</div>
+<div class="wrap">
+  <div class="card" id="c-hero"><img class="img" id="img-hero" src="img/p90plus-hero.jpg" alt="THz Tera-P90+"></div>
+
+  <div class="card" id="c-video">
+    <h2><span class="n">1</span>La vidéo de prise en main</h2>
+    <p>5 minutes pour voir l'appareil en situation : installation, réglages, première séance.</p>
+    <div class="video"><iframe id="yt" src="" title="Vidéo de prise en main" allow="accelerometer; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>
+    <a class="btn lt" id="yt-link" href="#" target="_blank" rel="noopener" style="margin-top:10px">▶️ Ouvrir la vidéo sur YouTube</a>
+  </div>
+
+  <div class="card" id="c-box">
+    <h2><span class="n">2</span>Dans votre colis</h2>
+    <img class="img" id="img-box" src="img/p90plus-colis.jpg" alt="Contenu du colis" style="margin-bottom:12px">
+    <div class="grid" id="box-list"></div>
+  </div>
+
+  <div class="card" id="c-steps">
+    <h2><span class="n">3</span>Vos premiers pas</h2>
+    <ol class="steps" id="steps"></ol>
+  </div>
+
+  <div class="card" id="c-rules">
+    <h2><span class="n">4</span>Les règles d'or</h2>
+    <div class="rules" id="rules"></div>
+  </div>
+
+  <div class="card" id="c-notice">
+    <h2><span class="n">5</span>Votre notice en français</h2>
+    <p>La notice officielle traduite en français, à garder sur votre téléphone : spécifications, utilisation, entretien, sécurité, garantie.</p>
+    <div class="row">
+      <a class="btn g" id="pdf-notice" href="#" target="_blank" rel="noopener">📖 Notice d'utilisation (PDF)</a>
+      <a class="btn lt" id="pdf-pres" href="#" target="_blank" rel="noopener">📘 Présentation complète (PDF)</a>
+    </div>
+    <div id="extra-docs" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card" id="c-warn">
+    <h2><span class="n">6</span>Qui ne doit pas l'utiliser</h2>
+    <div class="warn"><b>⛔ Selon le manuel officiel, l'appareil ne doit pas être utilisé par :</b><ul id="contra"></ul></div>
+    <p style="margin-top:10px;font-size:12.5px">Au moindre doute sur votre situation, parlez-en à votre médecin avant d'utiliser l'appareil.</p>
+  </div>
+
+  <div class="card" id="c-care">
+    <h2><span class="n">7</span>Entretien</h2>
+    <ul class="ent" id="care"></ul>
+  </div>
+
+  <div class="card" id="c-ref">
+    <h2>🤝 Votre référent Water Life High Tech</h2>
+    <div class="ref"><div class="av" id="ref-av">W</div><div><b id="ref-nom">L'équipe Water Life High Tech</b><small id="ref-role">Nous sommes là pour la mise en route et vos questions</small></div></div>
+    <div class="row" style="margin-top:12px">
+      <a class="btn wa" id="ref-wa" href="https://wa.me/33651001085" target="_blank" rel="noopener">💬 WhatsApp</a>
+      <a class="btn tg" id="ref-tg" href="https://t.me/+33651001085" target="_blank" rel="noopener">✈️ Telegram</a>
+    </div>
+    <a class="btn lt" id="ref-tel" href="tel:+33651001085" style="margin-top:10px">📞 Appeler</a>
+  </div>
+
+  <p class="foot">Les appareils OlyLife ne sont pas des dispositifs médicaux. Ces contenus accompagnent le bien-être et ne se substituent ni à un traitement, ni à un diagnostic, ni à l'avis d'un professionnel de santé. Informations issues des manuels officiels OlyLife.<br>Water Life High Tech — Groupe d'entraide et de partage pour une énergie de vie augmentée.</p>
+</div>
+<script>
+var GAS='https://script.google.com/macros/s/AKfycbzHmK4tcWPRr1G-4_f5yTkEPg3uTNTnrloEC8Y3-sZLcOoHTCRGQ9-Gv-FaZ4B4Kxjs/exec';
+var KITS={
+  p90plus:{nom:'THz Tera-P90+',ttl:'Bienvenue dans votre Tera-P90+',video:'MgDooCuq148',hero:'img/p90plus-hero.jpg',box:'img/p90plus-colis.jpg',notice:'docs/Notice_Tera-P90plus_FR.pdf',pres:'docs/Presentation_Tera-P90plus_FR.pdf',
+    items:[['🟩','Tera-P90+','l\'appareil principal (plaques d\'énergie)'],['🎛️','Télécommande sans fil','marche/arrêt, intensité, son'],['🔌','Cordon d\'alimentation','200-240 V'],['🧲','Bille magnétique de test',''],['🔩','Fusibles de rechange',''],['📄','Manuels','Instruction Manual · User Manual'],['💆','Revitaluxe Massager','poignée de massage (pack P90+)'],['✨','Frost Age Beauty Device','soin du visage RF + EMS (pack P90+)']],
+    steps:['Branchez le cordon d\'alimentation et allumez l\'interrupteur principal (sous l\'appareil) : un bip retentit, le voyant s\'allume.','Appuyez une fois sur « Marche/Arrêt » : l\'écran s\'allume, l\'appareil démarre en veille avec 20 minutes et une intensité 0.','Installez-vous confortablement, pieds nus et secs : pied gauche sur la plaque gauche, pied droit sur la plaque droite, bien à plat, jambes qui ne se touchent pas.','Réglez l\'intensité avec « + » et « − » (20 niveaux) : commencez bas, augmentez seulement si c\'est confortable.','Le bouton audio active ou coupe les messages vocaux.','À la fin des 20 minutes, trois bips : l\'appareil se met en veille. Reposez-vous quelques minutes avant de vous lever.','Éteignez et débranchez après chaque séance.'],
+    rules:[['⏱️','20 minutes maximum','par séance, et pas plus de 2 séances par jour, espacées d\'au moins 4 heures.'],['🦶','Pieds nus, bien à plat','un pied par plaque, sans chaussettes, mains et pieds secs. Ne touchez pas les plaques avec les doigts, coudes ou genoux.'],['📈','Intensité progressive','commencez à faible intensité. Les personnes âgées ne dépassent pas le niveau 8.'],['🚿','Jamais dans la salle de bain','ni en milieu humide, ni avec un autre appareil d\'électrothérapie en même temps.'],['🌡️','Pas de séance si fièvre','(température > 37 °C) ni après des soins esthétiques récents avec rougeurs.'],['🧘','Après la séance','quelques minutes de repos avant de marcher. Toute sensation inhabituelle : arrêtez.']],
+    contra:['les femmes enceintes et les nourrissons','les personnes souffrant de troubles de la fonction pulmonaire','les personnes présentant une altération de la conscience','les personnes dont la température corporelle dépasse 37 °C','les porteurs de dispositifs de maintien des fonctions vitales (cœur ou respirateur artificiel)','les personnes en convalescence postopératoire ou présentant des risques de saignement (fibromes utérins, menstruations…)','les personnes présentant une hypoesthésie thermique (sensibilité diminuée des membres inférieurs)','les porteurs de stimulateurs cardiaques ou d\'implants métalliques','les personnes diabétiques et celles souffrant d\'ulcères du pied','les personnes souffrant de graves problèmes cardiaques, d\'hypertension sévère ou de troubles graves de la fonction pulmonaire'],
+    care:['Débranchez toujours l\'appareil avant de le nettoyer ; chiffon propre et sec, jamais d\'alcool ni de solvant sur les plaques.','S\'il est mouillé : débranchez immédiatement et faites-le vérifier avant de le réutiliser.','Rangez-le à l\'abri de la poussière et de l\'humidité, débranché.','Après un stockage prolongé ou en milieu humide, laissez-le préchauffer 3 minutes.','Ne démontez jamais l\'appareil : en cas d\'anomalie, de fumée ou d\'odeur, débranchez et contactez votre référent / le service après-vente.','Garantie : conservez la carte de garantie et le reçu d\'achat (1 an, pièces et réparation).'],
+    extra:'<a class="btn lt" href="docs/Frost-Age_RF-EMS_FR.pdf" target="_blank" rel="noopener">✨ Frost Age — radiofréquence &amp; EMS expliqués (PDF)</a><p style="margin:10px 0 0;font-size:12.5px">Conseil OlyLife pour le Frost Age : 10 minutes d\'EMS, puis la radiofréquence — ou une séance complète de chaque, au choix.</p>'},
+  p90:null
+};
+KITS.p90=Object.assign({},KITS.p90plus,{nom:'THz Tera-P90',ttl:'Bienvenue dans votre Tera-P90',items:KITS.p90plus.items.slice(0,6),extra:''});
+var q=new URLSearchParams(location.search),P=KITS[q.get('p')||'p90plus']||KITS.p90plus,R=(q.get('r')||'').trim(),PR=(q.get('n')||'').trim();
+function esc(s){return String(s||'').replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+document.title=P.ttl+' · Water Life High Tech';
+document.getElementById('h-ttl').textContent=P.ttl;
+document.getElementById('h-prenom').textContent=PR?PR:'';
+if(!PR)document.getElementById('h-sub').innerHTML='Félicitations, votre appareil est arrivé ! Voici tout ce qu\'il faut pour bien démarrer, en français : la vidéo de prise en main, la notice complète et les règles d\'or.';
+document.getElementById('img-hero').src=P.hero;document.getElementById('img-box').src=P.box;
+document.getElementById('yt').src='https://www.youtube.com/embed/'+P.video+'?rel=0';document.getElementById('yt-link').href='https://youtu.be/'+P.video;
+document.getElementById('box-list').innerHTML=P.items.map(function(i){return'<div class="item"><span style="font-size:22px">'+i[0]+'</span><div><b>'+esc(i[1])+'</b>'+(i[2]?'<small>'+esc(i[2])+'</small>':'')+'</div></div>';}).join('');
+document.getElementById('steps').innerHTML=P.steps.map(function(s){return'<li>'+esc(s)+'</li>';}).join('');
+document.getElementById('rules').innerHTML=P.rules.map(function(r){return'<div class="rule"><span class="ic">'+r[0]+'</span><b>'+esc(r[1])+'</b>'+esc(r[2])+'</div>';}).join('');
+document.getElementById('pdf-notice').href=P.notice;document.getElementById('pdf-pres').href=P.pres;
+document.getElementById('extra-docs').innerHTML=P.extra||'';
+document.getElementById('contra').innerHTML=P.contra.map(function(x){return'<li>'+esc(x)+'</li>';}).join('');
+document.getElementById('care').innerHTML=P.care.map(function(x){return'<li>'+esc(x)+'</li>';}).join('');
+// référent (jeton r du QR / lien du CRM)
+if(R){fetch(GAS,{method:'POST',body:JSON.stringify({op:'leadInfo',r:R})}).then(function(x){return x.text();}).then(function(t){var d={};try{d=JSON.parse(t);}catch(e){}if(!d.ok)return;
+  document.getElementById('ref-nom').textContent=d.nom||'';document.getElementById('ref-av').textContent=(d.nom||'W').charAt(0).toUpperCase();
+  document.getElementById('ref-role').textContent=(d.role==='admin'?'Président':d.role==='gestionnaire'?'Gestionnaire':'Référent')+' · Water Life High Tech';
+  var n=String(d.tel||'').replace(/\D/g,'');if(n){document.getElementById('ref-wa').href='https://wa.me/'+n+'?text='+encodeURIComponent('Bonjour '+(d.nom||'').split(' ')[0]+', j\'ai bien reçu mon appareil OlyLife 🌿');document.getElementById('ref-tg').href='https://t.me/+'+n;document.getElementById('ref-tel').href='tel:+'+n;}
+}).catch(function(){});}
+</script>
+</body>
+</html>
