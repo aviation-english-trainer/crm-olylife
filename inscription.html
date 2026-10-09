@@ -209,9 +209,7 @@ function waAlt(canal){
   var txt=waMsg(),num=String(WA_SUPPORT.tel||'33651001085').replace(/\D/g,'');
   try{sessionStorage.setItem('wlht_ins',JSON.stringify({prenom:v('wq-prenom'),nom:v('wq-nom'),tel:v('wq-tel'),email:v('wq-email')}));}catch(e){}
   if(canal==='sms'){location.href='sms:+'+num+'?&body='+encodeURIComponent(txt);setTimeout(waClose,400);return;}
-  var go=function(){window.open('https://t.me/+'+num,'_blank');setTimeout(waClose,400);};
-  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(function(){alert('Votre message est copié : collez-le dans la conversation Telegram qui va s\'ouvrir.');go();},function(){prompt('Copiez ce message puis collez-le dans Telegram :',txt);go();});
-  else{prompt('Copiez ce message puis collez-le dans Telegram :',txt);go();}
+  window.open('https://t.me/share/url?url='+encodeURIComponent(' ')+'&text='+encodeURIComponent(txt),'_blank');setTimeout(waClose,400);
 }
 function waGo(){
   var err=document.getElementById('wq-err');err.style.display='none';

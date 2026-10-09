@@ -396,6 +396,7 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .acc-row .b{flex:1;min-width:0;font-size:13px;line-height:1.5;color:var(--tx);}
 .acc-row .b small{display:block;color:var(--t3);font-size:11.5px;}
 .acc-row .acts{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
+@media (max-width:759px){.acc-row{flex-wrap:wrap;}.acc-row .b{flex:1 1 calc(100% - 40px);}.acc-row .acts{flex:0 0 100%;justify-content:flex-start;gap:6px;margin-top:8px;padding-left:34px;}.acc-row .acts .ob{min-height:40px;}}
 #otem,#oproto,#oprec{display:none;position:fixed;inset:0;background:rgba(246,250,246,.86);backdrop-filter:blur(3px);z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 #otem.on,#oproto.on,#oprec.on{display:block;}
 .chk-list{display:flex;flex-wrap:wrap;gap:6px;}
@@ -1960,6 +1961,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
         <label class="ofl">Enregistrement audio (3 min max)</label>
         <button type="button" class="ob bgh bfull rec-btn" id="tem-rec" onclick="oTemRec()">🎙 Démarrer l'enregistrement</button>
         <div id="tem-audio-prev" style="margin-top:8px"></div>
+        <button type="button" class="ob bsm" id="tem-audio-del" style="display:none;margin-top:8px;background:var(--rdp);color:var(--rd);border:none;min-height:40px" onclick="oTemAudioDel()">🗑 Supprimer l'audio</button>
       </div>
       <div class="ofg1"><label class="ofl" id="tem-txt-lbl">Texte du témoignage</label><textarea class="ofc" id="tem-txt" rows="6" placeholder="Avec ses mots, tel qu'il l'a dit ou écrit…" oninput="oTemConf()"></textarea><div id="tem-conf"></div></div>
     </div>
@@ -2247,7 +2249,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.18 · 09/10';
+var APP_VERSION='v3.18.1 · 09/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -2350,7 +2352,7 @@ function oApplyPayload(d){
       if(d.users)USERS=d.users;
       oSaveCache();oHideLogin();oSyncDot('ok');
       oT('Bonjour '+USER.nom+' — '+OC.length+' contact(s)','s');
-      applyRole();populateRefUI();oRefresh();oMergeSeedThierry();if(ROLE()==='admin'){oDedup(false);var _np=fichesParasites().length;if(_np)oT('🧽 '+_np+' fiche(s) parasite(s) détectée(s) — Équipe → « Nettoyer les fiches d\'import raté »','w');}
+      applyRole();populateRefUI();oRefresh();oMergeSeedThierry();if(ROLE()==='admin'){var _fp=fixProduits(true);if(_fp)oT('🧹 '+_fp+' fiche(s) : noms de gestionnaires retirés des produits','w');oDedup(false);var _np=fichesParasites().length;if(_np)oT('🧽 '+_np+' fiche(s) parasite(s) détectée(s) — Équipe → « Nettoyer les fiches d\'import raté »','w');}
 }
 function oPullOffline(){
   oSyncDot('err');oLoader(false);
@@ -2951,7 +2953,7 @@ var MSG_DEFAULTS={};
   MSG_DEFAULTS.equipe_invitation={g:'Équipe',l:'Invitation d\'un membre de l\'équipe (code d\'accès)',vars:['nom','lienApp','code','role','moi'],
     t:'Bonjour {nom} 👋\n\nJe t\'invite à rejoindre notre CRM OlyLife — WLHT, l\'outil de suivi partagé de notre équipe.\n\n📲 *Accéder à l\'application :*\n{lienApp}\n\n🔑 *Ton code d\'accès :* {code}\n👤 *Ton rôle :* {role}\n\n📥 *Pour installer l\'app sur ton téléphone :*\n• *Android (Chrome) :* Ouvre le lien → 3 points en haut à droite → « Ajouter à l\'écran d\'accueil »\n• *iPhone (Safari) :* Ouvre le lien → icône Partager ↑ → « Sur l\'écran d\'accueil »\n\nL\'app fonctionne comme une vraie appli, sans téléchargement depuis les stores. 🌿\n\nÀ bientôt,\n{moi}'};
   MSG_DEFAULTS.bienvenue_kit={g:'Réception de l\'appareil',l:'Félicitations + kit de bienvenue (notice FR, vidéo, page)',vars:['prenom','appareil','lienKit','lienNotice','lienVideo','reglesOr','moi','role','telMoi'],
-    t:'🎉 Félicitations {prenom} ! Votre {appareil} est bien arrivé 🌿\n\nVoici votre kit de démarrage en français :{?lienVideo:\n🎬 Vidéo de prise en main : {lienVideo}}{?lienNotice:\n📖 Notice en français : {lienNotice}}{?lienKit:\n🧭 Votre page de bienvenue (premiers pas, règles d\'or, entretien) : {lienKit}}{?reglesOr:\n\n{reglesOr}}\n\nJe vous appelle dans les prochains jours pour la mise en route, et je reste disponible dès maintenant pour toute question 🙏\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
+    t:'🎉 Félicitations {prenom} ! Votre {appareil} est bien arrivé 🌿{?lienKit:\n\n🧭 Votre page de bienvenue (premiers pas, règles d\'or, entretien, vidéo et notice en français) : {lienKit}}{?reglesOr:\n\n{reglesOr}}\n\nJe vous appelle dans les prochains jours pour la mise en route, et je reste disponible dès maintenant pour toute question 🙏\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
   MSG_DEFAULTS.inscription_infos={g:'Inscription OlyLife',l:'Demande des informations d\'inscription',vars:['nomComplet','prenom','nom','moi','role','telMoi'],
     t:'Bonjour {nomComplet} 👋\n\nPour créer votre compte OlyLife et passer votre commande, merci de me renvoyer EN UN SEUL MESSAGE les informations suivantes :\n\n1️⃣ Votre identité EXACTEMENT comme sur votre PASSEPORT (tous les noms et tous les prénoms) + le numéro du passeport.\n   ➡️ Pas de passeport ? La carte nationale d\'identité est acceptée. (Permis de conduire et autres cartes refusés — sauf carte de résident pour les personnes étrangères.)\n2️⃣ Votre adresse postale complète de livraison — et l\'adresse de facturation si elle est différente.\n3️⃣ Votre adresse e-mail.\n4️⃣ Un mot de passe d\'au moins 8 caractères (lettres et chiffres ; symboles possibles mais non obligatoires) — vous pourrez le modifier ensuite.\n\n💳 *Paiement* : la commande se règle en dollars US auprès d\'OlyLife (plateforme à l\'étranger). Il arrive que la banque émettrice bloque la carte par sécurité. Si c\'est le cas, dites-le-moi simplement : je vous transmets une autre méthode via notre association Water Life High Tech (compte français), par carte bancaire ou virement.\n\n🔒 Ces informations restent strictement confidentielles : elles servent uniquement à votre enregistrement officiel OlyLife.\n\nMerci beaucoup, à très vite !\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
 })();
@@ -3558,6 +3560,8 @@ var ST2ET={afaire:'Prospect',encours:'Relance en cours',close:'Achat en cours',r
 var ET2ST={'Prospect':'afaire','Relance en cours':'encours','Achat en cours':'close','Client':'reseau','Partenaire équipe':'reseau','Abandon':'abandon'};
 var ET_LEGACY={'Closing / Devis':'Achat en cours','Client - Logistique':'Client','Client - Installation':'Client','Client actif':'Client','Ambassadeur':'Client','Inactif':'Abandon','Client potentiel':'Prospect','Prospect réseau':'Prospect','Suivi':'Relance en cours','Relance':'Relance en cours'};
 function normEtape(e){e=e||'Prospect';return ET_LEGACY[e]||(ET2ST[e]?e:'Prospect');}
+function produitsPollues(){var names={};USERS.forEach(function(u){names[String(u.nom||'').toLowerCase()]=1;});(CFG.suiveurs||[]).forEach(function(n){names[String(n||'').toLowerCase()]=1;});if(USER)names[String(USER.nom||'').toLowerCase()]=1;return OC.filter(function(c){return(c.produits||[]).some(function(p){return names[String(p||'').toLowerCase()];});});}
+function fixProduits(push){var names={};USERS.forEach(function(u){names[String(u.nom||'').toLowerCase()]=1;});(CFG.suiveurs||[]).forEach(function(n){names[String(n||'').toLowerCase()]=1;});if(USER)names[String(USER.nom||'').toLowerCase()]=1;var ch=[];OC.forEach(function(c){if(!c.produits)return;var np=c.produits.filter(function(p){return!names[String(p||'').toLowerCase()];});if(np.length!==c.produits.length){var removed=c.produits.filter(function(p){return names[String(p||'').toLowerCase()];});c.produits=np;c.suivis=c.suivis||[];removed.forEach(function(n){if(c.suivis.indexOf(n)<0)c.suivis.push(n);});jrnAdd(c,'systeme','🧹 Produits corrigés : '+removed.join(', ')+' déplacé(s) vers « suivi par »');ch.push(c);}});if(ch.length&&push)oPush(ch);return ch.length;}
 function normAll(){OC.forEach(function(c){var ne=normEtape(c.etape);if(ne!==c.etape)c.etape=ne;if(!c.statut&&(ne==='Client'||ne==='Achat en cours'||ne==='Abandon'||ne==='Partenaire équipe'))c.statut=ET2ST[ne];});}
 function statutInfo(c){
   var who=c.statutPar,when=c.statutLe;
@@ -3990,7 +3994,7 @@ function oOpenF(id){
         +'<div class="od-row"><span class="od-lbl">Transporteur</span><span class="od-val">'+(c.transporteur||'—')+'</span></div>'
         +'<div class="od-row"><span class="od-lbl">Tracking</span><span class="od-val">'+(c.tracking?(trackingUrl(c.transporteur,c.tracking)?'<a href="'+trackingUrl(c.transporteur,c.tracking)+'" target="_blank" rel="noopener" style="color:var(--aqua)">'+c.tracking+' ↗</a>':c.tracking):'<span class="obdg bor">en attente</span>')+'</span></div>'
         +(c.dateLivraison?'<div class="od-row"><span class="od-lbl">Livraison</span><span class="od-val">'+fD(c.dateLivraison)+'</span></div>':''):''),false):'')
-    +(c.produits&&c.produits.length?odSec('Produits','<div style="padding:12px 16px;display:flex;flex-wrap:wrap;gap:6px">'+c.produits.map(function(p){return'<span class="obdg baq">'+p+'</span>';}).join('')+'</div>',false):'')
+    +(c.produits&&c.produits.length?odSec('Produits','<div style="padding:12px 16px;display:flex;flex-wrap:wrap;gap:6px">'+c.produits.filter(function(p){return!USERS.some(function(u){return u.nom===p;})&&(CFG.suiveurs||[]).indexOf(p)<0;}).map(function(p){return'<span class="obdg baq">'+p+'</span>';}).join('')+'</div>',false):'')
     +(c.objectifs?odSec('Objectifs','<div style="padding:12px 16px;font-size:14px;line-height:1.6;color:var(--tx)">'+c.objectifs+'</div>',false):'')
     +(c.notesUsage||c.dateInstall?odSec('Installation & usage',
       '<div class="od-row"><span class="od-lbl">Confirmée</span><span class="od-val">'+(c.installConfirm?'✅ Oui':'Non')+'</span></div>'
@@ -4069,7 +4073,7 @@ function oSave(){
       if(!confirm('⚠️ '+dup.nom+' '+(dup.prenom||'')+' existe déjà (tél. '+(dup.tel||'—')+').\n\nOK = créer quand même une NOUVELLE fiche.\nAnnuler = ouvrir la fiche existante.')){oOpenF(dup.id);return;}
     }
   }
-  var prods=[];document.querySelectorAll('.oprd input:checked').forEach(function(cb){prods.push(cb.value);});
+  var prods=[];document.querySelectorAll('#opg .oprd input:checked').forEach(function(cb){prods.push(cb.value);});
   var isRef=(ROLE()==='referent');
   var data={
     nom:nm.toUpperCase(),prenom:pr,tel:tel,email:document.getElementById('fc-em').value,pays:document.getElementById('fc-pays').value,ville:document.getElementById('fc-vil').value,
@@ -5944,10 +5948,20 @@ function oTemOpen(cid,tid){
   document.getElementById('tem-statut').querySelector('[value=publie]').disabled=ROLE()==='referent';
   document.getElementById('tem-del').style.display=t?'':'none';
   document.getElementById('tem-audio-prev').innerHTML=t&&t.type==='audio'&&t.url?temEmbed(t):'';
+  TEM_DEL_URL='';document.getElementById('tem-audio-del').style.display=(t&&t.type==='audio'&&t.url)?'':'none';document.getElementById('tem-rec').textContent=(t&&t.type==='audio'&&t.url)?'🎙 Réenregistrer':'🎙 Démarrer l\'enregistrement';
   oTemType(t?t.type:'ecrit');oTemConf();oTemPreview();
   oSheetOpen('otem');
 }
 function oTemClose(){if(TEM_REC&&TEM_REC.state==='recording'){TEM_REC.stop();}oSheetClose('otem');}
+var TEM_DEL_URL='';
+function oTemAudioDel(){
+  var url=val('tem-url');if(!url)return;
+  if(!confirm('Supprimer cet enregistrement audio ?\nLe fichier sera retiré du Drive à l\'enregistrement du témoignage. Vous pourrez réenregistrer.'))return;
+  TEM_DEL_URL=url;document.getElementById('tem-url').value='';document.getElementById('tem-media').value='';
+  document.getElementById('tem-audio-prev').innerHTML='<div style="font-size:12px;color:var(--t3)">Audio supprimé — enregistrez-en un nouveau ou passez en témoignage écrit.</div>';
+  document.getElementById('tem-audio-del').style.display='none';document.getElementById('tem-rec').textContent='🎙 Démarrer l\'enregistrement';
+  oTemPreview();
+}
 function oTemSave(){
   var cid=val('tem-cid'),c=OC.find(function(x){return x.id===cid;});if(!c)return;
   var type=temType(),txt=val('tem-txt').trim(),url=type==='video'?val('tem-video').trim():val('tem-url');
@@ -5958,6 +5972,7 @@ function oTemSave(){
   if(statut==='publie'&&!consent){oT('Impossible de publier sans consentement — enregistré « à valider »','w');statut='avalider';}
   if(statut==='publie'&&confCheck(txt).length&&!confirm('Des termes sensibles sont surlignés. Publier quand même ?\n(Conseil : reformuler en ressenti personnel.)')){statut='avalider';}
   c.temoignages=c.temoignages||[];var tid=val('tem-id');var t=tid?c.temoignages.find(function(x){return x.id===tid;}):null;var isNew=!t;
+  if(TEM_DEL_URL&&TEM_DEL_URL!==url){oPostAsync_({op:'deleteMedia',url:TEM_DEL_URL}).catch(function(){});TEM_DEL_URL='';}
   if(!t){t={id:'tm_'+Date.now().toString(36),creePar:PARTNER_NOM()};c.temoignages.push(t);}
   t.type=type;t.appareil=val('tem-app');t.theme=val('tem-theme');t.date=val('tem-date')||todayYMD();t.texte=txt;t.url=url;t.media=type==='audio'?(val('tem-media')||'drive'):(type==='video'?'lien':'');
   t.consent=consent;t.affich=val('tem-affich');t.consentDate=consent?(val('tem-consent-date')||todayYMD()):'';t.visage=document.getElementById('tem-visage').checked;t.statut=statut;t.majLe=todayYMD();t.majPar=PARTNER_NOM();
@@ -5983,7 +5998,7 @@ function oTemRec(){
       var rd=new FileReader();rd.onload=function(){
         var b64=String(rd.result).split(',')[1];
         oPostAsync_({op:'uploadMedia',name:'temoignage_'+(c?(c.nom+'_'+(c.prenom||'')).replace(/[^\w-]+/g,'_'):'audio')+'_'+todayYMD()+(blob.type.indexOf('mp4')>=0?'.m4a':'.webm'),mime:blob.type,data:b64})
-          .then(function(d){btn.disabled=false;btn.textContent='🎙 Réenregistrer';if(d&&d.ok&&d.url){document.getElementById('tem-url').value=d.url;document.getElementById('tem-media').value='drive';document.getElementById('tem-audio-prev').innerHTML=temEmbed({url:d.url,type:'audio'});emojiBurst(['🎙','✅']);oT('🎙 Audio enregistré sur Drive','s');}else{oT(d&&d.error==='op'?'Le script Google n\'est pas à jour (v3.6) — audio non envoyé':'Envoi impossible : '+((d&&d.error)||'?'),'e');}})
+          .then(function(d){btn.disabled=false;btn.textContent='🎙 Réenregistrer';if(d&&d.ok&&d.url){document.getElementById('tem-url').value=d.url;document.getElementById('tem-media').value='drive';document.getElementById('tem-audio-prev').innerHTML=temEmbed({url:d.url,type:'audio'});document.getElementById('tem-audio-del').style.display='';emojiBurst(['🎙','✅']);oT('🎙 Audio enregistré sur Drive','s');}else{oT(d&&d.error==='op'?'Le script Google n\'est pas à jour (v3.6) — audio non envoyé':'Envoi impossible : '+((d&&d.error)||'?'),'e');}})
           .catch(function(){btn.disabled=false;btn.textContent='🎙 Réessayer';oT('Hors ligne — audio non envoyé','e');});
       };rd.readAsDataURL(blob);
     };
@@ -6156,19 +6171,19 @@ function sendCopy(t,msg){var done=function(){oT(msg||'📋 Message copié','s');
 var CANAL_LBL={wa:'WhatsApp',tg:'Telegram',signal:'Signal',sms:'SMS',mail:'e-mail',copy:'copie',share:'partage'};
 function sendContactFor(num){if(!num)return null;var t9=String(num).replace(/\D/g,'').slice(-9);if(t9.length<9)return null;return OC.find(function(x){return x.tel&&tel9(x.tel)===t9;})||null;}
 function sendLogContact(c,canal,text){if(!c||!text)return;try{jrnAdd(c,'note','📨 Message envoyé par '+(CANAL_LBL[canal]||canal)+' : « '+String(text).replace(/\s+/g,' ').slice(0,80)+(text.length>80?'…':'')+' »');oPush([c]);}catch(e){}}
-function sendAttachOpts(num){
-  var c=sendContactFor(num);if(!c)return[];var L=kitLinks(c),out=[];
+function sendAttachOpts(num,text){
+  var c=sendContactFor(num);if(!c)return[];var L=kitLinks(c),out=[];text=String(text||'');
   if(L.lienVideo)out.push({k:'video',l:'🎬 Vidéo de prise en main',t:'🎬 Vidéo de prise en main : '+L.lienVideo});
   if(L.lienNotice)out.push({k:'notice',l:'📖 Notice en français (PDF)',t:'📖 Notice en français : '+L.lienNotice});
   if(L.lienKit)out.push({k:'kit',l:'🧭 Page de bienvenue',t:'🧭 Votre page de bienvenue : '+L.lienKit});
   var pk=L.kit?L.kit.prec:(c.produits&&c.produits[0]?precKeyOf(c.produits[0]):'');if(pk&&PREC_DB[pk])out.push({k:'prec',l:'📋 Précautions (texte)',t:precText(pk,'interdits')?'⛔ À ne pas faire / avis médical si :\n'+String(precText(pk,'interdits')).split('\n').filter(Boolean).slice(0,6).join('\n'):''});
-  return out.filter(function(o){return o.t;});
+  return out.filter(function(o){if(!o.t)return false;var u=(o.t.match(/https?:\/\/\S+/)||[])[0];return!(u&&text.indexOf(u.split('&')[0])>=0);});
 }
 function sendAttachToggle(k){var m=document.getElementById('osend');if(!m)return;var opt=(m._att||[]).find(function(o){return o.k===k;});if(!opt)return;var on=m._on=m._on||{};on[k]=!on[k];var extra=(m._att||[]).filter(function(o){return on[o.k];}).map(function(o){return o.t;}).join('\n');m._p.text=m._base+(extra?'\n\n'+extra:'');m.querySelector('.snd-prev').textContent=m._p.text;m.querySelectorAll('.snd-att button').forEach(function(b){b.classList.toggle('on',!!on[b.getAttribute('data-k')]);});}
 function sendVia(canal,num,text,email){
   var plus=num?'+'+num:'';
   if(canal==='wa'){sendOpen('https://wa.me/'+num+'?text='+encodeURIComponent(text));}
-  else if(canal==='tg'){sendCopy(text,'📋 Message copié — collez-le dans Telegram');sendOpen(num?'https://t.me/'+plus:'https://t.me/share/url?url='+encodeURIComponent(' ')+'&text='+encodeURIComponent(text));}
+  else if(canal==='tg'){sendCopy(text,'✈️ Telegram : choisissez le destinataire'+(num?' (+'+num+')':'')+' — le message est pré-rempli (et copié au cas où)');sendOpen('https://t.me/share/url?url='+encodeURIComponent(' ')+'&text='+encodeURIComponent(text));}
   else if(canal==='signal'){sendCopy(text,'📋 Message copié — collez-le dans Signal');if(num)sendOpen('https://signal.me/#p/'+plus);}
   else if(canal==='sms'){location.href='sms:'+plus+'?&body='+encodeURIComponent(text);}
   else if(canal==='mail'){location.href='mailto:'+(email||'')+'?subject='+encodeURIComponent('OlyLife — Water Life High Tech')+'&body='+encodeURIComponent(text);}
@@ -6178,7 +6193,7 @@ function sendVia(canal,num,text,email){
 function oSendSheet(url){
   var p=sendParse(url);if(!p){sendOpen(url);return;}
   var pref=sendPref();if(pref){sendVia(pref,p.num,p.text,sendEmailFor(p.num));sendLogContact(sendContactFor(p.num),pref,p.text);return;}
-  var email=sendEmailFor(p.num),att=sendAttachOpts(p.num);
+  var email=sendEmailFor(p.num),att=sendAttachOpts(p.num,p.text);
   var old=document.getElementById('osend');if(old)old.remove();
   var m=document.createElement('div');m.id='osend';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
   var B=function(c,ic,l,cls){return'<button type="button" class="'+(cls||'')+'" onclick="sendGo(\''+c+'\')"><span class="ic">'+ic+'</span>'+l+'</button>';};
@@ -6188,7 +6203,7 @@ function oSendSheet(url){
     +(att.length?'<div class="snd-att" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"><span style="font-size:11px;color:var(--t3);align-self:center">📎 Joindre :</span>'+att.map(function(o){return'<button type="button" class="ofilter-chip" data-k="'+o.k+'" onclick="sendAttachToggle(\''+o.k+'\')">'+o.l+'</button>';}).join('')+'</div>':'')
     +'<div class="snd-grid">'+B('wa','💬','WhatsApp','wa')+B('tg','✈️','Telegram')+B('signal','🔒','Signal')+B('sms','📱','SMS')+B('mail','✉️',email?'E-mail':'E-mail (sans adresse)')+B('copy','📋','Copier')+(navigator.share?B('share','📤','Partager…'):'')+'</div>'
     +'<label class="ochk-row" style="margin-top:12px;font-size:12px"><input type="checkbox" id="snd-remember"><span>Toujours utiliser ce canal sans me demander (modifiable dans Mon profil)</span></label>'
-    +'<div style="font-size:11px;color:var(--t3);margin-top:6px">Telegram et Signal n\'acceptent pas de message pré-rempli vers un numéro : le texte est copié, il suffit de le coller dans la conversation.</div></div>';
+    +'<div style="font-size:11px;color:var(--t3);margin-top:6px">Telegram : le message est pré-rempli, il reste à choisir le destinataire dans la liste. Signal n\'accepte pas de message pré-rempli : le texte est copié, il suffit de le coller.</div></div>';
   m._p=p;m._email=email;m._att=att;m._base=p.text;document.body.appendChild(m);
 }
 function sendGo(canal){var m=document.getElementById('osend');if(!m)return;var p=m._p,email=m._email;var rem=document.getElementById('snd-remember');if(rem&&rem.checked)sendPrefSet(canal);m.remove();sendVia(canal,p.num,p.text,email);if(canal!=='copy'&&canal!=='share')sendLogContact(sendContactFor(p.num),canal,p.text);}
