@@ -1108,6 +1108,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <div class="sd-grp" data-grp="liens"><button class="sd-gh" type="button" onclick="navGrp('liens')" title="Liens"><span>Liens</span><i></i></button><div class="sd-gi">
         <button class="sd-it" onclick="oBOffice()" title="BO Office WaterLifeHighTech — accès aux formations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg><em>BO WLHT</em></button>
         <button class="sd-it" onclick="oBOlylife()" title="Back-office OlyLife (olylife.com) — commandes & généalogie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><em>BO OlyLife</em></button>
+        <button class="sd-it" onclick="oOlyNation()" title="OlyNation — site de l'équipe (olynation.team)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18"/><path d="M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/><circle cx="12" cy="12" r="9"/><path d="M5 7.5h14M5 16.5h14"/></svg><em>OlyNation</em></button>
         <button class="sd-it" onclick="oTunnels()" title="App Tunnels — Un lien, un client"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><em>App Tunnels</em></button>
         <div id="sd-liens-perso" class="sd-gi" style="gap:2px"></div>
       </div></div>
@@ -1740,6 +1741,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
             <div class="adm-grid" style="grid-template-columns:1fr">
               <div class="adm-f"><label>BO Office WaterLifeHighTech (formations)</label><input type="url" id="adm-l-boffice"></div>
               <div class="adm-f"><label>Back-office OlyLife</label><input type="url" id="adm-l-boly"></div>
+              <div class="adm-f"><label>OlyNation — site de l'équipe</label><input type="url" id="adm-l-olynation"></div>
               <div class="adm-f"><label>App Tunnels — Un lien, un client</label><input type="url" id="adm-l-tunnels"></div>
               <div class="adm-f"><label>Chaîne YouTube WaterLifeHighTech (témoignages vidéo)</label><input type="url" id="adm-l-youtube" placeholder="https://www.youtube.com/@…"></div>
               <div class="adm-grid"><div class="adm-f"><label>Assistance WhatsApp du formulaire d'inscription — numéro (international, sans +)</label><input type="tel" id="adm-l-watel" placeholder="33651001085"></div><div class="adm-f"><label>Prénom affiché dans la bulle « Écrivez à … »</label><input type="text" id="adm-l-wanom" placeholder="Jean-Charles"></div></div>
@@ -1811,6 +1813,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <div class="odr-grp" data-grp="liens"><button class="odr-sec odr-gh" type="button" onclick="navGrp('liens')"><span>Liens</span><i></i></button><div class="odr-gi">
         <button class="odr-it" onclick="oDrawerClose();oBOffice()"><span class="em">🏢</span>BO Office WaterLifeHighTech — formations</button>
         <button class="odr-it" onclick="oDrawerClose();oBOlylife()"><span class="em">🟢</span>BO OlyLife — olylife.com</button>
+        <button class="odr-it" onclick="oDrawerClose();oOlyNation()"><span class="em">🌐</span>OlyNation — olynation.team</button>
         <button class="odr-it" onclick="oDrawerClose();oTunnels()"><span class="em">🔗</span>App Tunnels — Un lien, un client</button>
         <div id="odr-liens-perso"></div>
       </div></div>
@@ -2226,7 +2229,7 @@ function applyParams(){
   if(typeof P.signature==='string'&&P.signature.trim())SIGN_SUFFIX=P.signature.trim();
   if(P.produits&&P.produits.length&&P.produits.join('|')!==PRODUCTS.join('|')){PRODUCTS=P.produits.slice();try{oBuildProductGrid();}catch(e){}}
   if(P.themes&&P.themes.length)THEMES=P.themes.slice();
-  if(P.liens){if(P.liens.boffice)BOFFICE_URL=P.liens.boffice;if(P.liens.boly)BOLY_URL=P.liens.boly;if(P.liens.tunnels)TUNNELS_URL=P.liens.tunnels;if(P.liens.youtube)YOUTUBE_URL=P.liens.youtube;}
+  if(P.liens){if(P.liens.boffice)BOFFICE_URL=P.liens.boffice;if(P.liens.boly)BOLY_URL=P.liens.boly;if(P.liens.tunnels)TUNNELS_URL=P.liens.tunnels;if(P.liens.youtube)YOUTUBE_URL=P.liens.youtube;if(P.liens.olynation)OLYNATION_URL=P.liens.olynation;}
   LIENS_PERSO=Array.isArray(P.liensPerso)?P.liensPerso:[];try{renderLiensPerso();}catch(e){}
 }
 
@@ -2234,7 +2237,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.16.1 · 09/10';
+var APP_VERSION='v3.16.2 · 09/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -5256,6 +5259,8 @@ function oTunnels(){window.open(TUNNELS_URL,'_blank');}
 function oBOffice(){window.open(BOFFICE_URL,'_blank');}
 var BOLY_URL='https://www.olylife.com/';
 function oBOlylife(){window.open(BOLY_URL,'_blank');}
+var OLYNATION_URL='https://www.olynation.team/';
+function oOlyNation(){window.open(OLYNATION_URL,'_blank');}
 
 // ── Tiroir de navigation (téléphone) ───────────────────────────────
 function oDrawerOpen(){
@@ -6186,7 +6191,7 @@ function admRenderTab(t){
   if(t==='messages'){admMsgFill();}
   if(t==='liens'){
     admLpRender(LIENS_PERSO);
-    document.getElementById('adm-l-boffice').value=BOFFICE_URL;var _pl=(CFG.params&&CFG.params.liens)||{};document.getElementById('adm-l-watel').value=_pl.waSupportTel||'33651001085';document.getElementById('adm-l-wanom').value=_pl.waSupportNom||'Jean-Charles';document.getElementById('adm-l-boly').value=BOLY_URL;document.getElementById('adm-l-tunnels').value=TUNNELS_URL;document.getElementById('adm-l-youtube').value=YOUTUBE_URL;
+    document.getElementById('adm-l-boffice').value=BOFFICE_URL;var _pl=(CFG.params&&CFG.params.liens)||{};document.getElementById('adm-l-watel').value=_pl.waSupportTel||'33651001085';document.getElementById('adm-l-wanom').value=_pl.waSupportNom||'Jean-Charles';document.getElementById('adm-l-boly').value=BOLY_URL;document.getElementById('adm-l-olynation').value=OLYNATION_URL;document.getElementById('adm-l-tunnels').value=TUNNELS_URL;document.getElementById('adm-l-youtube').value=YOUTUBE_URL;
     var cal=USERS.filter(function(u){return u.calendlyUrl;}).length;
     document.getElementById('adm-integ').innerHTML='📅 <b>Calendly</b> : '+cal+' membre(s) avec un lien de prise de RDV (chacun le renseigne dans Réglages ; la synchronisation des RDV se fait côté script toutes les heures).<br>🗺️ <b>Carte</b> : géolocalisation des adresses via OpenStreetMap (gratuit, sans clé).<br>📧 <b>Résumé quotidien</b> : envoyé par le script Google avec l\'adresse e-mail du profil de chaque membre.<br>🔐 <b>Serveur</b> : <span style="word-break:break-all">'+esc(GAS_URL)+'</span>';
   }
@@ -6286,7 +6291,7 @@ function admSaveParams(){
   var lines=function(id){return document.getElementById(id).value.split('\n').map(function(x){return x.trim();}).filter(Boolean);};
   if(ADM_TAB==='catalogue'){var pr=lines('adm-produits'),th=lines('adm-themes');if(!pr.length){oT('Il faut au moins un produit','w');return;}P.produits=pr;P.themes=th.length?th:THEMES;P.rangs={p2:n('adm-r-p2'),p3:n('adm-r-p3'),p4:n('adm-r-p4'),p5:n('adm-r-p5')};if(!(P.rangs.p2<P.rangs.p3&&P.rangs.p3<P.rangs.p4&&P.rangs.p4<P.rangs.p5)){oT('Les seuils de rang doivent être croissants','w');return;}}
   if(ADM_TAB==='relances'){P.relances={j1:n('adm-j1'),j2:n('adm-j2'),j3:n('adm-j3')};if(!(P.relances.j1<P.relances.j2&&P.relances.j2<P.relances.j3)){oT('Les rappels doivent être croissants (ex. 2, 5, 12)','w');return;}P.logistique=n('adm-logi');P.install=n('adm-inst');P.temoignage=n('adm-tem');P.protoPoints=[n('adm-pp1'),n('adm-pp2')];P.signature=document.getElementById('adm-sign').value.trim()||'OlyLife / WLHT';}
-  if(ADM_TAB==='liens'){P.liens={boffice:document.getElementById('adm-l-boffice').value.trim(),boly:document.getElementById('adm-l-boly').value.trim(),tunnels:document.getElementById('adm-l-tunnels').value.trim(),youtube:document.getElementById('adm-l-youtube').value.trim(),waSupportTel:document.getElementById('adm-l-watel').value.replace(/\D/g,''),waSupportNom:document.getElementById('adm-l-wanom').value.trim()};
+  if(ADM_TAB==='liens'){P.liens={boffice:document.getElementById('adm-l-boffice').value.trim(),boly:document.getElementById('adm-l-boly').value.trim(),olynation:document.getElementById('adm-l-olynation').value.trim(),tunnels:document.getElementById('adm-l-tunnels').value.trim(),youtube:document.getElementById('adm-l-youtube').value.trim(),waSupportTel:document.getElementById('adm-l-watel').value.replace(/\D/g,''),waSupportNom:document.getElementById('adm-l-wanom').value.trim()};
     var lp=admLpCollect().filter(function(l){return l.label||l.url;});for(var i=0;i<lp.length;i++){if(!lp[i].label||!/^https?:\/\//.test(lp[i].url)){oT('Lien '+(i+1)+' : libellé et adresse https:// obligatoires','w');return;}}P.liensPerso=lp;}
   CFG.params=P;applyParams();oSaveCache();
   oPost_({op:'saveConfig',config:{params:P}});
