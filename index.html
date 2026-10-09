@@ -729,7 +729,16 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
   .sd-new{display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:12px;background:linear-gradient(120deg,#C9A84C,#B38F35);color:#1E2B10;font-family:Outfit,sans-serif;font-weight:700;font-size:13px;cursor:pointer;min-height:44px;margin-bottom:8px;}
   .sd-new span{font-size:22px;line-height:1;}
   .sd-new em{display:none;font-style:normal;}
-  .sd-nav{display:flex;flex-direction:column;gap:3px;flex:1;}
+  .sd-nav{display:flex;flex-direction:column;gap:2px;flex:1;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;margin:0 -4px;padding:0 4px;}
+  .sd-nav::-webkit-scrollbar{display:none;}
+  .sd-grp{display:flex;flex-direction:column;gap:2px;}
+  .sd-gh{display:flex;align-items:center;justify-content:center;gap:4px;border:none;background:none;color:rgba(255,255,255,.42);font-family:Outfit,sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;padding:9px 2px 3px;cursor:pointer;white-space:nowrap;}
+  .sd-gh:hover{color:rgba(255,255,255,.8);}
+  .sd-gh i{display:inline-block;width:0;height:0;border-left:3.5px solid transparent;border-right:3.5px solid transparent;border-top:4px solid currentColor;transition:transform .15s;}
+  .sd-grp.cl .sd-gh i{transform:rotate(-90deg);}
+  .sd-grp.cl .sd-gi{display:none;}
+  .sd-gi{display:flex;flex-direction:column;gap:2px;}
+  .sd-it .sd-em{font-size:19px;line-height:21px;font-style:normal;}
   .sd-it{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:none;color:rgba(255,255,255,.72);font-family:Outfit,sans-serif;font-size:10px;font-weight:600;padding:9px 4px;border-radius:12px;cursor:pointer;min-height:56px;}
   .sd-it svg{width:21px;height:21px;stroke:currentColor;}
   .sd-it em{font-style:normal;}
@@ -795,7 +804,8 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
   .sd-brand-t span{font-size:10.5px;color:rgba(255,255,255,.55);letter-spacing:.3px;}
   .sd-new{justify-content:flex-start;padding:0 14px;}
   .sd-new em{display:inline;}
-  .sd-it{flex-direction:row;justify-content:flex-start;gap:12px;font-size:13.5px;font-weight:500;padding:0 14px;min-height:42px;}
+  .sd-it{flex-direction:row;justify-content:flex-start;gap:12px;font-size:13.5px;font-weight:500;padding:0 14px;min-height:40px;}
+  .sd-gh{justify-content:space-between;padding:10px 14px 4px;font-size:10px;letter-spacing:1px;}
   .sd-it .nbdg{position:static;margin-left:auto;font-size:10.5px;}
   .sd-user{justify-content:flex-start;padding:8px;}
   .sd-user div{display:flex;flex-direction:column;min-width:0;}
@@ -832,6 +842,11 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 .odr-user b{font-size:13.5px;color:#fff;display:block;}
 .odr-user small{font-size:11px;color:rgba(255,255,255,.6);}
 .odr-sec{font-size:9.5px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:rgba(255,255,255,.4);padding:12px 8px 6px;}
+.odr-gh{width:100%;display:flex;align-items:center;justify-content:space-between;border:none;background:none;font-family:Outfit,sans-serif;cursor:pointer;text-align:left;}
+.odr-gh i{display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid currentColor;transition:transform .15s;margin-right:4px;}
+.odr-grp.cl .odr-gh i{transform:rotate(-90deg);}
+.odr-grp.cl .odr-gi{display:none;}
+.odr-it .em{font-style:normal;}
 .odr-it{display:flex;align-items:center;gap:12px;width:100%;border:none;background:none;color:rgba(255,255,255,.82);font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;padding:12px 10px;border-radius:12px;cursor:pointer;text-align:left;position:relative;-webkit-tap-highlight-color:transparent;text-decoration:none;}
 .odr-it:active{background:rgba(255,255,255,.1);}
 .odr-it.on{background:rgba(201,162,77,.18);color:#F3D9A4;}
@@ -1046,26 +1061,37 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
   <aside id="oside">
     <div class="sd-brand"><img class="wlht-logo" alt=""><div class="sd-brand-t"><b>CRM OlyLife</b><span>Water Life High Tech</span></div></div>
     <button class="sd-new" onclick="oNew()" title="Nouveau contact (N)"><span>＋</span><em>Nouveau contact</em></button>
-    <nav class="sd-nav">
-      <button class="sd-it" data-nav="dashboard" onclick="oSw('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><em>Accueil</em><i class="nbdg" data-b="dashboard"></i></button>
-      <button class="sd-it" data-nav="contacts" onclick="oSw('contacts')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><em>Contacts</em><i class="nbdg" data-b="contacts"></i></button>
-      <button class="sd-it" data-nav="pipeline" onclick="oSw('pipeline')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg><em>Pipeline</em><i class="nbdg" data-b="pipeline"></i></button>
-      <button class="sd-it" data-nav="agenda" onclick="oSw('agenda')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><em>Agenda</em><i class="nbdg" data-b="agenda"></i></button>
-      <button class="sd-it" data-nav="actions" onclick="oSw('actions')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><em>Actions</em><i class="nbdg" data-b="actions"></i></button>
-      <button class="sd-it" data-nav="equipe" onclick="oSw('equipe')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v5m0 0L6.5 17m5.5-4.5L17.5 17"/></svg><em>Équipe</em><i class="nbdg" data-b="equipe"></i></button>
-      <button class="sd-it" data-nav="carte" onclick="oSw('carte')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.6-7-11a7 7 0 0 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg><em>Carte</em></button>
-      <button class="sd-it" data-nav="temoignages" onclick="oSw('temoignages')" title="Témoignages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg><em>Témoignages</em></button>
-      <button class="sd-it" data-nav="protocoles" onclick="oSw('protocoles')" title="Fiches conseils de soins (comité scientifique)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6v4l4 9a3 3 0 0 1-2.7 4H7.7A3 3 0 0 1 5 16l4-9z"/><path d="M8 14h8"/></svg><em>Fiches conseils</em></button>
-      <button class="sd-it" data-nav="precautions" onclick="oSw('precautions')" title="Utilisations & précautions des appareils"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M12 7v4m0 3h.01"/></svg><em>Précautions</em></button>
-      <button class="sd-it hide" data-nav="admin" id="sd-admin" onclick="oSw('admin')" title="Administration"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 3v6c0 5.25-3.4 9.6-8 11-4.6-1.4-8-5.75-8-11V5l8-3z"/><circle cx="12" cy="11" r="2.5"/><path d="M12 13.5v3"/></svg><em>Admin</em></button>
-      <button class="sd-it" data-nav="genea" onclick="oSw('genea')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2.5" width="6" height="5" rx="1.5"/><rect x="2.5" y="16.5" width="6" height="5" rx="1.5"/><rect x="15.5" y="16.5" width="6" height="5" rx="1.5"/><path d="M12 7.5v4m0 0H5.5v5m6.5-5h6.5v5"/></svg><em>Généalogie</em></button>
+    <nav class="sd-nav" id="sd-nav">
+      <div class="sd-grp" data-grp="pilotage"><button class="sd-gh" type="button" onclick="navGrp('pilotage')" title="Pilotage"><span>Pilotage</span><i></i></button><div class="sd-gi">
+        <button class="sd-it" data-nav="dashboard" onclick="oSw('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><em>Accueil</em><i class="nbdg" data-b="dashboard"></i></button>
+        <button class="sd-it" data-nav="contacts" onclick="oSw('contacts')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><em>Contacts</em><i class="nbdg" data-b="contacts"></i></button>
+        <button class="sd-it" data-nav="pipeline" onclick="oSw('pipeline')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg><em>Pipeline</em><i class="nbdg" data-b="pipeline"></i></button>
+        <button class="sd-it" data-nav="agenda" onclick="oSw('agenda')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><em>Agenda</em><i class="nbdg" data-b="agenda"></i></button>
+        <button class="sd-it" data-nav="actions" onclick="oSw('actions')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><em>Actions</em><i class="nbdg" data-b="actions"></i></button>
+      </div></div>
+      <div class="sd-grp" data-grp="equipe"><button class="sd-gh" type="button" onclick="navGrp('equipe')" title="Équipe"><span>Équipe</span><i></i></button><div class="sd-gi">
+        <button class="sd-it" data-nav="equipe" onclick="oSw('equipe')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v5m0 0L6.5 17m5.5-4.5L17.5 17"/></svg><em>Équipe</em><i class="nbdg" data-b="equipe"></i></button>
+        <button class="sd-it" data-nav="carte" onclick="oSw('carte')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.6-7-11a7 7 0 0 1 14 0c0 5.4-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg><em>Carte</em></button>
+        <button class="sd-it" data-nav="genea" onclick="oSw('genea')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="2.5" width="6" height="5" rx="1.5"/><rect x="2.5" y="16.5" width="6" height="5" rx="1.5"/><rect x="15.5" y="16.5" width="6" height="5" rx="1.5"/><path d="M12 7.5v4m0 0H5.5v5m6.5-5h6.5v5"/></svg><em>Généalogie</em></button>
+      </div></div>
+      <div class="sd-grp" data-grp="ressources"><button class="sd-gh" type="button" onclick="navGrp('ressources')" title="Ressources"><span>Ressources</span><i></i></button><div class="sd-gi">
+        <button class="sd-it" data-nav="temoignages" onclick="oSw('temoignages')" title="Témoignages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg><em>Témoignages</em></button>
+        <button class="sd-it" data-nav="protocoles" onclick="oSw('protocoles')" title="Fiches conseils de soins (comité scientifique)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6v4l4 9a3 3 0 0 1-2.7 4H7.7A3 3 0 0 1 5 16l4-9z"/><path d="M8 14h8"/></svg><em>Fiches conseils</em></button>
+        <button class="sd-it" data-nav="precautions" onclick="oSw('precautions')" title="Utilisations & précautions des appareils"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M12 7v4m0 3h.01"/></svg><em>Précautions</em></button>
+      </div></div>
+      <div class="sd-grp" data-grp="liens"><button class="sd-gh" type="button" onclick="navGrp('liens')" title="Liens"><span>Liens</span><i></i></button><div class="sd-gi">
+        <button class="sd-it" onclick="oBOffice()" title="BO Office WaterLifeHighTech — accès aux formations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg><em>BO WLHT</em></button>
+        <button class="sd-it" onclick="oBOlylife()" title="Back-office OlyLife (olylife.com) — commandes & généalogie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><em>BO OlyLife</em></button>
+        <button class="sd-it" onclick="oTunnels()" title="App Tunnels — Un lien, un client"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><em>App Tunnels</em></button>
+        <div id="sd-liens-perso" class="sd-gi" style="gap:2px"></div>
+      </div></div>
+      <div class="sd-grp" data-grp="outils"><button class="sd-gh" type="button" onclick="navGrp('outils')" title="Outils"><span>Outils</span><i></i></button><div class="sd-gi">
+        <button class="sd-it" id="sd-imp" onclick="oOpenImport()" title="Importer des contacts en masse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg><em>Importer</em></button>
+        <button class="sd-it hide" data-nav="admin" id="sd-admin" onclick="oSw('admin')" title="Administration"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 3v6c0 5.25-3.4 9.6-8 11-4.6-1.4-8-5.75-8-11V5l8-3z"/><circle cx="12" cy="11" r="2.5"/><path d="M12 13.5v3"/></svg><em>Admin</em></button>
+        <button class="sd-it" onclick="oShowSetup()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><em>Réglages</em></button>
+      </div></div>
     </nav>
     <div class="sd-foot">
-      <button class="sd-it" id="sd-imp" onclick="oOpenImport()" title="Importer des contacts en masse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4m0 0L7 9m5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg><em>Importer</em></button>
-      <button class="sd-it" onclick="oBOffice()" title="BO Office WaterLifeHighTech — accès aux formations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg><em>BO WLHT</em></button>
-      <button class="sd-it" onclick="oBOlylife()" title="Back-office OlyLife (olylife.com) — commandes & généalogie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><em>BO OlyLife</em></button>
-      <button class="sd-it" onclick="oTunnels()" title="App Tunnels — Un lien, un client"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg><em>App Tunnels</em></button>
-      <button class="sd-it" onclick="oShowSetup()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><em>Réglages</em></button>
       <div class="sd-user" onclick="oProfOpen()" style="cursor:pointer" title="Mon profil"><span class="sd-av" id="sd-av">·</span><div><b id="sd-un">—</b><small id="sd-ur">—</small></div></div>
     </div>
   </aside>
@@ -1576,6 +1602,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
         <button class="adm-tab" data-tab="refs" onclick="admTab('refs')">🏷️ Référents & tags</button>
         <button class="adm-tab" data-tab="catalogue" onclick="admTab('catalogue')">📦 Catalogue</button>
         <button class="adm-tab" data-tab="relances" onclick="admTab('relances')">🔔 Relances & automatismes</button>
+        <button class="adm-tab" data-tab="messages" onclick="admTab('messages')">✉️ Messages<span class="n" id="adm-n-msg" style="display:none"></span></button>
         <button class="adm-tab" data-tab="liens" onclick="admTab('liens')">🔗 Liens & intégrations</button>
         <button class="adm-tab" data-tab="donnees" onclick="admTab('donnees')">🗄️ Données & maintenance</button>
         <button class="adm-tab" data-tab="ressources" onclick="admTab('ressources')">📚 Ressources à valider<span class="n" id="adm-n-res" style="display:none"></span></button>
@@ -1648,9 +1675,32 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
         <div class="adm-save"><button class="ob bgold" style="min-height:46px" onclick="admSaveParams()">💾 Enregistrer les relances</button></div>
       </div>
 
+      <div class="adm-pane" id="adm-messages">
+        <div class="ocard" style="margin-bottom:14px">
+          <div class="adm-sec"><h4>Modèles de messages WhatsApp / e-mail</h4>
+            <div class="hint">Choisissez un message, modifiez le texte, enregistrez : toute l'équipe l'utilise aussitôt. Les mots entre accolades sont remplacés automatiquement (cliquez sur une variable pour l'insérer). Pour les relances, la logistique, l'installation et le témoignage, la signature est ajoutée automatiquement à la fin.</div>
+            <div class="adm-f"><label>Message</label><select id="adm-msg-key" onchange="admMsgLoad()"></select></div>
+            <div class="adm-stat" id="adm-msg-vars" style="margin:10px 0"></div>
+            <div class="adm-f"><textarea id="adm-msg-txt" style="min-height:220px" oninput="admMsgPreview()"></textarea></div>
+            <div class="adm-btns" style="margin-top:10px">
+              <button class="ob bgold" onclick="admMsgSave()">💾 Enregistrer ce message</button>
+              <button class="ob bgh" onclick="admMsgReset()">↩️ Revenir au texte d'origine</button>
+            </div>
+            <h4 style="margin-top:16px">Aperçu avec un contact d'exemple</h4>
+            <pre id="adm-msg-prev" style="white-space:pre-wrap;font-family:inherit;font-size:12.5px;line-height:1.55;background:var(--navy3);border:1px solid var(--bd);border-radius:12px;padding:12px;margin:0"></pre>
+          </div>
+          <div class="adm-sec"><h4>Messages personnalisés</h4><div class="hint">Les autres messages utilisent le texte d'origine.</div><div id="adm-msg-list"></div></div>
+        </div>
+      </div>
+
       <div class="adm-pane" id="adm-liens">
         <div class="ocard" style="margin-bottom:14px">
-          <div class="adm-sec"><h4>Liens de l'équipe</h4><div class="hint">Boutons « BO Office », « BO OlyLife » et « App Tunnels » de la barre latérale et du menu.</div>
+          <div class="adm-sec"><h4>Liens de l'équipe (personnalisés)</h4>
+            <div class="hint">Ajoutez vos propres raccourcis : ils apparaissent dans le menu « Liens » de la barre latérale (ordinateur, tablette) et du menu du téléphone, selon la visibilité choisie.</div>
+            <div id="adm-lp-list"></div>
+            <button class="ob bgh" style="min-height:40px;margin-top:8px" onclick="admLpAdd()">➕ Ajouter un lien</button>
+          </div>
+          <div class="adm-sec"><h4>Liens principaux</h4><div class="hint">Boutons « BO Office », « BO OlyLife » et « App Tunnels » de la barre latérale et du menu.</div>
             <div class="adm-grid" style="grid-template-columns:1fr">
               <div class="adm-f"><label>BO Office WaterLifeHighTech (formations)</label><input type="url" id="adm-l-boffice"></div>
               <div class="adm-f"><label>Back-office OlyLife</label><input type="url" id="adm-l-boly"></div>
@@ -1703,29 +1753,37 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <div class="odr-p">
       <div class="odr-hd"><img class="wlht-logo" alt=""><div><b>CRM OlyLife</b><span>Water Life High Tech</span></div></div>
       <div class="odr-user" onclick="oDrawerClose();setTimeout(oProfOpen,80)" title="Mon profil"><span class="sd-av" id="odr-av">·</span><div style="min-width:0"><b id="odr-un">—</b><small id="odr-ur">—</small><span class="odr-hello" id="odr-hello"></span></div><span class="pedit">✏️</span></div>
-      <div class="odr-sec">Navigation</div>
-      <button class="odr-it" data-dnav="dashboard" onclick="oDrGo('dashboard')"><span class="em">🏠</span>Accueil<span class="nbdg" data-b="dashboard"></span></button>
-      <button class="odr-it" data-dnav="contacts" onclick="oDrGo('contacts')"><span class="em">👥</span>Contacts<span class="nbdg" data-b="contacts"></span></button>
-      <button class="odr-it" data-dnav="pipeline" onclick="oDrGo('pipeline')"><span class="em">📊</span>Pipeline</button>
-      <button class="odr-it" data-dnav="agenda" onclick="oDrGo('agenda')"><span class="em">📅</span>Agenda<span class="nbdg" data-b="agenda"></span></button>
-      <button class="odr-it" data-dnav="actions" onclick="oDrGo('actions')"><span class="em">🔔</span>Actions<span class="nbdg" data-b="actions"></span></button>
-      <button class="odr-it" data-dnav="equipe" onclick="oDrGo('equipe')"><span class="em">🤝</span>Équipe</button>
-      <button class="odr-it" data-dnav="carte" onclick="oDrGo('carte')"><span class="em">🗺️</span>Carte des essais</button>
-      <button class="odr-it" data-dnav="genea" onclick="oDrGo('genea')"><span class="em">🧬</span>Généalogie</button>
-      <div class="odr-sec">Ressources</div>
-      <button class="odr-it" data-dnav="temoignages" onclick="oDrGo('temoignages')"><span class="em">🎙</span>Témoignages</button>
-      <button class="odr-it" data-dnav="protocoles" onclick="oDrGo('protocoles')"><span class="em">🧭</span>Fiches conseils de soins</button>
-      <button class="odr-it" data-dnav="precautions" onclick="oDrGo('precautions')"><span class="em">📖</span>Utilisations & précautions</button>
-      <div class="odr-sec">Outils</div>
-      <button class="odr-it" onclick="oDrawerClose();oNew()"><span class="em">➕</span>Nouveau contact</button>
-      <button class="odr-it" id="odr-req" onclick="oDrawerClose();oReqOpen()"><span class="em">📨</span>Demander les infos d'inscription</button>
-      <button class="odr-it" id="odr-imp" onclick="oDrawerClose();oOpenImport()"><span class="em">⇪</span>Importer des contacts</button>
-      <button class="odr-it" onclick="oDrawerClose();oBOffice()"><span class="em">🏢</span>BO Office WaterLifeHighTech — formations</button>
-      <button class="odr-it" onclick="oDrawerClose();oBOlylife()"><span class="em">🟢</span>BO OlyLife — olylife.com</button>
-      <button class="odr-it" onclick="oDrawerClose();oTunnels()"><span class="em">🔗</span>App Tunnels — Un lien, un client</button>
-      <button class="odr-it" id="odr-admin" data-dnav="admin" style="display:none" onclick="oDrGo('admin')"><span class="em">🛡️</span>Administration</button>
-      <button class="odr-it" onclick="oDrawerClose();oShowSetup()"><span class="em">⚙️</span>Réglages</button>
-      <button class="odr-it" onclick="oDrawerClose();oLogout()"><span class="em">🚪</span>Se déconnecter</button>
+      <div class="odr-grp" data-grp="pilotage"><button class="odr-sec odr-gh" type="button" onclick="navGrp('pilotage')"><span>Pilotage</span><i></i></button><div class="odr-gi">
+        <button class="odr-it" data-dnav="dashboard" onclick="oDrGo('dashboard')"><span class="em">🏠</span>Accueil<span class="nbdg" data-b="dashboard"></span></button>
+        <button class="odr-it" data-dnav="contacts" onclick="oDrGo('contacts')"><span class="em">👥</span>Contacts<span class="nbdg" data-b="contacts"></span></button>
+        <button class="odr-it" data-dnav="pipeline" onclick="oDrGo('pipeline')"><span class="em">📊</span>Pipeline</button>
+        <button class="odr-it" data-dnav="agenda" onclick="oDrGo('agenda')"><span class="em">📅</span>Agenda<span class="nbdg" data-b="agenda"></span></button>
+        <button class="odr-it" data-dnav="actions" onclick="oDrGo('actions')"><span class="em">🔔</span>Actions<span class="nbdg" data-b="actions"></span></button>
+      </div></div>
+      <div class="odr-grp" data-grp="equipe"><button class="odr-sec odr-gh" type="button" onclick="navGrp('equipe')"><span>Équipe</span><i></i></button><div class="odr-gi">
+        <button class="odr-it" data-dnav="equipe" onclick="oDrGo('equipe')"><span class="em">🤝</span>Équipe</button>
+        <button class="odr-it" data-dnav="carte" onclick="oDrGo('carte')"><span class="em">🗺️</span>Carte des essais</button>
+        <button class="odr-it" data-dnav="genea" onclick="oDrGo('genea')"><span class="em">🧬</span>Généalogie</button>
+      </div></div>
+      <div class="odr-grp" data-grp="ressources"><button class="odr-sec odr-gh" type="button" onclick="navGrp('ressources')"><span>Ressources</span><i></i></button><div class="odr-gi">
+        <button class="odr-it" data-dnav="temoignages" onclick="oDrGo('temoignages')"><span class="em">🎙</span>Témoignages</button>
+        <button class="odr-it" data-dnav="protocoles" onclick="oDrGo('protocoles')"><span class="em">🧭</span>Fiches conseils de soins</button>
+        <button class="odr-it" data-dnav="precautions" onclick="oDrGo('precautions')"><span class="em">📖</span>Utilisations & précautions</button>
+      </div></div>
+      <div class="odr-grp" data-grp="liens"><button class="odr-sec odr-gh" type="button" onclick="navGrp('liens')"><span>Liens</span><i></i></button><div class="odr-gi">
+        <button class="odr-it" onclick="oDrawerClose();oBOffice()"><span class="em">🏢</span>BO Office WaterLifeHighTech — formations</button>
+        <button class="odr-it" onclick="oDrawerClose();oBOlylife()"><span class="em">🟢</span>BO OlyLife — olylife.com</button>
+        <button class="odr-it" onclick="oDrawerClose();oTunnels()"><span class="em">🔗</span>App Tunnels — Un lien, un client</button>
+        <div id="odr-liens-perso"></div>
+      </div></div>
+      <div class="odr-grp" data-grp="outils"><button class="odr-sec odr-gh" type="button" onclick="navGrp('outils')"><span>Outils</span><i></i></button><div class="odr-gi">
+        <button class="odr-it" onclick="oDrawerClose();oNew()"><span class="em">➕</span>Nouveau contact</button>
+        <button class="odr-it" id="odr-req" onclick="oDrawerClose();oReqOpen()"><span class="em">📨</span>Demander les infos d'inscription</button>
+        <button class="odr-it" id="odr-imp" onclick="oDrawerClose();oOpenImport()"><span class="em">⇪</span>Importer des contacts</button>
+        <button class="odr-it" id="odr-admin" data-dnav="admin" style="display:none" onclick="oDrGo('admin')"><span class="em">🛡️</span>Administration</button>
+        <button class="odr-it" onclick="oDrawerClose();oShowSetup()"><span class="em">⚙️</span>Réglages</button>
+        <button class="odr-it" onclick="oDrawerClose();oLogout()"><span class="em">🚪</span>Se déconnecter</button>
+      </div></div>
       <div class="odr-ver" id="odr-ver"></div>
     </div>
   </div>
@@ -2119,13 +2177,14 @@ function applyParams(){
   if(P.produits&&P.produits.length&&P.produits.join('|')!==PRODUCTS.join('|')){PRODUCTS=P.produits.slice();try{oBuildProductGrid();}catch(e){}}
   if(P.themes&&P.themes.length)THEMES=P.themes.slice();
   if(P.liens){if(P.liens.boffice)BOFFICE_URL=P.liens.boffice;if(P.liens.boly)BOLY_URL=P.liens.boly;if(P.liens.tunnels)TUNNELS_URL=P.liens.tunnels;if(P.liens.youtube)YOUTUBE_URL=P.liens.youtube;}
+  LIENS_PERSO=Array.isArray(P.liensPerso)?P.liensPerso:[];try{renderLiensPerso();}catch(e){}
 }
 
 // ── ÉTAT GLOBAL ──────────────────────────────────────────────────────
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.13 · 09/10';
+var APP_VERSION='v3.14 · 09/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -2371,6 +2430,7 @@ function applyRole(){
   // Navigation
   document.querySelectorAll('[data-nav="actions"],[data-nav="equipe"]').forEach(function(b){b.classList.toggle('hide',isRef);});
   var sa=document.getElementById('sd-admin');if(sa)sa.classList.toggle('hide',!isAdmin);
+  try{renderLiensPerso();}catch(e){}
   var da=document.getElementById('odr-admin');if(da)da.style.display=isAdmin?'':'none';
   if(!isAdmin&&CUR_VIEW==='admin')oSw('dashboard');
   var sun=document.getElementById('sd-un');if(sun){sun.textContent=USER.nom||'—';document.getElementById('sd-ur').textContent=roleLabel(r)+(VIEW_AS_NOM?' · vue '+VIEW_AS_NOM:'');setAv('sd-av',USER.photo,ini(USER.nom||'?'));sun.innerHTML=esc(USER.nom||'—')+'<span class="vpill">'+esc(APP_VERSION.split(' ')[0])+'</span>';}
@@ -2600,17 +2660,7 @@ function oInviteUser(i){
   var nom=u.nom||'';
   var code=u.code||'';
   var roleLib=u.role==='referent'?'Référent':u.role==='gestionnaire'?'Gestionnaire':'Admin';
-  var msg='Bonjour '+nom+' 👋\n\n'
-    +'Je t\'invite à rejoindre notre CRM OlyLife — WLHT, l\'outil de suivi partagé de notre équipe.\n\n'
-    +'📲 *Accéder à l\'application :*\n'
-    +appUrl+'\n\n'
-    +'🔑 *Ton code d\'accès :* `'+code+'`\n'
-    +'👤 *Ton rôle :* '+roleLib+'\n\n'
-    +'📥 *Pour installer l\'app sur ton téléphone :*\n'
-    +'• *Android (Chrome) :* Ouvre le lien → 3 points en haut à droite → « Ajouter à l\'écran d\'accueil »\n'
-    +'• *iPhone (Safari) :* Ouvre le lien → icône Partager ↑ → « Sur l\'écran d\'accueil »\n\n'
-    +'L\'app fonctionne comme une vraie appli, sans téléchargement depuis les stores. 🌿\n\n'
-    +'À bientôt,\n'+PARTNER_NOM();
+  var msg=renderTpl(tplText('equipe_invitation'),{nom:nom,lienApp:appUrl,code:code,role:roleLib,moi:PARTNER_NOM()});
   var tel=(u.tel||'').replace(/[^\d+]/g,'');
   var waUrl='https://wa.me/'+(tel?tel:'')+'?text='+encodeURIComponent(msg);
   // Afficher modal de copie + bouton WhatsApp
@@ -2770,88 +2820,99 @@ function sign(lang,tone){
   return'\n\n'+nom+' — '+SIGN_SUFFIX;
 }
 
-function msgRelance(c,k,lang,tone){
-  lang=lang||'fr';tone=tone||c.registre||'pro';
-  var p=c.prenom,t;
-  var M={
-    j2:{fr:{pro:'Bonjour '+p+' ! Je reviens vers vous suite à notre échange sur OlyLife. Avez-vous eu l\'occasion d\'y réfléchir ? Je reste disponible pour répondre à vos questions.',
-            chaleureux:'Coucou '+p+' ! Je repensais à notre échange sur OlyLife — tu as eu le temps d\'y réfléchir ? N\'hésite pas si tu as des questions, je suis là 😊',
-            equipe:p+', où en es-tu sur OlyLife ? Dis-moi si tu veux qu\'on avance ensemble.'},
-        en:{pro:'Hello '+p+'! Following up on our conversation about OlyLife. Have you had a chance to think it over? Happy to answer any questions.',
-            chaleureux:'Hey '+p+'! Been thinking about our chat on OlyLife — had a chance to consider it? Just ask if you have questions, I\'m here 😊',
-            equipe:p+', where are you at with OlyLife? Let me know if you want to move forward.'}},
-    j5:{fr:{pro:'Bonjour '+p+' ! Je prends de vos nouvelles concernant OlyLife. Souhaitez-vous que je vous envoie plus d\'informations, ou en discuter directement ?',
-            chaleureux:'Hello '+p+' ! Ça faisait un moment — je voulais prendre de tes nouvelles côté OlyLife. Je t\'envoie plus d\'infos ou on en parle de vive voix ?',
-            equipe:p+', petit point rapide sur OlyLife : toujours partant(e) ? Réponds-moi quand tu peux.'},
-        en:{pro:'Hello '+p+'! Just checking in about OlyLife. Would you like more information, or shall we talk directly?',
-            chaleureux:'Hey '+p+'! It\'s been a bit — just checking in on OlyLife. Want me to send more info, or hop on a call?',
-            equipe:p+', quick check on OlyLife — still in? Let me know when you can.'}},
-    j12:{fr:{pro:'Bonjour '+p+' ! Un dernier mot de ma part sur OlyLife — je ne veux surtout pas être insistant(e). Si le moment n\'est pas encore venu, aucun souci, je reste disponible quand vous voudrez.',
-             chaleureux:'Coucou '+p+' ! Dernier petit mot promis 😊 Si le moment n\'est pas encore venu, pas de souci du tout, je reste dispo quand tu veux.',
-             equipe:p+', dernière relance de ma part sur ce sujet. Si ce n\'est pas le bon moment, dis-le-moi simplement.'},
-         en:{pro:'Hello '+p+'! One last note from me about OlyLife — I don\'t want to be pushy. If now isn\'t the right time, no worries, I\'m here whenever you\'re ready.',
-             chaleureux:'Hey '+p+'! Last little nudge, promise 😊 If it\'s not the right time, totally fine, I\'m here whenever.',
-             equipe:p+', last follow-up on this from me. If it\'s not the right time, just say so.'}}
-  };
-  t=(M[k][lang]&&M[k][lang][tone])||M[k].fr.pro;
-  return t+sign(lang,tone);
+// ── MODÈLES DE MESSAGES (v3.14) — modifiables dans Administration → Messages ──
+// Syntaxe : {variable} · bloc conditionnel {?variable:texte affiché seulement si la variable est renseignée}
+var MSG_DEFAULTS={};
+(function(){
+  var L={fr:'Français',en:'English'},T={pro:'Professionnel',chaleureux:'Chaleureux',equipe:'Équipe'};
+  function add(prefix,g,label,vars,M){Object.keys(M).forEach(function(lang){Object.keys(M[lang]).forEach(function(tone){MSG_DEFAULTS[prefix+'_'+lang+'_'+tone]={g:g,l:label+' · '+L[lang]+' · '+T[tone],vars:vars,sig:true,t:M[lang][tone]};});});}
+  add('relance_j2','Relances prospects','1er rappel',['prenom'],{
+    fr:{pro:'Bonjour {prenom} ! Je reviens vers vous suite à notre échange sur OlyLife. Avez-vous eu l\'occasion d\'y réfléchir ? Je reste disponible pour répondre à vos questions.',
+        chaleureux:'Coucou {prenom} ! Je repensais à notre échange sur OlyLife — tu as eu le temps d\'y réfléchir ? N\'hésite pas si tu as des questions, je suis là 😊',
+        equipe:'{prenom}, où en es-tu sur OlyLife ? Dis-moi si tu veux qu\'on avance ensemble.'},
+    en:{pro:'Hello {prenom}! Following up on our conversation about OlyLife. Have you had a chance to think it over? Happy to answer any questions.',
+        chaleureux:'Hey {prenom}! Been thinking about our chat on OlyLife — had a chance to consider it? Just ask if you have questions, I\'m here 😊',
+        equipe:'{prenom}, where are you at with OlyLife? Let me know if you want to move forward.'}});
+  add('relance_j5','Relances prospects','2e rappel',['prenom'],{
+    fr:{pro:'Bonjour {prenom} ! Je prends de vos nouvelles concernant OlyLife. Souhaitez-vous que je vous envoie plus d\'informations, ou en discuter directement ?',
+        chaleureux:'Hello {prenom} ! Ça faisait un moment — je voulais prendre de tes nouvelles côté OlyLife. Je t\'envoie plus d\'infos ou on en parle de vive voix ?',
+        equipe:'{prenom}, petit point rapide sur OlyLife : toujours partant(e) ? Réponds-moi quand tu peux.'},
+    en:{pro:'Hello {prenom}! Just checking in about OlyLife. Would you like more information, or shall we talk directly?',
+        chaleureux:'Hey {prenom}! It\'s been a bit — just checking in on OlyLife. Want me to send more info, or hop on a call?',
+        equipe:'{prenom}, quick check on OlyLife — still in? Let me know when you can.'}});
+  add('relance_j12','Relances prospects','Dernier rappel',['prenom'],{
+    fr:{pro:'Bonjour {prenom} ! Un dernier mot de ma part sur OlyLife — je ne veux surtout pas être insistant(e). Si le moment n\'est pas encore venu, aucun souci, je reste disponible quand vous voudrez.',
+        chaleureux:'Coucou {prenom} ! Dernier petit mot promis 😊 Si le moment n\'est pas encore venu, pas de souci du tout, je reste dispo quand tu veux.',
+        equipe:'{prenom}, dernière relance de ma part sur ce sujet. Si ce n\'est pas le bon moment, dis-le-moi simplement.'},
+    en:{pro:'Hello {prenom}! One last note from me about OlyLife — I don\'t want to be pushy. If now isn\'t the right time, no worries, I\'m here whenever you\'re ready.',
+        chaleureux:'Hey {prenom}! Last little nudge, promise 😊 If it\'s not the right time, totally fine, I\'m here whenever.',
+        equipe:'{prenom}, last follow-up on this from me. If it\'s not the right time, just say so.'}});
+  add('log_retard','Logistique','Commande sans tracking',['prenom','numCommande','logistique'],{
+    fr:{pro:'Bonjour {prenom} ! Je fais un point sur votre commande OlyLife{?numCommande: (n°{numCommande})}. Le suivi de livraison n\'est pas encore disponible de mon côté — je me renseigne activement auprès du {logistique} et reviens vers vous dès que j\'ai une information. Merci pour votre patience !',
+        chaleureux:'Coucou {prenom} ! Petit point sur ta commande OlyLife{?numCommande: (n°{numCommande})} : pas encore de suivi de mon côté, je suis sur le coup auprès du {logistique} et je te tiens au courant dès que j\'ai du nouveau. Merci pour ta patience 🙏',
+        equipe:'{prenom}, commande{?numCommande: {numCommande}} toujours sans tracking. Je relance la Logistique OlyLife, je te tiens au courant.'},
+    en:{pro:'Hello {prenom}! Checking in on your OlyLife order{?numCommande: (#{numCommande})}. Tracking isn\'t available yet on my end — I\'m actively following up with {logistique} and will update you as soon as I have news. Thank you for your patience!',
+        chaleureux:'Hey {prenom}! Quick update on your OlyLife order{?numCommande: (#{numCommande})} — no tracking yet on my end, I\'m chasing {logistique} and will let you know as soon as I hear back. Thanks for your patience 🙏',
+        equipe:'{prenom}, order{?numCommande: {numCommande}} still no tracking. Following up with OlyLife Logistics, will update you.'}});
+  add('log_ok','Logistique','Tracking disponible',['prenom','transporteur','tracking','lienSuivi','tipLivraison'],{
+    fr:{pro:'Bonjour {prenom} ! Bonne nouvelle, votre commande OlyLife est en route 📦\nTransporteur : {transporteur}\nN° de suivi : {tracking}{?lienSuivi:\n👉 Suivre mon colis en un clic : {lienSuivi}}\n\n💡 En cas de souci de livraison : {tipLivraison}Vérifiez que le numéro de téléphone renseigné correspond bien à votre pays de livraison.',
+        chaleureux:'Bonne nouvelle {prenom} ! Ta commande OlyLife est en route 📦\nTransporteur : {transporteur}\nN° de suivi : {tracking}{?lienSuivi:\n👉 Suivre mon colis en un clic : {lienSuivi}}\n\n💡 En cas de souci : {tipLivraison}Vérifie bien que ton numéro correspond à ton pays de livraison !',
+        equipe:'{prenom} — commande expédiée 📦\nTransporteur : {transporteur}\nN° de suivi : {tracking}{?lienSuivi:\n👉 Suivre mon colis en un clic : {lienSuivi}}'},
+    en:{pro:'Hello {prenom}! Good news, your OlyLife order is on its way 📦\nCarrier: {transporteur}\nTracking #: {tracking}{?lienSuivi:\n👉 Track your parcel in one click: {lienSuivi}}\n\n💡 If there\'s a delivery issue: {tipLivraison}Please make sure the phone number on file matches your delivery country.',
+        chaleureux:'Good news {prenom}! Your OlyLife order is on its way 📦\nCarrier: {transporteur}\nTracking #: {tracking}{?lienSuivi:\n👉 Track your parcel in one click: {lienSuivi}}\n\n💡 Just in case: {tipLivraison}double-check your phone number matches your delivery country!',
+        equipe:'{prenom} — order shipped 📦\nCarrier: {transporteur}\nTracking #: {tracking}{?lienSuivi:\n👉 Track your parcel in one click: {lienSuivi}}'}});
+  add('install','Installation','Suivi installation & mise en route',['prenom','sav','savEmail'],{
+    fr:{pro:'Bonjour {prenom} ! Votre appareil OlyLife devrait être arrivé. Avez-vous pu commencer à l\'utiliser ? Je suis disponible pour la mise en route ou le protocole — et le {sav} reste aussi disponible pour toute question technique ({savEmail}).',
+        chaleureux:'Coucou {prenom} ! Ton appareil OlyLife a dû arriver — tu as pu commencer à l\'utiliser ? Dis-moi si tu veux un coup de main pour la mise en route. Et le {sav} reste dispo aussi pour les questions techniques.',
+        equipe:'{prenom}, appareil livré ! Prêt(e) à te lancer ? Dis-moi si tu veux un point rapide sur le protocole.'},
+    en:{pro:'Hello {prenom}! Your OlyLife device should have arrived. Have you been able to start using it? I\'m here to help with setup or the protocol — and {sav} is also available for technical questions ({savEmail}).',
+        chaleureux:'Hey {prenom}! Your OlyLife device should be there by now — have you started using it? Let me know if you need a hand with setup. {sav} is also around for technical questions.',
+        equipe:'{prenom}, device delivered! Ready to get going? Let me know if you want a quick rundown of the protocol.'}});
+  add('temoin','Témoignage','Demande de témoignage',['prenom'],{
+    fr:{pro:'Bonjour {prenom} ! Cela fait maintenant quelques semaines que vous utilisez votre appareil OlyLife. Comment vous sentez-vous ? Avec votre accord, votre retour pourrait aider d\'autres personnes à découvrir OlyLife — seriez-vous d\'accord pour partager un petit témoignage ?',
+        chaleureux:'Coucou {prenom} ! Ça fait quelques semaines que tu utilises OlyLife — comment tu te sens ? Si tu es partant(e), ton retour pourrait vraiment aider d\'autres personnes à découvrir OlyLife 🙏',
+        equipe:'{prenom}, un retour rapide sur ton ressenti OlyLife m\'aiderait bien pour nos supports. Tu peux m\'envoyer 2-3 lignes ?'},
+    en:{pro:'Hello {prenom}! It\'s been a few weeks now since you started using your OlyLife device. How are you feeling? With your permission, your feedback could help others discover OlyLife — would you be open to sharing a short testimonial?',
+        chaleureux:'Hey {prenom}! It\'s been a few weeks with OlyLife now — how are you feeling? If you\'re up for it, your feedback could really help others discover OlyLife 🙏',
+        equipe:'{prenom}, a quick note on how OlyLife is going for you would really help our materials. Mind sending 2-3 lines?'}});
+  MSG_DEFAULTS.avance_client={g:'Avances d\'argent',l:'Rappel d\'échéance au client',vars:['prenom','montant','devise','date','motif','rendu','reste','echeance','moi'],
+    t:'Bonjour {prenom}, j\'espère que vous allez bien 🌿\n\nPetit rappel amical concernant l\'avance de {montant} {devise} du {date}{?motif: pour votre {motif}}{?rendu: (déjà rendu : {rendu} {devise}, reste {reste} {devise})} : le remboursement est prévu le {echeance}.\n\nMerci de me confirmer que c\'est toujours bon pour vous. Belle journée !\n{moi} — Water Life High Tech'};
+  MSG_DEFAULTS.avance_payeur={g:'Avances d\'argent',l:'Information à la personne qui a avancé',vars:['payeur','montant','devise','date','client','motif','echeance','rendu','reste','moi'],
+    t:'Bonjour {payeur} 🌿\n\nPetit point sur l\'avance de {montant} {devise} que vous avez faite le {date} à {client}{?motif: pour {motif}} : le remboursement est prévu le {echeance}{?rendu: (déjà rendu : {rendu} {devise}, reste {reste} {devise})}.\n\nJe vous tiens informé(e) dès que c\'est réglé. Merci pour votre confiance 🙏\n{moi} — Water Life High Tech'};
+  MSG_DEFAULTS.proto_suivi={g:'Fiches conseils de soins',l:'Point de suivi (J+7 / J+30)',vars:['prenom','jours','programme','rythme','moi'],
+    t:'Bonjour {prenom} 🌿\n\nPetit point après {jours} jours de votre programme « {programme} » : comment vous sentez-vous ? Les séances se passent bien ({rythme}) ?\n\nN\'hésitez pas à me dire ce que vous ressentez, je suis là pour ajuster avec vous 🙏\n{moi} — Water Life High Tech'};
+  MSG_DEFAULTS.prec_envoi={g:'Utilisations & précautions',l:'Envoi des précautions d\'un appareil',vars:['prenom','appareil','interdits','duree','precautions','moi'],
+    t:'Bonjour {prenom} 🌿\n\nComme promis, voici les points essentiels d\'utilisation et de sécurité de votre {appareil}, issus du manuel officiel OlyLife :\n\n{?interdits:⛔ *Ne pas utiliser / demander un avis médical si :*\n{interdits}\n\n}{?duree:⏱ *Durée & fréquence :*\n{duree}\n\n}{?precautions:⚠️ *Précautions :*\n{precautions}\n\n}📄 La notice complète est dans la boîte — gardez-la à portée de main. Au moindre doute, parlez-en à votre médecin : les appareils OlyLife ne sont pas des dispositifs médicaux et ne remplacent pas un avis médical.\n\nJe reste disponible pour toute question 🙏\n{moi} — Water Life High Tech'};
+  MSG_DEFAULTS.equipe_invitation={g:'Équipe',l:'Invitation d\'un membre de l\'équipe (code d\'accès)',vars:['nom','lienApp','code','role','moi'],
+    t:'Bonjour {nom} 👋\n\nJe t\'invite à rejoindre notre CRM OlyLife — WLHT, l\'outil de suivi partagé de notre équipe.\n\n📲 *Accéder à l\'application :*\n{lienApp}\n\n🔑 *Ton code d\'accès :* {code}\n👤 *Ton rôle :* {role}\n\n📥 *Pour installer l\'app sur ton téléphone :*\n• *Android (Chrome) :* Ouvre le lien → 3 points en haut à droite → « Ajouter à l\'écran d\'accueil »\n• *iPhone (Safari) :* Ouvre le lien → icône Partager ↑ → « Sur l\'écran d\'accueil »\n\nL\'app fonctionne comme une vraie appli, sans téléchargement depuis les stores. 🌿\n\nÀ bientôt,\n{moi}'};
+  MSG_DEFAULTS.inscription_infos={g:'Inscription OlyLife',l:'Demande des informations d\'inscription',vars:['prenom','moi'],
+    t:'Bonjour {prenom} 👋\n\nPour créer votre compte OlyLife et passer votre commande, merci de me renvoyer EN UN SEUL MESSAGE les informations suivantes :\n\n1️⃣ Votre identité EXACTEMENT comme sur votre PASSEPORT (tous les noms et tous les prénoms) + le numéro du passeport.\n   ➡️ Pas de passeport ? La carte nationale d\'identité est acceptée. (Permis de conduire et autres cartes refusés — sauf carte de résident pour les personnes étrangères.)\n2️⃣ Votre adresse postale complète de livraison — et l\'adresse de facturation si elle est différente.\n3️⃣ Votre adresse e-mail.\n4️⃣ Un mot de passe d\'au moins 8 caractères (lettres et chiffres ; symboles possibles mais non obligatoires) — vous pourrez le modifier ensuite.\n\n🔒 Ces informations restent strictement confidentielles : elles servent uniquement à votre enregistrement officiel OlyLife.\n\nMerci beaucoup, à très vite !\n{moi} — Water Life High Tech'};
+})();
+var MSG_VAR_HELP={prenom:'prénom du contact',nom:'nom',numCommande:'n° de commande',logistique:'Service Logistique OlyLife',transporteur:'transporteur',tracking:'n° de suivi',lienSuivi:'lien de suivi du colis',tipLivraison:'numéros utiles DHL / Colissimo (France)',sav:'Service Après-Vente OlyLife',savEmail:'e-mail du SAV',montant:'montant',devise:'devise',date:'date de l\'avance',motif:'motif',rendu:'déjà remboursé',reste:'reste à rembourser',echeance:'date d\'échéance',payeur:'prénom de la personne qui a avancé',client:'nom du client',moi:'votre nom (expéditeur)',jours:'nombre de jours',programme:'titre de la fiche conseils',rythme:'durée, fréquence',appareil:'nom de l\'appareil',interdits:'contre-indications (manuel)',duree:'durée & fréquence (manuel)',precautions:'précautions (manuel)',lienApp:'lien de l\'application',code:'code d\'accès',role:'rôle'};
+function renderTpl(t,v){
+  v=v||{};
+  return String(t||'').replace(/\{\?(\w+):((?:[^{}]|\{\w+\})*)\}/g,function(m,k,inner){return v[k]?inner.replace(/\{(\w+)\}/g,function(_,n){return v[n]!=null?v[n]:'';}):'';})
+    .replace(/\{(\w+)\}/g,function(_,n){return v[n]!=null?v[n]:'';});
 }
-function msgLogRetard(c,lang,tone){
-  lang=lang||'fr';tone=tone||c.registre||'pro';
-  var p=c.prenom,num=c.numCommande;
-  var M={
-    fr:{pro:'Bonjour '+p+' ! Je fais un point sur votre commande OlyLife'+(num?' (n°'+num+')':'')+'. Le suivi de livraison n\'est pas encore disponible de mon côté — je me renseigne activement auprès du '+OLY_SVC.logistics.fr+' et reviens vers vous dès que j\'ai une information. Merci pour votre patience !',
-        chaleureux:'Coucou '+p+' ! Petit point sur ta commande OlyLife'+(num?' (n°'+num+')':'')+' : pas encore de suivi de mon côté, je suis sur le coup auprès du '+OLY_SVC.logistics.fr+' et je te tiens au courant dès que j\'ai du nouveau. Merci pour ta patience 🙏',
-        equipe:p+', commande'+(num?' '+num:'')+' toujours sans tracking. Je relance la Logistique OlyLife, je te tiens au courant.'},
-    en:{pro:'Hello '+p+'! Checking in on your OlyLife order'+(num?' (#'+num+')':'')+'. Tracking isn\'t available yet on my end — I\'m actively following up with '+OLY_SVC.logistics.en+' and will update you as soon as I have news. Thank you for your patience!',
-        chaleureux:'Hey '+p+'! Quick update on your OlyLife order'+(num?' (#'+num+')':'')+' — no tracking yet on my end, I\'m chasing '+OLY_SVC.logistics.en+' and will let you know as soon as I hear back. Thanks for your patience 🙏',
-        equipe:p+', order'+(num?' '+num:'')+' still no tracking. Following up with OlyLife Logistics, will update you.'}
-  };
-  return(M[lang]&&M[lang][tone]||M.fr.pro)+sign(lang,tone);
+function tplText(key){var o=CFG&&CFG.params&&CFG.params.messages&&CFG.params.messages[key];return(typeof o==='string'&&o.trim())?o:(MSG_DEFAULTS[key]?MSG_DEFAULTS[key].t:'');}
+function tplVars(c,lang){
+  c=c||{};lang=lang||'fr';
+  var url=trackingUrl(c.transporteur,c.tracking);
+  return{prenom:c.prenom||'',nom:c.nom||'',numCommande:c.numCommande||'',logistique:OLY_SVC.logistics[lang]||OLY_SVC.logistics.fr,transporteur:c.transporteur||'—',tracking:c.tracking||'—',lienSuivi:url||'',
+    tipLivraison:isFR(c)?(lang==='en'?'DHL Parcel: 01 80 14 63 32 · Colissimo/La Poste: 09 72 72 12 13. ':'DHL Parcel : 01 80 14 63 32 · Colissimo/La Poste : 09 72 72 12 13. '):'',
+    sav:OLY_SVC.aftersales[lang]||OLY_SVC.aftersales.fr,savEmail:OLY_SVC.aftersales.email,moi:PARTNER_NOM()||'L\'équipe WLHT'};
 }
-function msgLogOk(c,lang,tone){
+function msgTpl(prefix,c,lang,tone,extra){
   lang=lang||'fr';tone=tone||c.registre||'pro';
-  var p=c.prenom,url=trackingUrl(c.transporteur,c.tracking);
-  var tip=isFR(c)?'DHL Parcel : 01 80 14 63 32 · Colissimo/La Poste : 09 72 72 12 13. ':'';
-  var tipEn=isFR(c)?'DHL Parcel: 01 80 14 63 32 · Colissimo/La Poste: 09 72 72 12 13. ':'';
-  var track='\nTransporteur : '+(c.transporteur||'—')+'\nN° de suivi : '+(c.tracking||'—')+(url?'\n👉 Suivre mon colis en un clic : '+url:'');
-  var trackEn='\nCarrier: '+(c.transporteur||'—')+'\nTracking #: '+(c.tracking||'—')+(url?'\n👉 Track your parcel in one click: '+url:'');
-  var M={
-    fr:{pro:'Bonjour '+p+' ! Bonne nouvelle, votre commande OlyLife est en route 📦'+track+'\n\n💡 En cas de souci de livraison : '+tip+'Vérifiez que le numéro de téléphone renseigné correspond bien à votre pays de livraison.',
-        chaleureux:'Bonne nouvelle '+p+' ! Ta commande OlyLife est en route 📦'+track+'\n\n💡 En cas de souci : '+tip+'Vérifie bien que ton numéro correspond à ton pays de livraison !',
-        equipe:p+' — commande expédiée 📦'+track},
-    en:{pro:'Hello '+p+'! Good news, your OlyLife order is on its way 📦'+trackEn+'\n\n💡 If there\'s a delivery issue: '+tipEn+'Please make sure the phone number on file matches your delivery country.',
-        chaleureux:'Good news '+p+'! Your OlyLife order is on its way 📦'+trackEn+'\n\n💡 Just in case: '+tipEn+'double-check your phone number matches your delivery country!',
-        equipe:p+' — order shipped 📦'+trackEn}
-  };
-  return(M[lang]&&M[lang][tone]||M.fr.pro)+sign(lang,tone);
+  var key=prefix+'_'+lang+'_'+tone;if(!MSG_DEFAULTS[key])key=prefix+'_fr_pro';
+  var v=tplVars(c,lang);if(extra)for(var k in extra)v[k]=extra[k];
+  return renderTpl(tplText(key),v)+sign(lang,tone);
 }
-function msgInstall(c,lang,tone){
-  lang=lang||'fr';tone=tone||c.registre||'pro';
-  var p=c.prenom;
-  var M={
-    fr:{pro:'Bonjour '+p+' ! Votre appareil OlyLife devrait être arrivé. Avez-vous pu commencer à l\'utiliser ? Je suis disponible pour la mise en route ou le protocole — et le '+OLY_SVC.aftersales.fr+' reste aussi disponible pour toute question technique ('+OLY_SVC.aftersales.email+').',
-        chaleureux:'Coucou '+p+' ! Ton appareil OlyLife a dû arriver — tu as pu commencer à l\'utiliser ? Dis-moi si tu veux un coup de main pour la mise en route. Et le '+OLY_SVC.aftersales.fr+' reste dispo aussi pour les questions techniques.',
-        equipe:p+', appareil livré ! Prêt(e) à te lancer ? Dis-moi si tu veux un point rapide sur le protocole.'},
-    en:{pro:'Hello '+p+'! Your OlyLife device should have arrived. Have you been able to start using it? I\'m here to help with setup or the protocol — and '+OLY_SVC.aftersales.en+' is also available for technical questions ('+OLY_SVC.aftersales.email+').',
-        chaleureux:'Hey '+p+'! Your OlyLife device should be there by now — have you started using it? Let me know if you need a hand with setup. '+OLY_SVC.aftersales.en+' is also around for technical questions.',
-        equipe:p+', device delivered! Ready to get going? Let me know if you want a quick rundown of the protocol.'}
-  };
-  return(M[lang]&&M[lang][tone]||M.fr.pro)+sign(lang,tone);
-}
-function msgTemoin(c,lang,tone){
-  lang=lang||'fr';tone=tone||c.registre||'pro';
-  var p=c.prenom;
-  var M={
-    fr:{pro:'Bonjour '+p+' ! Cela fait maintenant quelques semaines que vous utilisez votre appareil OlyLife. Comment vous sentez-vous ? Avec votre accord, votre retour pourrait aider d\'autres personnes à découvrir OlyLife — seriez-vous d\'accord pour partager un petit témoignage ?',
-        chaleureux:'Coucou '+p+' ! Ça fait quelques semaines que tu utilises OlyLife — comment tu te sens ? Si tu es partant(e), ton retour pourrait vraiment aider d\'autres personnes à découvrir OlyLife 🙏',
-        equipe:p+', un retour rapide sur ton ressenti OlyLife m\'aiderait bien pour nos supports. Tu peux m\'envoyer 2-3 lignes ?'},
-    en:{pro:'Hello '+p+'! It\'s been a few weeks now since you started using your OlyLife device. How are you feeling? With your permission, your feedback could help others discover OlyLife — would you be open to sharing a short testimonial?',
-        chaleureux:'Hey '+p+'! It\'s been a few weeks with OlyLife now — how are you feeling? If you\'re up for it, your feedback could really help others discover OlyLife 🙏',
-        equipe:p+', a quick note on how OlyLife is going for you would really help our materials. Mind sending 2-3 lines?'}
-  };
-  return(M[lang]&&M[lang][tone]||M.fr.pro)+sign(lang,tone);
-}
+function msgRelance(c,k,lang,tone){return msgTpl('relance_'+k,c,lang,tone);}
+function msgLogRetard(c,lang,tone){return msgTpl('log_retard',c,lang,tone);}
+function msgLogOk(c,lang,tone){return msgTpl('log_ok',c,lang,tone);}
+function msgInstall(c,lang,tone){return msgTpl('install',c,lang,tone);}
+function msgTemoin(c,lang,tone){return msgTpl('temoin',c,lang,tone);}
 function buildMsgFor(item,lang,tone){
   if(item.type==='Relance')return msgRelance(item.c,item.key,lang,tone);
   if(item.key==='logistique')return msgLogRetard(item.c,lang,tone);
@@ -4302,6 +4363,7 @@ function oSw(v){
   el.classList.add('on');
   var navKey=(v==='pipeline'&&!isDesk())?'contacts':(v==='nouvelle'?'':v);
   document.querySelectorAll('[data-nav]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-nav')===navKey);});
+  try{navGrpReveal(navKey);}catch(e){}
   document.getElementById('ottl').textContent=VIEW_T[v]||v;
   CUR_VIEW=v;document.body.setAttribute('data-view',v);
   try{window.scrollTo(0,0);}catch(e){}
@@ -5043,11 +5105,26 @@ function oDrawerOpen(){
   oSheetOpen('odrawer');
 }
 function oDrawerClose(){oSheetClose('odrawer');}
+// ── Menus & sous-menus (v3.14) ───────────────────────────────────────
+function navGrpState(){try{return JSON.parse(localStorage.getItem('owlht2_navgrp')||'{}')||{};}catch(e){return{};}}
+function navGrpApply(){var st=navGrpState();document.querySelectorAll('.sd-grp,.odr-grp').forEach(function(g){g.classList.toggle('cl',!!st[g.getAttribute('data-grp')]);});}
+function navGrp(k){var st=navGrpState();st[k]=!st[k];try{localStorage.setItem('owlht2_navgrp',JSON.stringify(st));}catch(e){}navGrpApply();}
+function navGrpReveal(v){var b=document.querySelector('#sd-nav [data-nav="'+v+'"]');if(!b)return;var g=b.closest('.sd-grp');if(g&&g.classList.contains('cl')){var st=navGrpState();delete st[g.getAttribute('data-grp')];try{localStorage.setItem('owlht2_navgrp',JSON.stringify(st));}catch(e){}navGrpApply();}}
+try{navGrpApply();}catch(e){}
+var LIENS_PERSO=[];
+function lienVisible(l){var r=ROLE();if(!l.roles||l.roles==='all')return true;if(l.roles==='admin')return r==='admin';return r==='admin'||r==='gestionnaire';}
+function renderLiensPerso(){
+  var sd=document.getElementById('sd-liens-perso'),dr=document.getElementById('odr-liens-perso');
+  var list=LIENS_PERSO.filter(function(l){return l&&l.url&&lienVisible(l);});
+  if(sd)sd.innerHTML=list.map(function(l){return'<button class="sd-it" type="button" onclick="window.open(\''+esc(l.url)+'\',\'_blank\')" title="'+esc(l.label)+'"><span class="sd-em">'+esc(l.emoji||'🔗')+'</span><em>'+esc(l.label)+'</em></button>';}).join('');
+  if(dr)dr.innerHTML=list.map(function(l){return'<button class="odr-it" type="button" onclick="oDrawerClose();window.open(\''+esc(l.url)+'\',\'_blank\')"><span class="em">'+esc(l.emoji||'🔗')+'</span>'+esc(l.label)+'</button>';}).join('');
+}
 function oDrGo(v){oDrawerClose();setTimeout(function(){oSw(v);},60);}
 
 // ── Avances d'argent ───────────────────────────────────────────────
 function avWaMsg(c,a){
-  return'Bonjour '+(c.prenom||'')+', j\'espère que vous allez bien 🌿\n\nPetit rappel amical concernant l\'avance de '+a.montant+' '+(a.devise||'€')+' du '+fD(a.date)+(a.motif?' pour votre '+a.motif:'')+(avRendu(a)?' (déjà rendu : '+avRendu(a)+' '+(a.devise||'€')+', reste '+avReste(a)+' '+(a.devise||'€')+')':'')+' : le remboursement est prévu le '+fD(a.echeance)+'.\n\nMerci de me confirmer que c\'est toujours bon pour vous. Belle journée !\n'+(PARTNER_NOM()||'L\'équipe WLHT')+' — Water Life High Tech';
+  var v=tplVars(c,'fr');v.montant=a.montant;v.devise=a.devise||'€';v.date=fD(a.date);v.motif=a.motif||'';v.rendu=avRendu(a)||'';v.reste=avReste(a);v.echeance=fD(a.echeance);
+  return renderTpl(tplText('avance_client'),v);
 }
 var AV_CUR=null;
 function avPayeurs(excludeId){
@@ -5133,8 +5210,8 @@ function oAvRembDel(i){
   a.rembs=a.rembs.filter(function(x){return x!==r;});avRembRender();
 }
 function avWaPayeur(c,a){
-  var pr=(a.par||'').split(' ')[0];
-  return'Bonjour '+pr+' 🌿\n\nPetit point sur l\'avance de '+a.montant+' '+(a.devise||'€')+' que vous avez faite le '+fD(a.date)+' à '+c.nom+' '+(c.prenom||'')+(a.motif?' pour '+a.motif:'')+' : le remboursement est prévu le '+fD(a.echeance)+(avRendu(a)?' (déjà rendu : '+avRendu(a)+' '+(a.devise||'€')+', reste '+avReste(a)+' '+(a.devise||'€')+')':'')+'.\n\nJe vous tiens informé(e) dès que c\'est réglé. Merci pour votre confiance 🙏\n'+(PARTNER_NOM()||'L\'équipe WLHT')+' — Water Life High Tech';
+  var v=tplVars(c,'fr');v.payeur=(a.par||'').split(' ')[0];v.montant=a.montant;v.devise=a.devise||'€';v.date=fD(a.date);v.client=((c.nom||'')+' '+(c.prenom||'')).trim();v.motif=a.motif||'';v.rendu=avRendu(a)||'';v.reste=avReste(a);v.echeance=fD(a.echeance);
+  return renderTpl(tplText('avance_payeur'),v);
 }
 function avParTel(a){if(a.parTel)return a.parTel;var pi=avParInfo(a.parRef||'');if(pi.tel)return pi.tel;var p=a.parId?OC.find(function(x){return x.id===a.parId;}):null;return p?(p.tel||''):'';}
 function oAvOpen(cid,aid){
@@ -5335,8 +5412,7 @@ function oGenea(){
 
 // ── Demande d'infos d'inscription ──────────────────────────────────
 function reqMsg(pr){
-  var sig=PARTNER_NOM()||'L\'équipe WLHT';
-  return'Bonjour '+(pr||'')+' 👋\n\nPour créer votre compte OlyLife et passer votre commande, merci de me renvoyer EN UN SEUL MESSAGE les informations suivantes :\n\n1️⃣ Votre identité EXACTEMENT comme sur votre PASSEPORT (tous les noms et tous les prénoms) + le numéro du passeport.\n   ➡️ Pas de passeport ? La carte nationale d\'identité est acceptée. (Permis de conduire et autres cartes refusés — sauf carte de résident pour les personnes étrangères.)\n2️⃣ Votre adresse postale complète de livraison — et l\'adresse de facturation si elle est différente.\n3️⃣ Votre adresse e-mail.\n4️⃣ Un mot de passe d\'au moins 8 caractères (lettres et chiffres ; symboles possibles mais non obligatoires) — vous pourrez le modifier ensuite.\n\n🔒 Ces informations restent strictement confidentielles : elles servent uniquement à votre enregistrement officiel OlyLife.\n\nMerci beaucoup, à très vite !\n'+sig+' — Water Life High Tech';
+  var v=tplVars({prenom:pr||''},'fr');return renderTpl(tplText('inscription_infos'),v);
 }
 function oReqPrev(){var e=document.getElementById('rq-prev');if(e)e.textContent=reqMsg(val('rq-pr').trim()||'…');}
 function oReqOpen(){
@@ -5473,11 +5549,8 @@ function precMsg(c,k){
   var dur=precText(k,'duree');
   var pre=precText(k,'precautions');
   function short(t,n){t=String(t||'').replace(/\n/g,'\n').trim();if(!t)return'';var lines=t.split('\n').filter(Boolean).slice(0,n);return lines.join('\n');}
-  return'Bonjour '+pr+' 🌿\n\nComme promis, voici les points essentiels d\'utilisation et de sécurité de votre '+d.nom+', issus du manuel officiel OlyLife :\n\n'
-    +(inter?'⛔ *Ne pas utiliser / demander un avis médical si :*\n'+short(inter,8)+'\n\n':'')
-    +(dur?'⏱ *Durée & fréquence :*\n'+short(dur,4)+'\n\n':'')
-    +(pre?'⚠️ *Précautions :*\n'+short(pre,6)+'\n\n':'')
-    +'📄 La notice complète est dans la boîte — gardez-la à portée de main. Au moindre doute, parlez-en à votre médecin : les appareils OlyLife ne sont pas des dispositifs médicaux et ne remplacent pas un avis médical.\n\nJe reste disponible pour toute question 🙏\n'+(PARTNER_NOM()||'L\'équipe WLHT')+' — Water Life High Tech';
+  var v=tplVars(c,'fr');v.appareil=d.nom;v.interdits=short(inter,8);v.duree=short(dur,4);v.precautions=short(pre,6);
+  return renderTpl(tplText('prec_envoi'),v);
 }
 function oPrecOpen(cid,k){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
@@ -5593,7 +5666,7 @@ function oProtoAssign(id){
   oPush([c]);oProtoClose();oOpenF(cid);emojiBurst(['🧭','🌿','✨']);oT('🧭 Fiche conseils assignée — suivi J+7 / J+30 programmé','s');
 }
 function oProtoTermine(cid,paId){var c=OC.find(function(x){return x.id===cid;});if(!c)return;var pa=(c.protocoles||[]).find(function(x){return x.id===paId;});if(!pa)return;pa.termine=todayYMD();var p=protoById(pa.protoId);jrnAdd(c,'fait','🧭 Fiche conseils terminée : '+(p?p.titre:''));oPush([c]);oOpenF(cid);}
-function protoSuiviMsg(c,p,j){return'Bonjour '+(c.prenom||'')+' 🌿\n\nPetit point après '+j+' jours de votre programme « '+p.titre+' » : comment vous sentez-vous ? Les séances se passent bien ('+[p.duree,p.frequence].filter(Boolean).join(', ')+') ?\n\nN\'hésitez pas à me dire ce que vous ressentez, je suis là pour ajuster avec vous 🙏\n'+(PARTNER_NOM()||'L\'équipe WLHT')+' — Water Life High Tech';}
+function protoSuiviMsg(c,p,j){var v=tplVars(c,'fr');v.jours=j;v.programme=p.titre||'';v.rythme=[p.duree,p.frequence].filter(Boolean).join(', ');return renderTpl(tplText('proto_suivi'),v);}
 function oProtoShare(id){var p=protoById(id);if(!p)return;var t='🧭 Fiche conseils — '+p.titre+'\n'+(p.theme||'')+' · '+lvlLbl(p.niveau)+'\n\n'+[['Appareil',(p.appareils||[]).join(', ')],['Objectif',p.objectif],['Pour qui',p.public],['Zone',p.zone],['Programme',p.programme],['Durée',p.duree],['Fréquence',p.frequence],['Cure',p.cure],['Conseils',p.conseils],['Précautions',p.precautions]].filter(function(x){return x[1];}).map(function(x){return x[0]+' : '+x[1];}).join('\n')+'\n\n⚖️ '+FICHE_DISCLAIMER;navigator.clipboard&&navigator.clipboard.writeText(t).then(function(){oT('Fiche conseils copiée','s');});}
 function oProtoGrille(){
   var t='GRILLE DE SAISIE — FICHE CONSEILS DE SOINS WLHT / OLYLIFE (comité scientifique)\n\n1. Titre :\n2. Thème bien-être ('+THEMES.join(' / ')+') :\n3. Appareil(s) :\n4. Objectif d\'accompagnement (formulé en bien-être — jamais traiter / guérir / prévenir / diagnostiquer) :\n5. Pour qui / situation :\n6. Zone / position :\n7. Programme / intensité :\n8. Durée de séance :\n9. Fréquence :\n10. Durée de cure & progression :\n11. Conseils associés :\n12. Précautions spécifiques (en plus de la notice officielle) :\n13. Niveau de preuve : science établie / recherche en cours / communication fabricant\n14. Références / sources :\n15. Date · version :\n\nRappel : '+FICHE_DISCLAIMER;
@@ -5777,7 +5850,9 @@ function admRenderTab(t){
     document.getElementById('adm-logi').value=SEUIL_LOGISTIQUE;document.getElementById('adm-inst').value=DELAI_INSTALL;document.getElementById('adm-tem').value=DELAI_TEMOIGNAGE;
     document.getElementById('adm-pp1').value=PROTO_POINTS[0];document.getElementById('adm-pp2').value=PROTO_POINTS[1];document.getElementById('adm-sign').value=SIGN_SUFFIX;
   }
+  if(t==='messages'){admMsgFill();}
   if(t==='liens'){
+    admLpRender(LIENS_PERSO);
     document.getElementById('adm-l-boffice').value=BOFFICE_URL;document.getElementById('adm-l-boly').value=BOLY_URL;document.getElementById('adm-l-tunnels').value=TUNNELS_URL;document.getElementById('adm-l-youtube').value=YOUTUBE_URL;
     var cal=USERS.filter(function(u){return u.calendlyUrl;}).length;
     document.getElementById('adm-integ').innerHTML='📅 <b>Calendly</b> : '+cal+' membre(s) avec un lien de prise de RDV (chacun le renseigne dans Réglages ; la synchronisation des RDV se fait côté script toutes les heures).<br>🗺️ <b>Carte</b> : géolocalisation des adresses via OpenStreetMap (gratuit, sans clé).<br>📧 <b>Résumé quotidien</b> : envoyé par le script Google avec l\'adresse e-mail du profil de chaque membre.<br>🔐 <b>Serveur</b> : <span style="word-break:break-all">'+esc(GAS_URL)+'</span>';
@@ -5813,13 +5888,73 @@ function admMergeTags(){
   if(touched.length)oPush(touched);oPushUsers();oPushCfg();populateRefUI();
   oT('🔀 « '+from+' » fusionné dans « '+to+' » — '+touched.length+' fiche(s)','s');oAdmin();
 }
+// ── Admin : modèles de messages (v3.14) ─────────────────────────────
+var ADM_MSG_KEY='';
+function admMsgSample(key){
+  var d=MSG_DEFAULTS[key]||{};var lang=/_en_/.test(key)?'en':'fr',tone=/_chaleureux$/.test(key)?'chaleureux':/_equipe$/.test(key)?'equipe':'pro';
+  var c={prenom:'Marie',nom:'DUPONT',pays:'France',numCommande:'20261008120000000001',transporteur:'DHL Parcel',tracking:'JD014600012345678',registre:tone};
+  var v=tplVars(c,lang);
+  var ex={montant:'500',devise:'€',date:'12/09/2026',motif:'Tera-P90+',rendu:'',reste:'500',echeance:'12/10/2026',payeur:'Eddie',client:'DUPONT Marie',jours:'7',programme:'Sommeil & récupération',rythme:'20 min, 2 fois par jour',appareil:'Tera-P90+',interdits:'• Stimulateur cardiaque ou implant électronique\n• Grossesse',duree:'• 20 à 30 min par séance\n• 1 à 2 séances par jour',precautions:'• Ne pas utiliser sur une peau lésée\n• Retirer bijoux et objets métalliques',lienApp:'https://crm.team-waterlifehightech.com/',code:'AB7KM3PQ2X',role:'Référent'};
+  for(var k in ex)v[k]=ex[k];
+  return{v:v,sig:d.sig?sign(lang,tone):''};
+}
+function admMsgIsCustom(key){var o=CFG.params&&CFG.params.messages&&CFG.params.messages[key];return typeof o==='string'&&o.trim()&&o!==(MSG_DEFAULTS[key]||{}).t;}
+function admMsgFill(){
+  var sel=document.getElementById('adm-msg-key');if(!sel)return;var cur=sel.value||ADM_MSG_KEY;
+  var groups={};Object.keys(MSG_DEFAULTS).forEach(function(k){var g=MSG_DEFAULTS[k].g;(groups[g]=groups[g]||[]).push(k);});
+  sel.innerHTML=Object.keys(groups).map(function(g){return'<optgroup label="'+esc(g)+'">'+groups[g].map(function(k){return'<option value="'+k+'"'+(k===cur?' selected':'')+'>'+(admMsgIsCustom(k)?'✏️ ':'')+esc(MSG_DEFAULTS[k].l)+'</option>';}).join('')+'</optgroup>';}).join('');
+  if(!sel.value)sel.value=Object.keys(MSG_DEFAULTS)[0];
+  var custom=Object.keys(MSG_DEFAULTS).filter(admMsgIsCustom);
+  var nb=document.getElementById('adm-n-msg');if(nb){nb.textContent=custom.length;nb.style.display=custom.length?'':'none';}
+  document.getElementById('adm-msg-list').innerHTML=custom.length?custom.map(function(k){return'<div class="adm-row"><span>✏️</span><div class="b"><b>'+esc(MSG_DEFAULTS[k].l)+'</b><small>'+esc(MSG_DEFAULTS[k].g)+'</small></div><button class="ob bgh bsm" onclick="document.getElementById(\'adm-msg-key\').value=\''+k+'\';admMsgLoad()">Modifier</button><button class="ob bgh bsm" onclick="admMsgReset(\''+k+'\')">↩️ Origine</button></div>';}).join(''):'<div style="font-size:12px;color:var(--t3)">Aucun message personnalisé pour l\'instant.</div>';
+  admMsgLoad();
+}
+function admMsgLoad(){
+  var key=document.getElementById('adm-msg-key').value;ADM_MSG_KEY=key;var d=MSG_DEFAULTS[key];if(!d)return;
+  document.getElementById('adm-msg-txt').value=tplText(key);
+  document.getElementById('adm-msg-vars').innerHTML=d.vars.map(function(v){return'<span style="cursor:pointer" title="'+esc(MSG_VAR_HELP[v]||v)+'" onclick="admMsgInsert(\'{'+v+'}\')"><b>{'+v+'}</b>'+esc(MSG_VAR_HELP[v]||'')+'</span>';}).join('')+(d.sig?'<span title="ajoutée automatiquement"><b>+</b>signature automatique</span>':'');
+  admMsgPreview();
+}
+function admMsgInsert(t){var ta=document.getElementById('adm-msg-txt');var st=ta.selectionStart||0,en=ta.selectionEnd||0;ta.value=ta.value.slice(0,st)+t+ta.value.slice(en);ta.focus();ta.selectionStart=ta.selectionEnd=st+t.length;admMsgPreview();}
+function admMsgPreview(){var key=ADM_MSG_KEY;if(!MSG_DEFAULTS[key])return;var sm=admMsgSample(key);document.getElementById('adm-msg-prev').textContent=renderTpl(document.getElementById('adm-msg-txt').value,sm.v)+sm.sig;}
+function admMsgSave(){
+  var key=ADM_MSG_KEY;if(!MSG_DEFAULTS[key])return;var txt=document.getElementById('adm-msg-txt').value;
+  if(!txt.trim()){oT('Le message ne peut pas être vide','w');return;}
+  var bad=confCheck(txt);if(bad.length&&!confirm('Termes sensibles détectés : '+bad.join(', ')+'.\nRappel : pas d\'allégation de santé dans les messages. Enregistrer quand même ?'))return;
+  var P=CFG.params||{};P.messages=P.messages||{};
+  if(txt===MSG_DEFAULTS[key].t)delete P.messages[key];else P.messages[key]=txt;
+  CFG.params=P;oSaveCache();oPost_({op:'saveConfig',config:{params:P}});
+  oT('💾 Message enregistré — utilisé par toute l\'équipe','s');admMsgFill();
+}
+function admMsgReset(key){
+  key=key||ADM_MSG_KEY;if(!MSG_DEFAULTS[key])return;
+  if(admMsgIsCustom(key)&&!confirm('Revenir au texte d\'origine de « '+MSG_DEFAULTS[key].l+' » ?'))return;
+  var P=CFG.params||{};if(P.messages)delete P.messages[key];CFG.params=P;oSaveCache();oPost_({op:'saveConfig',config:{params:P}});
+  document.getElementById('adm-msg-key').value=key;admMsgFill();oT('Texte d\'origine rétabli','s');
+}
+// ── Admin : liens personnalisés (v3.14) ─────────────────────────────
+function admLpRender(list){
+  var box=document.getElementById('adm-lp-list');if(!box)return;
+  box.innerHTML=(list||[]).map(function(l,i){return'<div class="adm-row" data-lp="'+i+'" style="flex-wrap:wrap;gap:6px">'
+    +'<input class="lp-emoji" type="text" value="'+esc(l.emoji||'🔗')+'" maxlength="4" style="width:52px;text-align:center;border:1px solid var(--bd);border-radius:8px;padding:8px 4px;font-size:16px">'
+    +'<input class="lp-label" type="text" value="'+esc(l.label||'')+'" placeholder="Libellé" style="flex:1;min-width:130px;border:1px solid var(--bd);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px">'
+    +'<input class="lp-url" type="url" value="'+esc(l.url||'')+'" placeholder="https://…" style="flex:2;min-width:180px;border:1px solid var(--bd);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px">'
+    +'<select class="lp-roles" style="border:1px solid var(--bd);border-radius:8px;padding:8px;font-family:inherit;font-size:12px"><option value="all"'+(l.roles==='all'||!l.roles?' selected':'')+'>Tout le monde</option><option value="equipe"'+(l.roles==='equipe'?' selected':'')+'>Gestionnaires & admin</option><option value="admin"'+(l.roles==='admin'?' selected':'')+'>Admin seulement</option></select>'
+    +'<button class="ob bgh bsm" type="button" title="Monter" onclick="admLpMove('+i+',-1)">▲</button><button class="ob bgh bsm" type="button" title="Descendre" onclick="admLpMove('+i+',1)">▼</button><button class="ob bsm" type="button" style="background:var(--rdp);color:var(--rd);border:none" onclick="admLpDel('+i+')">🗑</button></div>';}).join('')||'<div style="font-size:12px;color:var(--t3)">Aucun lien personnalisé.</div>';
+}
+function admLpCollect(){return Array.from(document.querySelectorAll('#adm-lp-list [data-lp]')).map(function(r){return{emoji:r.querySelector('.lp-emoji').value.trim()||'🔗',label:r.querySelector('.lp-label').value.trim(),url:r.querySelector('.lp-url').value.trim(),roles:r.querySelector('.lp-roles').value};});}
+function admLpAdd(){var l=admLpCollect();l.push({emoji:'🔗',label:'',url:'',roles:'all'});admLpRender(l);var last=document.querySelector('#adm-lp-list [data-lp]:last-child .lp-label');if(last)last.focus();}
+function admLpDel(i){var l=admLpCollect();l.splice(i,1);admLpRender(l);}
+function admLpMove(i,d){var l=admLpCollect();var j=i+d;if(j<0||j>=l.length)return;var t=l[i];l[i]=l[j];l[j]=t;admLpRender(l);}
+
 function admSaveParams(){
   var P=CFG.params||{};
   var n=function(id){var v=+document.getElementById(id).value;return v>0?v:0;};
   var lines=function(id){return document.getElementById(id).value.split('\n').map(function(x){return x.trim();}).filter(Boolean);};
   if(ADM_TAB==='catalogue'){var pr=lines('adm-produits'),th=lines('adm-themes');if(!pr.length){oT('Il faut au moins un produit','w');return;}P.produits=pr;P.themes=th.length?th:THEMES;P.rangs={p2:n('adm-r-p2'),p3:n('adm-r-p3'),p4:n('adm-r-p4'),p5:n('adm-r-p5')};if(!(P.rangs.p2<P.rangs.p3&&P.rangs.p3<P.rangs.p4&&P.rangs.p4<P.rangs.p5)){oT('Les seuils de rang doivent être croissants','w');return;}}
   if(ADM_TAB==='relances'){P.relances={j1:n('adm-j1'),j2:n('adm-j2'),j3:n('adm-j3')};if(!(P.relances.j1<P.relances.j2&&P.relances.j2<P.relances.j3)){oT('Les rappels doivent être croissants (ex. 2, 5, 12)','w');return;}P.logistique=n('adm-logi');P.install=n('adm-inst');P.temoignage=n('adm-tem');P.protoPoints=[n('adm-pp1'),n('adm-pp2')];P.signature=document.getElementById('adm-sign').value.trim()||'OlyLife / WLHT';}
-  if(ADM_TAB==='liens'){P.liens={boffice:document.getElementById('adm-l-boffice').value.trim(),boly:document.getElementById('adm-l-boly').value.trim(),tunnels:document.getElementById('adm-l-tunnels').value.trim(),youtube:document.getElementById('adm-l-youtube').value.trim()};}
+  if(ADM_TAB==='liens'){P.liens={boffice:document.getElementById('adm-l-boffice').value.trim(),boly:document.getElementById('adm-l-boly').value.trim(),tunnels:document.getElementById('adm-l-tunnels').value.trim(),youtube:document.getElementById('adm-l-youtube').value.trim()};
+    var lp=admLpCollect().filter(function(l){return l.label||l.url;});for(var i=0;i<lp.length;i++){if(!lp[i].label||!/^https?:\/\//.test(lp[i].url)){oT('Lien '+(i+1)+' : libellé et adresse https:// obligatoires','w');return;}}P.liensPerso=lp;}
   CFG.params=P;applyParams();oSaveCache();
   oPost_({op:'saveConfig',config:{params:P}});
   oT('💾 Paramètres enregistrés','s');admRenderTab(ADM_TAB);
