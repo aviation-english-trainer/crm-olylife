@@ -143,6 +143,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--g);box-s
     <label>Votre question</label><textarea id="wq-msg" rows="3" placeholder="Ex. : comment se passe le paiement ? quel appareil choisir ?…"></textarea>
     <div class="err" id="wq-err"></div>
     <a class="btn wa" id="wa-go" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;text-decoration:none;margin-top:12px" onclick="return waGo()">💬 Ouvrir WhatsApp</a>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" type="button" id="tg-go" style="background:#229ED9;color:#fff;min-height:46px;padding:10px;font-size:14px" onclick="waAlt('tg')">✈️ Telegram</button>
+      <button class="btn" type="button" id="sms-go" style="background:#EEF3EF;color:var(--tx);min-height:46px;padding:10px;font-size:14px" onclick="waAlt('sms')">📱 SMS</button>
+    </div>
     <button class="btn" type="button" style="background:#EEF3EF;color:var(--t2);margin-top:8px;min-height:44px;padding:10px" onclick="waClose()">Fermer</button>
   </div>
 </div>
@@ -195,9 +199,19 @@ function waOpen(){
 }
 function waClose(){document.getElementById('wa-pop').classList.remove('on');}
 function waLink(){
-  var pr=v('wq-prenom'),nm=v('wq-nom'),tel=v('wq-tel'),em=v('wq-email'),q=v('wq-msg');
-  var txt='Bonjour '+(WA_SUPPORT.nom||'Jean-Charles')+' 👋\nJe suis '+[pr,nm].filter(Boolean).join(' ')+' (📞 '+tel+(em?' · ✉️ '+em:'')+').\nJe consulte le formulaire d\'inscription OlyLife'+(REF&&REF.nom?' transmis par '+REF.nom:'')+'.'+(q?'\n\nMa question : '+q:'\n\nJ\'aurais une question.');
+  var txt=waMsg();
   return 'https://wa.me/'+String(WA_SUPPORT.tel||'33651001085').replace(/\D/g,'')+'?text='+encodeURIComponent(txt);
+}
+function waMsg(){var pr=v('wq-prenom'),nm=v('wq-nom'),tel=v('wq-tel'),em=v('wq-email'),q=v('wq-msg');return'Bonjour '+(WA_SUPPORT.nom||'Jean-Charles')+' 👋\nJe suis '+[pr,nm].filter(Boolean).join(' ')+' (📞 '+tel+(em?' · ✉️ '+em:'')+').\nJe consulte le formulaire d\'inscription OlyLife'+(REF&&REF.nom?' transmis par '+REF.nom:'')+'.'+(q?'\n\nMa question : '+q:'\n\nJ\'aurais une question.');}
+function waAlt(canal){
+  var err=document.getElementById('wq-err');err.style.display='none';
+  if(!v('wq-prenom')||v('wq-tel').replace(/\D/g,'').length<8){err.textContent='Merci d\'indiquer au moins votre prénom et un numéro de téléphone.';err.style.display='block';return;}
+  var txt=waMsg(),num=String(WA_SUPPORT.tel||'33651001085').replace(/\D/g,'');
+  try{sessionStorage.setItem('wlht_ins',JSON.stringify({prenom:v('wq-prenom'),nom:v('wq-nom'),tel:v('wq-tel'),email:v('wq-email')}));}catch(e){}
+  if(canal==='sms'){location.href='sms:+'+num+'?&body='+encodeURIComponent(txt);setTimeout(waClose,400);return;}
+  var go=function(){window.open('https://t.me/+'+num,'_blank');setTimeout(waClose,400);};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(function(){alert('Votre message est copié : collez-le dans la conversation Telegram qui va s\'ouvrir.');go();},function(){prompt('Copiez ce message puis collez-le dans Telegram :',txt);go();});
+  else{prompt('Copiez ce message puis collez-le dans Telegram :',txt);go();}
 }
 function waGo(){
   var err=document.getElementById('wq-err');err.style.display='none';

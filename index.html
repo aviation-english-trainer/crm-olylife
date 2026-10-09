@@ -406,6 +406,12 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .rq-sugg button:last-child{border-bottom:none;}
 .rq-sugg button:hover{background:var(--navy3);}
 .rq-sugg small{display:block;color:var(--t3);font-size:11px;}
+.snd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+.snd-grid button,.snd-grid a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1px solid var(--bd);background:#fff;border-radius:14px;padding:12px 6px;font-family:inherit;font-size:12px;font-weight:600;color:var(--tx);cursor:pointer;text-decoration:none;min-height:70px;}
+.snd-grid button:hover,.snd-grid a:hover{background:var(--navy3);}
+.snd-grid .ic{font-size:24px;line-height:1;}
+.snd-grid .wa{background:#25D366;color:#fff;border-color:#25D366;grid-column:1/-1;flex-direction:row;font-size:14px;min-height:52px;}
+.snd-prev{font-size:12px;color:var(--t2);background:var(--navy3);border:1px solid var(--bd);border-radius:12px;padding:10px 12px;max-height:120px;overflow:auto;white-space:pre-wrap;line-height:1.5;margin-top:8px;}
 /* ── DEMANDES REÇUES / QR (v3.16) ─────────────────────────────────── */
 .ld-card{background:#fff;border:1px solid var(--bd);border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--sh);}
 .ld-card.done{opacity:.6;}
@@ -2026,6 +2032,8 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <div style="margin-top:16px;padding:12px;background:var(--navy3);border-radius:12px;border:1px solid var(--bd)">
       <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">🔐 Sécurité de cet appareil</div>
       <div id="oprof-pin-row" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px"></div>
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin:12px 0 6px">📨 Canal d'envoi des messages</div>
+      <select class="ofc" id="oprof-canal" onchange="sendPrefSet(this.value);oT(this.value?'Canal mémorisé':'L\'app demandera à chaque envoi','s')"><option value="">Me demander à chaque fois (WhatsApp, Telegram, Signal, SMS, e-mail, copier)</option><option value="wa">Toujours WhatsApp</option><option value="tg">Toujours Telegram</option><option value="signal">Toujours Signal</option><option value="sms">Toujours SMS</option><option value="copy">Toujours copier le message</option></select>
       <div style="font-size:12px;font-weight:700;color:var(--gold);margin:12px 0 6px">📲 Mon QR code d'inscription</div>
       <div style="font-size:12px;color:var(--t2);line-height:1.5;margin-bottom:8px">À imprimer, afficher ou envoyer : la personne remplit le formulaire d'inscription OlyLife sur son téléphone et sa demande arrive dans « Demandes reçues », rattachée à vous.</div>
       <button class="ob bgh bsm" type="button" onclick="oMyQr()">📲 Afficher mon QR code</button>
@@ -2237,7 +2245,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.16.2 · 09/10';
+var APP_VERSION='v3.17 · 09/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -5782,9 +5790,9 @@ function telE164(t){var n=String(t||'').replace(/[^\d+]/g,'');if(!n)return'';if(
 function oPrecSend(via){
   var cid=val('oprec-cid'),c=OC.find(function(x){return x.id===cid;});if(!c)return;
   var msg=val('oprec-msg'),num=telE164(c.tel);
-  if(via==='wa'){if(c.tel)window.open(mkWA(c.tel,msg),'_blank');else{navigator.clipboard&&navigator.clipboard.writeText(msg);oT('Pas de téléphone — message copié','w');}}
-  else if(via==='signal'){navigator.clipboard&&navigator.clipboard.writeText(msg);oT('📋 Copié — collez dans Signal','s');if(num)window.open('https://signal.me/#p/'+num,'_blank');}
-  else if(via==='tg'){navigator.clipboard&&navigator.clipboard.writeText(msg);window.open('https://t.me/share/url?url='+encodeURIComponent(' ')+'&text='+encodeURIComponent(msg),'_blank');}
+  var n=num.replace(/\D/g,'');
+  if(via==='wa'){if(c.tel)window.open(mkWA(c.tel,msg),'_blank');else{sendCopy(msg,'Pas de téléphone — message copié');}}
+  else if(via==='signal'||via==='tg'){sendVia(via,n,msg,c.email);}
   oPrecMark();
 }
 
@@ -6012,6 +6020,51 @@ function accHtml(c){
   rows+='<div class="acc-row"><span class="em">🎙</span><div class="b" style="color:var(--t3)">'+(tems.length?'':'Aucun témoignage recueilli pour l\'instant. ')+(sim.length?'<b style="color:var(--tx)">'+sim.length+' témoignage'+(sim.length>1?'s':'')+' publié'+(sim.length>1?'s':'')+'</b> d\'autres membres sur le même appareil — utile pour un prospect.':'')+'</div><div class="acts"><button class="ob bgh bsm" onclick="oTemOpen(\''+c.id+'\')">➕ Témoignage</button>'+(sim.length?'<button class="ob bgh bsm" onclick="TEM_F={type:\'\',app:\''+esc((c.produits||[])[0]||'')+'\',theme:\'\',statut:\'publie\'};oClose();oSw(\'temoignages\')">👀 Voir</button>':'')+'</div></div>';
   return'<div class="od-section"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">🌿 Accompagnement — précautions · fiche conseils · témoignage</div><div class="od-bd">'+rows+'</div></div>';
 }
+
+// ── ENVOI MULTI-CANAL (v3.17) : WhatsApp · Telegram · Signal · SMS · e-mail · copier · partager ──
+var SEND_DIRECT=false;
+function sendPref(){try{return localStorage.getItem('owlht2_canal')||'';}catch(e){return'';}}
+function sendPrefSet(v){try{if(v)localStorage.setItem('owlht2_canal',v);else localStorage.removeItem('owlht2_canal');}catch(e){}}
+function sendParse(u){var m=String(u||'').match(/^https:\/\/wa\.me\/(\d*)\?text=(.*)$/);if(!m)return null;var t='';try{t=decodeURIComponent(m[2]);}catch(e){t=m[2];}return{num:m[1],text:t};}
+function sendOpen(url){SEND_DIRECT=true;try{window.open(url,'_blank');}finally{setTimeout(function(){SEND_DIRECT=false;},50);}}
+function sendCopy(t,msg){var done=function(){oT(msg||'📋 Message copié','s');};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){prompt('Message :',t);});else prompt('Message :',t);}
+function sendVia(canal,num,text,email){
+  var plus=num?'+'+num:'';
+  if(canal==='wa'){sendOpen('https://wa.me/'+num+'?text='+encodeURIComponent(text));}
+  else if(canal==='tg'){sendCopy(text,'📋 Message copié — collez-le dans Telegram');sendOpen(num?'https://t.me/'+plus:'https://t.me/share/url?url='+encodeURIComponent(' ')+'&text='+encodeURIComponent(text));}
+  else if(canal==='signal'){sendCopy(text,'📋 Message copié — collez-le dans Signal');if(num)sendOpen('https://signal.me/#p/'+plus);}
+  else if(canal==='sms'){location.href='sms:'+plus+'?&body='+encodeURIComponent(text);}
+  else if(canal==='mail'){location.href='mailto:'+(email||'')+'?subject='+encodeURIComponent('OlyLife — Water Life High Tech')+'&body='+encodeURIComponent(text);}
+  else if(canal==='copy'){sendCopy(text);}
+  else if(canal==='share'){if(navigator.share)navigator.share({text:text}).catch(function(){});else sendCopy(text);}
+}
+function oSendSheet(url){
+  var p=sendParse(url);if(!p){sendOpen(url);return;}
+  var pref=sendPref();if(pref){sendVia(pref,p.num,p.text,sendEmailFor(p.num));return;}
+  var email=sendEmailFor(p.num);
+  var old=document.getElementById('osend');if(old)old.remove();
+  var m=document.createElement('div');m.id='osend';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
+  var B=function(c,ic,l,cls){return'<button type="button" class="'+(cls||'')+'" onclick="sendGo(\''+c+'\')"><span class="ic">'+ic+'</span>'+l+'</button>';};
+  m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:520px;max-height:88vh;overflow:auto">'
+    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">Envoyer le message</b><span style="font-size:12px;color:var(--t3)">'+(p.num?'→ +'+esc(p.num):'')+'</span><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'osend\').remove()">✕</button></div>'
+    +'<div class="snd-prev">'+esc(p.text)+'</div>'
+    +'<div class="snd-grid">'+B('wa','💬','WhatsApp','wa')+B('tg','✈️','Telegram')+B('signal','🔒','Signal')+B('sms','📱','SMS')+B('mail','✉️',email?'E-mail':'E-mail (sans adresse)')+B('copy','📋','Copier')+(navigator.share?B('share','📤','Partager…'):'')+'</div>'
+    +'<label class="ochk-row" style="margin-top:12px;font-size:12px"><input type="checkbox" id="snd-remember"><span>Toujours utiliser ce canal sans me demander (modifiable dans Mon profil)</span></label>'
+    +'<div style="font-size:11px;color:var(--t3);margin-top:6px">Telegram et Signal n\'acceptent pas de message pré-rempli vers un numéro : le texte est copié, il suffit de le coller dans la conversation.</div></div>';
+  m._p=p;m._email=email;document.body.appendChild(m);
+}
+function sendGo(canal){var m=document.getElementById('osend');if(!m)return;var p=m._p,email=m._email;var rem=document.getElementById('snd-remember');if(rem&&rem.checked)sendPrefSet(canal);m.remove();sendVia(canal,p.num,p.text,email);}
+function sendEmailFor(num){if(!num)return'';var t9=String(num).slice(-9);var c=OC.find(function(x){return x.tel&&tel9(x.tel)===t9&&x.email;});if(c)return c.email;var u=USERS.find(function(x){return x.tel&&tel9(x.tel)===t9&&x.email;});return u?u.email:'';}
+// interception : window.open(...) vers wa.me avec texte, et liens <a href="https://wa.me/…?text=…">
+(function(){
+  var _open=window.open;
+  window.open=function(u,t,f){if(!SEND_DIRECT&&typeof u==='string'&&sendParse(u)){oSendSheet(u);return null;}return _open.apply(window,arguments);};
+  document.addEventListener('click',function(e){
+    var a=e.target&&e.target.closest?e.target.closest('a[href^="https://wa.me/"]'):null;
+    if(!a||SEND_DIRECT)return;var p=sendParse(a.getAttribute('href'));if(!p)return;
+    e.preventDefault();oSendSheet(a.getAttribute('href'));
+  },true);
+})();
 
 // ── DEMANDES REÇUES (QR) & QR CODES (v3.16) ─────────────────────────
 var LEADS=[],LEADS_NEW=0,LEADS_LOADED=false;
@@ -6418,6 +6471,7 @@ function oProfOpen(){
     :'Pour changer votre nom affiché ou votre rôle, demandez à l\'administrateur (onglet Équipe).';
   var pr=document.getElementById('oprof-pin-row');if(pr)pr.innerHTML=pinStored()?'<span>🔒 Verrou PIN actif à l\'ouverture</span><button class="ob bgh bsm" type="button" onclick="oPinSet()">Changer</button><button class="ob bgh bsm" type="button" onclick="oPinRemove()">Retirer</button>':'<span>Pas de verrou PIN — conseillé si votre téléphone n\'est pas verrouillé</span><button class="ob bgh bsm" type="button" onclick="oPinSet()">🔒 Activer un PIN</button>';
   oSessList('', 'oprof-sess');
+  var pc=document.getElementById('oprof-canal');if(pc)pc.value=sendPref();
   oSheetOpen('oprof');
 }
 function oProfClose(){oSheetClose('oprof');}
