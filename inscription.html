@@ -38,6 +38,23 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--g);box-s
 .foot{text-align:center;font-size:11px;color:var(--t3);margin:16px 0 0;line-height:1.5}
 .hp{position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden}
 #fact{display:none}
+/* bouton WhatsApp animé + popup « Une question ? » */
+.wa-fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:900;display:flex;align-items:center;gap:10px;text-decoration:none}
+.wa-fab .bub{background:#fff;color:var(--tx);border:1px solid var(--bd);border-radius:14px;padding:8px 12px;font-size:12.5px;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,.14);opacity:0;transform:translateX(8px);transition:all .4s;pointer-events:none}
+.wa-fab.show .bub{opacity:1;transform:none}
+.wa-fab .btn-wa{width:60px;height:60px;border-radius:50%;background:#25D366;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 22px rgba(37,211,102,.45);animation:wapulse 2.2s infinite;padding:0}
+.wa-fab .btn-wa svg{width:34px;height:34px;fill:#fff;animation:wawiggle 2.2s infinite}
+@keyframes wapulse{0%{box-shadow:0 0 0 0 rgba(37,211,102,.55),0 8px 22px rgba(37,211,102,.45)}70%{box-shadow:0 0 0 20px rgba(37,211,102,0),0 8px 22px rgba(37,211,102,.45)}100%{box-shadow:0 0 0 0 rgba(37,211,102,0),0 8px 22px rgba(37,211,102,.45)}}
+@keyframes wawiggle{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(-12deg)}90%{transform:rotate(10deg)}95%{transform:rotate(-6deg)}}
+@media (prefers-reduced-motion:reduce){.wa-fab .btn-wa,.wa-fab .btn-wa svg{animation:none}}
+.wa-pop{position:fixed;inset:0;z-index:950;background:rgba(10,47,28,.55);display:none;align-items:flex-end;justify-content:center;padding:0}
+.wa-pop.on{display:flex}
+.wa-card{background:#fff;width:100%;max-width:520px;border-radius:20px 20px 0 0;padding:18px 18px calc(22px + env(safe-area-inset-bottom,0px));max-height:92vh;overflow:auto;animation:up .25s ease}
+@keyframes up{from{transform:translateY(30px);opacity:.5}to{transform:none;opacity:1}}
+@media (min-width:640px){.wa-pop{align-items:center;padding:20px}.wa-card{border-radius:20px}}
+.wa-card h3{margin:0 0 4px;font-size:17px;display:block}
+.wa-card .who{font-size:12.5px;color:var(--t2);margin:0 0 6px}
+.wa-card .pre{font-size:12px;color:var(--g);background:#EAF6EE;border-radius:10px;padding:8px 10px;margin:8px 0 0;display:none}
 </style>
 </head>
 <body>
@@ -109,13 +126,34 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--g);box-s
     <p class="hint" style="font-size:14px">Ce lien d'inscription n'est pas valide ou n'est plus actif. Demandez un nouveau QR code à la personne qui vous l'a transmis.</p>
   </div>
 </div>
+<a class="wa-fab" id="wa-fab" href="#" onclick="waOpen();return false" aria-label="Poser une question sur WhatsApp"><span class="bub">Une question ? 💬</span><span class="btn-wa"><svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4zM12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2z"/></svg></span></a>
+<div class="wa-pop" id="wa-pop" onclick="if(event.target===this)waClose()">
+  <div class="wa-card">
+    <h3>💬 Une question ? Écrivez à <span id="wa-nom">Jean-Charles</span></h3>
+    <p class="who">Président de Water Life High Tech — réponse directement sur WhatsApp. Vos coordonnées servent uniquement à vous répondre.</p>
+    <div class="pre" id="wa-pre">✅ Coordonnées reprises du formulaire — rien à ressaisir.</div>
+    <div class="row">
+      <div><label>Prénom <b>*</b></label><input id="wq-prenom" placeholder="Marie"></div>
+      <div><label>Téléphone <b>*</b></label><input id="wq-tel" type="tel" placeholder="+33 6 …"></div>
+    </div>
+    <div class="row">
+      <div><label>Nom (facultatif)</label><input id="wq-nom" placeholder="DUPONT"></div>
+      <div><label>E-mail (facultatif)</label><input id="wq-email" type="email" placeholder="vous@email.com"></div>
+    </div>
+    <label>Votre question</label><textarea id="wq-msg" rows="3" placeholder="Ex. : comment se passe le paiement ? quel appareil choisir ?…"></textarea>
+    <div class="err" id="wq-err"></div>
+    <a class="btn wa" id="wa-go" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;text-decoration:none;margin-top:12px" onclick="return waGo()">💬 Ouvrir WhatsApp</a>
+    <button class="btn" type="button" style="background:#EEF3EF;color:var(--t2);margin-top:8px;min-height:44px;padding:10px" onclick="waClose()">Fermer</button>
+  </div>
+</div>
 <script>
+var WA_SUPPORT={tel:'33651001085',nom:'Jean-Charles'};   // assistance WhatsApp (modifiable dans le CRM → Administration → Liens)
 var GAS='https://script.google.com/macros/s/AKfycbzHmK4tcWPRr1G-4_f5yTkEPg3uTNTnrloEC8Y3-sZLcOoHTCRGQ9-Gv-FaZ4B4Kxjs/exec';
 var R=(new URLSearchParams(location.search).get('r')||'').trim(),REF=null;
 function post(o){o.r=R;return fetch(GAS,{method:'POST',body:JSON.stringify(o)}).then(function(r){return r.text();}).then(function(t){try{return JSON.parse(t);}catch(e){return{ok:false,error:'reponse'};}});}
 function showBad(){document.getElementById('f').style.display='none';document.getElementById('bad').style.display='block';document.getElementById('by').textContent='Lien invalide';}
 if(!R){showBad();}
-else post({op:'leadInfo'}).then(function(d){if(!d.ok){showBad();return;}REF=d;document.getElementById('by').textContent='Transmis par '+d.nom+(d.role==='admin'?' — Water Life High Tech':'');}).catch(function(){document.getElementById('by').textContent='Water Life High Tech';});
+else post({op:'leadInfo'}).then(function(d){if(!d.ok){showBad();return;}REF=d;document.getElementById('by').textContent='Transmis par '+d.nom+(d.role==='admin'?' — Water Life High Tech':'');if(d.support&&d.support.tel){WA_SUPPORT=d.support;document.getElementById('wa-nom').textContent=d.support.nom||'Jean-Charles';}}).catch(function(){document.getElementById('by').textContent='Water Life High Tech';});
 function v(id){return (document.getElementById(id).value||'').trim();}
 document.getElementById('f').addEventListener('submit',function(e){
   e.preventDefault();var err=document.getElementById('err');err.style.display='none';
@@ -133,12 +171,41 @@ document.getElementById('f').addEventListener('submit',function(e){
   if(document.getElementById('factDiff').checked){o.factAdresse=v('factAdresse');o.factCp=v('factCp');o.factVille=v('factVille');o.factPays=v('factPays');}
   post(o).then(function(d){
     if(!d.ok){btn.disabled=false;btn.textContent='Envoyer mes informations';err.textContent=d.error==='trop'?'Trop de demandes pour l\'instant — réessayez dans une heure.':d.error==='lien'?'Ce lien n\'est plus valide.':'Envoi impossible pour le moment ('+(d.error||'?')+'). Réessayez ou contactez votre référent.';err.style.display='block';return;}
+    try{sessionStorage.setItem('wlht_ins',JSON.stringify({prenom:v('prenom'),nom:v('nom'),tel:v('tel'),email:v('email')}));}catch(e){}
     document.getElementById('f').style.display='none';var ok=document.getElementById('ok');ok.style.display='block';
     document.getElementById('ok-nom').textContent=v('prenom').split(' ')[0];document.getElementById('ok-ref').textContent=d.referent||(REF&&REF.nom)||'votre référent';
     if(REF&&REF.tel){var wa=document.getElementById('ok-wa');wa.href='https://wa.me/'+REF.tel.replace(/\D/g,'')+'?text='+encodeURIComponent('Bonjour '+REF.nom.split(' ')[0]+', je viens de remplir le formulaire d\'inscription OlyLife 🌿');wa.style.display='flex';}
     window.scrollTo(0,0);
   }).catch(function(){btn.disabled=false;btn.textContent='Envoyer mes informations';err.textContent='Connexion impossible. Vérifiez votre réseau et réessayez.';err.style.display='block';});
 });
+// ── Popup WhatsApp « Une question ? » ──
+setTimeout(function(){document.getElementById('wa-fab').classList.add('show');},2500);
+setTimeout(function(){document.getElementById('wa-fab').classList.remove('show');},12000);
+function waKnown(){
+  var k={prenom:v('prenom'),nom:v('nom'),tel:v('tel'),email:v('email')};
+  if(!k.prenom&&!k.tel){try{var s=JSON.parse(sessionStorage.getItem('wlht_ins')||'null');if(s)k=s;}catch(e){}}
+  return k;
+}
+function waOpen(){
+  var k=waKnown(),pre=document.getElementById('wa-pre');
+  [['wq-prenom',k.prenom],['wq-nom',k.nom],['wq-tel',k.tel],['wq-email',k.email]].forEach(function(p){var el=document.getElementById(p[0]);if(!el.value&&p[1])el.value=p[1];});
+  pre.style.display=(k.prenom&&k.tel)?'block':'none';
+  document.getElementById('wa-pop').classList.add('on');
+  setTimeout(function(){var f=(k.prenom&&k.tel)?'wq-msg':(k.prenom?'wq-tel':'wq-prenom');document.getElementById(f).focus();},150);
+}
+function waClose(){document.getElementById('wa-pop').classList.remove('on');}
+function waLink(){
+  var pr=v('wq-prenom'),nm=v('wq-nom'),tel=v('wq-tel'),em=v('wq-email'),q=v('wq-msg');
+  var txt='Bonjour '+(WA_SUPPORT.nom||'Jean-Charles')+' 👋\nJe suis '+[pr,nm].filter(Boolean).join(' ')+' (📞 '+tel+(em?' · ✉️ '+em:'')+').\nJe consulte le formulaire d\'inscription OlyLife'+(REF&&REF.nom?' transmis par '+REF.nom:'')+'.'+(q?'\n\nMa question : '+q:'\n\nJ\'aurais une question.');
+  return 'https://wa.me/'+String(WA_SUPPORT.tel||'33651001085').replace(/\D/g,'')+'?text='+encodeURIComponent(txt);
+}
+function waGo(){
+  var err=document.getElementById('wq-err');err.style.display='none';
+  if(!v('wq-prenom')||v('wq-tel').replace(/\D/g,'').length<8){err.textContent='Merci d\'indiquer au moins votre prénom et un numéro de téléphone.';err.style.display='block';return false;}
+  var a=document.getElementById('wa-go');a.href=waLink();
+  try{sessionStorage.setItem('wlht_ins',JSON.stringify({prenom:v('wq-prenom'),nom:v('wq-nom'),tel:v('wq-tel'),email:v('wq-email')}));}catch(e){}
+  setTimeout(waClose,400);return true;
+}
 </script>
 </body>
 </html>
