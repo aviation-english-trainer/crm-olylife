@@ -2249,7 +2249,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.18.2 · 10/10';
+var APP_VERSION='v3.18.3 · 10/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -3877,7 +3877,7 @@ function oBuildProductGrid(){
   var g=document.getElementById('opg');
   g.innerHTML=PRODUCTS.map(function(p){return'<label class="oprd" onclick="oTP(this)"><input type="checkbox" value="'+p+'"> '+p+'</label>';}).join('');
 }
-function oTP(lbl){lbl.classList.toggle('on',lbl.querySelector('input').checked);}
+function oTP(lbl){setTimeout(function(){lbl.classList.toggle('on',lbl.querySelector('input').checked);},0);}
 function oTEQ(){document.getElementById('feq-wrap').style.display=document.getElementById('fe-partenaire').checked?'flex':'none';}
 
 // ── FICHE MODAL ──────────────────────────────────────────────────────
@@ -4035,7 +4035,7 @@ function oEdit(id){
   var rh=document.getElementById('fo-rang-hint');if(rh){var est=rangFromUSD(c.achatsUSD||c.montantUSD);rh.textContent=est?'— estimé d\'après '+(c.achatsUSD||c.montantUSD)+' USD d\'achats : '+est:'';if(est&&!c.rangOly)document.getElementById('fo-rang').value=est;}
   oSetFact(!!(c.factAdresse||c.factCp||c.factVille||c.factPays));
   oTEQ();
-  document.querySelectorAll('.oprd').forEach(function(p){var cb=p.querySelector('input');cb.checked=(c.produits||[]).indexOf(cb.value)>=0;p.classList.toggle('on',cb.checked);});
+  document.querySelectorAll('#opg .oprd').forEach(function(p){var cb=p.querySelector('input');cb.checked=(c.produits||[]).indexOf(cb.value)>=0;p.classList.toggle('on',cb.checked);});
   oSw('nouvelle',4);document.getElementById('ocont').scrollTop=0;
 }
 function oReset(){
@@ -4052,7 +4052,7 @@ function oReset(){
   document.getElementById('fo-essai').checked=false;document.getElementById('fo-rang').value='';var rh0=document.getElementById('fo-rang-hint');if(rh0)rh0.textContent='';
   oSetFact(false);
   oTEQ();
-  document.querySelectorAll('.oprd').forEach(function(p){p.classList.remove('on');p.querySelector('input').checked=false;});
+  document.querySelectorAll('#opg .oprd').forEach(function(p){p.classList.remove('on');p.querySelector('input').checked=false;});
   document.getElementById('offttl').textContent='Nouveau contact';
   document.getElementById('obtn-save').textContent='Enregistrer la fiche';
 }
