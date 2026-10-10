@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Découvrir OlyLife — Water Life High Tech</title>
+<link rel="icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Cormorant+Garamond:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--g:#126A3C;--g2:#0F3B22;--gold:#C9A84C;--bg:#F3F8F4;--bd:#D7E6DB;--tx:#20362A;--t2:#5A6E61;--t3:#7F9186;--rd:#C63E47;}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:Outfit,system-ui,sans-serif;-webkit-text-size-adjust:100%}
+.hd{background:linear-gradient(160deg,#0F3B22,#1E6B3A);color:#fff;padding:22px 18px 26px;text-align:center}
+.hd h1{font-family:'Cormorant Garamond',serif;font-size:27px;margin:6px 0 2px;font-weight:700}
+.hd p{margin:0;font-size:13px;opacity:.85}
+.hd .by{display:inline-block;margin-top:10px;background:rgba(255,255,255,.14);border-radius:20px;padding:6px 12px;font-size:12.5px}
+.wrap{max-width:560px;margin:-14px auto 40px;padding:0 14px}
+.card{background:#fff;border:1px solid var(--bd);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 6px 20px rgba(18,106,60,.06)}
+.card h2{font-size:14px;margin:0 0 10px;color:var(--g);display:flex;align-items:center;gap:8px}
+.card h2 .n{width:22px;height:22px;border-radius:50%;background:var(--g);color:#fff;font-size:12px;display:inline-flex;align-items:center;justify-content:center}
+.hint{font-size:12.5px;color:var(--t2);line-height:1.55;margin:0 0 10px}
+label{display:block;font-size:11.5px;font-weight:700;color:var(--t2);margin:10px 0 4px;letter-spacing:.2px}
+label b{color:var(--rd)}
+input,textarea{width:100%;border:1.5px solid var(--bd);border-radius:12px;padding:12px;font:inherit;font-size:16px;background:#fff;color:var(--tx);min-height:48px}
+input:focus,textarea:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 3px rgba(18,106,60,.12)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.chips label{margin:0;display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--bd);border-radius:22px;padding:10px 14px;font-size:14px;font-weight:600;color:var(--tx);cursor:pointer;background:#fff;min-height:44px;user-select:none}
+.chips label.on{border-color:var(--g);background:#EAF6EE;color:var(--g)}
+.chips input{width:18px;height:18px;min-height:0;margin:0}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;margin-top:12px}
+.chk input{width:22px;height:22px;min-height:0;margin:1px 0 0;flex-shrink:0}
+.btn{width:100%;border:none;border-radius:14px;background:linear-gradient(120deg,#C9A84C,#B38F35);color:#1E2B10;font:inherit;font-weight:700;font-size:16px;padding:16px;cursor:pointer;margin-top:6px;min-height:54px}
+.btn:disabled{opacity:.6}
+.btn.wa{background:#25D366;color:#fff}
+.err{display:none;background:#FBEBEC;color:#8E2A31;border:1px solid #F0C4C8;border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px}
+.ok{display:none;text-align:center;padding:10px 0}
+.ok .big{font-size:52px}
+.ok h2{display:block;font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--g);margin:6px 0}
+.foot{text-align:center;font-size:11px;color:var(--t3);margin:16px 0 0;line-height:1.5}
+.hp{position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden}
+.note{background:#FBF6E9;border:1px solid #EBDDB0;border-radius:12px;padding:10px 12px;font-size:12.5px;line-height:1.5;color:#6F5A1C;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="hd">
+  <img src="icon-192.png" alt="" style="width:54px;height:54px;border-radius:14px;background:#fff;padding:4px">
+  <h1>Découvrir OlyLife</h1>
+  <p>Water Life High Tech — dites-nous ce qui vous intéresse</p>
+  <div class="by" id="by">Chargement…</div>
+</div>
+<div class="wrap">
+  <form id="f" class="card" novalidate autocomplete="on">
+    <p class="hint">Une minute suffit : indiquez votre prénom, votre WhatsApp et ce que vous aimeriez découvrir. <b id="who-txt">Votre référent</b> vous envoie ensuite les bonnes pages — la technologie des appareils, l'association, les rapports de test — <b>sans aucun engagement</b>.</p>
+    <input class="hp" type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+
+    <h2><span class="n">1</span>Vous</h2>
+    <div class="row">
+      <div><label>Prénom <b>*</b></label><input id="prenom" name="given-name" autocomplete="given-name" placeholder="Marie" required></div>
+      <div><label>Nom (facultatif)</label><input id="nom" name="family-name" autocomplete="family-name" placeholder="DUPONT"></div>
+    </div>
+    <label>Téléphone / WhatsApp <b>*</b></label><input id="tel" type="tel" autocomplete="tel" placeholder="+33 6 12 34 56 78" required>
+    <label>E-mail (facultatif)</label><input id="email" type="email" autocomplete="email" placeholder="vous@email.com">
+
+    <h2 style="margin-top:16px"><span class="n">2</span>Ce qui vous intéresse <span style="font-weight:500;color:var(--t3);font-size:12px">— plusieurs choix possibles</span></h2>
+    <div class="chips" id="chips">
+      <label><input type="checkbox" value="Tera-P90+"> 🦶 Tera-P90+ (la pédale)</label>
+      <label><input type="checkbox" value="Galaxy G-One"> 😌 Galaxy G-One (masque oculaire)</label>
+      <label><input type="checkbox" value="Vitality Wand"> ✨ Vitality Wand (baguette)</label>
+      <label><input type="checkbox" value="Shaken Massager"> 💆 Shaken Massager</label>
+      <label><input type="checkbox" value="La technologie"> 🔬 La technologie (PEMF, térahertz, lumière)</label>
+      <label><input type="checkbox" value="L'association / l'opportunité"> 🌿 L'association et l'opportunité</label>
+      <label><input type="checkbox" value="Je ne sais pas encore"> 🤔 Je ne sais pas encore</label>
+    </div>
+
+    <label style="margin-top:14px">Un mot sur votre situation ou votre question (facultatif)</label><textarea id="message" rows="2" placeholder="Ex. : je suis kiné, je cherche à comprendre le térahertz…"></textarea>
+
+    <label class="chk"><input type="checkbox" id="consent"><span>J'accepte que ces informations soient transmises à mon référent Water Life High Tech pour qu'il me contacte et m'envoie de la documentation. Je peux en demander la suppression à tout moment. <b>*</b></span></label>
+
+    <div class="note">ℹ️ Les appareils OlyLife sont des appareils de bien-être, pas des dispositifs médicaux. La documentation que vous recevrez n'a pas vocation à remplacer un avis médical.</div>
+
+    <div class="err" id="err"></div>
+    <button class="btn" id="go" type="submit">Recevoir les informations</button>
+    <p class="foot">🔒 Transmission sécurisée (HTTPS). Aucune donnée n'est publiée ni partagée avec des tiers.</p>
+  </form>
+
+  <div class="card ok" id="ok">
+    <div class="big">🌱</div>
+    <h2>Merci, <span id="ok-nom"></span> !</h2>
+    <p class="hint" style="font-size:14px"><b id="ok-ref"></b> a bien reçu votre demande et vous envoie les informations sur WhatsApp très prochainement.</p>
+    <a class="btn wa" id="ok-wa" style="display:none;text-decoration:none;align-items:center;justify-content:center" target="_blank">💬 Lui écrire dès maintenant</a>
+    <p class="foot">Water Life High Tech — Groupe d'entraide et de partage pour une énergie de vie augmentée</p>
+  </div>
+  <div class="card" id="bad" style="display:none;text-align:center">
+    <div style="font-size:40px">🔗</div>
+    <p class="hint" style="font-size:14px">Ce lien n'est pas valide ou n'est plus actif. Demandez un nouveau lien à la personne qui vous l'a transmis.</p>
+  </div>
+</div>
+<script>
+var GAS='https://script.google.com/macros/s/AKfycbzHmK4tcWPRr1G-4_f5yTkEPg3uTNTnrloEC8Y3-sZLcOoHTCRGQ9-Gv-FaZ4B4Kxjs/exec';
+var Q=new URLSearchParams(location.search),R=(Q.get('r')||'').trim(),REF=null;
+function post(o){o.r=R;return fetch(GAS,{method:'POST',body:JSON.stringify(o)}).then(function(r){return r.text();}).then(function(t){try{return JSON.parse(t);}catch(e){return{ok:false,error:'reponse'};}});}
+function showBad(){document.getElementById('f').style.display='none';document.getElementById('bad').style.display='block';document.getElementById('by').textContent='Lien invalide';}
+if(!R){showBad();}
+else post({op:'leadInfo'}).then(function(d){if(!d.ok){showBad();return;}REF=d;document.getElementById('by').textContent='Transmis par '+d.nom+(d.role==='admin'?' — Water Life High Tech':'');document.getElementById('who-txt').textContent=d.nom;}).catch(function(){document.getElementById('by').textContent='Water Life High Tech';});
+// pré-remplissage éventuel (?p=Prénom&i=Tera-P90+,Galaxy)
+(function(){var p=Q.get('p');if(p)document.getElementById('prenom').value=p;var i=(Q.get('i')||'').split(',');document.querySelectorAll('#chips input').forEach(function(cb){if(i.indexOf(cb.value)>=0){cb.checked=true;cb.parentNode.classList.add('on');}});})();
+document.querySelectorAll('#chips input').forEach(function(cb){cb.addEventListener('change',function(){cb.parentNode.classList.toggle('on',cb.checked);});});
+function v(id){return (document.getElementById(id).value||'').trim();}
+function interets(){var l=[];document.querySelectorAll('#chips input:checked').forEach(function(cb){l.push(cb.value);});return l;}
+document.getElementById('f').addEventListener('submit',function(e){
+  e.preventDefault();var err=document.getElementById('err');err.style.display='none';
+  var msg='';
+  if(!v('prenom')||!v('tel'))msg='Merci d\'indiquer au moins votre prénom et votre numéro WhatsApp.';
+  else if(v('tel').replace(/\D/g,'').length<8)msg='Le numéro de téléphone semble incomplet.';
+  else if(v('email')&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('email')))msg='L\'adresse e-mail ne semble pas valide.';
+  else if(!interets().length)msg='Cochez au moins un centre d\'intérêt (« Je ne sais pas encore » convient très bien).';
+  else if(!document.getElementById('consent').checked)msg='Merci de cocher la case de consentement.';
+  if(msg){err.textContent=msg;err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  var btn=document.getElementById('go');btn.disabled=true;btn.textContent='Envoi en cours…';
+  var o={op:'lead',type:'decouverte',website:v('website'),nom:v('nom'),prenom:v('prenom'),tel:v('tel'),email:v('email'),interets:interets(),message:v('message'),consent:true,lang:'fr'};
+  post(o).then(function(d){
+    if(!d.ok){btn.disabled=false;btn.textContent='Recevoir les informations';err.textContent=d.error==='trop'?'Trop de demandes pour l\'instant — réessayez dans une heure.':d.error==='lien'?'Ce lien n\'est plus valide.':d.error==='champs'?'Le lien utilisé attend une version plus récente du service — contactez votre référent.':'Envoi impossible pour le moment ('+(d.error||'?')+'). Réessayez ou contactez votre référent.';err.style.display='block';return;}
+    document.getElementById('f').style.display='none';var ok=document.getElementById('ok');ok.style.display='block';
+    document.getElementById('ok-nom').textContent=v('prenom').split(' ')[0];document.getElementById('ok-ref').textContent=d.referent||(REF&&REF.nom)||'Votre référent';
+    if(REF&&REF.tel){var wa=document.getElementById('ok-wa');wa.href='https://wa.me/'+REF.tel.replace(/\D/g,'')+'?text='+encodeURIComponent('Bonjour '+REF.nom.split(' ')[0]+', je viens de remplir le formulaire découverte OlyLife 🌿 ('+interets().join(', ')+')');wa.style.display='flex';}
+    window.scrollTo(0,0);
+  }).catch(function(){btn.disabled=false;btn.textContent='Recevoir les informations';err.textContent='Connexion impossible. Vérifiez votre réseau et réessayez.';err.style.display='block';});
+});
+</script>
+</body>
+</html>
