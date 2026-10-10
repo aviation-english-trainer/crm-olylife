@@ -2249,7 +2249,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.18.1 · 09/10';
+var APP_VERSION='v3.18.2 · 10/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -4120,7 +4120,69 @@ function oOpenImport(){
 }
 function oCloseImport(){oSheetClose('oimp');}
 
-function normPhone(p){return(p||'').replace(/[\s().\u00A0-]/g,'');}
+function normPhone(p){return(p||'').replace(/\(0\)/g,'').replace(/[\s().\u00A0-]/g,'');}
+
+// Carte de visite : un seul contact étalé sur plusieurs lignes (nom, société, adresse, tél, email, sites)
+function looksCard(text){
+  var lines=text.split(/\n/).map(function(l){return l.trim();}).filter(Boolean);
+  if(lines.length<3||lines.length>25)return false;
+  var emails=(text.match(/[\w.+-]+@[\w-]+\.[\w.-]+/g)||[]);
+  var phones=(text.match(/(?:\+\d[\d\s(). -]{6,}\d|\b0[1-9][\d\s.-]{7,}\d)/g)||[]);
+  if(emails.length>2||phones.length>2)return false;
+  if(!emails.length&&!phones.length)return false;
+  var s=0;
+  if(/\b(rue|avenue|boulevard|impasse|all[ée]e|chemin|route|place|street|road)\b/i.test(text))s++;
+  if(/\b\d{4,5}\s*[-–]?\s*[A-ZÀ-Ý]/.test(text))s++;
+  if(/\b(FRANCE|BELGIQUE|SUISSE|MAROC|CANADA|ALLEMAGNE|ESPAGNE|ITALIE)\b/i.test(text))s++;
+  if(/\b(cedex|c[ée]dex)\b/i.test(text))s++;
+  if(/\bCS\s+\d{3,}\b/i.test(text))s++;
+  if(/\b(Sarl|SAS|SARL|SA|SCI|EURL|SASU|GmbH|Ltd|LLC|Inc)\b/.test(text))s++;
+  if(/\b(Dr|Pr|Me|Mme|Mr|M\.)\b/.test(text))s++;
+  if(/\b(courriel|e-?mail|sites?\s*[:：])\b/i.test(text))s++;
+  if(/\bt[ée]l(?:[ée]phone)?\s*[:：]/i.test(text))s++;
+  return s>=3;
+}
+function parseCard(text){
+  var lines=text.split(/\n/).map(function(l){return l.trim();}).filter(Boolean);
+  var email=(text.match(/[\w.+-]+@[\w-]+\.[\w.-]+/)||[])[0]||'';
+  var phone='';
+  var mp=text.match(/(?:t[ée]l(?:[ée]phone)?|phone|mobile|portable|fax)\s*[:：]\s*(\+?\(?\d[\d\s(). -]{6,}\d)/i);
+  if(mp)phone=mp[1];else{var mp2=text.match(/(\+\d[\d\s(). -]{6,}\d)/);if(mp2)phone=mp2[1];}
+  var sites=[];
+  lines.forEach(function(l){var m=l.match(/(?:https?:\/\/)?www\.[\w-]+\.[\w.-]+/g);if(m)m.forEach(function(u){sites.push(u);});});
+  var nom='',prenom='',societe='',adrParts=[],cp='',ville='',pays='';
+  var SOCIETE_RX=/\b(Sarl|SAS|SARL|SA|SCI|EURL|EI|SASU|GmbH|Ltd|Inc|LLC|Cie|Cabinet)\b/;
+  var ADDR_RX=/\b(rue|avenue|boulevard|impasse|all[ée]e|chemin|route|place|street|road|lane|bat\s|b[aâ]timent)\b/i;
+  var COUNTRY_RX=/^(FRANCE|BELGIQUE|SUISSE|MAROC|CANADA|ALLEMAGNE|ESPAGNE|ITALIE|CÔTE D'IVOIRE|SENEGAL|BENIN|TOGO|CAMEROUN)$/i;
+  var LABEL_RX2=/^(t[ée]l|phone|mobile|fax|courriel|e-?mail|sites?\s*[:：]|adresse|address)/i;
+  lines.forEach(function(l){
+    if(LABEL_RX2.test(l)||/[\w.+-]+@[\w-]+\.[\w.-]+/.test(l))return;
+    if(phone){var pp=normPhone(phone);if(pp&&l.replace(/[\s(). -]/g,'').indexOf(pp.replace(/[\s(). -]/g,''))>=0&&!/[a-zA-ZÀ-Ý]{3,}/.test(l.replace(phone,'')))return;}
+    if(COUNTRY_RX.test(l.trim())){pays=l.trim();return;}
+    var mcp=l.match(/^(\d{4,5})\s*[-–—]\s*(.+)/);
+    if(mcp){cp=mcp[1];ville=mcp[2].replace(/\s+\d+\s*$/,'').trim();return;}
+    if(/^CS\s+\d/i.test(l)||/^BP\s+\d/i.test(l))return;
+    if(ADDR_RX.test(l)){adrParts.push(l);return;}
+    if(!societe&&SOCIETE_RX.test(l)){societe=l;return;}
+    if(!nom){
+      var clean=l.replace(/^(Dr|Pr|Me|Mme|Mr|M\.)\.?\s*(vet\.?\s*)?/i,'').trim();
+      if(!clean||clean.length<2)return;
+      var parts=clean.split(/\s+/).filter(Boolean);
+      for(var i=0;i<parts.length;i++){
+        if(parts[i].length>1&&parts[i]===parts[i].toUpperCase()&&/[A-ZÀ-Ý]/.test(parts[i])){nom=parts[i];parts.splice(i,1);break;}
+      }
+      if(nom)prenom=parts.map(function(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();}).join(' ');
+      else if(parts.length>=2){nom=(parts.pop()||'').toUpperCase();prenom=parts.map(function(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();}).join(' ');}
+    }
+  });
+  var notes=[];
+  if(societe)notes.push('Société : '+societe);
+  if(adrParts.length)notes.push('Adresse : '+adrParts.join(', '));
+  if(cp||ville)notes.push((cp?cp+' ':'')+(ville||''));
+  if(pays)notes.push(pays);
+  if(sites.length)notes.push('Sites : '+sites.join(', '));
+  return [{nom:nom,prenom:prenom,email:email,tel:normPhone(phone),notes:notes.join(' · '),registre:'chaleureux',_src:'card'}];
+}
 function parseVrac(text){
   var out=[];
   text.split(/\n/).forEach(function(line){
@@ -4253,7 +4315,7 @@ function impParseGroups(raw){
   });
   var items=[];
   groups.forEach(function(t){
-    var its=looksOlyOrder(t)?parseOlyOrders(t):looksOlyReg(t)?parseOlyReg(t):looksOlyRows(t)?parseOlyRows(t):parseVrac(t);
+    var its=looksOlyOrder(t)?parseOlyOrders(t):looksOlyReg(t)?parseOlyReg(t):looksOlyRows(t)?parseOlyRows(t):looksCard(t)?parseCard(t):parseVrac(t);
     its.forEach(function(it){items.push(it);});
   });
   return items;
