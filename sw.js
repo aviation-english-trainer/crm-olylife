@@ -1,7 +1,7 @@
 /* Service worker — CRM OlyLife WLHT
    À chaque nouvelle version de index.html : incrémenter VERSION ci-dessous
    (sinon les téléphones gardent l'ancienne version en cache). */
-var VERSION = 'crm-olylife-v3.18.3';
+var VERSION = 'crm-olylife-v3.19';
 var SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './qr.js'];
 
 self.addEventListener('install', function (e) {
