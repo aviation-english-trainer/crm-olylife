@@ -1077,7 +1077,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:20px">
         <button class="ob baqua bfull" onclick="oHideSetup();oOpenImport()">⇪ Importer des contacts en masse</button>
-        <button class="ob bgh bfull" id="os-install-btn" style="display:none" onclick="oHideSetup();try{sessionStorage.removeItem('owlht2_inst_skip');}catch(e){}oInstallGate()">📲 Installer l'application sur ce téléphone</button>
+        <button class="ob bgh bfull" id="os-install-btn" style="display:none" onclick="oHideSetup();try{sessionStorage.removeItem('owlht2_inst_skip');localStorage.removeItem('owlht2_inst_skip_until');}catch(e){}oInstallGate(true)">📲 Installer l'application sur ce téléphone</button>
         <button class="ob bgh bfull" onclick="oHideSetup()">Fermer</button>
         <button class="ob bdel bfull" onclick="oLogout()">Se déconnecter</button>
       </div>
@@ -1638,6 +1638,8 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <div class="ocard" style="padding:14px 16px;margin-bottom:12px">
         <div style="font-size:13px;color:var(--t2);line-height:1.6">🌱 <b>Lien découverte</b> (temps 1) : la personne indique son prénom, son WhatsApp et ce qui l'intéresse ; vous lui envoyez les bonnes pages en un clic.<br>📥 <b>QR code d'inscription</b> (temps 2) : les personnes qui le scannent remplissent elles-mêmes le formulaire (identité passeport, pièce, adresses, e-mail, téléphone, mot de passe souhaité) : leurs demandes arrivent ici, déjà rattachées à la personne qui a transmis le QR code. <b>Créer la fiche</b> l'intègre dans les contacts ; le mot de passe n'est consultable qu'ici, le temps de créer le compte OlyLife, puis il est effacé.</div>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="ob bgold bsm" style="min-height:40px" onclick="oMyQr()">📲 Mon QR code d'inscription</button><button class="ob bgh bsm" style="min-height:40px" onclick="oMyQrDec()">🌱 Mon lien découverte</button><button class="ob bgh bsm" style="min-height:40px" onclick="oLeads(true)">🔄 Actualiser</button><label class="ochk-row" style="margin-left:auto;font-size:12px"><input type="checkbox" id="ld-showdone" onchange="oLeadsRender()"><span>Afficher les demandes déjà intégrées</span></label></div>
+        <div id="ld-bar" style="display:none;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center"><select class="ofc" id="ld-fown" style="max-width:230px" onchange="oLeadsRender()"></select><select class="ofc" id="ld-ftype" style="max-width:190px" onchange="oLeadsRender()"><option value="">Tous les types</option><option value="decouverte">🌱 Découverte</option><option value="inscription">📥 Inscription</option></select><button class="ob bsm" id="ld-purge" style="display:none;min-height:40px;background:var(--rdp);color:var(--rd);border:none;margin-left:auto" onclick="oLeadsPurge()">🗑 Supprimer les demandes intégrées</button></div>
+        <div id="ld-sum" style="font-size:12px;color:var(--t2);margin-top:8px"></div>
       </div>
       <div id="ld-list"><div class="oemp"><div class="oemp-i">📥</div><div class="oemp-t">Chargement…</div></div></div>
     </div>
@@ -2283,7 +2285,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.20.2 · 13/10';
+var APP_VERSION='v3.21 · 13/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -2347,7 +2349,7 @@ function oShowLogin(msg){
   if(msg){err.textContent=msg;err.style.display='block';}else{err.style.display='none';}
   document.getElementById('ologin').classList.add('on');
 }
-function oHideLogin(){document.getElementById('ologin').classList.remove('on');setTimeout(oInstallGate,400);}
+function oHideLogin(){document.getElementById('ologin').classList.remove('on');setTimeout(function(){oGoDeep();oInstallGate();},400);}
 function oLogin(){
   var u=(DEFAULT_GAS_URL||document.getElementById('ol-url').value.trim());
   var c=document.getElementById('ol-code').value.trim();
@@ -2988,6 +2990,8 @@ var MSG_DEFAULTS={};
     t:'Bonjour {nom} 👋\n\nJe t\'invite à rejoindre notre CRM OlyLife — WLHT, l\'outil de suivi partagé de notre équipe.\n\n📲 *Accéder à l\'application :*\n{lienApp}\n\n🔑 *Ton code d\'accès :* {code}\n👤 *Ton rôle :* {role}\n\n📥 *Pour installer l\'app sur ton téléphone :*\n• *Android (Chrome) :* Ouvre le lien → 3 points en haut à droite → « Ajouter à l\'écran d\'accueil »\n• *iPhone (Safari) :* Ouvre le lien → icône Partager ↑ → « Sur l\'écran d\'accueil »\n\nL\'app fonctionne comme une vraie appli, sans téléchargement depuis les stores. 🌿\n\nÀ bientôt,\n{moi}'};
   MSG_DEFAULTS.bienvenue_kit={g:'Réception de l\'appareil',l:'Félicitations + kit de bienvenue (notice FR, vidéo, page)',vars:['prenom','appareil','lienKit','lienNotice','lienVideo','reglesOr','moi','role','telMoi'],
     t:'🎉 Félicitations {prenom} ! Votre {appareil} est bien arrivé 🌿{?lienKit:\n\n🧭 Votre page de bienvenue (premiers pas, règles d\'or, entretien, vidéo et notice en français) : {lienKit}}{?reglesOr:\n\n{reglesOr}}\n\nJe vous appelle dans les prochains jours pour la mise en route, et je reste disponible dès maintenant pour toute question 🙏\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
+  MSG_DEFAULTS.commande_merci={g:'Commande OlyLife',l:'Merci pour la commande + premières infos (appareil, contact du gestionnaire, la société)',vars:['prenom','appareil','numCommande','gest','telGest','emailGest','liensAppareils','lienParcours','lienCertificats','lienRdv','moi','role','telMoi'],
+    t:'🙏 Merci {prenom} pour votre confiance !\n\nVotre commande{?appareil: de {appareil}}{?numCommande: (n° {numCommande})} est bien enregistrée et votre règlement est confirmé ✅\n\n📦 La suite : OlyLife prépare l\'expédition ; je vous transmets le numéro de suivi dès qu\'il est disponible, et je vous aide à la prise en main à la réception.\n\n👤 Votre interlocuteur pour toute question : {gest}{?telGest: · 📞 {telGest}}{?emailGest: · ✉️ {emailGest}}{?liensAppareils:\n\n📖 Pour préparer l\'arrivée de votre appareil (mode d\'emploi et consignes de sécurité) :\n{liensAppareils}}\n\n🎬 Pour mieux connaître l\'association et la technologie (6 courtes vidéos) :\n{lienParcours}\n\n🧪 Les certificats et rapports de test, en toute transparence :\n{lienCertificats}{?lienRdv:\n\n📅 Un point de vive voix quand vous voulez :\n{lienRdv}}\n\nBienvenue dans l\'aventure Water Life High Tech 🌿\n{moi} — {role}{?telMoi: · 📞 {telMoi}}'};
   MSG_DEFAULTS.decouverte_infos={g:'Découverte OlyLife',l:'Envoi des pages de découverte (parcours vidéo, appareils, certificats, rendez-vous)',vars:['prenom','lienParcours','liensAppareils','lienCertificats','lienRdv','interets','moi','role','telMoi'],
     t:'Bonjour {prenom} 👋\n\nComme promis, voici de quoi découvrir OlyLife tranquillement, à votre rythme 🌿\n\n🎬 *Commencez par ici* — le parcours découverte en 6 courtes vidéos (la technologie, l\'association, les appareils) :\n{lienParcours}{?liensAppareils:\n\n📖 Les appareils qui vous intéressent, expliqués sans raccourci (mode d\'emploi et consignes de sécurité compris) :\n{liensAppareils}}\n\n🧪 Et parce que la transparence compte : les certificats et rapports de test, consultables un par un :\n{lienCertificats}{?lienRdv:\n\n📅 Quand vous voudrez en parler de vive voix, choisissez un créneau (appel découverte, sans engagement) :\n{lienRdv}}\n\nPrenez le temps qu\'il vous faut — je reste disponible pour toute question 🙏\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
   MSG_DEFAULTS.decouverte_lien={g:'Découverte OlyLife',l:'Envoi du lien « dites-moi ce qui vous intéresse » (formulaire d\'une minute)',vars:['prenom','lienDecouverte','moi','role','telMoi'],
@@ -2995,7 +2999,7 @@ var MSG_DEFAULTS={};
   MSG_DEFAULTS.inscription_infos={g:'Inscription OlyLife',l:'Demande des informations d\'inscription',vars:['nomComplet','prenom','nom','lienInscription','moi','role','telMoi'],
     t:'Bonjour {nomComplet} 👋\n\nPour créer votre compte OlyLife et passer votre commande, j\'ai besoin de quelques informations.{?lienInscription:\n\n✅ *Le plus simple* : remplissez ce formulaire sécurisé (2 minutes, sur votre téléphone) — il m\'arrive directement :\n{lienInscription}\n\n📋 À avoir sous la main : votre passeport (ou carte nationale d\'identité — permis et autres cartes refusés, sauf carte de résident), votre adresse de livraison (et de facturation si différente), votre e-mail, et un mot de passe d\'au moins 8 caractères (lettres et chiffres) que vous pourrez modifier ensuite.\n\n✍️ Vous préférez répondre ici ? Envoyez-moi alors EN UN SEUL MESSAGE :}{?sansLien:\n\nMerci de me renvoyer EN UN SEUL MESSAGE les informations suivantes :}\n\n1️⃣ Votre identité EXACTEMENT comme sur votre PASSEPORT (tous les noms et tous les prénoms) + le numéro du passeport.\n   ➡️ Pas de passeport ? La carte nationale d\'identité est acceptée. (Permis de conduire et autres cartes refusés — sauf carte de résident pour les personnes étrangères.)\n2️⃣ Votre adresse postale complète de livraison — et l\'adresse de facturation si elle est différente.\n3️⃣ Votre adresse e-mail.\n4️⃣ Un mot de passe d\'au moins 8 caractères (lettres et chiffres ; symboles possibles mais non obligatoires) — vous pourrez le modifier ensuite.\n\n💳 *Paiement* : la commande se règle en dollars US auprès d\'OlyLife (plateforme à l\'étranger). Il arrive que la banque émettrice bloque la carte par sécurité. Si c\'est le cas, dites-le-moi simplement : je vous transmets une autre méthode via notre association Water Life High Tech (compte français), par carte bancaire ou virement.\n\n🔒 Ces informations restent strictement confidentielles : elles servent uniquement à votre enregistrement officiel OlyLife.\n\nMerci beaucoup, à très vite !\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
 })();
-var MSG_VAR_HELP={appareil:'nom de l\'appareil reçu',lienKit:'page de bienvenue (vidéo, premiers pas, règles d\'or)',lienNotice:'notice en français (PDF)',lienVideo:'vidéo de prise en main (YouTube)',reglesOr:'règles d\'or de l\'appareil (texte)',nomComplet:'prénom + nom (ou seulement ce qui est rempli)',lienInscription:'votre lien personnel du formulaire d\'inscription (celui de votre QR code)',lienDecouverte:'votre lien personnel du formulaire découverte (1 minute : prénom, WhatsApp, intérêts)',lienParcours:'parcours découverte OlyLife (6 vidéos), personnalisé à votre nom',liensAppareils:'pages des appareils cochés (une ligne par appareil)',lienCertificats:'certificats et rapports de test',lienRdv:'votre lien de rendez-vous (Calendly de Mon profil, sinon l\'appel découverte WLHT)',interets:'centres d\'intérêt cochés',sansLien:'vrai seulement si le lien n\'est pas disponible (bloc de repli)',role:'votre rôle (admin, gestionnaire, référent…)',telMoi:'votre téléphone (Mon profil)',prenom:'prénom du contact',nom:'nom',numCommande:'n° de commande',logistique:'Service Logistique OlyLife',transporteur:'transporteur',tracking:'n° de suivi',lienSuivi:'lien de suivi du colis',tipLivraison:'numéros utiles DHL / Colissimo (France)',sav:'Service Après-Vente OlyLife',savEmail:'e-mail du SAV',montant:'montant',devise:'devise',date:'date de l\'avance',motif:'motif',rendu:'déjà remboursé',reste:'reste à rembourser',echeance:'date d\'échéance',payeur:'prénom de la personne qui a avancé',client:'nom du client',moi:'votre nom (expéditeur)',jours:'nombre de jours',programme:'titre de la fiche conseils',rythme:'durée, fréquence',appareil:'nom de l\'appareil',interdits:'contre-indications (manuel)',duree:'durée & fréquence (manuel)',precautions:'précautions (manuel)',lienApp:'lien de l\'application',code:'code d\'accès',role:'rôle'};
+var MSG_VAR_HELP={gest:'nom du gestionnaire qui suit la fiche (sinon vous)',telGest:'téléphone du gestionnaire',emailGest:'e-mail du gestionnaire',appareil:'nom de l\'appareil reçu',lienKit:'page de bienvenue (vidéo, premiers pas, règles d\'or)',lienNotice:'notice en français (PDF)',lienVideo:'vidéo de prise en main (YouTube)',reglesOr:'règles d\'or de l\'appareil (texte)',nomComplet:'prénom + nom (ou seulement ce qui est rempli)',lienInscription:'votre lien personnel du formulaire d\'inscription (celui de votre QR code)',lienDecouverte:'votre lien personnel du formulaire découverte (1 minute : prénom, WhatsApp, intérêts)',lienParcours:'parcours découverte OlyLife (6 vidéos), personnalisé à votre nom',liensAppareils:'pages des appareils cochés (une ligne par appareil)',lienCertificats:'certificats et rapports de test',lienRdv:'votre lien de rendez-vous (Calendly de Mon profil, sinon l\'appel découverte WLHT)',interets:'centres d\'intérêt cochés',sansLien:'vrai seulement si le lien n\'est pas disponible (bloc de repli)',role:'votre rôle (admin, gestionnaire, référent…)',telMoi:'votre téléphone (Mon profil)',prenom:'prénom du contact',nom:'nom',numCommande:'n° de commande',logistique:'Service Logistique OlyLife',transporteur:'transporteur',tracking:'n° de suivi',lienSuivi:'lien de suivi du colis',tipLivraison:'numéros utiles DHL / Colissimo (France)',sav:'Service Après-Vente OlyLife',savEmail:'e-mail du SAV',montant:'montant',devise:'devise',date:'date de l\'avance',motif:'motif',rendu:'déjà remboursé',reste:'reste à rembourser',echeance:'date d\'échéance',payeur:'prénom de la personne qui a avancé',client:'nom du client',moi:'votre nom (expéditeur)',jours:'nombre de jours',programme:'titre de la fiche conseils',rythme:'durée, fréquence',appareil:'nom de l\'appareil',interdits:'contre-indications (manuel)',duree:'durée & fréquence (manuel)',precautions:'précautions (manuel)',lienApp:'lien de l\'application',code:'code d\'accès',role:'rôle'};
 function renderTpl(t,v){
   v=v||{};
   return String(t||'').replace(/\{\?(\w+):((?:[^{}]|\{\w+\})*)\}/g,function(m,k,inner){return v[k]?inner.replace(/\{(\w+)\}/g,function(_,n){return v[n]!=null?v[n]:'';}):'';})
@@ -3028,6 +3032,7 @@ function buildMsgFor(item,lang,tone){
   if(item.type==='Installation')return msgInstall(item.c,lang,tone);
   if(item.type==='Témoignage')return msgTemoin(item.c,lang,tone);
   if(item.type==='Bienvenue')return msgBienvenue(item.c);
+  if(item.type==='Commande')return msgMerci(item.c);
   return item.msg;
 }
 
@@ -3079,6 +3084,10 @@ function computeActions(){
         if(diff!==null&&diff<=3)items.push({c:c,key:'temoignage',type:'Témoignage',label:'Demande de témoignage',diff:diff,msg:msgTemoin(c,'fr')});
       }
     }
+    // v3.21 — commande récente → remercier + premières infos
+    if(c.numCommande&&c.dateCommande&&!dateRecu(c)&&!(c.actions&&c.actions.merci&&c.actions.merci.done)){
+      var dM=diffD(c.dateCommande);if(dM!==null&&dM>=-14)items.push({c:c,key:'merci',type:'Commande',label:'🙏 Remercier & envoyer les premières infos — commande n°'+c.numCommande,diff:Math.min(dM+1,0),msg:msgMerci(c)});
+    }
     // v3.18 — appareil reçu → féliciter + kit de bienvenue
     var rec=dateRecu(c);
     if(rec&&!(c.actions&&c.actions.bienvenue&&c.actions.bienvenue.done)){
@@ -3128,7 +3137,7 @@ function oDone(cid,key){
   }
   if(!c.actions)c.actions={};
   c.actions[key]={done:true,doneAt:new Date().toISOString().split('T')[0]};
-  var LBLS={j2:'Relance J+2',j5:'Relance J+5',j12:'Relance J+12',logistique:'Relance logistique',trackingEnvoye:'Tracking envoyé au client',installation:'Suivi installation',temoignage:'Demande de témoignage'};
+  var LBLS={j2:'Relance J+2',j5:'Relance J+5',j12:'Relance J+12',logistique:'Relance logistique',trackingEnvoye:'Tracking envoyé au client',installation:'Suivi installation',temoignage:'Demande de témoignage',merci:'Merci pour la commande + premières infos'};
   jrnAdd(c,'fait',(LBLS[key]||key)+' — effectuée');
   oPush([c]);oT('Action marquée comme faite !','s');oRefresh();
 }
@@ -4003,6 +4012,7 @@ function oOpenF(id){
       +(ROLE()==='admin'&&stkList().some(function(x){return(+x.qte||0)>0;})?'<button class="ob baqua bfull" style="min-height:44px;margin-top:8px" onclick="oStkOpen(\''+id+'\')">📦 Remise immédiate depuis un stock</button>':'')
     +'</div></div>'
     +decHtml(c)
+    +merciHtml(c)
     +kitHtml(c)
     +logiHtml(c)
     +accHtml(c)
@@ -5417,6 +5427,15 @@ if('serviceWorker' in navigator){
     }).catch(function(){});
   });
 }
+var GO_TARGET=(function(){try{var m=location.search.match(/[?&]go=([a-z]+)/);var t=m?m[1]:'';return['demandes','contacts','dashboard','pipeline','agenda','actions','carte','equipe'].indexOf(t)>=0?t:'';}catch(e){return'';}})();
+var GO_USED=false;
+function oGoDeep(){
+  if(!GO_TARGET)return;var t=GO_TARGET;GO_TARGET='';GO_USED=true;
+  try{history.replaceState(null,'',location.pathname);}catch(e){}
+  try{oSw(t);}catch(e){}
+}
+function installFlag(){try{return localStorage.getItem('owlht2_installed')==='1';}catch(e){return false;}}
+function setInstallFlag(){try{localStorage.setItem('owlht2_installed','1');}catch(e){}}
 function isStandalone(){
   return (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true||location.search.indexOf('source=pwa')>=0;
 }
@@ -5429,15 +5448,26 @@ window.addEventListener('beforeinstallprompt',function(e){
   var m=document.getElementById('oinst-android-manual');if(m)m.style.display='none';
 });
 window.addEventListener('appinstalled',function(){
-  APP_INSTALLED=true;deferredPrompt=null;
+  setInstallFlag();APP_INSTALLED=true;deferredPrompt=null;
   ['oinst-android','oinst-ios'].forEach(function(id){document.getElementById(id).style.display='none';});
   document.getElementById('oinst-done').style.display='block';
   oT('✅ Application installée','s');
 });
 // Appelée après chaque connexion réussie
-function oInstallGate(){
-  if(isStandalone()||!isMobileDevice())return;
-  try{if(sessionStorage.getItem('owlht2_inst_skip')==='1')return;}catch(e){}
+function oInstallGate(force){
+  if(isStandalone()){setInstallFlag();return;}
+  if(!isMobileDevice())return;
+  if(force!==true){
+    // v3.21 — arrivée par un lien profond (courriel « Demandes reçues ») : on va droit au but
+    if(GO_USED)return;
+    // v3.21 — déjà installée sur ce téléphone : on ne bloque plus, simple rappel
+    if(installFlag()){
+      try{if(sessionStorage.getItem('owlht2_inst_note')!=='1'){sessionStorage.setItem('owlht2_inst_note','1');oT('📲 Le CRM est déjà installé sur ce téléphone — ouvrez-le depuis l\'icône verte pour la meilleure expérience','i');}}catch(e){}
+      return;
+    }
+    try{if(sessionStorage.getItem('owlht2_inst_skip')==='1')return;}catch(e){}
+    try{var su=parseInt(localStorage.getItem('owlht2_inst_skip_until')||'0',10);if(su&&Date.now()<su)return;}catch(e){}
+  }
   var g=document.getElementById('oinst');
   document.getElementById('oinst-done').style.display='none';
   if(isIOS()){
@@ -5462,7 +5492,7 @@ function oInstallNow(){
   }
 }
 function oInstallSkip(){
-  try{sessionStorage.setItem('owlht2_inst_skip','1');}catch(e){}
+  try{sessionStorage.setItem('owlht2_inst_skip','1');localStorage.setItem('owlht2_inst_skip_until',String(Date.now()+12*3600*1000));}catch(e){}
   document.getElementById('oinst').classList.remove('on');
   oT('Pensez à installer l\'application — elle vous sera redemandée à la prochaine ouverture','w');
 }
@@ -6330,6 +6360,40 @@ function kitLinks(c){
   return{kit:k,appareil:appareil,lienKit:k?SITE_URL+k.page+(tok?'&r='+encodeURIComponent(tok):'')+(c.prenom?'&n='+encodeURIComponent(c.prenom):''):'',lienNotice:k?SITE_URL+k.notice:'',lienPres:k?SITE_URL+k.pres:'',lienVideo:k?k.video:'',reglesOr:k?k.regles:''};
 }
 function dateRecu(c){return c.dateReception||c.dateInstall||'';}
+// ── Merci pour la commande (v3.21) ──────────────────────────────────
+var DEV_RX=[['Tera-P90+',/p90/i],['Galaxy G-One',/galaxy|g-?one/i],['Vitality Wand',/vitality|wand/i],['Shaken Massager',/shaken|massag/i]];
+function devKeysOf(c){var out=[];(c&&c.produits||[]).forEach(function(pn){DEV_RX.forEach(function(d){if(d[1].test(pn)&&out.indexOf(d[0])<0)out.push(d[0]);});});return out;}
+function gestOf(c){
+  var nm=(suivisDe(c)||[])[0]||PARTNER_NOM()||'';var eq=(typeof equipeContacts==='function'?equipeContacts():[]).find(function(x){return x.nom===nm;});
+  var me=USER&&USER.nom===nm?USER:null;
+  return{nom:nm,tel:(eq&&eq.tel)||(me&&me.tel)||'',email:(eq&&eq.email)||(me&&me.email)||''};
+}
+function msgMerci(c,devs){
+  devs=devs||devKeysOf(c);var v=decVars(c,devs),g=gestOf(c);
+  v.gest=g.nom;v.telGest=g.tel;v.emailGest=g.email;
+  v.appareil=devs.length?devs.map(function(k){return DECOUV[k]?DECOUV[k].l.replace(/\s*\(.*\)\s*$/,''):k;}).join(' + '):((c.produits&&c.produits[0])?c.produits[0].split('(')[0].trim():'');
+  return renderTpl(tplText('commande_merci'),v);
+}
+function merciHtml(c){
+  if(ROLE()==='referent'||ROLE()==='comite')return'';
+  if(!(c.numCommande||(c.produits&&c.produits.length)||c.etape==='Client'))return'';
+  var pre=devKeysOf(c),done=c.actions&&c.actions.merci&&c.actions.merci.done;
+  var chips=DEV_RX.map(function(d){return'<label class="ochk-row" style="font-size:13px"><input type="checkbox" class="mc-dev" data-k="'+esc(d[0])+'"'+(pre.indexOf(d[0])>=0?' checked':'')+'><span>'+esc(d[0])+'</span></label>';}).join('');
+  return'<div class="od-section'+(done?' clps':'')+'"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">🙏 Merci pour la commande & premières infos</div><div class="od-bd">'
+    +'<div class="acc-row"><span class="em">🙏</span><div class="b">Remercier, présenter son gestionnaire, envoyer les pages de l\'appareil et de la société<small>'+(done?'✅ envoyé le '+fD(c.actions.merci.doneAt)+' · ':'')+'Cochez le ou les appareils commandés : le message reprend leurs pages (modifiable dans Modèles de messages)</small></div></div>'
+    +'<div id="mc-'+c.id+'" style="display:flex;gap:14px;flex-wrap:wrap;padding:4px 2px 10px">'+chips+'</div>'
+    +'<div class="acts" style="padding:0 2px 8px">'+(c.tel?'<button class="ob bwa bsm" onclick="oMerciSend(\''+c.id+'\',\'wa\')">💬 WhatsApp</button>':'')+(c.email?'<button class="ob bsm" style="background:var(--blp);color:var(--bl);border:none" onclick="oMerciSend(\''+c.id+'\',\'mail\')">✉️ E-mail</button>':'')+'<button class="ob bgh bsm" onclick="oMerciSend(\''+c.id+'\',\'copy\')">📋 Copier</button></div>'
+    +'</div></div>';
+}
+function oMerciSend(cid,canal){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var box=document.getElementById('mc-'+cid),devs=[];if(box)box.querySelectorAll('.mc-dev').forEach(function(i){if(i.checked)devs.push(i.getAttribute('data-k'));});
+  var msg=msgMerci(c,devs);
+  if(canal==='wa')window.open(mkWA(c.tel,msg),'_blank');
+  else if(canal==='mail')window.open('mailto:'+encodeURIComponent(c.email)+'?subject='+encodeURIComponent('Merci pour votre commande OlyLife')+'&body='+encodeURIComponent(msg),'_blank');
+  else{try{navigator.clipboard.writeText(msg);oT('📋 Message copié','s');}catch(e){oT('Copie impossible','e');}}
+  if(canal!=='copy'||true){c.actions=c.actions||{};c.actions.merci={done:true,doneAt:todayYMD()};jrnAdd(c,'fait','🙏 Merci pour la commande + premières infos'+(devs.length?' — '+devs.join(', '):'')+(canal==='copy'?' (copié)':''));oPush([c]);}
+}
 function msgBienvenue(c){var L=kitLinks(c),v=tplVars(c,'fr');v.appareil=L.appareil;v.lienKit=L.lienKit;v.lienNotice=L.lienNotice;v.lienVideo=L.lienVideo;v.reglesOr=L.reglesOr;return renderTpl(tplText('bienvenue_kit'),v);}
 function oRecu(cid){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
@@ -6401,7 +6465,7 @@ function oBulkMsg(){
   var list=selContacts();if(!list.length)return;
   var m=document.createElement('div');m.id='obulkmsg';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:14px';m.onclick=function(e){if(e.target===m)m.remove();};
   m.innerHTML='<div style="background:#fff;border-radius:16px;width:100%;max-width:720px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden"><div style="padding:12px 16px;border-bottom:1px solid var(--bd)"><b>📨 Message groupé — '+list.length+' contact'+(list.length>1?'s':'')+'</b><div style="font-size:12px;color:var(--t3)">Chaque message est personnalisé ({prenom}, {nom}…). Les applications de messagerie n\'autorisent pas l\'envoi automatique : envoyez-les un par un, ils se cochent au fur et à mesure.</div></div>'
-    +'<div style="padding:10px 16px;border-bottom:1px solid var(--bd);display:grid;grid-template-columns:1fr 1fr;gap:8px"><select class="ofc" id="bm-tpl" onchange="oBulkMsgRender()"><option value="relance_j2">Relance — 1er rappel</option><option value="relance_j5">Relance — 2e rappel</option><option value="relance_j12">Relance — dernier rappel</option><option value="temoin">Demande de témoignage</option><option value="install">Suivi installation</option><option value="bienvenue">🎁 Kit de bienvenue</option><option value="custom">✏️ Message libre…</option></select>'
+    +'<div style="padding:10px 16px;border-bottom:1px solid var(--bd);display:grid;grid-template-columns:1fr 1fr;gap:8px"><select class="ofc" id="bm-tpl" onchange="oBulkMsgRender()"><option value="relance_j2">Relance — 1er rappel</option><option value="relance_j5">Relance — 2e rappel</option><option value="relance_j12">Relance — dernier rappel</option><option value="temoin">Demande de témoignage</option><option value="install">Suivi installation</option><option value="merci">🙏 Merci pour la commande</option><option value="bienvenue">🎁 Kit de bienvenue</option><option value="custom">✏️ Message libre…</option></select>'
     +'<select class="ofc" id="bm-canal"><option value="wa">💬 WhatsApp</option><option value="tg">✈️ Telegram</option><option value="signal">🔒 Signal</option><option value="sms">📱 SMS</option><option value="copy">📋 Copier</option></select>'
     +'<textarea class="ofc" id="bm-custom" style="grid-column:1/-1;display:none;min-height:90px" placeholder="Bonjour {prenom}, …" oninput="oBulkMsgRender()"></textarea></div>'
     +'<div id="bm-list" style="flex:1;overflow:auto;padding:6px 16px"></div>'
@@ -6412,6 +6476,7 @@ function bulkMsgFor(c){
   var k=val('bm-tpl');
   if(k==='custom')return renderTpl(val('bm-custom'),tplVars(c,'fr'));
   if(k==='bienvenue')return msgBienvenue(c);
+  if(k==='merci')return msgMerci(c);
   if(k.indexOf('relance_')===0)return msgRelance(c,k.replace('relance_',''),'fr',c.registre||'pro');
   if(k==='temoin')return msgTemoin(c,'fr');if(k==='install')return msgInstall(c,'fr');return'';
 }
@@ -6499,16 +6564,28 @@ function leadById(id){return LEADS.find(function(l){return l.id===id;});}
 function oLeadsRender(){
   var box=document.getElementById('ld-list');if(!box)return;
   var showDone=document.getElementById('ld-showdone').checked;
-  var list=LEADS.filter(function(l){return showDone||l.statut!=='traite';});
+  var canAssign=ROLE()==='admin'||ROLE()==='gestionnaire',isAdm=ROLE()==='admin';
+  // v3.21 — barre de filtres (admin / gestionnaire) : par personne qui a transmis le lien, par type
+  var bar=document.getElementById('ld-bar'),fo=document.getElementById('ld-fown'),ft=document.getElementById('ld-ftype');
+  var owners={};LEADS.forEach(function(l){var k=l.userNom||'?';owners[k]=owners[k]||{n:0,nw:0};owners[k].n++;if(l.statut!=='traite')owners[k].nw++;});
+  if(bar){
+    bar.style.display=canAssign&&Object.keys(owners).length>0?'flex':'none';
+    var cur=fo.value;fo.innerHTML='<option value="">Toutes les personnes ('+LEADS.length+')</option>'+Object.keys(owners).sort().map(function(k){return'<option value="'+esc(k)+'">'+esc(k)+' — '+owners[k].nw+' à traiter / '+owners[k].n+'</option>';}).join('');
+    if(cur&&owners[cur])fo.value=cur;
+  }
+  var sel=(canAssign&&fo)?fo.value:'',ty=(canAssign&&ft)?ft.value:'';
+  var list=LEADS.filter(function(l){return(showDone||l.statut!=='traite')&&(!sel||l.userNom===sel)&&(!ty||(l.type||'inscription')===ty);});
+  var nDone=LEADS.filter(function(l){return l.statut==='traite'&&(!sel||l.userNom===sel);}).length;
+  var pb=document.getElementById('ld-purge');if(pb){pb.style.display=isAdm&&nDone?'inline-flex':'none';pb.textContent='🗑 Supprimer les demandes intégrées ('+nDone+')';}
+  var sm=document.getElementById('ld-sum');if(sm)sm.textContent=canAssign?(list.length+' demande'+(list.length>1?'s':'')+' affichée'+(list.length>1?'s':'')+' · '+LEADS.filter(function(l){return l.statut!=='traite';}).length+' à traiter au total'):'';
   if(!list.length){box.innerHTML='<div class="oemp"><div class="oemp-i">📭</div><div class="oemp-t">Aucune demande pour l\'instant</div><div style="font-size:12px;color:var(--t3);margin-top:6px">Partagez votre QR code : les demandes apparaîtront ici dès qu\'une personne aura rempli le formulaire.</div></div>';return;}
-  var canAssign=ROLE()==='admin'||ROLE()==='gestionnaire';
   box.innerHTML=list.map(function(l){
     var ex=impFindExisting({tel:l.tel,email:l.email,nom:l.nom,prenom:l.prenom});
     var dt=new Date(l.ts);var when=isNaN(dt)?'':dt.toLocaleDateString('fr-FR')+' '+('0'+dt.getHours()).slice(-2)+':'+('0'+dt.getMinutes()).slice(-2);
     var isDec=l.type==='decouverte';
     return'<div class="ld-card'+(l.statut==='traite'?' done':'')+'">'
-      +'<div class="ld-hd"><span style="font-size:22px">'+(l.statut==='traite'?'✅':(isDec?'🌱':'🆕'))+'</span><div><b>'+esc(l.prenom+' '+(l.nom||''))+'</b> <span class="obdg '+(isDec?'bgr':'bgold')+'">'+(isDec?'Découverte':'Inscription')+'</span><br><small>reçue le '+when+' · via le lien de <b>'+esc(l.userNom||'')+'</b>'+(l.statut==='traite'?' · intégrée par '+esc(l.traitePar||'')+' le '+fD((l.traiteLe||'').slice(0,10)):'')+'</small></div>'
-      +(ex?'<span class="obdg bor" title="Un contact avec ce téléphone / e-mail / nom existe déjà">fiche existante : '+esc((ex.prenom||'')+' '+(ex.nom||''))+'</span>':'')+'</div>'
+      +'<div class="ld-hd"><span style="font-size:22px">'+(l.statut==='traite'?'✅':(isDec?'🌱':'🆕'))+'</span><div><b>'+esc(l.prenom+' '+(l.nom||''))+'</b> <span class="obdg '+(isDec?'bgr':'bgold')+'">'+(isDec?'Découverte':'Inscription')+'</span><br><small>reçue le '+when+' · via le lien de <b>'+esc(l.userNom||'')+'</b>'+(l.statut==='traite'?' · intégrée par '+esc(l.traitePar||'')+' le '+fD((l.traiteLe||'').slice(0,10))+(l.suiviPar?' · suivie par '+esc(l.suiviPar):''):'')+'</small></div>'
+      +(ex?'<span class="obdg bor" title="Un contact avec ce téléphone / e-mail / nom existe déjà">fiche existante : '+esc((ex.prenom||'')+' '+(ex.nom||''))+'</span>':'')+leadCheckHtml(l,ex)+'</div>'
       +'<div class="ld-grid">'
         +'<span>📞 <b>'+esc(l.tel||'—')+'</b></span><span>✉️ <b>'+esc(l.email||'—')+'</b></span>'
         +(isDec?'<span style="grid-column:1/-1">🌱 Intérêts : <b>'+esc((l.interets||[]).join(', ')||'—')+'</b></span>'
@@ -6525,9 +6602,36 @@ function oLeadsRender(){
           +(isDec?'':'<button class="ob bgh bsm" style="min-height:40px" onclick="oLeadMdp(\''+l.id+'\')">🔑 Mot de passe & pièce</button>'):'')
         +(l.tel&&!isDec?'<a class="ob bwa bsm" style="min-height:40px;text-decoration:none" target="_blank" href="'+mkWA(l.tel,'Bonjour '+(l.prenom||'').split(' ')[0]+' 🌿 J\'ai bien reçu vos informations d\'inscription OlyLife, je m\'en occupe et reviens vers vous très vite.\n'+rqSignature())+'">💬 WhatsApp</a>':'')
         +(ex?'<button class="ob bgh bsm" style="min-height:40px" onclick="oOpenF(\''+ex.id+'\')">👁 Voir la fiche</button>':'')
-        +'<button class="ob bsm" style="min-height:40px;background:var(--rdp);color:var(--rd);border:none;margin-left:auto" onclick="oLeadDel(\''+l.id+'\')">🗑</button>'
+        +(isAdm?'<button class="ob bsm" style="min-height:40px;background:var(--rdp);color:var(--rd);border:none;margin-left:auto" onclick="oLeadDel(\''+l.id+'\')">🗑</button>':'')
       +'</div></div>';
   }).join('');
+}
+// v3.21 — vérification : la fiche est-elle bien rattachée à la personne qui a transmis le lien ?
+function leadAttribOk(l,ex){
+  var tag=l.tag||l.userNom||'';if(!ex)return null;
+  return ex.refere===tag||ex.refere===l.userNom||ex.referentNom===l.userNom||(ex.ctags||[]).indexOf(tag)>=0;
+}
+function leadCheckHtml(l,ex){
+  var tag=l.tag||l.userNom||'';
+  if(!ex){return l.statut==='traite'?'<span class="obdg brd" title="La demande est marquée intégrée mais aucune fiche ne correspond (téléphone, e-mail ou nom)">⚠️ aucune fiche trouvée</span>':'';}
+  var ok=leadAttribOk(l,ex),suivi=suivisDe(ex).join(', ');
+  var s=ok?'<span class="obdg bgr" title="La fiche porte bien le tag / référent de la personne qui a transmis le lien">✅ rattachée à '+esc(tag)+'</span>'
+          :'<span class="obdg brd">⚠️ fiche sous « '+esc(ex.refere||'—')+' » — lien de '+esc(tag)+'</span>'+(ROLE()!=='referent'?' <button class="ob bgh bsm" style="min-height:32px" onclick="oLeadAttach(\''+l.id+'\')">🔗 Rattacher à '+esc(tag)+'</button>':'');
+  s+=' <span class="obdg '+(suivi?'bbl':'bor')+'" title="Personne qui s\'occupe de la fiche">'+(suivi?'👤 suivi par '+esc(suivi):'👤 sans suivi')+'</span>';
+  return s;
+}
+function oLeadAttach(id){
+  var l=leadById(id);if(!l)return;var ex=impFindExisting({tel:l.tel,email:l.email,nom:l.nom,prenom:l.prenom});if(!ex)return;
+  var tag=l.tag||l.userNom||'';ex.ctags=ex.ctags||[];if(tag&&ex.ctags.indexOf(tag)<0)ex.ctags.push(tag);if(!ex.refere)ex.refere=tag;
+  jrnAdd(ex,'note','🔗 Fiche rattachée à '+tag+' (lien QR / découverte de '+(l.userNom||tag)+')');oPush([ex]);oT('🔗 Fiche rattachée à '+tag,'s');oLeadsRender();
+}
+function oLeadsPurge(){
+  if(ROLE()!=='admin')return;var sel=(document.getElementById('ld-fown')||{}).value||'';
+  var tr=LEADS.filter(function(l){return l.statut==='traite'&&(!sel||l.userNom===sel);});if(!tr.length)return;
+  var bad=tr.filter(function(l){var ex=impFindExisting({tel:l.tel,email:l.email,nom:l.nom,prenom:l.prenom});return!ex||leadAttribOk(l,ex)===false;}).length;
+  if(!confirm('Supprimer définitivement '+tr.length+' demande(s) déjà intégrée(s)'+(sel?' de '+sel:'')+' ?'+(bad?'\n\n⚠️ '+bad+' d\'entre elles n\'ont pas de fiche ou une fiche mal rattachée — vérifiez d\'abord.':'')))return;
+  var i=0;(function next(){if(i>=tr.length){LEADS_NEW=LEADS.filter(function(x){return x.statut!=='traite';}).length;navBadges();oLeadsRender();oT('🗑 '+tr.length+' demande(s) supprimée(s)','s');return;}
+    var l=tr[i++];oPostAsync_({op:'leadDone',id:l.id,action:'supprime'}).then(function(d){if(d&&d.ok)LEADS=LEADS.filter(function(x){return x.id!==l.id;});next();}).catch(next);})();
 }
 function oLeadDecSend(id){
   var l=leadById(id);if(!l)return;
@@ -6556,7 +6660,7 @@ function oLeadCreate(id){
     OC.unshift(c);
   }
   oPush([c]);
-  oPostAsync_({op:'leadDone',id:id,action:'traite'}).then(function(){l.statut='traite';l.traitePar=PARTNER_NOM();l.traiteLe=new Date().toISOString();LEADS_NEW=LEADS.filter(function(x){return x.statut!=='traite';}).length;navBadges();oLeadsRender();}).catch(function(){});
+  oPostAsync_({op:'leadDone',id:id,action:'traite',ficheId:c.id,suiviPar:suivisDe(c).join(', ')}).then(function(){l.statut='traite';l.traitePar=PARTNER_NOM();l.traiteLe=new Date().toISOString();l.suiviPar=suivisDe(c).join(', ');LEADS_NEW=LEADS.filter(function(x){return x.statut!=='traite';}).length;navBadges();oLeadsRender();}).catch(function(){});
   emojiBurst(isDec?['🌱','✨']:['📥','✨']);oT(isDec?(ex?'🔗 Fiche complétée — envoyez-lui les infos découverte depuis la fiche':'➕ Fiche Prospect créée — envoyez-lui les infos découverte depuis la fiche'):(ex?'🔗 Fiche complétée — pensez à récupérer le mot de passe avant de créer le compte OlyLife':'➕ Fiche créée — pensez à récupérer le mot de passe avant de créer le compte OlyLife'),'s');
   oRefresh();oOpenF(c.id);
 }
