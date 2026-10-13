@@ -2283,7 +2283,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.20.1 · 13/10';
+var APP_VERSION='v3.20.2 · 13/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -4349,15 +4349,80 @@ function impParseGroups(raw){
   var parts=raw.split(/^--- capture \d+ ---$/m).map(function(x){return x.trim();}).filter(Boolean);
   var groups=[];
   parts.forEach(function(t){
-    var starts=looksOlyOrder(t)||looksOlyReg(t)||looksOlyRows(t);
+    var starts=looksOlyOrder(t)||looksOlyOrderOcr(t)||looksOlyReg(t)||looksOlyRows(t);
     if(starts||!groups.length)groups.push(t);else groups[groups.length-1]+='\n'+t;
   });
   var items=[];
   groups.forEach(function(t){
-    var its=looksOlyOrder(t)?parseOlyOrders(t):looksOlyReg(t)?parseOlyReg(t):looksOlyRows(t)?parseOlyRows(t):looksCard(t)?parseCard(t):parseVrac(t);
+    var its=(looksOlyOrder(t)||looksOlyOrderOcr(t))?parseOlyOrderAny(t):looksOlyReg(t)?parseOlyReg(t):looksOlyRows(t)?parseOlyRows(t):looksCard(t)?parseCard(t):parseVrac(t);
     its.forEach(function(it){items.push(it);});
   });
   return items;
+}
+// v3.20.2 — page « Informations sur la commande » lue par OCR sur mobile (colonnes mélangées, libellés coupés sur plusieurs lignes)
+function looksOlyOrderOcr(text){
+  var t=deEnt(text);
+  var hasNum=/\b20\d{14,}\b/.test(t),hasEA=/\b(EA|AF)\d{5,}\b/i.test(t),hasHead=/informations? (sur|de) la commande|order information|informations de base|basic information|informations sur les membres|member information/i.test(t);
+  return(hasNum&&(hasEA||hasHead))||(hasHead&&hasEA&&/@|\+\d{6,}/.test(t));
+}
+function parseOlyOrderOcr(text){
+  var raw=deEnt(text).replace(/ /g,' ');
+  var lines=raw.split(/\r?\n/).map(function(l){return l.trim();}).filter(Boolean);
+  var flat=lines.join(' ').replace(/\s+/g,' ');
+  function after(rx,from){var m=(from||flat).match(rx);return m?m[1].trim():'';}
+  var num=after(/\b(20\d{14,})\b/);
+  // ID membre : le plus fréquent (l'en-tête de page affiche aussi l'identifiant de la personne connectée)
+  var member='',cnt={};(flat.match(/\b(?:EA|AF)\d{5,}\b/gi)||[]).forEach(function(x){x=x.toUpperCase();cnt[x]=(cnt[x]||0)+1;});
+  Object.keys(cnt).forEach(function(k){if(!member||cnt[k]>cnt[member])member=k;});
+  if(member&&cnt[member]===1){var mm=flat.match(/(?:identifiant\s*(?:de)?\s*(?:membre)?|member id)\s*[:：]?\s*((?:EA|AF)\d{5,})/i);if(mm)member=mm[1].toUpperCase();}
+  var email=after(/([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/i);
+  var tels=flat.match(/\+\d{1,3}[\s.-]?\d[\d\s.-]{6,}\d/g)||[];
+  var tel=tels[0]||'',recipTel=tels.length>1?tels[1]:'';
+  var noTel=flat.replace(/\+\d{1,3}[\s.-]?\d[\d\s.-]{6,}\d/g,' ');
+  var montant=after(/(?:montant|amount)[^\d]{0,40}?(\d[\d\s]{0,6}[.,]\d{2})\b/i);if(montant)montant=montant.replace(/\s/g,'');
+  // Nom : « Nom: MACE CARINE » (jamais « Nom du destinataire »)
+  var nomC='';for(var i=0;i<lines.length;i++){var ml=lines[i].match(/^(?:nom|name)\s*[:：]\s*(.+)$/i);if(ml&&!/destinataire|recipient/i.test(lines[i])){nomC=ml[1].replace(/\b(surnom|nickname).*$/i,'').trim();break;}}
+  if(!nomC){var mn=flat.match(/\b(?:nom|name)\s*[:：]\s*([A-ZÀ-Ý][A-ZÀ-Ý' -]{2,}?)(?=\s+(?:surnom|nickname|num[ée]ro|id card|adresse|email)\b|$)/i);if(mn)nomC=mn[1].trim();}
+  // Pièce d'identité : suite de 6 à 15 chiffres qui n'est ni le n° de commande ni un téléphone
+  var idcard='';var mb=noTel.match(/(?:^|[^A-Z\d])(\d{8,15})\s*(?::\s*)?(?:carte d'identit[ée]|id card)/i);if(mb&&mb[1]!==num)idcard=mb[1];
+  if(!idcard){var mid=noTel.match(/(?:carte d'identit[ée]|id card)\s*:?\s*(?:[^\dA-Z]{0,20})(?<![A-Z])(\d{8,15})\b/i);if(mid&&mid[1]!==num)idcard=mid[1];}
+  if(!idcard){(noTel.match(/\b\d{6,15}\b/g)||[]).forEach(function(d){if(!idcard&&d!==num&&!/^0?[67]\d{8}$/.test(d)&&!/^\d{5}$/.test(d)&&d.indexOf(num.slice(0,8))!==0)idcard=d;});}
+  var pays=after(/\b(France|Belgique|Belgium|Suisse|Switzerland|Luxembourg|Monaco|Maroc|Morocco|Tunisie|Alg[ée]rie|C[ôo]te d'Ivoire|S[ée]n[ée]gal|Cameroun|B[ée]nin|Togo|Mali|Burkina Faso|Gabon|Congo|Guin[ée]e|Niger|Madagascar|R[ée]union|Guadeloupe|Martinique|Guyane|Canada|Espagne|Spain|Italie|Italy|Portugal|Allemagne|Germany|Royaume-Uni|United Kingdom)\b/i);
+  // Adresse : de « Adresse » (hors e-mail) jusqu'au nom du destinataire / numéro
+  var adr='';var ai=-1;for(var j=0;j<lines.length;j++){if(/^adresse\b/i.test(lines[j])&&!/e-?mail|courriel/i.test(lines[j])){ai=j;break;}if(/^(detailed )?address\b/i.test(lines[j])&&!/e-?mail/i.test(lines[j])){ai=j;break;}}
+  if(ai>=0){var buf=[];for(var k=ai;k<lines.length&&k<ai+5;k++){var L=lines[k];if(k>ai&&/^(nom du|recipient|num[ée]ro|code|postal|phone|t[ée]l[ée]phone)/i.test(L))break;L=L.replace(/^adresse\b/i,'').replace(/^(detailed )?address\b/i,'').replace(/^d[ée]taill[ée]e\s*[:：]?/i,'').replace(/^[:：]\s*/,'').trim();if(L&&!/^d[ée]taill[ée]e$/i.test(L))buf.push(L);}adr=buf.join(' ').replace(/\s+,/g,',').replace(/\s+/g,' ').trim();}
+  var destinataire='';for(var d=0;d<lines.length;d++){var md=lines[d].match(/^(?:nom du|recipient'?s? name)\s*[:：]?\s*(.*)$/i);if(md){destinataire=md[1].trim();if(!destinataire&&lines[d+1]&&!/^destinataire/i.test(lines[d+1]))destinataire=lines[d+1].trim();destinataire=destinataire.replace(/^destinataire\s*[:：]?\s*/i,'').trim();break;}}
+  var cp=after(/\b(?:code\s*postal|postal code|code)\s*[:：]?\s*(\d{4,5})\b/i)||after(/\b(\d{5})\b/,adr);
+  var ville='';var segs=adr.split(',').map(function(x){return x.trim();}).filter(Boolean);
+  for(var si=0;si<segs.length;si++){if(/^\d{4,5}$/.test(segs[si])&&segs[si+1]&&!/^(france|belgique|suisse|maroc)$/i.test(segs[si+1])){ville=segs[si+1];break;}}
+  if(!ville&&segs.length>=3)ville=segs[segs.length-2];
+  // Produit : code OLY-XXX (éventuellement coupé « OLY- » / « HCA002A »), nom par mots-clés, prix USD, quantité
+  var code=after(/\b(OLY-?\s*[A-Z]{2,}\d{2,}[A-Z]?)\b/i).replace(/\s+/g,'').toUpperCase();if(!code){var mc=flat.match(/\b([A-Z]{3}\d{3}[A-Z]?)\b/);if(mc&&/OLY-/i.test(flat))code='OLY-'+mc[1];}
+  var prods=[],prodName='';
+  if(/p90\s*\+|p90plus|HCA002A/i.test(flat)){prods.push('Tera-P90+ (PEMF/Terahertz)');prodName='Tera-P90+';}
+  else if(/tera[\s-]*p90|HCA002\b/i.test(flat)){prods.push('Tera-P90 (PEMF/Terahertz)');prodName='Tera-P90';}
+  PRODUCTS.forEach(function(P){if(/p90/i.test(P))return;var pk=P.toLowerCase().split('(')[0].trim();var w=pk.split(/\s+/)[0];if(w.length>=4&&new RegExp('\\b'+w,'i').test(flat)&&prods.indexOf(P)<0){prods.push(P);if(!prodName)prodName=pk;}});
+  var pz=flat.indexOf('OLY-')>=0?flat.slice(flat.indexOf('OLY-')):flat;var prix=after(/(\d{2,5}[.,]\d{2})\s*(?:\d{1,2}\s+)?(?:\S+\s+){0,4}?USD/i,pz)||after(/(\d{2,5}[.,]\d{2})\s*USD/i);var qte=after(/\d{2,5}[.,]\d{2}\s*(\d{1,2})\b/,pz)||after(/USD\s*(\d{1,2})\b/i)||'1';
+  var type=/inscription des membres|member registration/i.test(flat)?'Inscription des membres':(/r[ée]achat|repurchase|reorder/i.test(flat)?'Réachat':'');
+  var paid=/(?:^|[^a-zà-ÿ])(r[ée]gl[ée]e?|pay[ée]e?|paid)(?![a-zà-ÿ])/i.test(flat);
+  var parts=nomC.split(/\s+/).filter(Boolean);var nom=parts.shift()||'';
+  var prenom=parts.map(function(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();}).join(' ');
+  var dateCmd=/^\d{8}/.test(num)?num.slice(0,4)+'-'+num.slice(4,6)+'-'+num.slice(6,8):'';
+  var montantUSD=parseFloat(String(montant||prix||'').replace(/[^\d.,]/g,'').replace(',','.'))||0;
+  var rang=montantUSD?rangFromUSD(montantUSD):'';
+  var prodTxt=prodName?(qte+'× '+prodName+(prix?' ('+prix.replace(',','.')+' USD)':'')+(code?' · '+code:'')):'';
+  var notes=['Commande OlyLife'+(num?' n°'+num:'')+(dateCmd?' du '+fD(dateCmd):'')+' (lue par OCR — à vérifier)',montant?'Montant : '+montant+' USD':'',type?'Type : '+type:'',paid?'Statut commande : Réglé':'',prodTxt?'Produits : '+prodTxt:'',adr?'Livraison : '+adr:'',destinataire&&destinataire.toLowerCase()!==nomC.toLowerCase()?'Destinataire : '+destinataire:''].filter(Boolean).join('\n');
+  var livNom=(destinataire&&destinataire.replace(/\s+/g,' ').toLowerCase()!==nomC.replace(/\s+/g,' ').toLowerCase())?destinataire:'';
+  var livTel=(recipTel&&normPhone(recipTel)!==normPhone(tel))?normPhone(recipTel):'';
+  var it={nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,livNom:livNom,livTel:livTel,numCommande:num,memberIdOlyLife:member,pieceId:idcard,dateCommande:dateCmd,rangOly:rang,montantUSD:montantUSD,achatsUSD:montantUSD,produits:prods,etape:'Client',qualification:'Chaud',statut:'reseau',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olylife-ocr'};
+  return(it.nom||it.tel||it.email||it.numCommande)?[it]:[];
+}
+// Page de commande : copier-coller propre (libellé : valeur) sinon lecture OCR
+function parseOlyOrderAny(text){
+  var its=looksOlyOrder(text)?parseOlyOrders(text):[];
+  var weak=!its.length||(its.length===1&&!its[0].nom&&!its[0].tel&&!its[0].email);
+  if(weak&&looksOlyOrderOcr(text)){var o=parseOlyOrderOcr(text);if(o.length)return o;}
+  return its;
 }
 function looksOlyOrder(text){
   if((/num[ée]ro de commande\s*[:：]/i.test(text)&&/id membre\s*[:：]/i.test(text))
@@ -4541,10 +4606,11 @@ function oImpAnalyse(){
       items=impParseGroups(raw);
       oT('📷 '+items.length+' fiche(s) lue(s) dans les captures — vérifiez avant d\'importer','s');
     }else{
-      var isReg=!looksOlyOrder(raw)&&looksOlyReg(raw);
-      var isRows=!looksOlyOrder(raw)&&!isReg&&!looksCSV&&looksOlyRows(raw);
-      items=looksOlyOrder(raw)?parseOlyOrders(raw):isReg?parseOlyReg(raw):isRows?parseOlyRows(raw):(looksCSV?parseCSV(raw):parseVrac(raw));
-      if(looksOlyOrder(raw))oT('📦 Relevé de commande OlyLife reconnu — '+items.length+' client(s)','s');
+      var isOrd=looksOlyOrder(raw)||looksOlyOrderOcr(raw);
+      var isReg=!isOrd&&looksOlyReg(raw);
+      var isRows=!isOrd&&!isReg&&!looksCSV&&looksOlyRows(raw);
+      items=isOrd?parseOlyOrderAny(raw):isReg?parseOlyReg(raw):isRows?parseOlyRows(raw):(looksCSV?parseCSV(raw):parseVrac(raw));
+      if(isOrd)oT('📦 Page de commande OlyLife reconnue — '+items.length+' client(s)','s');
       if(isReg)oT(items.length?'📝 Formulaire d\'inscription OlyLife reconnu — 1 fiche (le mot de passe n\'est jamais enregistré)':'📝 Formulaire d\'inscription reconnu mais nom / téléphone introuvables','s');
       if(isRows)oT('📋 Liste de membres OlyLife reconnue — '+items.length+' ligne(s)','s');
     }
