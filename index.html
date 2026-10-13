@@ -2283,7 +2283,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.20 · 10/10';
+var APP_VERSION='v3.20.1 · 13/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -4503,6 +4503,31 @@ function impDiff(it,ex){
   });
   return{news:news,known:known};
 }
+// v3.20.1 — plusieurs blocs (captures, pages) qui désignent la même personne → une seule fiche à l'aperçu
+function impSameKey(a,b){
+  if(a.numCommande&&b.numCommande&&a.numCommande===b.numCommande)return true;
+  if(a.memberIdOlyLife&&b.memberIdOlyLife&&String(a.memberIdOlyLife).toUpperCase()===String(b.memberIdOlyLife).toUpperCase())return true;
+  var ta=tel9(a.tel),tb=tel9(b.tel);if(ta&&tb&&ta.length>=9&&ta===tb)return true;
+  if(a.email&&b.email&&a.email.toLowerCase().trim()===b.email.toLowerCase().trim())return true;
+  return!!(a.nom&&a.prenom&&b.nom&&b.prenom)&&a.nom.trim().toUpperCase()===b.nom.trim().toUpperCase()&&prem(a.prenom)===prem(b.prenom);
+}
+function impFold(into,it){
+  Object.keys(it).forEach(function(k){
+    var v=it[k];if(v==null||v==='')return;
+    if(Array.isArray(v)){into[k]=into[k]||[];v.forEach(function(x){if(into[k].indexOf(x)<0)into[k].push(x);});return;}
+    if(k==='notes'){if(!into.notes)into.notes=v;else if(into.notes.indexOf(v)<0)into.notes+='\n'+v;return;}
+    if(into[k]==null||into[k]==='')into[k]=v;
+  });
+  return into;
+}
+function impMergeSame(items){
+  var out=[];
+  items.forEach(function(it){
+    var hit=null;for(var i=0;i<out.length&&!hit;i++)if(impSameKey(out[i],it))hit=out[i];
+    if(hit)impFold(hit,it);else out.push(it);
+  });
+  return out;
+}
 function oImpAnalyse(){
   var raw=document.getElementById('oimp-ta').value.trim();
   if(!raw){oT('Collez d\'abord des données à analyser','e');return;}
@@ -4531,6 +4556,8 @@ function oImpAnalyse(){
     if(defSuivi&&!it.suiviPar)it.suiviPar=defSuivi;
     if(it.tel)it.tel=normPhone(it.tel);
   });
+  var nbAvant=items.length;items=impMergeSame(items);
+  if(items.length<nbAvant)oT('🧩 '+(nbAvant-items.length)+' bloc(s) regroupé(s) : plusieurs captures décrivaient la même personne','s');
   IMP_PARSED=items;
   var card=document.getElementById('oimp-prev-card');
   var prev=document.getElementById('oimp-prev');
