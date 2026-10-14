@@ -2285,7 +2285,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.21.2 · 14/10';
+var APP_VERSION='v3.21.3 · 14/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -4413,18 +4413,28 @@ function parseOlyOrderOcr(text){
   else if(/tera[\s-]*p90|HCA002\b/i.test(flat)){prods.push('Tera-P90 (PEMF/Terahertz)');prodName='Tera-P90';}
   PRODUCTS.forEach(function(P){if(/p90/i.test(P))return;var pk=P.toLowerCase().split('(')[0].trim();var w=pk.split(/\s+/)[0];if(w.length>=4&&new RegExp('\\b'+w,'i').test(flat)&&prods.indexOf(P)<0){prods.push(P);if(!prodName)prodName=pk;}});
   var pz=flat.indexOf('OLY-')>=0?flat.slice(flat.indexOf('OLY-')):flat;var prix=after(/(\d{2,5}[.,]\d{2})\s*(?:\d{1,2}\s+)?(?:\S+\s+){0,4}?USD/i,pz)||after(/(\d{2,5}[.,]\d{2})\s*USD/i);var qte=after(/\d{2,5}[.,]\d{2}\s*(\d{1,2})\b/,pz)||after(/USD\s*(\d{1,2})\b/i)||'1';
+  // Transporteur, tracking, date de livraison (tableau « Delivery information »)
+  var transporteur='',trackingNums=[],dLivr='';
+  var CARRIERS=/\b(DHL|UPS|FedEx|Chronopost|Colissimo|La Poste|EMS|GLS|TNT|DPD|Aramex)\b/i;
+  lines.forEach(function(l){var mc=l.match(CARRIERS);if(mc&&!transporteur)transporteur=mc[1].toUpperCase()==='LA POSTE'?'Colissimo / La Poste':mc[1];});
+  // Tracking : format postal international XX000000000XX, ou alphanumérique 8+ chars près de "tracking"
+  (flat.match(/\b[A-Z]{2}\d{9}[A-Z]{2}\b/g)||[]).forEach(function(t){if(trackingNums.indexOf(t)<0)trackingNums.push(t);});
+  if(!trackingNums.length){var mt=flat.match(/(?:tracking|suivi|n[°o]\s*(?:de\s*)?suivi)\s*(?:number)?\s*[:：]?\s*([A-Z0-9]{8,20})/i);if(mt)trackingNums.push(mt[1]);}
+  // Date de livraison : YYYY-MM-DD
+  lines.forEach(function(l){var md=l.match(/\b(20\d{2}-\d{2}-\d{2})\b/g);if(md)dLivr=md[md.length-1];});
   var type=/inscription des membres|member registration/i.test(flat)?'Inscription des membres':(/r[ée]achat|repurchase|reorder/i.test(flat)?'Réachat':'');
-  var paid=/(?:^|[^a-zà-ÿ])(r[ée]gl[ée]e?|pay[ée]e?|paid)(?![a-zà-ÿ])/i.test(flat);
+  var paid=/(?:^|[^a-zà-ÿ])(r[ée]gl[ée]e?|pay[ée]e?|paid|settled)(?![a-zà-ÿ])/i.test(flat);
   var parts=nomC.split(/\s+/).filter(Boolean);var nom=parts.shift()||'';
   var prenom=parts.map(function(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();}).join(' ');
   var dateCmd=/^\d{8}/.test(num)?num.slice(0,4)+'-'+num.slice(4,6)+'-'+num.slice(6,8):'';
   var montantUSD=parseFloat(String(montant||prix||'').replace(/[^\d.,]/g,'').replace(',','.'))||0;
   var rang=montantUSD?rangFromUSD(montantUSD):'';
   var prodTxt=prodName?(qte+'× '+prodName+(prix?' ('+prix.replace(',','.')+' USD)':'')+(code?' · '+code:'')):'';
-  var notes=['Commande OlyLife'+(num?' n°'+num:'')+(dateCmd?' du '+fD(dateCmd):'')+' (lue par OCR — à vérifier)',montant?'Montant : '+montant+' USD':'',type?'Type : '+type:'',paid?'Statut commande : Réglé':'',prodTxt?'Produits : '+prodTxt:'',adr?'Livraison : '+adr:'',destinataire&&destinataire.toLowerCase()!==nomC.toLowerCase()?'Destinataire : '+destinataire:''].filter(Boolean).join('\n');
+  if(dLivr&&dLivr===dateCmd)dLivr='';
+  var notes=['Commande OlyLife'+(num?' n°'+num:'')+(dateCmd?' du '+fD(dateCmd):'')+' (lue par OCR — à vérifier)',montant?'Montant : '+montant+' USD':'',type?'Type : '+type:'',paid?'Statut commande : Réglé':'',prodTxt?'Produits : '+prodTxt:'',transporteur?'Transporteur : '+transporteur:'',trackingNums.length?'Tracking : '+trackingNums.join(' / '):'',dLivr?'Date livraison : '+dLivr:'',adr?'Livraison : '+adr:'',destinataire&&destinataire.toLowerCase()!==nomC.toLowerCase()?'Destinataire : '+destinataire:''].filter(Boolean).join('\n');
   var livNom=(destinataire&&destinataire.replace(/\s+/g,' ').toLowerCase()!==nomC.replace(/\s+/g,' ').toLowerCase())?destinataire:'';
   var livTel=(recipTel&&normPhone(recipTel)!==normPhone(tel))?normPhone(recipTel):'';
-  var it={nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,livNom:livNom,livTel:livTel,numCommande:num,memberIdOlyLife:member,pieceId:idcard,dateCommande:dateCmd,rangOly:rang,montantUSD:montantUSD,achatsUSD:montantUSD,produits:prods,etape:'Client',qualification:'Chaud',statut:'reseau',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olylife-ocr'};
+  var it={nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,livNom:livNom,livTel:livTel,numCommande:num,memberIdOlyLife:member,pieceId:idcard,dateCommande:dateCmd,rangOly:rang,montantUSD:montantUSD,achatsUSD:montantUSD,produits:prods,transporteur:transporteur,tracking:trackingNums.join(' / '),dateLivraison:dLivr,etape:'Client',qualification:'Chaud',statut:'reseau',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olylife-ocr'};
   return(it.nom||it.tel||it.email||it.numCommande)?[it]:[];
 }
 // Page de commande : copier-coller propre (libellé : valeur) sinon lecture OCR
