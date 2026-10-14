@@ -2285,7 +2285,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.21.1 · 14/10';
+var APP_VERSION='v3.21.2 · 14/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -4561,7 +4561,8 @@ function impFindExisting(it){
     if(it.memberIdOlyLife&&c.memberIdOlyLife&&String(c.memberIdOlyLife).toUpperCase()===String(it.memberIdOlyLife).toUpperCase())return true;
     var t=tel9(it.tel);if(t&&t.length>=9&&tel9(c.tel)===t)return true;
     if(it.email&&c.email&&c.email.toLowerCase().trim()===it.email.toLowerCase().trim())return true;
-    return!!(it.nom&&it.prenom)&&normStr(c.nom)===normStr(it.nom)&&prem(c.prenom)===prem(it.prenom);
+    if(!(it.nom&&it.prenom))return false;var iN=normStr(it.nom),iP=prem(it.prenom),cN=normStr(c.nom),cP=prem(c.prenom);
+    return(cN===iN&&cP===iP)||(cN===normStr(it.prenom)&&cP===prem(it.nom));
   })||null;
 }
 var IMP_FLBL={tel:'téléphone',email:'e-mail',pays:'pays',ville:'ville',adresse:'adresse livraison',cp:'code postal',livNom:'destinataire livraison',livTel:'tél. livraison',factAdresse:'adresse facturation',numCommande:'n° commande',memberIdOlyLife:'ID membre',pieceId:'pièce d\'identité',tracking:'n° de tracking',transporteur:'transporteur',dateLivraison:'date de livraison',dateCommande:'date de commande',rangOly:'rang OlyLife',refere:'référent',suiviPar:'suivi par',produits:'produits',notes:'notes de commande',statut:'statut',etape:'étape'};
@@ -4585,7 +4586,8 @@ function impSameKey(a,b){
   if(a.memberIdOlyLife&&b.memberIdOlyLife&&String(a.memberIdOlyLife).toUpperCase()===String(b.memberIdOlyLife).toUpperCase())return true;
   var ta=tel9(a.tel),tb=tel9(b.tel);if(ta&&tb&&ta.length>=9&&ta===tb)return true;
   if(a.email&&b.email&&a.email.toLowerCase().trim()===b.email.toLowerCase().trim())return true;
-  return!!(a.nom&&a.prenom&&b.nom&&b.prenom)&&normStr(a.nom)===normStr(b.nom)&&prem(a.prenom)===prem(b.prenom);
+  if(!(a.nom&&a.prenom&&b.nom&&b.prenom))return false;var aN=normStr(a.nom),aP=prem(a.prenom),bN=normStr(b.nom),bP=prem(b.prenom);
+  return(aN===bN&&aP===bP)||(aN===normStr(b.prenom)&&aP===prem(b.nom));
 }
 function impFold(into,it){
   Object.keys(it).forEach(function(k){
