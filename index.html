@@ -163,7 +163,8 @@ html,body{-webkit-text-size-adjust:100%;overscroll-behavior:none;background:var(
 .oct{font-size:13px;font-weight:600;color:var(--gold);}
 
 /* ── CONTACT CARDS ─────────────────────────────────────────────── */
-.ocli-card{background:var(--navy2);border-radius:var(--r);border:1px solid var(--bd);padding:14px 16px;margin-bottom:10px;box-shadow:var(--sh);display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .12s;}
+.ocli-card{background:var(--navy2);border-radius:var(--r);border:1px solid var(--bd);padding:14px 16px;margin-bottom:10px;box-shadow:var(--sh);display:flex;flex-wrap:wrap;align-items:center;gap:12px;cursor:pointer;transition:background .12s;}
+.ocli-card>.ocli-info{flex:1 1 0;min-width:0;}
 .ocli-card:active{background:var(--navy3);}
 .ocli-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--goldd),var(--gold));color:#fff;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .ocli-info{flex:1;min-width:0;}
@@ -394,11 +395,18 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .acc-row:last-child{border-bottom:none;}
 @keyframes resPulse{0%,100%{box-shadow:0 0 0 0 rgba(198,62,71,.55);}50%{box-shadow:0 0 0 7px rgba(198,62,71,0);}}
 .res-pulse{animation:resPulse 1.7s ease-out infinite;}
+.av-todo{outline:2px solid #C63E47;outline-offset:2px;}
+.jrn-acts{display:flex;flex-direction:column;gap:2px;flex-shrink:0;}
+.jrn-acts button{background:transparent;border:1px solid var(--bd);border-radius:8px;min-width:30px;min-height:30px;cursor:pointer;font-size:13px;}
+.jrn-acts button:hover{background:var(--navy3);}
 .res-box{display:flex;align-items:center;gap:10px;background:#FFF5F5;border:1px solid #F3C1C5;border-radius:var(--r);padding:10px 12px;margin:0 0 12px;}
 @media (prefers-reduced-motion:reduce){.res-pulse{animation:none;}}
-.qi-panel{display:none;flex:0 0 100%;margin-top:8px;padding:10px 12px;background:var(--navy3);border:1px solid var(--bd);border-radius:var(--rs);font-size:12px;line-height:1.7;color:var(--tx);cursor:default;}
+.qi-panel{display:none;flex:1 1 100%;width:100%;margin-top:8px;padding:10px 12px;background:var(--navy3);border:1px solid var(--bd);border-radius:var(--rs);font-size:12px;line-height:1.7;color:var(--tx);cursor:default;}
 .qi-panel.on{display:block;}
 .qi-panel b{color:var(--t2);font-weight:600;}
+.qi-panel>div{overflow-wrap:anywhere;}
+tr.qi-row td{background:var(--navy3);padding:8px 14px 10px 54px;font-size:12px;line-height:1.7;}
+tr.qi-row td>div{overflow-wrap:anywhere;}
 .acc-row .em{font-size:18px;flex-shrink:0;width:26px;text-align:center;}
 .acc-row .b{flex:1;min-width:0;font-size:13px;line-height:1.5;color:var(--tx);}
 .acc-row .b small{display:block;color:var(--t3);font-size:11.5px;}
@@ -2301,7 +2309,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.22 · 15/10';
+var APP_VERSION='v3.22.1 · 16/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -3679,11 +3687,34 @@ var JRN_IC={appel:'📞',note:'📝',statut:'🎯',rappel:'⏰',fait:'✅',syste
 function jrnHtml(c){
   var j=(c.journal||[]).slice().sort(function(a,b){return new Date(b.ts)-new Date(a.ts);});
   if(!j.length)return'<div style="padding:14px 16px;font-size:12px;color:var(--t3)">Aucune action enregistrée pour l\'instant — ce contact est <b style="color:#C63E47">à contacter</b>.</div>';
+  var can=jrnCanEdit(c);
   return j.map(function(e){
+    var mine=e.auteur===PARTNER_NOM();
+    var btns=(can||(mine&&ROLE()!=='referent'))?'<div class="jrn-acts"><button type="button" title="Modifier cette observation" onclick="oJrnEdit(\''+c.id+'\',\''+e.id+'\')">✏️</button><button type="button" title="Supprimer cette observation" onclick="oJrnDel(\''+c.id+'\',\''+e.id+'\')">🗑</button></div>'
+      :(ROLE()==='referent'&&mine?'<div class="jrn-acts"><button type="button" title="Demander une correction au gestionnaire" onclick="oReqModif(\''+c.id+'\')">📨</button></div>':'');
     return'<div class="jrn-it"><div class="jrn-ic">'+(JRN_IC[e.type]||'•')+'</div><div style="flex:1;min-width:0">'
-      +'<div class="jrn-dt">'+fDTfull(e.ts)+' · <span class="jrn-au">'+esc(e.auteur)+'</span>'+(e.role?' <span style="opacity:.7">('+roleLabel(e.role)+')</span>':'')+'</div>'
-      +'<div class="jrn-tx">'+esc(e.texte)+'</div></div></div>';
+      +'<div class="jrn-dt">'+fDTfull(e.ts)+' · <span class="jrn-au">'+esc(e.auteur)+'</span>'+(e.role?' <span style="opacity:.7">('+roleLabel(e.role)+')</span>':'')+(e.editLe?' <span style="opacity:.7">· modifié le '+fDT(e.editLe)+(e.editPar?' par '+esc(e.editPar):'')+'</span>':'')+'</div>'
+      +'<div class="jrn-tx">'+esc(e.texte)+'</div></div>'+btns+'</div>';
   }).join('');
+}
+// v3.22.1 — correction d'une observation : admin partout, gestionnaire sur ses fiches attribuées, chacun sur ses propres entrées (sauf référent → demande)
+function jrnCanEdit(c){return canEditContact(c);}
+function oJrnEdit(cid,eid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var e=(c.journal||[]).find(function(x){return x.id===eid;});if(!e)return;
+  if(!(jrnCanEdit(c)||(e.auteur===PARTNER_NOM()&&ROLE()!=='referent'))){oT('Modification réservée au gestionnaire de la fiche','w');return;}
+  var t=prompt('Corriger l\'observation :',e.texte);if(t==null)return;t=t.trim();if(!t||t===e.texte)return;
+  e.texteAvant=e.texteAvant||e.texte;e.texte=t;e.editLe=new Date().toISOString();e.editPar=PARTNER_NOM();
+  oPush([c]);oT('✏️ Observation corrigée','s');if(document.getElementById('omo').classList.contains('on'))oOpenF(cid);oRefresh();
+}
+function oJrnDel(cid,eid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var e=(c.journal||[]).find(function(x){return x.id===eid;});if(!e)return;
+  if(!(jrnCanEdit(c)||(e.auteur===PARTNER_NOM()&&ROLE()!=='referent'))){oT('Suppression réservée au gestionnaire de la fiche','w');return;}
+  if(!confirm('Supprimer cette observation ?\n« '+e.texte.slice(0,120)+' »'))return;
+  c.journal=c.journal.filter(function(x){return x.id!==eid;});
+  var lastE=c.journal.slice().sort(function(a,b){return new Date(b.ts)-new Date(a.ts);})[0];c.lastActivity=lastE?lastE.ts:'';
+  oPush([c]);oT('🗑 Observation supprimée','w');if(document.getElementById('omo').classList.contains('on'))oOpenF(cid);oRefresh();
 }
 // Liste des personnes à qui attribuer un rappel (gestionnaires + admin)
 function gestionnaires(){
@@ -3894,7 +3925,7 @@ function cardHtml(c,showAttr){
   var d=rappelDiff(c);
   return'<div class="ocli-card st-'+s+(SEL[c.id]?' sel':'')+'" data-cid="'+c.id+'" onclick="oCardClick(event,\''+c.id+'\')">'
     +(SEL_MODE?'<span class="c-chk">'+(SEL[c.id]?'☑':'☐')+'</span>':'')
-    +'<div class="ocli-avatar">'+cAv(c)+'</div>'
+    +'<div class="ocli-avatar'+(resManque(c).length?' res-pulse av-todo':'')+'"'+(resManque(c).length?' title="À compléter : '+esc(resManque(c).join(' · '))+'"':'')+'>'+cAv(c)+'</div>'
     +'<div class="ocli-info" style="min-width:0">'
       +'<div class="ocli-name">'+esc(c.nom)+' '+esc(c.prenom||'')+'</div>'
       +'<div class="ocli-sub">'+(c.tel||'—')+(c.pays?' · '+c.pays:'')+'</div>'
@@ -3932,6 +3963,15 @@ function qiHtml(c){
     +li('🤝','Référé par',esc(c.refere||''))
     +li('💬','Canal · registre',esc((c.canal||'')+(c.registre?' · '+(TONE_LABEL[c.registre]||''):'')))
     ||'<div style="color:var(--t3)">Aucune information de contact renseignée.</div>';
+}
+// Tableau (ordinateur) : ligne d'infos dépliée sous le contact
+function oQiRow(id,btn){
+  var tr=btn&&btn.closest?btn.closest('tr'):null;if(!tr)return;
+  var nx=tr.nextElementSibling;
+  if(nx&&nx.classList.contains('qi-row')){nx.parentNode.removeChild(nx);btn.style.background='';return;}
+  var c=OC.find(function(x){return x.id===id;});if(!c)return;
+  var r=document.createElement('tr');r.className='qi-row';r.innerHTML='<td colspan="'+tr.children.length+'" onclick="event.stopPropagation()">'+qiHtml(c)+'</td>';
+  tr.parentNode.insertBefore(r,tr.nextSibling);btn.style.background='var(--goldp)';
 }
 function oQiTog(id,btn){var p=document.getElementById('qi-'+id);if(!p)return;p.classList.toggle('on');if(btn)btn.style.background=p.classList.contains('on')?'var(--goldp)':'';}
 
@@ -4680,18 +4720,35 @@ function parseCSV(text){
 function tel9(t){return String(t||'').replace(/\D/g,'').slice(-9);}
 function normStr(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').trim().toUpperCase();}
 function prem(p){return normStr(p).toLowerCase().split(/\s+/)[0]||'';}
+// Même personne ? (téléphone, e-mail, ou nom+prénom dans un sens ou dans l'autre — accents/majuscules ignorés)
+function impSamePerson(it,c){
+  var t=tel9(it.tel);if(t&&t.length>=9&&tel9(c.tel)===t)return true;
+  if(it.email&&c.email&&c.email.toLowerCase().trim()===it.email.toLowerCase().trim())return true;
+  if(!(it.nom&&it.prenom&&c.nom&&c.prenom))return!(t&&t.length>=9&&tel9(c.tel)&&tel9(c.tel).length>=9); // pas de nom pour trancher : même personne sauf si deux téléphones différents
+  var iN=normStr(it.nom),iP=prem(it.prenom),cN=normStr(c.nom),cP=prem(c.prenom);
+  return(cN===iN&&cP===iP)||(cN===normStr(it.prenom)&&cP===prem(it.nom));
+}
+function impSameKeyBo(it,c){
+  if(it.numCommande&&c.numCommande===it.numCommande)return true;
+  return!!(it.memberIdOlyLife&&c.memberIdOlyLife&&String(c.memberIdOlyLife).toUpperCase()===String(it.memberIdOlyLife).toUpperCase());
+}
 function impFindExisting(it){
   return OC.find(function(c){
-    if(it.numCommande&&c.numCommande===it.numCommande)return true;
-    if(it.memberIdOlyLife&&c.memberIdOlyLife&&String(c.memberIdOlyLife).toUpperCase()===String(it.memberIdOlyLife).toUpperCase())return true;
+    // n° de commande / ID membre identiques MAIS autre personne → commande passée sur le BO d'un autre membre : ce n'est pas la même fiche
+    if(impSameKeyBo(it,c))return impSamePerson(it,c);
     var t=tel9(it.tel);if(t&&t.length>=9&&tel9(c.tel)===t)return true;
     if(it.email&&c.email&&c.email.toLowerCase().trim()===it.email.toLowerCase().trim())return true;
     if(!(it.nom&&it.prenom))return false;var iN=normStr(it.nom),iP=prem(it.prenom),cN=normStr(c.nom),cP=prem(c.prenom);
     return(cN===iN&&cP===iP)||(cN===normStr(it.prenom)&&cP===prem(it.nom));
   })||null;
 }
+// Le membre dont le compte (ID / n° de commande) a servi à passer la commande, quand ce n'est pas la personne importée
+function impBoOwner(it){
+  if(!(it.memberIdOlyLife||it.numCommande))return null;
+  return OC.find(function(c){return impSameKeyBo(it,c)&&!impSamePerson(it,c);})||null;
+}
 var IMP_FLBL={tel:'téléphone',email:'e-mail',pays:'pays',ville:'ville',adresse:'adresse livraison',cp:'code postal',livNom:'destinataire livraison',livTel:'tél. livraison',factAdresse:'adresse facturation',numCommande:'n° commande',memberIdOlyLife:'ID membre',pieceId:'pièce d\'identité',tracking:'n° de tracking',transporteur:'transporteur',dateLivraison:'date de livraison',dateCommande:'date de commande',rangOly:'rang OlyLife',refere:'référent',suiviPar:'suivi par',produits:'produits',notes:'notes de commande',statut:'statut',etape:'étape'};
-var IMP_SKIP={id:1,createdAt:1,createdBy:1,journal:1,actions:1,rdvs:1,avances:1,suivis:1,geo:1,qualification:1,canal:1,registre:1,referentId:1,referentNom:1,_src:1,_state:1,_exid:1};
+var IMP_SKIP={id:1,createdAt:1,createdBy:1,journal:1,actions:1,rdvs:1,avances:1,suivis:1,geo:1,qualification:1,canal:1,registre:1,referentId:1,referentNom:1,_src:1,_state:1,_exid:1,_bo:1};
 var IMP_FORCE={tracking:1,transporteur:1,dateLivraison:1,numCommande:1,dateCommande:1,memberIdOlyLife:1,montantUSD:1};
 function impDiff(it,ex){
   var news=[],known=[];
@@ -4759,6 +4816,15 @@ function oImpAnalyse(){
     if(defRef&&!it.refere)it.refere=defRef;
     if(defSuivi&&!it.suiviPar)it.suiviPar=defSuivi;
     if(it.tel)it.tel=normPhone(it.tel);
+    // v3.22.1 — commande passée depuis le compte d'un autre membre (ex. le parrain commande pour son filleul)
+    var own=impBoOwner(it);
+    if(own){
+      var ea=String(own.memberIdOlyLife||it.memberIdOlyLife||'').toUpperCase();
+      it.boCompte=ea?eaNorm(ea):(own.nom+' '+(own.prenom||''));
+      if(it.memberIdOlyLife&&ea&&String(it.memberIdOlyLife).toUpperCase()===ea)delete it.memberIdOlyLife; // l'ID appartient au titulaire du compte, pas au client
+      it._bo=own.nom+' '+(own.prenom||'');
+      it.notes=(it.notes?it.notes+'\n':'')+'Commande passée sur le BO de '+it.boCompte;
+    }
   });
   var nbAvant=items.length;items=impMergeSame(items);
   if(items.length<nbAvant)oT('🧩 '+(nbAvant-items.length)+' bloc(s) regroupé(s) : plusieurs captures décrivaient la même personne','s');
@@ -4771,11 +4837,11 @@ function oImpAnalyse(){
     var warn=(!it.nom&&!it.prenom)||(!it.tel&&!it.email);
     var ex=warn?null:impFindExisting(it),badge,detail='';
     if(warn)badge='<span class="obdg bor">incomplet</span>';
-    else if(!ex){badge='<span class="obdg bgr">🆕 nouveau</span>';it._state='new';}
+    else if(!ex){badge='<span class="obdg bgr">🆕 nouveau</span>';it._state='new';if(it._bo)detail='<div class="oimp-diff"><span class="kn">📦 Commande passée sur le BO de <b>'+esc(it._bo)+'</b>'+(it.boCompte?' ('+esc(it.boCompte.split(' — ')[0])+')':'')+' — nouvelle fiche créée pour le client, le compte du titulaire n\'est pas modifié</span></div>';}
     else{
       var d=impDiff(it,ex);
       if(d.news.length){badge='<span class="obdg baq">🔁 complète la fiche</span>';it._state='merge';
-        detail='<div class="oimp-diff"><span class="nw">➕ Nouveau : '+esc(d.news.join(', '))+'</span>'+(d.known.length?'<br><span class="kn">Déjà enregistré : '+esc(d.known.join(', '))+'</span>':'')+'</div>';
+        detail='<div class="oimp-diff">'+(normStr(ex.nom)!==normStr(it.nom||ex.nom)?'<span class="kn">→ met à jour la fiche de <b>'+esc(ex.nom+' '+(ex.prenom||''))+'</b></span><br>':'')+'<span class="nw">➕ Nouveau : '+esc(d.news.join(', '))+'</span>'+(d.known.length?'<br><span class="kn">Déjà enregistré : '+esc(d.known.join(', '))+'</span>':'')+'</div>';
       }else{badge='<span class="obdg bgy">⛔ doublon — ignoré</span>';it._state='dup';
         detail='<div class="oimp-diff"><span class="kn">Fiche identique déjà présente : '+esc(ex.nom+' '+(ex.prenom||''))+'</span></div>';}
     }
@@ -4800,7 +4866,7 @@ function oImpGo(){
   IMP_PARSED.forEach(function(item){
     if(!item.nom&&!item.prenom){skipped++;return;}
     if(!keepInc&&!item.tel&&!item.email){skipped++;return;}
-    delete item._src;delete item._state;
+    delete item._src;delete item._state;delete item._bo;
     var existing=impFindExisting(item);
     if(existing){
       var adds=[],prevNum=existing.numCommande;
@@ -5213,8 +5279,8 @@ function tableHtml(l){
     var s=cStatut(c),last=lastMeaningful(c),num=(c.tel||'').replace(/\D/g,'');
     return'<tr class="'+(SEL[c.id]?'sel ':'')+(ACTIVE_ID===c.id?'active':'')+'" data-cid="'+c.id+'" onclick="oRowClick(event,\''+c.id+'\')" oncontextmenu="event.preventDefault();oCtxOpen(\''+c.id+'\')">'
       +'<td class="c-chkc"><input type="checkbox" '+(SEL[c.id]?'checked':'')+' onclick="event.stopPropagation();oSelToggle(\''+c.id+'\',this.checked)"></td>'
-      +'<td><div class="tc"><span class="tav st-'+s+'">'+cAv(c)+'</span><div><b>'+esc(c.nom)+' '+esc(c.prenom||'')+'</b><small>'+esc(c.tel||'—')+(c.ville?' · '+esc(c.ville):c.pays?' · '+esc(c.pays):'')+'</small></div></div></td>'
-      +'<td>'+stBdg(c)+'</td>'
+      +'<td><div class="tc"><span class="tav st-'+s+(resManque(c).length?' res-pulse av-todo':'')+'"'+(resManque(c).length?' title="À compléter : '+esc(resManque(c).join(' · '))+'"':'')+'>'+cAv(c)+'</span><div><b>'+esc(c.nom)+' '+esc(c.prenom||'')+'</b><small>'+esc(c.tel||'—')+(c.ville?' · '+esc(c.ville):c.pays?' · '+esc(c.pays):'')+'</small></div></div></td>'
+      +'<td>'+stBdg(c)+(jBdg(c)||resBdg(c,true)?'<div style="margin-top:3px;display:flex;gap:3px;flex-wrap:wrap">'+jBdg(c)+resBdg(c,true)+'</div>':'')+'</td>'
       +'<td class="c-lg c-sp">'+(c.etape?eBdg(c.etape):'<span class="t-muted">—</span>')+'</td>'
       +'<td class="c-sp">'+(c.refere?'<div style="font-size:12.5px">'+esc(c.refere)+'</div>':'')+((c.ctags||[]).slice(0,2).map(function(t){return'<span class="obdg bpu" style="margin:2px 2px 0 0">'+esc(t)+'</span>';}).join('')||(c.refere?'':'<span class="t-muted">—</span>'))+'</td>'
       +'<td class="c-sp">'+avsHtml(c)+'</td>'
@@ -5224,6 +5290,7 @@ function tableHtml(l){
         +(isRef?'':'<button class="tb-ic go" title="Valider un contact / observation" onclick="event.stopPropagation();oOpenSuivi(\''+c.id+'\')">📞</button>')
         +(num?'<a class="tb-ic c-opt" title="WhatsApp" href="https://wa.me/'+num+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">💬</a>':'')
         +'<button class="tb-ic c-opt" title="Prendre un rendez-vous (Calendly)" onclick="event.stopPropagation();oCalOpen(\''+c.id+'\')">📅</button>'
+        +'<button class="tb-ic" title="Infos de base (sans ouvrir la fiche)" onclick="event.stopPropagation();oQiRow(\''+c.id+'\',this)">ℹ️</button>'
         +'<button class="tb-ic" title="Plus d\'actions" onclick="event.stopPropagation();oCtxOpen(\''+c.id+'\')">⋯</button>'
       +'</div></td></tr>';
   }).join('');
