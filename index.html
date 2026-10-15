@@ -2309,7 +2309,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.22.1 · 16/10';
+var APP_VERSION='v3.22.2 · 16/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -4742,13 +4742,28 @@ function impFindExisting(it){
     return(cN===iN&&cP===iP)||(cN===normStr(it.prenom)&&cP===prem(it.nom));
   })||null;
 }
-// Le membre dont le compte (ID / n° de commande) a servi à passer la commande, quand ce n'est pas la personne importée
+// Nettoyage : retire d'une autre fiche l'ID membre / la commande (et sa logistique) qui appartiennent à la personne importée
+function impCleanOther(cid,ea,num,btn){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  if(!canEditContact(c)){oT('Fiche non modifiable avec votre accès','w');return;}
+  var what=[];
+  if(ea&&String(c.memberIdOlyLife||'').toUpperCase()===String(ea).toUpperCase())what.push('ID membre '+ea);
+  if(num&&c.numCommande===num)what.push('commande n°'+num+' (date, montant, transporteur, tracking, livraison)');
+  if(!what.length){oT('Rien à retirer sur cette fiche','i');return;}
+  if(!confirm('Retirer de la fiche '+c.nom+' '+(c.prenom||'')+' :\n– '+what.join('\n– ')+'\n\nLes autres informations (adresse, téléphone, journal…) sont conservées.'))return;
+  if(ea&&String(c.memberIdOlyLife||'').toUpperCase()===String(ea).toUpperCase())c.memberIdOlyLife='';
+  if(num&&c.numCommande===num){['numCommande','dateCommande','transporteur','tracking','dateLivraison','montantUSD','achatsUSD','rangOly'].forEach(function(k){c[k]='';});if(c.actions){delete c.actions.merci;delete c.actions.trackingEnvoye;delete c.actions.logistique;}}
+  jrnAdd(c,'systeme','🧹 Données retirées (appartenaient à une autre personne) : '+what.join(' · '));
+  oPush([c]);oRefresh();if(btn){btn.disabled=true;btn.textContent='✅ Fiche '+c.nom+' nettoyée';}
+  oT('🧹 Fiche '+c.nom+' nettoyée','s');
+}
+// Le membre dont la fiche porte déjà cet ID / ce n° de commande, quand ce n'est pas la personne importée
 function impBoOwner(it){
   if(!(it.memberIdOlyLife||it.numCommande))return null;
   return OC.find(function(c){return impSameKeyBo(it,c)&&!impSamePerson(it,c);})||null;
 }
 var IMP_FLBL={tel:'téléphone',email:'e-mail',pays:'pays',ville:'ville',adresse:'adresse livraison',cp:'code postal',livNom:'destinataire livraison',livTel:'tél. livraison',factAdresse:'adresse facturation',numCommande:'n° commande',memberIdOlyLife:'ID membre',pieceId:'pièce d\'identité',tracking:'n° de tracking',transporteur:'transporteur',dateLivraison:'date de livraison',dateCommande:'date de commande',rangOly:'rang OlyLife',refere:'référent',suiviPar:'suivi par',produits:'produits',notes:'notes de commande',statut:'statut',etape:'étape'};
-var IMP_SKIP={id:1,createdAt:1,createdBy:1,journal:1,actions:1,rdvs:1,avances:1,suivis:1,geo:1,qualification:1,canal:1,registre:1,referentId:1,referentNom:1,_src:1,_state:1,_exid:1,_bo:1};
+var IMP_SKIP={id:1,createdAt:1,createdBy:1,journal:1,actions:1,rdvs:1,avances:1,suivis:1,geo:1,qualification:1,canal:1,registre:1,referentId:1,referentNom:1,_src:1,_state:1,_exid:1,_bo:1,_boId:1};
 var IMP_FORCE={tracking:1,transporteur:1,dateLivraison:1,numCommande:1,dateCommande:1,memberIdOlyLife:1,montantUSD:1};
 function impDiff(it,ex){
   var news=[],known=[];
@@ -4816,15 +4831,10 @@ function oImpAnalyse(){
     if(defRef&&!it.refere)it.refere=defRef;
     if(defSuivi&&!it.suiviPar)it.suiviPar=defSuivi;
     if(it.tel)it.tel=normPhone(it.tel);
-    // v3.22.1 — commande passée depuis le compte d'un autre membre (ex. le parrain commande pour son filleul)
+    // v3.22.2 — le même ID membre / n° de commande figure déjà sur la fiche d'une AUTRE personne :
+    // on crée bien la fiche de la personne importée (avec son ID), et on signale le conflit pour nettoyer l'autre fiche
     var own=impBoOwner(it);
-    if(own){
-      var ea=String(own.memberIdOlyLife||it.memberIdOlyLife||'').toUpperCase();
-      it.boCompte=ea?eaNorm(ea):(own.nom+' '+(own.prenom||''));
-      if(it.memberIdOlyLife&&ea&&String(it.memberIdOlyLife).toUpperCase()===ea)delete it.memberIdOlyLife; // l'ID appartient au titulaire du compte, pas au client
-      it._bo=own.nom+' '+(own.prenom||'');
-      it.notes=(it.notes?it.notes+'\n':'')+'Commande passée sur le BO de '+it.boCompte;
-    }
+    if(own){it._bo=own.nom+' '+(own.prenom||'');it._boId=own.id;}
   });
   var nbAvant=items.length;items=impMergeSame(items);
   if(items.length<nbAvant)oT('🧩 '+(nbAvant-items.length)+' bloc(s) regroupé(s) : plusieurs captures décrivaient la même personne','s');
@@ -4837,7 +4847,7 @@ function oImpAnalyse(){
     var warn=(!it.nom&&!it.prenom)||(!it.tel&&!it.email);
     var ex=warn?null:impFindExisting(it),badge,detail='';
     if(warn)badge='<span class="obdg bor">incomplet</span>';
-    else if(!ex){badge='<span class="obdg bgr">🆕 nouveau</span>';it._state='new';if(it._bo)detail='<div class="oimp-diff"><span class="kn">📦 Commande passée sur le BO de <b>'+esc(it._bo)+'</b>'+(it.boCompte?' ('+esc(it.boCompte.split(' — ')[0])+')':'')+' — nouvelle fiche créée pour le client, le compte du titulaire n\'est pas modifié</span></div>';}
+    else if(!ex){badge='<span class="obdg bgr">🆕 nouveau</span>';it._state='new';if(it._bo)detail='<div class="oimp-diff"><span class="nw" style="color:#C0392B">⚠️ L\'ID membre '+esc(it.memberIdOlyLife||'')+(it.numCommande?' / la commande n°'+esc(it.numCommande):'')+' figure déjà sur la fiche de <b>'+esc(it._bo)+'</b> (probable erreur de fusion). La nouvelle fiche est créée avec ses propres données.</span> <button type="button" class="ob bgh bsm" style="margin-top:4px" onclick="impCleanOther(\''+it._boId+'\',\''+esc(it.memberIdOlyLife||'')+'\',\''+esc(it.numCommande||'')+'\',this)">🧹 Retirer ces données de la fiche '+esc(it._bo)+'</button></div>';}
     else{
       var d=impDiff(it,ex);
       if(d.news.length){badge='<span class="obdg baq">🔁 complète la fiche</span>';it._state='merge';
@@ -4866,7 +4876,7 @@ function oImpGo(){
   IMP_PARSED.forEach(function(item){
     if(!item.nom&&!item.prenom){skipped++;return;}
     if(!keepInc&&!item.tel&&!item.email){skipped++;return;}
-    delete item._src;delete item._state;delete item._bo;
+    delete item._src;delete item._state;delete item._bo;delete item._boId;
     var existing=impFindExisting(item);
     if(existing){
       var adds=[],prevNum=existing.numCommande;
