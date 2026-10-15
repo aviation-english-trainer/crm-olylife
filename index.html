@@ -2309,7 +2309,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.22.2 · 16/10';
+var APP_VERSION='v3.22.3 · 16/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -4720,27 +4720,32 @@ function parseCSV(text){
 function tel9(t){return String(t||'').replace(/\D/g,'').slice(-9);}
 function normStr(s){return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').trim().toUpperCase();}
 function prem(p){return normStr(p).toLowerCase().split(/\s+/)[0]||'';}
-// Même personne ? (téléphone, e-mail, ou nom+prénom dans un sens ou dans l'autre — accents/majuscules ignorés)
-function impSamePerson(it,c){
-  var t=tel9(it.tel);if(t&&t.length>=9&&tel9(c.tel)===t)return true;
-  if(it.email&&c.email&&c.email.toLowerCase().trim()===it.email.toLowerCase().trim())return true;
-  if(!(it.nom&&it.prenom&&c.nom&&c.prenom))return!(t&&t.length>=9&&tel9(c.tel)&&tel9(c.tel).length>=9); // pas de nom pour trancher : même personne sauf si deux téléphones différents
+// Noms compatibles ? (nom+prénom dans un sens ou dans l'autre, accents/majuscules ignorés) — true si l'un des deux n'a pas de nom complet
+function impNamesOk(it,c){
+  if(!(it.nom&&it.prenom&&c.nom&&c.prenom))return true;
   var iN=normStr(it.nom),iP=prem(it.prenom),cN=normStr(c.nom),cP=prem(c.prenom);
   return(cN===iN&&cP===iP)||(cN===normStr(it.prenom)&&cP===prem(it.nom));
+}
+function impNamesMatch(it,c){return!!(it.nom&&it.prenom&&c.nom&&c.prenom)&&impNamesOk(it,c);}
+function impTelEq(it,c){var t=tel9(it.tel);return!!(t&&t.length>=9&&tel9(c.tel)===t);}
+function impEmailEq(it,c){return!!(it.email&&c.email&&c.email.toLowerCase().trim()===it.email.toLowerCase().trim());}
+// Même personne ? Un e-mail identique suffit ; un téléphone partagé (même foyer) ou un même ID/commande ne suffisent PAS si les noms complets diffèrent
+function impSamePerson(it,c){
+  if(impEmailEq(it,c))return true;
+  if(!impNamesOk(it,c))return false;
+  if(impTelEq(it,c)||impSameKeyBo(it,c)||impNamesMatch(it,c))return true;
+  return false;
 }
 function impSameKeyBo(it,c){
   if(it.numCommande&&c.numCommande===it.numCommande)return true;
   return!!(it.memberIdOlyLife&&c.memberIdOlyLife&&String(c.memberIdOlyLife).toUpperCase()===String(it.memberIdOlyLife).toUpperCase());
 }
 function impFindExisting(it){
-  return OC.find(function(c){
-    // n° de commande / ID membre identiques MAIS autre personne → commande passée sur le BO d'un autre membre : ce n'est pas la même fiche
-    if(impSameKeyBo(it,c))return impSamePerson(it,c);
-    var t=tel9(it.tel);if(t&&t.length>=9&&tel9(c.tel)===t)return true;
-    if(it.email&&c.email&&c.email.toLowerCase().trim()===it.email.toLowerCase().trim())return true;
-    if(!(it.nom&&it.prenom))return false;var iN=normStr(it.nom),iP=prem(it.prenom),cN=normStr(c.nom),cP=prem(c.prenom);
-    return(cN===iN&&cP===iP)||(cN===normStr(it.prenom)&&cP===prem(it.nom));
-  })||null;
+  // priorité : e-mail > nom complet > téléphone / ID / commande (ces derniers seulement si les noms sont compatibles)
+  return OC.find(function(c){return impEmailEq(it,c);})
+    ||OC.find(function(c){return impNamesMatch(it,c);})
+    ||OC.find(function(c){return(impTelEq(it,c)||impSameKeyBo(it,c))&&impNamesOk(it,c);})
+    ||null;
 }
 // Nettoyage : retire d'une autre fiche l'ID membre / la commande (et sa logistique) qui appartiennent à la personne importée
 function impCleanOther(cid,ea,num,btn){
