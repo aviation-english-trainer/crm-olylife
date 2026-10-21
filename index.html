@@ -399,6 +399,9 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .jrn-acts{display:flex;flex-direction:column;gap:2px;flex-shrink:0;}
 .jrn-acts button{background:transparent;border:1px solid var(--bd);border-radius:8px;min-width:30px;min-height:30px;cursor:pointer;font-size:13px;}
 .jrn-acts button:hover{background:var(--navy3);}
+.cpt-box{border:1px solid var(--bd);border-radius:var(--r);padding:10px 12px;margin-bottom:10px;background:var(--navy3);}
+.cpt-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.cpt-hd button{margin-left:auto;}
 .res-box{display:flex;align-items:center;gap:10px;background:#FFF5F5;border:1px solid #F3C1C5;border-radius:var(--r);padding:10px 12px;margin:0 0 12px;}
 @media (prefers-reduced-motion:reduce){.res-pulse{animation:none;}}
 .qi-panel{display:none;flex:1 1 100%;width:100%;margin-top:8px;padding:10px 12px;background:var(--navy3);border:1px solid var(--bd);border-radius:var(--rs);font-size:12px;line-height:1.7;color:var(--tx);cursor:default;}
@@ -1555,6 +1558,13 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
             </div>
           </div>
 
+          <div class="fb" id="fb-comptes">
+            <div class="osec">Autres comptes OlyLife — même personne</div>
+            <div style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:10px">Une même personne peut détenir plusieurs n° de distributeur (par ex. pour un 2ᵉ appareil). Chaque compte garde son n° de commande, son appareil, son suivi colis, sa facture et son mot de passe.</div>
+            <div id="fo-comptes"></div><datalist id="prod-list"></datalist>
+            <button type="button" class="ob bgh bfull" onclick="oCompteAdd()">➕ Ajouter un autre n° de distributeur</button>
+          </div>
+
           <div class="fb" id="fb-install">
             <div class="osec">Installation &amp; usage</div>
             <div class="ofg">
@@ -2309,7 +2319,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.22.4 · 21/10';
+var APP_VERSION='v3.23 · 21/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -2577,7 +2587,7 @@ function applyRole(){
   document.getElementById('eq-refs-card').classList.toggle('hide',!isAdmin);
   var sk=document.getElementById('eq-stock-card');if(sk)sk.classList.toggle('hide',isRef);
   // Formulaire : le référent ne voit que l'essentiel
-  ['fb-pipeline','fb-prod','fb-cmd','fb-install','fb-temoin','fb-equipe'].forEach(function(id){
+  ['fb-pipeline','fb-prod','fb-cmd','fb-comptes','fb-install','fb-temoin','fb-equipe'].forEach(function(id){
     document.getElementById(id).classList.toggle('hide',isRef);
   });
   document.getElementById('fg-ref').style.display=isRef?'none':'flex';
@@ -2924,7 +2934,8 @@ function setAv(id,photo,txt){var e=document.getElementById(id);if(e)e.innerHTML=
 function mkWA(tel,msg){var n=(tel||'').replace(/\D/g,'');if(!n)return'#';return'https://wa.me/'+n+'?text='+encodeURIComponent(msg);}
 function trackingUrl(carrier,num){
   if(!num)return'';
-  var c=(carrier||'').toLowerCase();var n=encodeURIComponent(num);
+  num=String(num).split(/\s*[\/,]\s*/)[0].replace(/^GEL\(S\)\s*:?\s*/i,'').trim();
+  var c=(carrier||'').toLowerCase();if(/^1Z/i.test(num))c='ups';var n=encodeURIComponent(num);
   if(c.indexOf('dhl')>=0)return'https://www.dhl.de/en/privatkunden/pakete-empfangen/verfolgen.html?piececode='+n;
   if(c.indexOf('ups')>=0)return'https://www.ups.com/track?tracknum='+n;
   if(c.indexOf('fedex')>=0)return'https://www.fedex.com/fedextrack/?trknbr='+n;
@@ -3035,10 +3046,14 @@ var MSG_DEFAULTS={};
     t:'Bonjour {prenom} 👋\n\nComme promis, voici de quoi découvrir OlyLife tranquillement, à votre rythme 🌿\n\n🎬 *Commencez par ici* — le parcours découverte en 6 courtes vidéos (la technologie, l\'association, les appareils) :\n{lienParcours}{?liensAppareils:\n\n📖 Les appareils qui vous intéressent, expliqués sans raccourci (mode d\'emploi et consignes de sécurité compris) :\n{liensAppareils}}\n\n🧪 Et parce que la transparence compte : les certificats et rapports de test, consultables un par un :\n{lienCertificats}{?lienRdv:\n\n📅 Quand vous voudrez en parler de vive voix, choisissez un créneau (appel découverte, sans engagement) :\n{lienRdv}}\n\nPrenez le temps qu\'il vous faut — je reste disponible pour toute question 🙏\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
   MSG_DEFAULTS.decouverte_lien={g:'Découverte OlyLife',l:'Envoi du lien « dites-moi ce qui vous intéresse » (formulaire d\'une minute)',vars:['prenom','lienDecouverte','moi','role','telMoi'],
     t:'Bonjour{?prenom: {prenom}} 👋\n\nRavi de notre échange 🌿 Pour que je vous envoie les bonnes informations sur OlyLife (la technologie, les appareils, l\'association), dites-moi simplement ce qui vous intéresse — une minute, sur votre téléphone :\n{lienDecouverte}\n\nSans aucun engagement, bien sûr. À très vite !\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
+  MSG_DEFAULTS.facture_envoi={g:'Factures OlyLife',l:'Envoi de la facture (vouvoiement) + demande de changement du mot de passe',vars:['prenom','produitFacture','numFacture','montantFacture','lienFacture','transporteur','tracking','lienSuivi','demandeMdp','moi','role','telMoi'],
+    t:'Bonjour {prenom} 👋\n\nVoici la facture de votre commande OlyLife{?produitFacture: — {produitFacture}}{?numFacture: (document n°{numFacture})} :\n📄 {lienFacture}{?tracking:\n\n🚚 Votre colis est expédié par {transporteur} — n° de suivi : {tracking}}{?lienSuivi:\n{lienSuivi}}{?demandeMdp:\n\n🔐 Pour votre sécurité : nous avions besoin d\'accéder à votre compte OlyLife pour récupérer ce document. Ce n\'est plus nécessaire et nous avons supprimé votre mot de passe de nos dossiers. Merci de le modifier dès maintenant depuis votre espace OlyLife.}\n\nJe reste à votre disposition pour toute question.\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
+  MSG_DEFAULTS.facture_envoi_tu={g:'Factures OlyLife',l:'Envoi de la facture (tutoiement) + demande de changement du mot de passe',vars:['prenom','produitFacture','numFacture','montantFacture','lienFacture','transporteur','tracking','lienSuivi','demandeMdp','moi','role','telMoi'],
+    t:'Coucou {prenom} 👋\n\nVoici la facture de ta commande OlyLife{?produitFacture: — {produitFacture}}{?numFacture: (document n°{numFacture})} :\n📄 {lienFacture}{?tracking:\n\n🚚 Ton colis est expédié par {transporteur} — n° de suivi : {tracking}}{?lienSuivi:\n{lienSuivi}}{?demandeMdp:\n\n🔐 Pour ta sécurité : on avait besoin d\'accéder à ton compte OlyLife pour récupérer ce document. Ce n\'est plus nécessaire et ton mot de passe a été supprimé de nos dossiers. Pense à le changer dès maintenant depuis ton espace OlyLife.}\n\nJe reste dispo si tu as la moindre question 😊\n{moi}{?telMoi: · 📞 {telMoi}}'};
   MSG_DEFAULTS.inscription_infos={g:'Inscription OlyLife',l:'Demande des informations d\'inscription',vars:['nomComplet','prenom','nom','lienInscription','moi','role','telMoi'],
     t:'Bonjour {nomComplet} 👋\n\nPour créer votre compte OlyLife et passer votre commande, j\'ai besoin de quelques informations.{?lienInscription:\n\n✅ *Le plus simple* : remplissez ce formulaire sécurisé (2 minutes, sur votre téléphone) — il m\'arrive directement :\n{lienInscription}\n\n📋 À avoir sous la main : votre passeport (ou carte nationale d\'identité — permis et autres cartes refusés, sauf carte de résident), votre adresse de livraison (et de facturation si différente), votre e-mail, et un mot de passe d\'au moins 8 caractères (lettres et chiffres) que vous pourrez modifier ensuite.\n\n✍️ Vous préférez répondre ici ? Envoyez-moi alors EN UN SEUL MESSAGE :}{?sansLien:\n\nMerci de me renvoyer EN UN SEUL MESSAGE les informations suivantes :}\n\n1️⃣ Votre identité EXACTEMENT comme sur votre PASSEPORT (tous les noms et tous les prénoms) + le numéro du passeport.\n   ➡️ Pas de passeport ? La carte nationale d\'identité est acceptée. (Permis de conduire et autres cartes refusés — sauf carte de résident pour les personnes étrangères.)\n2️⃣ Votre adresse postale complète de livraison — et l\'adresse de facturation si elle est différente.\n3️⃣ Votre adresse e-mail.\n4️⃣ Un mot de passe d\'au moins 8 caractères (lettres et chiffres ; symboles possibles mais non obligatoires) — vous pourrez le modifier ensuite.\n\n💳 *Paiement* : la commande se règle en dollars US auprès d\'OlyLife (plateforme à l\'étranger). Il arrive que la banque émettrice bloque la carte par sécurité. Si c\'est le cas, dites-le-moi simplement : je vous transmets une autre méthode via notre association Water Life High Tech (compte français), par carte bancaire ou virement.\n\n🔒 Ces informations restent strictement confidentielles : elles servent uniquement à votre enregistrement officiel OlyLife.\n\nMerci beaucoup, à très vite !\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
 })();
-var MSG_VAR_HELP={prenom:'forme d\'adresse selon le registre : premier prénom (tutoiement / équipe) ou titre + premier prénom + NOM (professionnel)',prenomSeul:'premier prénom seulement',civilite:'titre de la fiche (Dr, Pr, Maître…)',gest:'nom du gestionnaire qui suit la fiche (sinon vous)',telGest:'téléphone du gestionnaire',emailGest:'e-mail du gestionnaire',appareil:'nom de l\'appareil reçu',lienKit:'page de bienvenue (vidéo, premiers pas, règles d\'or)',lienNotice:'notice en français (PDF)',lienVideo:'vidéo de prise en main (YouTube)',reglesOr:'règles d\'or de l\'appareil (texte)',nomComplet:'prénom + nom (ou seulement ce qui est rempli)',lienInscription:'votre lien personnel du formulaire d\'inscription (celui de votre QR code)',lienDecouverte:'votre lien personnel du formulaire découverte (1 minute : prénom, WhatsApp, intérêts)',lienParcours:'parcours découverte OlyLife (6 vidéos), personnalisé à votre nom',liensAppareils:'pages des appareils cochés (une ligne par appareil)',lienCertificats:'certificats et rapports de test',lienRdv:'votre lien de rendez-vous (Calendly de Mon profil, sinon l\'appel découverte WLHT)',interets:'centres d\'intérêt cochés',sansLien:'vrai seulement si le lien n\'est pas disponible (bloc de repli)',role:'votre rôle (admin, gestionnaire, référent…)',telMoi:'votre téléphone (Mon profil)',prenom:'prénom du contact',nom:'nom',numCommande:'n° de commande',logistique:'Service Logistique OlyLife',transporteur:'transporteur',tracking:'n° de suivi',lienSuivi:'lien de suivi du colis',tipLivraison:'numéros utiles DHL / Colissimo (France)',sav:'Service Après-Vente OlyLife',savEmail:'e-mail du SAV',montant:'montant',devise:'devise',date:'date de l\'avance',motif:'motif',rendu:'déjà remboursé',reste:'reste à rembourser',echeance:'date d\'échéance',payeur:'prénom de la personne qui a avancé',client:'nom du client',moi:'votre nom (expéditeur)',jours:'nombre de jours',programme:'titre de la fiche conseils',rythme:'durée, fréquence',appareil:'nom de l\'appareil',interdits:'contre-indications (manuel)',duree:'durée & fréquence (manuel)',precautions:'précautions (manuel)',lienApp:'lien de l\'application',code:'code d\'accès',role:'rôle'};
+var MSG_VAR_HELP={lienFacture:'lien de la facture PDF (Drive, lecture seule)',numFacture:'n° de document de la facture',produitFacture:'appareil facturé',montantFacture:'montant total de la facture',demandeMdp:'(case) demande de changement du mot de passe OlyLife',compte:'ID membre du compte facturé',prenom:'forme d\'adresse selon le registre : premier prénom (tutoiement / équipe) ou titre + premier prénom + NOM (professionnel)',prenomSeul:'premier prénom seulement',civilite:'titre de la fiche (Dr, Pr, Maître…)',gest:'nom du gestionnaire qui suit la fiche (sinon vous)',telGest:'téléphone du gestionnaire',emailGest:'e-mail du gestionnaire',appareil:'nom de l\'appareil reçu',lienKit:'page de bienvenue (vidéo, premiers pas, règles d\'or)',lienNotice:'notice en français (PDF)',lienVideo:'vidéo de prise en main (YouTube)',reglesOr:'règles d\'or de l\'appareil (texte)',nomComplet:'prénom + nom (ou seulement ce qui est rempli)',lienInscription:'votre lien personnel du formulaire d\'inscription (celui de votre QR code)',lienDecouverte:'votre lien personnel du formulaire découverte (1 minute : prénom, WhatsApp, intérêts)',lienParcours:'parcours découverte OlyLife (6 vidéos), personnalisé à votre nom',liensAppareils:'pages des appareils cochés (une ligne par appareil)',lienCertificats:'certificats et rapports de test',lienRdv:'votre lien de rendez-vous (Calendly de Mon profil, sinon l\'appel découverte WLHT)',interets:'centres d\'intérêt cochés',sansLien:'vrai seulement si le lien n\'est pas disponible (bloc de repli)',role:'votre rôle (admin, gestionnaire, référent…)',telMoi:'votre téléphone (Mon profil)',prenom:'prénom du contact',nom:'nom',numCommande:'n° de commande',logistique:'Service Logistique OlyLife',transporteur:'transporteur',tracking:'n° de suivi',lienSuivi:'lien de suivi du colis',tipLivraison:'numéros utiles DHL / Colissimo (France)',sav:'Service Après-Vente OlyLife',savEmail:'e-mail du SAV',montant:'montant',devise:'devise',date:'date de l\'avance',motif:'motif',rendu:'déjà remboursé',reste:'reste à rembourser',echeance:'date d\'échéance',payeur:'prénom de la personne qui a avancé',client:'nom du client',moi:'votre nom (expéditeur)',jours:'nombre de jours',programme:'titre de la fiche conseils',rythme:'durée, fréquence',appareil:'nom de l\'appareil',interdits:'contre-indications (manuel)',duree:'durée & fréquence (manuel)',precautions:'précautions (manuel)',lienApp:'lien de l\'application',code:'code d\'accès',role:'rôle'};
 function renderTpl(t,v){
   v=v||{};
   return String(t||'').replace(/\{\?(\w+):((?:[^{}]|\{\w+\})*)\}/g,function(m,k,inner){return v[k]?inner.replace(/\{(\w+)\}/g,function(_,n){return v[n]!=null?v[n]:'';}):'';})
@@ -3056,7 +3071,7 @@ function nomAdresse(c,tone){
 function tplVars(c,lang,tone){
   c=c||{};lang=lang||'fr';tone=tone||c.registre||'pro';
   var url=trackingUrl(c.transporteur,c.tracking);
-  return{prenom:nomAdresse(c,tone),prenomSeul:prenom1(c),civilite:c.civilite||'',nom:c.nom||'',numCommande:c.numCommande||'',logistique:OLY_SVC.logistics[lang]||OLY_SVC.logistics.fr,transporteur:c.transporteur||'—',tracking:c.tracking||'—',lienSuivi:url||'',
+  return{prenom:nomAdresse(c,tone),prenomSeul:prenom1(c),civilite:c.civilite||'',nom:c.nom||'',numCommande:c.numCommande||'',logistique:OLY_SVC.logistics[lang]||OLY_SVC.logistics.fr,transporteur:c.transporteur||'—',tracking:c.tracking||'—',lienSuivi:suiviTxt(c)||url||'',
     tipLivraison:isFR(c)?(lang==='en'?'DHL Parcel: 01 80 14 63 32 · Colissimo/La Poste: 09 72 72 12 13. ':'DHL Parcel : 01 80 14 63 32 · Colissimo/La Poste : 09 72 72 12 13. '):'',
     sav:OLY_SVC.aftersales[lang]||OLY_SVC.aftersales.fr,savEmail:OLY_SVC.aftersales.email,moi:PARTNER_NOM()||'L\'équipe WLHT',
     role:roleLabel(ROLE()),telMoi:(USER&&USER.tel)||'',nomComplet:[(tone==='pro'?c.civilite:''),prenom1(c),c.nom||''].filter(Boolean).join(' ').trim(),lienInscription:inscriptionUrl(),sansLien:inscriptionUrl()?'':'1'};
@@ -3135,6 +3150,8 @@ function computeActions(){
     if(c.numCommande&&c.dateCommande&&!dateRecu(c)&&!(c.actions&&c.actions.merci&&c.actions.merci.done)){
       var dM=diffD(c.dateCommande);if(dM!==null&&dM>=-14)items.push({c:c,key:'merci',type:'Commande',label:'🙏 Remercier & envoyer les premières infos — commande n°'+c.numCommande,diff:Math.min(dM+1,0),msg:msgMerci(c)});
     }
+    // v3.23 — facture déposée mais pas encore envoyée
+    (c.factures||[]).forEach(function(f){if(f.envoyeLe)return;items.push({c:c,key:'fact_'+f.id,type:'Facture',label:'🧾 Envoyer la facture '+(f.docNo||'')+(f.produit?' — '+f.produit:''),diff:0,msg:factMsg(c,f,!!(c.mdpSet&&c.mdpSet[f.compte]))});});
     // v3.18 — appareil reçu → féliciter + kit de bienvenue
     var rec=dateRecu(c);
     if(rec&&!(c.actions&&c.actions.bienvenue&&c.actions.bienvenue.done)){
@@ -3182,6 +3199,10 @@ function oDone(cid,key){
     var a=(c.avances||[]).find(function(x){return'av_'+x.id===key;});
     if(a){a.rembs=a.rembs||[];a.rembs.push({date:todayYMD(),montant:avReste(a),complet:true});avRecalc(a);jrnAdd(c,'fait','💶 Avance de '+a.montant+' '+(a.devise||'€')+' entièrement remboursée');oPush([c]);oT('✅ Avance soldée','s');emojiBurst(['✅','💰']);oRefresh();return;}
   }
+  if(key&&key.indexOf('fact_')===0){var fx=(c.factures||[]).find(function(x){return'fact_'+x.id===key;});
+    if(fx){fx.envoyeLe=new Date().toISOString();fx.envoyePar=PARTNER_NOM();fx.canal=fx.canal||'wa';jrnAdd(c,'fait','🧾 Facture '+(fx.docNo||'')+' envoyée');oPush([c]);
+      if(c.mdpSet&&c.mdpSet[fx.compte]&&confirm('Facture envoyée. Effacer maintenant du CRM le mot de passe du compte '+(fx.ea||'')+' ?'))mdpPurgeDo(c,fx.compte,'facture envoyée au client').then(function(){oT('🔒 Mot de passe effacé','s');oRefresh();}).catch(function(){});
+      oT('🧾 Facture notée comme envoyée','s');oRefresh();return;}}
   if(key==='decouverte'){c.decEnvoye=todayYMD();jrnAdd(c,'fait','🌱 Parcours découverte / infos envoyées — effectué');oPush([c]);oT('✅ Découverte notée comme faite','s');if(document.getElementById('omo').classList.contains('on'))oOpenF(cid);oRefresh();return;}
   if(!c.actions)c.actions={};
   c.actions[key]={done:true,doneAt:new Date().toISOString().split('T')[0],par:PARTNER_NOM()};
@@ -3227,6 +3248,7 @@ function oAct(){
       var mailBody='Bonjour,\n\nMerci de me communiquer le statut d\'expédition de la commande n°'+(a.c.numCommande||'')+' (Member ID '+(a.c.memberIdOlyLife||'')+').\n\nCordialement,\n'+(PARTNER_NOM()||'');
       extraBtn='<div class="brow"><a class="ob bgh" href="'+olySvcWA('logistics',waMsg)+'" target="_blank" rel="noopener">📨 WhatsApp Logistique OlyLife</a><a class="ob bgh" href="'+olySvcMail('logistics',mailSubj,mailBody)+'">✉️ Email Logistique</a></div>';
     }
+    if(a.key.indexOf('fact_')===0){extraBtn='<div class="brow"><button type="button" class="ob bwa" onclick="oFactSend(\''+a.c.id+'\',\''+a.key.slice(5)+'\')">📤 Envoyer par '+esc(a.c.canal||'WhatsApp')+' (et effacer le mot de passe)</button></div>';}
     if(a.key==='bienvenue'){var KL=kitLinks(a.c);extraBtn='<div class="brow"><button type="button" class="ob" style="background:var(--blp);color:var(--bl);border:none" onclick="oKitMail(\''+a.c.id+'\')">✉️ E-mail de bienvenue'+(a.c.email?'':' (pas d\'adresse)')+'</button>'+(KL.lienKit?'<a class="ob bgh" href="'+esc(KL.lienKit)+'" target="_blank" rel="noopener">🧭 Page du kit</a>':'')+'</div>';}
     return'<div class="oacc '+cls+'">'
       +'<div class="oacc-hd" onclick="oAccTog(\''+uid+'\')">'
@@ -3954,11 +3976,12 @@ function qiHtml(c){
   return li('📞','Tél.',c.tel?'<a href="tel:'+esc(c.tel)+'" style="color:var(--tx)">'+esc(c.tel)+'</a>':'')
     +li('✉️','E-mail',c.email?'<a href="mailto:'+esc(c.email)+'" style="color:var(--tx)">'+esc(c.email)+'</a>':'')
     +li('📍','Adresse',esc(adr))
-    +li('🆔','Member ID',esc(c.memberIdOlyLife||''))
+    +li('🆔','Member ID',esc(allEAs(c).join(' · ')))
     +li('📦','Commande',c.numCommande?esc(c.numCommande)+(c.dateCommande?' · '+fD(c.dateCommande):''):'')
     +li('🚚','Livraison',[c.transporteur?esc(c.transporteur):'',trk,c.dateLivraison?'livrée le '+fD(c.dateLivraison):''].filter(Boolean).join(' · '))
     +li('🧬','Sponsor / placement',[c.sponsor?esc(c.sponsor):'',c.placement?esc(c.placement):''].filter(Boolean).join(' · '))
     +li('🏅','Rang',esc(c.rangOly||''))
+    +li('🧾','Factures',(c.factures||[]).map(function(f){return'<a href="'+esc(f.url)+'" target="_blank" rel="noopener" style="color:var(--aqua)">'+esc(f.produit||f.docNo||'PDF')+'</a>'+(f.envoyeLe?' ✅':'');}).join(' · '))
     +li('👤','Suivi par',esc(suivisDe(c).join(', ')))
     +li('🤝','Référé par',esc(c.refere||''))
     +li('💬','Canal · registre',esc((c.canal||'')+(c.registre?' · '+(TONE_LABEL[c.registre]||''):'')))
@@ -4071,6 +4094,7 @@ var RES_CHECK=[
   {l:'Transporteur',f:function(c){return!!c.transporteur;}},
   {l:'N° de tracking',f:function(c){return!!c.tracking;}},
   {l:'Date de livraison',f:function(c){return!!c.dateLivraison;}},
+  {l:'Facture ajoutée et envoyée au client',f:function(c){var F=c.factures||[];return!c.tracking||(F.length>0&&F.every(function(f){return f.envoyeLe;}));}},
   {l:'Installation confirmée',f:function(c){return!!c.installConfirm;}},
   {l:'Notes d\'usage / protocole',f:function(c){return!!(c.notesUsage&&String(c.notesUsage).trim());}},
   {l:'Case « devenu partenaire OlyLife »',f:function(c){return!!c.estPartenaire;}},
@@ -4168,6 +4192,8 @@ function oOpenF(id){
     +merciHtml(c)
     +kitHtml(c)
     +logiHtml(c)
+    +comptesHtml(c)
+    +factHtml(c)
     +accHtml(c)
     +odSec('Journal des actions ('+((c.journal||[]).length)+')',jrnHtml(c),true)
     +((c.avances&&c.avances.length)||!isRef?odSec('💶 Avances / dons reçus'+((c.avances||[]).length?' ('+c.avances.length+')':''),avListHtml(c),avanceEnCours(c)):'')
@@ -4239,6 +4265,7 @@ function oEdit(id){
   oSetFact(!!(c.factAdresse||c.factCp||c.factVille||c.factPays));
   oTEQ();
   document.querySelectorAll('#opg .oprd').forEach(function(p){var cb=p.querySelector('input');cb.checked=(c.produits||[]).indexOf(cb.value)>=0;p.classList.toggle('on',cb.checked);});
+  FORM_COMPTES=JSON.parse(JSON.stringify(c.comptes||[]));oCompteRender();
   oSw('nouvelle',4);document.getElementById('ocont').scrollTop=0;
 }
 function oReset(){
@@ -4256,6 +4283,7 @@ function oReset(){
   oSetFact(false);
   oTEQ();
   document.querySelectorAll('#opg .oprd').forEach(function(p){p.classList.remove('on');p.querySelector('input').checked=false;});
+  FORM_COMPTES=[];oCompteRender();
   document.getElementById('offttl').textContent='Nouveau contact';
   document.getElementById('obtn-save').textContent='Enregistrer la fiche';
 }
@@ -4295,9 +4323,10 @@ function oSave(){
     temoignageTexte:document.getElementById('ft-texte').value,temoignageAutorise:document.getElementById('ft-autorise').checked,
     estPartenaire:document.getElementById('fe-partenaire').checked,sponsor:eaNorm(document.getElementById('fe-sponsor').value),placement:eaNorm(document.getElementById('fe-placement').value),cote:document.getElementById('fe-cote').value,generation:document.getElementById('fe-gen').value,rang:document.getElementById('fe-rang').value,
     notes:document.getElementById('fc-notes').value,
+    comptes:isRef?undefined:oCompteCollect(),
     referentId:PARTNER_ID,referentNom:PARTNER_NOM()
   };
-  data.suiviPar=data.suivis.join(', ');
+  data.suiviPar=data.suivis.join(', ');if(data.comptes===undefined)delete data.comptes;
   if(!EID)data.createdBy=PARTNER_NOM();
   var prevC=EID?OC.find(function(x){return x.id===EID;}):null;
   if(!prevC||prevC.etape!==data.etape){data.statut=ET2ST[data.etape]||(prevC?prevC.statut:undefined);data.statutPar=PARTNER_NOM();data.statutLe=new Date().toISOString();}
@@ -4315,6 +4344,7 @@ function oSave(){
 // ── IMPORT EN MASSE (vrac / CSV / JSON) ─────────────────────────────
 var IMP_PARSED=[];
 function oOpenImport(){
+  IMP_IDMODE={};
   document.getElementById('oimp-ta').value='';
   try{var r=ROLE();if(r==='referent'||r==='comite'){var dr=document.getElementById('oimp-defref'),want=(USER.tags&&USER.tags[0])||USER.nom;var has=Array.prototype.some.call(dr.options,function(o){return o.value===want;});if(!has){var o=document.createElement('option');o.value=want;o.textContent=want;dr.appendChild(o);}dr.value=want;}}catch(e){}
   document.getElementById('oimp-prev-card').style.display='none';
@@ -4589,10 +4619,11 @@ function parseOlyOrderOcr(text){
   var CARRIERS=/\b(DHL|UPS|FedEx|Chronopost|Colissimo|La Poste|EMS|GLS|TNT|DPD|Aramex)\b/i;
   lines.forEach(function(l){var mc=l.match(CARRIERS);if(mc&&!transporteur)transporteur=mc[1].toUpperCase()==='LA POSTE'?'Colissimo / La Poste':mc[1];});
   // Tracking : format postal international XX000000000XX, ou alphanumérique 8+ chars près de "tracking"
-  (flat.match(/\b[A-Z]{2}\d{9}[A-Z]{2}\b/g)||[]).forEach(function(t){if(trackingNums.indexOf(t)<0)trackingNums.push(t);});
+  (flat.match(TRK_RX)||[]).forEach(function(t){if(trackingNums.indexOf(t)<0)trackingNums.push(t);});
   if(!trackingNums.length){var mt=flat.match(/(?:tracking|suivi|n[°o]\s*(?:de\s*)?suivi)\s*(?:number)?\s*[:：]?\s*([A-Z0-9]{8,20})/i);if(mt)trackingNums.push(mt[1]);}
   // Date de livraison : YYYY-MM-DD
   lines.forEach(function(l){var md=l.match(/\b(20\d{2}-\d{2}-\d{2})\b/g);if(md)dLivr=md[md.length-1];});
+  var LR=delivRows(flat);delivApply(LR,trackingNums,prods,function(t){transporteur=t;},function(d){dLivr=d;});
   var type=/inscription des membres|member registration/i.test(flat)?'Inscription des membres':(/r[ée]achat|repurchase|reorder/i.test(flat)?'Réachat':'');
   var paid=/(?:^|[^a-zà-ÿ])(r[ée]gl[ée]e?|pay[ée]e?|paid|settled)(?![a-zà-ÿ])/i.test(flat);
   var parts=nomC.split(/\s+/).filter(Boolean);var nom=parts.shift()||'';
@@ -4605,7 +4636,7 @@ function parseOlyOrderOcr(text){
   var notes=['Commande OlyLife'+(num?' n°'+num:'')+(dateCmd?' du '+fD(dateCmd):'')+' (lue par OCR — à vérifier)',montant?'Montant : '+montant+' USD':'',type?'Type : '+type:'',paid?'Statut commande : Réglé':'',prodTxt?'Produits : '+prodTxt:'',transporteur?'Transporteur : '+transporteur:'',trackingNums.length?'Tracking : '+trackingNums.join(' / '):'',dLivr?'Date livraison : '+dLivr:'',adr?'Livraison : '+adr:'',destinataire&&destinataire.toLowerCase()!==nomC.toLowerCase()?'Destinataire : '+destinataire:''].filter(Boolean).join('\n');
   var livNom=(destinataire&&destinataire.replace(/\s+/g,' ').toLowerCase()!==nomC.replace(/\s+/g,' ').toLowerCase())?destinataire:'';
   var livTel=(recipTel&&normPhone(recipTel)!==normPhone(tel))?normPhone(recipTel):'';
-  var it={nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,livNom:livNom,livTel:livTel,numCommande:num,memberIdOlyLife:member,pieceId:idcard,dateCommande:dateCmd,rangOly:rang,montantUSD:montantUSD,achatsUSD:montantUSD,produits:prods,transporteur:transporteur,tracking:trackingNums.join(' / '),dateLivraison:dLivr,etape:'Client',qualification:'Chaud',statut:'reseau',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olylife-ocr'};
+  var it={nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,livNom:livNom,livTel:livTel,numCommande:num,memberIdOlyLife:member,pieceId:idcard,dateCommande:dateCmd,rangOly:rang,montantUSD:montantUSD,achatsUSD:montantUSD,produits:prods,transporteur:transporteur,tracking:trackingNums.join(' / '),dateLivraison:dLivr,livraisons:LR.length>1?LR:undefined,etape:'Client',qualification:'Chaud',statut:'reseau',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olylife-ocr'};
   return(it.nom||it.tel||it.email||it.numCommande)?[it]:[];
 }
 // Page de commande : copier-coller propre (libellé : valeur) sinon lecture OCR
@@ -4688,10 +4719,11 @@ function parseOlyOrders(text){
     bl.forEach(function(l){
       var mc=l.match(/\b(DHL|UPS|FedEx|Chronopost|Colissimo|La Poste|EMS|GLS|TNT|DPD|Aramex)\b/i);
       if(mc&&!transporteur)transporteur=mc[1].toUpperCase()==='LA POSTE'?'Colissimo / La Poste':mc[1];
-      (l.match(/\b([A-Z]{2}\d{9}[A-Z]{2})\b/g)||[]).forEach(function(t){if(tracking.indexOf(t)<0)tracking.push(t);});
+      (l.match(TRK_RX)||[]).forEach(function(t){if(tracking.indexOf(t)<0)tracking.push(t);});
       var md=l.match(/\b(20\d{2}-\d{2}-\d{2})\b/g);
       if(md)dLivr=md[md.length-1];
     });
+    var LR=delivRows(bl.join(' '));delivApply(LR,tracking,prods,function(t){transporteur=t;},function(d){dLivr=d;});
     // Rang OlyLife éventuel (P1…P5 / Starter…Pioneer)
     var rang='';
     bl.forEach(function(l){var mr=l.match(/\b(P[1-5])\b[\s–-]*(Starter|Builder|Leader|Supervisor|Pioneer)?/i)||l.match(/\b(Starter|Builder|Leader|Supervisor|Pioneer)\b/i);if(mr&&!rang)rang=RANG_OLY[(mr[1]||mr[0]).toLowerCase()]||'';});
@@ -4714,7 +4746,7 @@ function parseOlyOrders(text){
     var notes=['Commande OlyLife n°'+num+(dateCmd?' du '+fD(dateCmd):''),montant?'Montant : '+montant+' USD':'',type?'Type : '+type:'',stCmd?'Statut commande : '+stCmd:'',prodTxt.length?'Produits : '+prodTxt.join(', '):'',adr?'Livraison : '+adr:'',destinataire&&destinataire!==nomC?'Destinataire : '+destinataire:'',rem?'Remarque : '+rem:''].filter(Boolean).join('\n');
     var livNom=(destinataire&&destinataire.replace(/\s+/g,' ').toLowerCase()!==nomC.replace(/\s+/g,' ').toLowerCase())?destinataire:'';
     var livTel=(recipTel&&normPhone(recipTel)!==normPhone(tel))?normPhone(recipTel):'';
-    return{nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,livNom:livNom,livTel:livTel,numCommande:num,memberIdOlyLife:(member||'').toUpperCase(),pieceId:idcard,dateCommande:dateCmd,transporteur:transporteur,tracking:tracking.join(' / '),dateLivraison:dLivr,rangOly:rang,montantUSD:montantUSD,achatsUSD:montantUSD,produits:prods,etape:'Client',qualification:'Chaud',statut:'reseau',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olylife'};
+    return{nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,livNom:livNom,livTel:livTel,numCommande:num,memberIdOlyLife:(member||'').toUpperCase(),pieceId:idcard,dateCommande:dateCmd,transporteur:transporteur,tracking:tracking.join(' / '),dateLivraison:dLivr,livraisons:LR.length>1?LR:undefined,rangOly:rang,montantUSD:montantUSD,achatsUSD:montantUSD,produits:prods,etape:'Client',qualification:'Chaud',statut:'reseau',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olylife'};
   }).filter(function(x){return x.nom||x.tel||x.numCommande;});
 }
 function parseCSV(text){
@@ -4759,8 +4791,8 @@ function impSamePerson(it,c){
   return false;
 }
 function impSameKeyBo(it,c){
-  if(it.numCommande&&c.numCommande===it.numCommande)return true;
-  return!!(it.memberIdOlyLife&&c.memberIdOlyLife&&String(c.memberIdOlyLife).toUpperCase()===String(it.memberIdOlyLife).toUpperCase());
+  if(it.numCommande&&(c.numCommande===it.numCommande||(c.comptes||[]).some(function(k){return k.numCommande===it.numCommande;})))return true;
+  return!!(it.memberIdOlyLife&&allEAs(c).indexOf(String(it.memberIdOlyLife).toUpperCase())>=0);
 }
 function impFindExisting(it){
   // priorité : e-mail > nom complet > téléphone / ID / commande (ces derniers seulement si les noms sont compatibles)
@@ -4789,13 +4821,14 @@ function impBoOwner(it){
   if(!(it.memberIdOlyLife||it.numCommande))return null;
   return OC.find(function(c){return impSameKeyBo(it,c)&&!impSamePerson(it,c);})||null;
 }
-var IMP_FLBL={tel:'téléphone',email:'e-mail',pays:'pays',ville:'ville',adresse:'adresse livraison',cp:'code postal',livNom:'destinataire livraison',livTel:'tél. livraison',factAdresse:'adresse facturation',numCommande:'n° commande',memberIdOlyLife:'ID membre',pieceId:'pièce d\'identité',tracking:'n° de tracking',transporteur:'transporteur',dateLivraison:'date de livraison',dateCommande:'date de commande',rangOly:'rang OlyLife',refere:'référent',suiviPar:'suivi par',produits:'produits',notes:'notes de commande',statut:'statut',etape:'étape'};
-var IMP_SKIP={id:1,createdAt:1,createdBy:1,journal:1,actions:1,rdvs:1,avances:1,suivis:1,geo:1,qualification:1,canal:1,registre:1,referentId:1,referentNom:1,_src:1,_state:1,_exid:1,_bo:1,_boId:1};
+var IMP_FLBL={livraisons:'colis (plusieurs)',tel:'téléphone',email:'e-mail',pays:'pays',ville:'ville',adresse:'adresse livraison',cp:'code postal',livNom:'destinataire livraison',livTel:'tél. livraison',factAdresse:'adresse facturation',numCommande:'n° commande',memberIdOlyLife:'ID membre',pieceId:'pièce d\'identité',tracking:'n° de tracking',transporteur:'transporteur',dateLivraison:'date de livraison',dateCommande:'date de commande',rangOly:'rang OlyLife',refere:'référent',suiviPar:'suivi par',produits:'produits',notes:'notes de commande',statut:'statut',etape:'étape'};
+var IMP_SKIP={id:1,createdAt:1,createdBy:1,journal:1,actions:1,rdvs:1,avances:1,suivis:1,geo:1,qualification:1,canal:1,registre:1,referentId:1,referentNom:1,_src:1,_state:1,_exid:1,_bo:1,_boId:1,_idMode:1};
 var IMP_FORCE={tracking:1,transporteur:1,dateLivraison:1,numCommande:1,dateCommande:1,memberIdOlyLife:1,montantUSD:1};
 function impDiff(it,ex){
   var news=[],known=[];
   Object.keys(it).forEach(function(k){
     if(IMP_SKIP[k]||it[k]==null||it[k]==='')return;
+    if(k==='livraisons'){(JSON.stringify(ex[k]||[])===JSON.stringify(it[k])?known:news).push(IMP_FLBL[k]);return;}
     if(Array.isArray(it[k])){var miss=it[k].filter(function(v){return(ex[k]||[]).indexOf(v)<0;});if(miss.length)news.push(IMP_FLBL[k]||k);else if(it[k].length)known.push(IMP_FLBL[k]||k);return;}
     if(k==='notes'){if(it.numCommande&&String(ex.notes||'').indexOf(it.numCommande)>=0)known.push(IMP_FLBL[k]);else news.push(IMP_FLBL[k]);return;}
     if(!ex[k])news.push(IMP_FLBL[k]||k);
@@ -4816,6 +4849,7 @@ function impSameKey(a,b){
 function impFold(into,it){
   Object.keys(it).forEach(function(k){
     var v=it[k];if(v==null||v==='')return;
+    if(k==='livraisons'){into[k]=into[k]||[];v.forEach(function(r){if(!into[k].some(function(x){return x.doc===r.doc;}))into[k].push(r);});return;}
     if(Array.isArray(v)){into[k]=into[k]||[];v.forEach(function(x){if(into[k].indexOf(x)<0)into[k].push(x);});return;}
     if(k==='notes'){if(!into.notes)into.notes=v;else if(into.notes.indexOf(v)<0)into.notes+='\n'+v;return;}
     if(into[k]==null||into[k]==='')into[k]=v;
@@ -4876,11 +4910,17 @@ function oImpAnalyse(){
     if(warn)badge='<span class="obdg bor">incomplet</span>';
     else if(!ex){badge='<span class="obdg bgr">🆕 nouveau</span>';it._state='new';if(it._bo)detail='<div class="oimp-diff"><span class="nw" style="color:#C0392B">⚠️ L\'ID membre '+esc(it.memberIdOlyLife||'')+(it.numCommande?' / la commande n°'+esc(it.numCommande):'')+' figure déjà sur la fiche de <b>'+esc(it._bo)+'</b> (probable erreur de fusion). La nouvelle fiche est créée avec ses propres données.</span> <button type="button" class="ob bgh bsm" style="margin-top:4px" onclick="impCleanOther(\''+it._boId+'\',\''+esc(it.memberIdOlyLife||'')+'\',\''+esc(it.numCommande||'')+'\',this)">🧹 Retirer ces données de la fiche '+esc(it._bo)+'</button></div>';}
     else{
+      var rt=impCompteRoute(it,ex),eaI=String(it.memberIdOlyLife||'').toUpperCase();
+      if(rt){badge='<span class="obdg baq">🧬 autre compte</span>';it._state='merge';
+        detail='<div class="oimp-diff"><span class="nw">🧬 Même personne que <b>'+esc(ex.nom+' '+(ex.prenom||''))+'</b> ('+esc(ex.memberIdOlyLife)+') : '+eaI+' sera '+(rt.isNew?'ajouté comme <b>autre n° de distributeur</b>':'mis à jour (compte déjà connu)')+(it.numCommande?' · commande '+esc(it.numCommande):'')+'</span><br><button type="button" class="ob bgh bsm" style="margin-top:4px" onclick="impIdMode(\''+eaI+'\',\'replace\')">↔ Non : remplacer l\'ID principal de la fiche</button></div>';}
+      else{
       var d=impDiff(it,ex);
       if(d.news.length){badge='<span class="obdg baq">🔁 complète la fiche</span>';it._state='merge';
         detail='<div class="oimp-diff">'+(normStr(ex.nom)!==normStr(it.nom||ex.nom)?'<span class="kn">→ met à jour la fiche de <b>'+esc(ex.nom+' '+(ex.prenom||''))+'</b></span><br>':'')+'<span class="nw">➕ Nouveau : '+esc(d.news.join(', '))+'</span>'+(d.known.length?'<br><span class="kn">Déjà enregistré : '+esc(d.known.join(', '))+'</span>':'')+'</div>';
       }else{badge='<span class="obdg bgy">⛔ doublon — ignoré</span>';it._state='dup';
         detail='<div class="oimp-diff"><span class="kn">Fiche identique déjà présente : '+esc(ex.nom+' '+(ex.prenom||''))+'</span></div>';}
+      if(IMP_IDMODE[eaI]==='replace')detail+='<div class="oimp-diff"><span class="kn">↔ L\'ID principal sera remplacé par '+esc(eaI)+'</span> <button type="button" class="ob bgh bsm" onclick="impIdMode(\''+eaI+'\',\'\')">Annuler</button></div>';
+      }
     }
     return'<div class="oimp-row'+(warn?' warn':'')+'">'
       +'<span class="nm">'+esc((it.nom||'?')+' '+(it.prenom||''))+'</span>'
@@ -4907,8 +4947,11 @@ function oImpGo(){
     var existing=impFindExisting(item);
     if(existing){
       var adds=[],prevNum=existing.numCommande;
+      var route=impCompteRoute(item,existing);if(route)impApplyCompte(item,existing,route,adds);
+      delete item._idMode;
       Object.keys(item).forEach(function(k){
         if(IMP_SKIP[k]||item[k]==null||item[k]==='')return;
+        if(k==='livraisons'){if(JSON.stringify(existing[k]||[])!==JSON.stringify(item[k])){existing[k]=item[k];adds.push(IMP_FLBL[k]);}return;}
         if(k==='notes'){
           if(item.numCommande&&String(existing.notes||'').indexOf(item.numCommande)>=0)return;
           existing.notes=(existing.notes?existing.notes+'\n\n':'')+item.notes;adds.push('notes');return;
@@ -5229,7 +5272,7 @@ function filterContacts(q,o){
   return OC.filter(function(c){
     if(VIEW_AS_TAG&&!(c.ctags&&c.ctags.indexOf(VIEW_AS_TAG)>=0))return false;
     if(q){
-      var hay=((c.nom||'')+' '+(c.prenom||'')+' '+(c.email||'')+' '+(c.ville||'')+' '+(c.pays||'')+' '+(c.refere||'')+' '+(c.numCommande||'')+' '+(c.memberIdOlyLife||'')+' '+(c.ctags||[]).join(' ')).toLowerCase();
+      var hay=((c.nom||'')+' '+(c.prenom||'')+' '+(c.email||'')+' '+(c.ville||'')+' '+(c.pays||'')+' '+(c.refere||'')+' '+(c.numCommande||'')+' '+(c.memberIdOlyLife||'')+' '+(c.tracking||'')+' '+(c.ctags||[]).join(' ')+' '+(c.comptes||[]).map(function(k){return[k.memberIdOlyLife,k.numCommande,k.tracking].join(' ');}).join(' ')+' '+(c.factures||[]).map(function(f){return f.docNo||'';}).join(' ')).toLowerCase();
       var tel=(c.tel||'').replace(/\D/g,'');
       if(hay.indexOf(q)<0&&!(qd.length>=3&&tel.indexOf(qd)>=0))return false;
     }
@@ -6048,7 +6091,7 @@ function oGeneaAll(open){
 }
 function oGenea(){
   var list=OC.filter(function(c){return c.memberIdOlyLife||c.estPartenaire;});
-  var byEA={};list.forEach(function(c){var ea=String(c.memberIdOlyLife||'').toUpperCase().trim()||(mtEstEA(c)?String(c.nom).toUpperCase():'');if(ea&&!byEA[ea])byEA[ea]=c;});
+  var byEA={};list.forEach(function(c){var ea=String(c.memberIdOlyLife||'').toUpperCase().trim()||(mtEstEA(c)?String(c.nom).toUpperCase():'');if(ea&&!byEA[ea])byEA[ea]=c;(c.comptes||[]).forEach(function(k){var e2=String(k.memberIdOlyLife||'').toUpperCase().trim();if(e2&&!byEA[e2])byEA[e2]=c;});});
   var kids={},roots=[];
   list.forEach(function(c){
     var sp=(String(c.sponsor||'').toUpperCase().match(/(EA|AF)\d+/)||[])[0]||'';
@@ -6541,7 +6584,7 @@ function logiHtml(c){
   var waMsg='Bonjour, je vous contacte au sujet de la commande OlyLife n°'+(c.numCommande||'')+' (Member ID '+(c.memberIdOlyLife||'')+'), le suivi n\'est toujours pas disponible. Merci de votre retour.';
   var mailSubj='Suivi commande OlyLife n°'+(c.numCommande||'');
   var mailBody='Bonjour,\n\nMerci de me communiquer le statut d\'expédition de la commande n°'+(c.numCommande||'')+' (Member ID '+(c.memberIdOlyLife||'')+').\n\nCordialement,\n'+(PARTNER_NOM()||'');
-  var rows='<div class="acc-row"><span class="em">📦</span><div class="b">Commande n° '+esc(c.numCommande)+' '+st+'<small>'+(c.dateCommande?'commandée le '+fD(c.dateCommande):'date de commande non renseignée')+(c.tracking?' · tracking : '+esc(c.tracking):'')+(c.dateLivraison?' · livrée le '+fD(c.dateLivraison):'')+'</small></div></div>';
+  var rows='<div class="acc-row"><span class="em">📦</span><div class="b">Commande n° '+esc(c.numCommande)+' '+st+'<small>'+(c.dateCommande?'commandée le '+fD(c.dateCommande):'date de commande non renseignée')+(c.tracking?' · tracking : '+esc(c.tracking):'')+(c.dateLivraison?' · livrée le '+fD(c.dateLivraison):'')+'</small>'+livHtml(c)+'</div></div>';
   rows+='<div class="acc-row"><span class="em">💬</span><div class="b">Messages client (pré-rédigés, à envoyer sur WhatsApp)<small>'+(c.actions&&c.actions.logistique&&c.actions.logistique.done?'rassurance envoyée le '+fD(c.actions.logistique.doneAt)+' · ':'')+(c.actions&&c.actions.trackingEnvoye&&c.actions.trackingEnvoye.done?'tracking transmis le '+fD(c.actions.trackingEnvoye.doneAt):'')+'</small></div><div class="acts">'
     +(c.tel&&!c.tracking?'<a class="ob bwa bsm" href="'+mkWA(c.tel,msgLogRetard(c,'fr'))+'" target="_blank" rel="noopener" onclick="oDone(\''+c.id+'\',\'logistique\')">⏳ Rassurer (délai)</a>':'')
     +(c.tel&&c.tracking?'<a class="ob bwa bsm" href="'+mkWA(c.tel,msgLogOk(c,'fr'))+'" target="_blank" rel="noopener" onclick="oDone(\''+c.id+'\',\'trackingEnvoye\')">🚚 Envoyer le tracking</a>':'')
@@ -6550,6 +6593,337 @@ function logiHtml(c){
     +'</div></div>';
   rows+='<div class="acc-row"><span class="em">📨</span><div class="b">Relancer la logistique OlyLife<small>WhatsApp ou e-mail au service logistique, message prêt avec n° de commande et Member ID</small></div><div class="acts"><a class="ob bgh bsm" href="'+olySvcWA('logistics',waMsg)+'" target="_blank" rel="noopener">📨 WhatsApp</a><a class="ob bgh bsm" href="'+olySvcMail('logistics',mailSubj,mailBody)+'">✉️ E-mail</a></div></div>';
   return'<div class="od-section'+(c.installConfirm?' clps':'')+'"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">🚚 Logistique — commande & messages automatisés</div><div class="od-bd">'+rows+'</div></div>';
+}
+
+
+// ═══════════ v3.23 — Comptes OlyLife multiples · factures · mot de passe temporaire ═══════════
+function srvNum(){var v=String((CFG&&CFG.srv)||'0').split('.');return(+v[0]||0)*1000+(+v[1]||0);}
+function srvOk(){return srvNum()>=3013;}
+// Comptes OlyLife d'une même personne : le compte principal (champs de la fiche) + c.comptes[]
+function comptesDe(c){
+  var out=[{key:'main',ea:String(c.memberIdOlyLife||'').toUpperCase(),o:c,lbl:'compte principal'}];
+  (c.comptes||[]).forEach(function(k,i){out.push({key:k.id,ea:String(k.memberIdOlyLife||'').toUpperCase(),o:k,lbl:(i+2)+'ᵉ compte'});});
+  return out;
+}
+function compteByKey(c,key){return comptesDe(c).find(function(x){return x.key===key;})||null;}
+function compteByEa(c,ea){ea=String(ea||'').toUpperCase();if(!ea)return null;return comptesDe(c).find(function(x){return x.ea===ea;})||null;}
+function compteLbl(c,key){var k=compteByKey(c,key);return k?(k.ea||'ID non renseigné')+' — '+k.lbl:'';}
+function allEAs(c){return comptesDe(c).map(function(k){return k.ea;}).filter(Boolean);}
+function canalCode(c){var v=String((c&&c.canal)||'').toLowerCase();if(v.indexOf('signal')>=0)return'signal';if(v.indexOf('telegram')>=0)return'tg';if(v.indexOf('mail')>=0)return'mail';if(v.indexOf('sms')>=0)return'sms';return'wa';}
+// Nom d'appareil OlyLife (« Olylife THZ Tera-P90+ ») → entrée du catalogue
+function prodFromName(s){
+  s=String(s||'');if(!s)return'';
+  if(/p90\s*\+|p90plus|HCA002A/i.test(s))return PRODUCTS.find(function(P){return/p90\+/i.test(P);})||'Tera-P90+ (PEMF/Terahertz)';
+  var flat=s.toLowerCase().replace(/[\s\-+]/g,'');
+  return PRODUCTS.find(function(P){if(/p90/i.test(P))return false;var w=P.toLowerCase().split('(')[0].replace(/[\s\-+]/g,'');return w.length>=4&&flat.indexOf(w)>=0;})||'';
+}
+// Tracking : postal international (XX000000000XX) ou UPS (1Z…)
+var TRK_RX=/\b([A-Z]{2}\d{9}[A-Z]{2}|1Z[A-Z0-9]{16})\b/g;
+// Tableau « Delivery information » : une ligne par colis (n° « commande-1 », « commande-2 »…)
+function delivRows(flat){
+  var rx=/\b(20\d{14,})-(\d{1,3})\b/g,pos=[],m;
+  while((m=rx.exec(flat)))pos.push({i:m.index,doc:m[1]+'-'+m[2]});
+  return pos.map(function(p,j){
+    var seg=flat.slice(p.i,j+1<pos.length?pos[j+1].i:flat.length);
+    var car=(seg.match(/\b(DHL|UPS|FedEx|Chronopost|Colissimo|La Poste|EMS|GLS|TNT|DPD|Aramex)\b/i)||[])[1]||'';
+    var trk=[];(seg.match(TRK_RX)||[]).forEach(function(t){if(trk.indexOf(t)<0)trk.push(t);});
+    if(!car&&trk.length&&/^1Z/.test(trk[0]))car='UPS';
+    var dts=seg.match(/\b20\d{2}-\d{2}-\d{2}\b/g)||[];
+    return{doc:p.doc,produit:prodFromName(seg),transporteur:car,tracking:trk.join(' / '),date:dts.length?dts[dts.length-1]:''};
+  }).filter(function(r,i,a){return a.findIndex(function(x){return x.doc===r.doc;})===i;});
+}
+// Applique les lignes de livraison : tous les n° de suivi, transporteurs distincts, dernière date, appareils
+function delivApply(LR,trk,prods,setCar,setDate){
+  if(!LR||!LR.length)return;
+  var cars=[],dts=[];
+  LR.forEach(function(r){(r.tracking?r.tracking.split(' / '):[]).forEach(function(t){if(trk.indexOf(t)<0)trk.push(t);});if(r.transporteur&&cars.indexOf(r.transporteur)<0)cars.push(r.transporteur);if(r.date)dts.push(r.date);if(r.produit&&prods.indexOf(r.produit)<0)prods.push(r.produit);});
+  if(cars.length)setCar(cars.join(' / '));if(dts.length)setDate(dts.sort()[dts.length-1]);
+}
+function livHtml(c){
+  var L=c.livraisons||[];if(L.length<2)return'';
+  return L.map(function(r){var u=trackingUrl(r.transporteur,r.tracking);return'<div style="font-size:12px;line-height:1.6">📦 <b>'+esc((r.produit||'').split('(')[0].trim()||r.doc)+'</b> · '+(r.tracking?esc(r.transporteur||'')+' '+(u?'<a href="'+u+'" target="_blank" rel="noopener" style="color:var(--aqua)">'+esc(r.tracking)+' ↗</a>':esc(r.tracking))+(r.date?' · expédié le '+fD(r.date):''):'<span style="color:var(--t3)">pas encore expédié</span>')+'</div>';}).join('');
+}
+function suiviTxt(c){
+  var L=c.livraisons||[];
+  if(L.length>1)return L.filter(function(r){return r.tracking;}).map(function(r){var u=trackingUrl(r.transporteur,r.tracking);return'• '+((r.produit||'').split('(')[0].trim()||'Colis')+' — '+(r.transporteur||'')+' '+r.tracking+(u?' : '+u:'');}).join('\n');
+  return trackingUrl(c.transporteur,c.tracking)||'';
+}
+
+// ── Fiche : autres comptes OlyLife ──
+function comptesHtml(c){
+  var K=c.comptes||[];if(!K.length)return'';
+  var rows=K.map(function(k,i){
+    var u=trackingUrl(k.transporteur,k.tracking);
+    var li=function(l,v){return v?'<div class="od-row"><span class="od-lbl">'+l+'</span><span class="od-val">'+v+'</span></div>':'';};
+    return'<div style="padding:8px 16px 4px;font-weight:700;color:var(--tx)">🆔 '+esc(k.memberIdOlyLife||'ID non renseigné')+' <span style="font-weight:400;color:var(--t3)">· '+(i+2)+'ᵉ compte</span></div>'
+      +li('Appareil',esc((k.produits||[]).join(', ')))
+      +li('N° commande',esc(k.numCommande||'')+(k.dateCommande?' · '+fD(k.dateCommande):''))
+      +li('Livraison',(k.tracking?esc(k.transporteur||'')+' '+(u?'<a href="'+u+'" target="_blank" rel="noopener" style="color:var(--aqua)">'+esc(k.tracking)+' ↗</a>':esc(k.tracking)):'')+(k.dateLivraison?' · '+fD(k.dateLivraison):''))
+      +li('Sponsor / placement',esc([k.sponsor,k.placement,k.cote].filter(Boolean).join(' · ')))
+      +li('Rang',esc(k.rangOly||''))
+      +li('Notes',esc(k.notes||''));
+  }).join('');
+  return odSec('🧬 Autres comptes OlyLife ('+K.length+') — même personne',rows,true);
+}
+
+// ── Fiche : factures & accès au compte OlyLife ──
+function factHtml(c){
+  var r=ROLE();if(r==='referent'||r==='comite')return'';
+  var F=c.factures||[];
+  var has=c.memberIdOlyLife||c.numCommande||(c.comptes&&c.comptes.length)||F.length||(c.mdpSet&&Object.keys(c.mdpSet).length)||cStatut(c)==='reseau';
+  if(!has)return'';
+  var can=canEditContact(c),rows='';
+  comptesDe(c).forEach(function(k){
+    if(k.key!=='main'&&!k.ea&&!k.o.numCommande)return;
+    var set=c.mdpSet&&c.mdpSet[k.key],eff=c.mdpEfface&&c.mdpEfface[k.key];
+    rows+='<div class="acc-row"><span class="em">🔑</span><div class="b"><b>'+esc(k.ea||'ID membre non renseigné')+'</b> <span style="color:var(--t3)">· '+k.lbl+'</span><small>'
+      +(set?'Mot de passe OlyLife dans le coffre depuis le '+fD(String(set).slice(0,10))+' — effacé automatiquement à l\'envoi de la facture'
+        :eff?'🔒 Mot de passe effacé le '+fD(String(eff.le||'').slice(0,10))+(eff.raison?' — '+esc(eff.raison):'')
+        :'Aucun mot de passe enregistré')+'</small></div><div class="acts">'
+      +(can&&set?'<button class="ob bgh bsm" onclick="oMdpShow(\''+c.id+'\',\''+k.key+'\')">👁 Afficher</button><button class="ob bgh bsm" title="Effacer du CRM" onclick="oMdpPurge(\''+c.id+'\',\''+k.key+'\')">🗑</button>':'')
+      +(can&&!set?'<button class="ob bgh bsm" onclick="oMdpSet(\''+c.id+'\',\''+k.key+'\')">🔑 Enregistrer</button>':'')
+      +'<button class="ob bgh bsm" title="Back-office OlyLife" onclick="oBOlylife()">🌐 BO</button></div></div>';
+  });
+  F.forEach(function(f){
+    rows+='<div class="acc-row"><span class="em">🧾</span><div class="b">Facture '+esc(f.docNo||f.nom||'')+(f.produit?' · <b>'+esc(f.produit)+'</b>':'')+(f.montant?' · '+esc(f.montant)+' USD':'')
+      +'<small>'+(f.ea?'compte '+esc(f.ea)+' · ':'')+(f.dateDoc?'émise le '+fD(f.dateDoc)+' · ':'')
+      +(f.envoyeLe?'✅ envoyée le '+fD(String(f.envoyeLe).slice(0,10))+(f.canal?' par '+esc(CANAL_LBL[f.canal]||f.canal):''):'<span style="color:#C0392B">pas encore envoyée au client</span>')+'</small></div><div class="acts">'
+      +'<a class="ob bgh bsm" href="'+esc(f.url)+'" target="_blank" rel="noopener" title="Ouvrir la facture">📄</a>'
+      +(can?'<button class="ob '+(f.envoyeLe?'bgh':'bwa')+' bsm" onclick="oFactSend(\''+c.id+'\',\''+f.id+'\')">'+(f.envoyeLe?'↻ Renvoyer':'📤 Envoyer')+'</button><button class="ob bgh bsm" title="Supprimer" onclick="oFactDel(\''+c.id+'\',\''+f.id+'\')">🗑</button>':'')+'</div></div>';
+  });
+  if(can)rows+='<div class="acc-row"><span class="em">➕</span><div class="b" style="color:var(--t3)">Déposez la facture PDF téléchargée sur le BO OlyLife : n° de document, appareil, montant et compte sont lus automatiquement, puis envoyée au client par son canal préféré ('+esc(c.canal||'WhatsApp')+').'
+    +(srvOk()?'':'<br><b style="color:#C0392B">⚠️ Le script serveur doit être mis à jour (v3.13) pour stocker les factures et les mots de passe.</b>')+'</div><div class="acts"><button class="ob bgold bsm" onclick="oFactAdd(\''+c.id+'\')">🧾 Ajouter une facture</button></div></div>';
+  var nb=F.filter(function(f){return!f.envoyeLe;}).length;
+  return'<div class="od-section"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">🧾 Factures & accès compte OlyLife'+(nb?' <span class="obdg brd">'+nb+' à envoyer</span>':'')+'</div><div class="od-bd">'+rows+'</div></div>';
+}
+
+// ── Mot de passe OlyLife : coffre côté serveur, jamais dans la fiche ──
+function oMdpSet(cid,key){
+  var c=OC.find(function(x){return x.id===cid;});if(!c||!canEditContact(c))return;
+  if(!srvOk()){oT('Mettez d\'abord à jour le script serveur (v3.13) : sans lui, le mot de passe serait stocké dans la fiche','e');return;}
+  var v=prompt('🔑 Mot de passe du compte OlyLife '+compteLbl(c,key)+'\n'+(c.prenom||'')+' '+(c.nom||'')+'\n\nGardé dans un coffre séparé (jamais dans la fiche ni dans la liste), visible seulement par l\'admin et le gestionnaire de la fiche, effacé à l\'envoi de la facture.');
+  if(v==null)return;v=v.trim();if(!v)return;
+  oPostAsync_({op:'mdpSet',contactId:cid,key:key,mdp:v}).then(function(d){
+    if(!d.ok){oT('Refusé : '+(d.error==='forbidden'?'fiche non attribuée à vous':d.error==='op'?'script serveur pas à jour':(d.error||'?')),'e');return;}
+    c.mdpSet=d.mdpSet||{};if(c.mdpEfface)delete c.mdpEfface[key];
+    jrnAdd(c,'systeme','🔑 Mot de passe OlyLife enregistré dans le coffre ('+compteLbl(c,key)+')');oPush([c]);oOpenF(cid);oT('🔑 Mot de passe enregistré','s');
+  }).catch(function(){oT('Hors ligne — rien n\'a été enregistré','e');});
+}
+function oMdpShow(cid,key){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  oPostAsync_({op:'mdpGet',contactId:cid,key:key}).then(function(d){
+    if(!d.ok){oT(d.error==='absent'?'Mot de passe déjà effacé':'Indisponible : '+(d.error||'?'),'e');return;}
+    var k=compteByKey(c,key)||{};
+    var m=document.createElement('div');m.id='omdp';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px';
+    m.onclick=function(e){if(e.target===m)m.remove();};
+    m.innerHTML='<div style="background:#fff;border-radius:16px;padding:18px;max-width:420px;width:100%">'
+      +'<div style="font-weight:700;margin-bottom:4px">🔑 '+esc((c.prenom||'')+' '+(c.nom||''))+'</div>'
+      +'<div style="font-size:12px;color:var(--t2);margin-bottom:12px">Compte OlyLife '+esc(compteLbl(c,key))+' · consultation tracée dans le journal d\'administration · fermeture automatique dans 60 s.</div>'
+      +'<div style="font-size:11px;font-weight:700;color:var(--t2)">IDENTIFIANT (ID MEMBRE)</div><div style="font-family:monospace;font-size:17px;background:var(--navy3);border-radius:10px;padding:10px 12px;margin:4px 0 10px">'+esc(k.ea||'—')+'</div>'
+      +'<div style="font-size:11px;font-weight:700;color:var(--t2)">MOT DE PASSE</div><div style="font-family:monospace;font-size:17px;background:var(--navy3);border-radius:10px;padding:10px 12px;margin:4px 0 12px;display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="overflow-wrap:anywhere">'+esc(d.mdp)+'</span><button class="ob bgh bsm" id="omdp-cp">📋</button></div>'
+      +'<div style="display:flex;gap:8px"><button class="ob baqua" style="flex:1" onclick="oBOlylife()">🌐 Ouvrir le BO OlyLife</button><button class="ob bgh" style="flex:1" onclick="document.getElementById(\'omdp\').remove()">Fermer</button></div></div>';
+    document.body.appendChild(m);
+    document.getElementById('omdp-cp').onclick=function(){if(navigator.clipboard)navigator.clipboard.writeText(d.mdp).then(function(){oT('📋 Copié','s');});};
+    setTimeout(function(){var x=document.getElementById('omdp');if(x)x.remove();},60000);
+  }).catch(function(){oT('Hors ligne','e');});
+}
+function mdpPurgeDo(c,key,raison){
+  return oPostAsync_({op:'mdpPurge',contactId:c.id,key:key,raison:raison}).then(function(d){
+    if(!d.ok)throw d;
+    c.mdpSet=d.mdpSet||{};c.mdpEfface=c.mdpEfface||{};c.mdpEfface[key]={le:new Date().toISOString(),par:PARTNER_NOM(),raison:raison};
+    jrnAdd(c,'systeme','🔒 Mot de passe OlyLife effacé du CRM ('+compteLbl(c,key)+') — '+raison);oPush([c]);return d;
+  });
+}
+function oMdpPurge(cid,key){
+  var c=OC.find(function(x){return x.id===cid;});if(!c||!canEditContact(c))return;
+  if(!confirm('Effacer définitivement du CRM le mot de passe du compte '+compteLbl(c,key)+' ?\nPlus personne ne pourra le consulter.'))return;
+  mdpPurgeDo(c,key,'effacé manuellement').then(function(){oOpenF(cid);oT('🔒 Mot de passe effacé','s');}).catch(function(e){oT('Échec : '+((e&&e.error)||'hors ligne'),'e');});
+}
+
+// ── Factures : lecture du PDF (pdf.js), dépôt sur Drive, envoi au client ──
+var PDFJS_V='3.11.174';
+function loadPdfJs(cb){
+  if(window.pdfjsLib)return cb(true);
+  var done=false;function fin(ok){if(done)return;done=true;cb(ok);}
+  var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/'+PDFJS_V+'/pdf.min.js';s.async=true;
+  s.onload=function(){try{window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/'+PDFJS_V+'/pdf.worker.min.js';}catch(e){}fin(!!window.pdfjsLib);};
+  s.onerror=function(){fin(false);};document.head.appendChild(s);setTimeout(function(){fin(!!window.pdfjsLib);},9000);
+}
+function pdfText(buf,cb){
+  loadPdfJs(function(ok){
+    if(!ok)return cb('');
+    window.pdfjsLib.getDocument({data:new Uint8Array(buf.slice(0))}).promise.then(function(doc){
+      var n=Math.min(doc.numPages,3),out=[],p=Promise.resolve();
+      for(var i=1;i<=n;i++)(function(i){p=p.then(function(){return doc.getPage(i).then(function(pg){return pg.getTextContent().then(function(tc){out.push(tc.items.map(function(x){return x.str+(x.hasEOL?'\n':' ');}).join(''));});});});})(i);
+      return p.then(function(){cb(out.join('\n'));});
+    }).catch(function(){cb('');});
+  });
+}
+function parseFacture(t){
+  t=deEnt(String(t||'')).replace(/\s+/g,' ');
+  var g=function(rx){var m=t.match(rx);return m?m[1].trim():'';};
+  var prod=g(/OLY-[A-Z0-9]+\s+(.+?)\s+\d+\s+[\d,]+\.\d{2}\s/i);
+  return{
+    ea:(g(/User\s*ID\s*:?\s*((?:EA|AF)\d{5,})/i)||g(/\b((?:EA|AF)\d{5,})\b/)).toUpperCase(),
+    docNo:g(/Doc\s*No\.?\s*:?\s*(\d{12,}(?:-\d+)?)/i)||g(/\b(20\d{14,}(?:-\d+)?)\b/),
+    dateDoc:g(/Issued\s*Date\s*:?\s*(\d{4}-\d{2}-\d{2})/i)||g(/\b(20\d{2}-\d{2}-\d{2})\s+\d{2}:\d{2}/),
+    code:g(/\b(OLY-[A-Z0-9]+)\b/i),
+    produit:prod,
+    montant:(g(/Grand\s*Total\s*:?\s*USD\s*([\d,]+\.\d{2})/i)||'').replace(/,/g,''),
+    paye:/payment\s+successful/i.test(t)
+  };
+}
+function abToB64(buf){var b=new Uint8Array(buf),s='',CH=0x8000;for(var i=0;i<b.length;i+=CH)s+=String.fromCharCode.apply(null,b.subarray(i,i+CH));return btoa(s);}
+function oFactAdd(cid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c||!canEditContact(c))return;
+  if(!srvOk()){oT('Mettez d\'abord à jour le script serveur (v3.13) pour pouvoir stocker les factures','e');return;}
+  var inp=document.createElement('input');inp.type='file';inp.accept='application/pdf,image/*';
+  inp.onchange=function(){
+    var file=inp.files&&inp.files[0];if(!file)return;
+    if(file.size>10*1024*1024){oT('Fichier trop lourd (10 Mo maximum)','e');return;}
+    oT('🧾 Lecture de la facture…','i');
+    file.arrayBuffer().then(function(buf){
+      var go=function(txt){
+        var info=parseFacture(txt);
+        var base=String(info.docNo||'').split('-')[0];
+        var k=compteByEa(c,info.ea)||(base?comptesDe(c).find(function(x){return x.o.numCommande&&String(x.o.numCommande)===base;}):null);
+        if(!k&&info.ea){
+          var other=OC.find(function(x){return x.id!==c.id&&allEAs(x).indexOf(info.ea)>=0;});
+          if(other&&!confirm('⚠️ Cette facture concerne le compte '+info.ea+', qui figure sur la fiche de '+other.nom+' '+(other.prenom||'')+'.\n\nL\'ajouter quand même à la fiche de '+c.nom+' '+(c.prenom||'')+' ?'))return;
+          if(!c.memberIdOlyLife){c.memberIdOlyLife=info.ea;k=compteByKey(c,'main');}
+          else if(confirm('Le compte '+info.ea+' n\'est pas encore sur cette fiche (compte principal : '+c.memberIdOlyLife+').\n\nOK = l\'ajouter comme autre n° de distributeur de '+c.prenom+' '+c.nom+'.\nAnnuler = rattacher la facture au compte principal.')){
+            c.comptes=c.comptes||[];var nk={id:'k_'+Date.now().toString(36),memberIdOlyLife:info.ea,numCommande:base,dateCommande:info.dateDoc||'',produits:prodFromName(info.produit)?[prodFromName(info.produit)]:[]};
+            c.comptes.push(nk);k=compteByKey(c,nk.id);jrnAdd(c,'systeme','🧬 Autre compte OlyLife ajouté : '+info.ea);
+          }else k=compteByKey(c,'main');
+        }
+        if(!k)k=compteByKey(c,'main');
+        if(!info.docNo){var dn=prompt('N° de document de la facture (facultatif) :','');if(dn)info.docNo=dn.trim();}
+        var nm=('Facture_'+(info.docNo||Date.now())+'_'+(c.nom||'')+'_'+(c.prenom||'').split(' ')[0]).replace(/[^\w\-]+/g,'_')+(/pdf/i.test(file.type)||/\.pdf$/i.test(file.name)?'.pdf':'.'+(file.name.split('.').pop()||'jpg'));
+        oT('⬆️ Dépôt de la facture…','i');
+        oPostAsync_({op:'uploadFacture',contactId:c.id,data:abToB64(buf),name:nm,mime:file.type||'application/pdf'}).then(function(d){
+          if(!d.ok){oT('Dépôt refusé : '+(d.error==='op'?'script serveur pas à jour (v3.13)':(d.error||'?')),'e');return;}
+          var pn=prodFromName(info.produit);
+          var f={id:'f_'+Date.now().toString(36),compte:k.key,ea:k.ea||info.ea||'',docNo:info.docNo||'',produit:pn?pn.split('(')[0].trim():(info.produit||''),montant:info.montant||'',dateDoc:info.dateDoc||'',url:d.url,fileId:d.id,nom:nm,ajouteLe:new Date().toISOString(),par:PARTNER_NOM()};
+          c.factures=c.factures||[];
+          if(f.docNo){var dup=c.factures.find(function(x){return x.docNo===f.docNo;});if(dup&&!confirm('Une facture n°'+f.docNo+' existe déjà sur la fiche. La remplacer ?'))return;if(dup)c.factures=c.factures.filter(function(x){return x!==dup;});}
+          c.factures.push(f);
+          if(pn&&(c.produits||[]).indexOf(pn)<0){c.produits=c.produits||[];c.produits.push(pn);}
+          if(k.key!=='main'&&pn){k.o.produits=k.o.produits||[];if(k.o.produits.indexOf(pn)<0)k.o.produits.push(pn);}
+          jrnAdd(c,'systeme','🧾 Facture '+(f.docNo||nm)+' ajoutée'+(f.produit?' — '+f.produit:'')+(f.montant?' · '+f.montant+' USD':'')+' (compte '+(f.ea||'?')+')');
+          oPush([c]);oOpenF(c.id);
+          oT('🧾 Facture ajoutée'+(info.docNo?'':' (n° non lu — à vérifier)'),'s');
+          setTimeout(function(){oFactSend(c.id,f.id);},350);
+        }).catch(function(){oT('Hors ligne — facture non déposée','e');});
+      };
+      if(/pdf/i.test(file.type)||/\.pdf$/i.test(file.name))pdfText(buf,go);else go('');
+    });
+  };
+  inp.click();
+}
+function factVars(c,f,demandeMdp){
+  var k=compteByKey(c,f.compte)||{o:c};var o=k.o;
+  var v=tplVars(c,'fr');
+  v.lienFacture=f.url||'';v.numFacture=f.docNo||'';v.produitFacture=f.produit||'';v.montantFacture=f.montant?f.montant+' USD':'';v.compte=f.ea||'';
+  var row=(c.livraisons||[]).find(function(r){return f.docNo&&r.doc===f.docNo;});
+  var trk=row?row.tracking:(o.tracking||''),car=row?row.transporteur:(o.transporteur||'');
+  v.tracking=trk;v.transporteur=car;v.lienSuivi=trk?(trackingUrl(car,trk)||''):'';
+  v.demandeMdp=demandeMdp?'1':'';
+  return v;
+}
+function factMsg(c,f,demandeMdp){return renderTpl(tplText((c.registre&&c.registre!=='pro')?'facture_envoi_tu':'facture_envoi'),factVars(c,f,demandeMdp));}
+function oFactSend(cid,fid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;var f=(c.factures||[]).find(function(x){return x.id===fid;});if(!f)return;
+  var set=!!(c.mdpSet&&c.mdpSet[f.compte]),eff=!!(c.mdpEfface&&c.mdpEfface[f.compte]);
+  var canal=canalCode(c),opts=[['wa','💬 WhatsApp'],['signal','🔵 Signal'],['tg','✈️ Telegram'],['mail','✉️ E-mail'],['sms','📱 SMS'],['copy','📋 Copier']];
+  var old=document.getElementById('ofact');if(old)old.remove();
+  var m=document.createElement('div');m.id='ofact';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:12px';
+  m.onclick=function(e){if(e.target===m)m.remove();};
+  m.innerHTML='<div style="background:#fff;border-radius:16px;padding:16px;max-width:520px;width:100%;max-height:92vh;overflow:auto">'
+    +'<div style="font-weight:700;font-size:16px;margin-bottom:2px">📤 Envoyer la facture</div>'
+    +'<div style="font-size:12px;color:var(--t2);margin-bottom:10px">'+esc((c.prenom||'')+' '+(c.nom||''))+' · '+esc(f.docNo||'')+(f.produit?' · '+esc(f.produit):'')+'</div>'
+    +'<label class="ofl">Canal (préféré sur la fiche : '+esc(c.canal||'WhatsApp')+')</label><select class="ofc" id="fs-canal">'+opts.map(function(o){return'<option value="'+o[0]+'"'+(o[0]===canal?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>'
+    +'<label class="ochk-row" style="margin-top:10px"><input type="checkbox" id="fs-dem"'+(set||!eff?' checked':'')+'><span>Demander au client de <b>changer le mot de passe</b> de son compte OlyLife</span></label>'
+    +(set?'<label class="ochk-row"><input type="checkbox" id="fs-purge" checked><span>🔒 <b>Effacer du CRM</b> le mot de passe du compte '+esc(f.ea||'')+' après l\'envoi (recommandé)</span></label>':'')
+    +'<label class="ofl" style="margin-top:10px">Message (modifiable)</label><textarea class="ofc" id="fs-txt" style="min-height:220px;font-size:13px"></textarea>'
+    +'<div style="display:flex;gap:8px;margin-top:12px"><button class="ob bgh" style="flex:1" onclick="document.getElementById(\'ofact\').remove()">Annuler</button><button class="ob bwa" style="flex:2;min-height:46px" onclick="oFactSendGo(\''+cid+'\',\''+fid+'\')">📤 Envoyer</button></div></div>';
+  document.body.appendChild(m);
+  var ta=document.getElementById('fs-txt'),dem=document.getElementById('fs-dem');
+  ta.value=factMsg(c,f,dem.checked);
+  dem.onchange=function(){ta.value=factMsg(c,f,dem.checked);};
+}
+function oFactSendGo(cid,fid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;var f=(c.factures||[]).find(function(x){return x.id===fid;});if(!f)return;
+  var canal=val('fs-canal'),text=val('fs-txt'),dem=document.getElementById('fs-dem').checked,pg=document.getElementById('fs-purge'),purge=pg&&pg.checked;
+  var num=(c.tel||'').replace(/\D/g,'');
+  if((canal==='wa'||canal==='sms')&&!num){oT('Pas de téléphone sur la fiche','e');return;}
+  if(canal==='mail'&&!c.email){oT('Pas d\'e-mail sur la fiche','e');return;}
+  sendVia(canal,num,text,c.email);
+  f.envoyeLe=new Date().toISOString();f.envoyePar=PARTNER_NOM();f.canal=canal;
+  c.actions=c.actions||{};c.actions['fact_'+f.id]={done:true,doneAt:todayYMD(),par:PARTNER_NOM()};
+  jrnAdd(c,'fait','🧾 Facture '+(f.docNo||'')+(f.produit?' ('+f.produit+')':'')+' envoyée par '+(CANAL_LBL[canal]||canal)+(dem?' + demande de changement du mot de passe OlyLife':''));
+  oPush([c]);
+  var m=document.getElementById('ofact');if(m)m.remove();
+  if(purge)mdpPurgeDo(c,f.compte,'facture envoyée au client').then(function(){oT('🔒 Facture envoyée — mot de passe effacé du CRM','s');oOpenF(cid);oRefresh();}).catch(function(e){oT('Facture envoyée, mais le mot de passe n\'a pas pu être effacé ('+((e&&e.error)||'hors ligne')+') — réessayez avec 🗑','w');oOpenF(cid);});
+  else{oT('🧾 Facture envoyée','s');oOpenF(cid);oRefresh();}
+}
+function oFactDel(cid,fid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c||!canEditContact(c))return;var f=(c.factures||[]).find(function(x){return x.id===fid;});if(!f)return;
+  if(!confirm('Supprimer la facture '+(f.docNo||f.nom||'')+' de la fiche ?\nLe lien déjà envoyé au client cessera de fonctionner.'))return;
+  oPostAsync_({op:'deleteFacture',url:f.url}).catch(function(){});
+  c.factures=c.factures.filter(function(x){return x.id!==fid;});
+  jrnAdd(c,'systeme','🗑 Facture '+(f.docNo||f.nom||'')+' supprimée');oPush([c]);oOpenF(cid);
+}
+
+// ── Formulaire : autres comptes OlyLife (même personne) ──
+var FORM_COMPTES=[];
+var CPT_FIELDS=[['memberIdOlyLife','Member ID (EA…)','text','EA932687'],['numCommande','N° commande','text',''],['dateCommande','Date de commande','date',''],['produit','Appareil','text',''],['transporteur','Transporteur','text','DHL'],['tracking','N° de tracking','text',''],['dateLivraison','Date de livraison','date',''],['sponsor','Sponsor (parrain)','text','Rechercher un nom ou EA…'],['placement','Placement (position arbre)','text','Rechercher un nom ou EA…'],['cote','Côté binaire','select',''],['rangOly','Rang OlyLife','select',''],['notes','Notes','text','']];
+function oCompteRender(){
+  var box=document.getElementById('fo-comptes');if(!box)return;
+  var pl=document.getElementById('prod-list');if(pl)pl.innerHTML=PRODUCTS.map(function(P){return'<option value="'+esc(P)+'">';}).join('');
+  box.innerHTML=FORM_COMPTES.map(function(k,i){
+    return'<div class="cpt-box" data-i="'+i+'"><div class="cpt-hd"><b>'+(i+2)+'ᵉ compte</b>'+(k.memberIdOlyLife?' <span style="color:var(--t3)">· '+esc(k.memberIdOlyLife)+'</span>':'')+'<button type="button" class="ob bgh bsm" onclick="oCompteDel('+i+')">🗑 Retirer</button></div><div class="ofg">'
+      +CPT_FIELDS.map(function(f){
+        var v=f[0]==='produit'?((k.produits||[])[0]||''):(k[f[0]]||''),inp;
+        if(f[2]==='select'){var o=f[0]==='cote'?['','Gauche','Droite']:['','P1 - Starter','P2 - Builder','P3 - Leader','P4 - Supervisor','P5 - Pioneer'];
+          inp='<select class="ofc" data-f="'+f[0]+'">'+o.map(function(x){return'<option value="'+esc(x)+'"'+(x===v?' selected':'')+'>'+(x||(f[0]==='cote'?'—':'Aucun rang'))+'</option>';}).join('')+'</select>';}
+        else inp='<input type="'+f[2]+'" class="ofc" data-f="'+f[0]+'" value="'+esc(v)+'"'+(f[3]?' placeholder="'+esc(f[3])+'"':'')+(f[0]==='sponsor'||f[0]==='placement'?' list="bo-list" autocomplete="off"':f[0]==='produit'?' list="prod-list" autocomplete="off"':f[0]==='transporteur'?' list="carrier-list"':'')+'>';
+        return'<div class="ofg1"><label class="ofl">'+f[1]+'</label>'+inp+'</div>';
+      }).join('')+'</div></div>';
+  }).join('');
+}
+function oCompteCollect(){
+  document.querySelectorAll('#fo-comptes .cpt-box').forEach(function(b){
+    var k=FORM_COMPTES[+b.getAttribute('data-i')];if(!k)return;
+    b.querySelectorAll('[data-f]').forEach(function(el){var f=el.getAttribute('data-f'),v=el.value.trim();
+      if(f==='produit')k.produits=v?[v]:[];else if(f==='memberIdOlyLife')k[f]=v.toUpperCase();else if(f==='sponsor'||f==='placement')k[f]=eaNorm(v);else k[f]=v;});
+  });
+  return FORM_COMPTES.filter(function(k){return k.memberIdOlyLife||k.numCommande||k.tracking||(k.produits&&k.produits.length);});
+}
+function oCompteAdd(){oCompteCollect();FORM_COMPTES.push({id:'k_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),produits:[]});oCompteRender();}
+function oCompteDel(i){oCompteCollect();var k=FORM_COMPTES[i];if(k&&(k.memberIdOlyLife||k.numCommande)&&!confirm('Retirer le compte '+(k.memberIdOlyLife||k.numCommande)+' de cette fiche ?'))return;FORM_COMPTES.splice(i,1);oCompteRender();}
+
+// ── Import : un autre n° de distributeur de la même personne devient un compte de plus (pas un écrasement) ──
+var IMP_IDMODE={};
+var CPT_IMPORT_KEYS=['memberIdOlyLife','numCommande','dateCommande','transporteur','tracking','dateLivraison','rangOly','sponsor','placement','cote','livraisons'];
+function impCompteRoute(it,ex){
+  if(!ex||!it.memberIdOlyLife)return null;
+  var ea=String(it.memberIdOlyLife).toUpperCase(),main=String(ex.memberIdOlyLife||'').toUpperCase();
+  if(IMP_IDMODE[ea]==='replace'||!main||main===ea)return null;
+  var k=(ex.comptes||[]).find(function(x){return String(x.memberIdOlyLife||'').toUpperCase()===ea;});
+  return k?{k:k,isNew:false}:{k:null,isNew:true};
+}
+function impIdMode(ea,mode){IMP_IDMODE[ea]=mode;oImpAnalyse();}
+function impApplyCompte(item,ex,route,adds){
+  var k=route.k;
+  if(route.isNew){k={id:'k_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),produits:[]};ex.comptes=ex.comptes||[];ex.comptes.push(k);adds.push('autre compte OlyLife '+item.memberIdOlyLife);}
+  CPT_IMPORT_KEYS.forEach(function(f){
+    var v=item[f];if(v==null||v===''||(Array.isArray(v)&&!v.length))return;
+    if(!k[f]||(IMP_FORCE[f]&&String(k[f])!==String(v))){if(!route.isNew)adds.push((IMP_FLBL[f]||f)+' ('+item.memberIdOlyLife+')');k[f]=v;}
+    delete item[f];
+  });
+  (item.produits||[]).forEach(function(p){if(k.produits.indexOf(p)<0)k.produits.push(p);});
+  if(item.montantUSD){ex.achatsUSD=(+ex.achatsUSD||0)+(+item.montantUSD||0);adds.push('achats cumulés');}
+  delete item.montantUSD;delete item.achatsUSD;
 }
 
 // ── Fiche : bloc Accompagnement ───────────────────────────────────
@@ -7367,17 +7741,18 @@ function oBuildBoList(){
   var seen={},opts=[];
   // Moi-même (ID partenaire de l'accès) en tête de liste
   if(PARTNER_ID&&!OC.some(function(c){return String(c.memberIdOlyLife||'').toUpperCase()===PARTNER_ID.toUpperCase();})){var me=PARTNER_ID.toUpperCase()+' — '+(PARTNER_NOM()||'moi');seen[me]=1;opts.push('<option value="'+esc(me)+'">');}
-  OC.filter(function(c){return c.memberIdOlyLife;}).sort(function(a,b){return(a.nom||'').localeCompare(b.nom||'');}).slice(0,800).forEach(function(c){
-    var v=String(c.memberIdOlyLife).toUpperCase()+' — '+c.nom+' '+(c.prenom||'');
-    if(seen[v])return;seen[v]=1;
-    opts.push('<option value="'+esc(v)+'">');
+  OC.filter(function(c){return allEAs(c).length;}).sort(function(a,b){return(a.nom||'').localeCompare(b.nom||'');}).slice(0,800).forEach(function(c){
+    comptesDe(c).forEach(function(k){if(!k.ea)return;
+      var v=k.ea+' — '+c.nom+' '+(c.prenom||'')+(k.key==='main'?'':' ('+k.lbl+')');
+      if(seen[v])return;seen[v]=1;
+      opts.push('<option value="'+esc(v)+'">');});
   });
   dl.innerHTML=opts.join('');
 }
 // ID membre (EA…/AF…) contenu dans une valeur « EA123 — Nom Prénom »
 function eaOf(s){return(String(s||'').toUpperCase().match(/(EA|AF)\d+/)||[])[0]||'';}
 // Normalise une saisie sponsor / placement : « EA123 — NOM Prénom » si le membre est connu
-function eaNorm(raw){raw=String(raw||'').trim();if(!raw)return'';var ea=eaOf(raw);if(!ea)return raw;var o=OC.find(function(x){return String(x.memberIdOlyLife||'').toUpperCase()===ea;});if(o)return ea+' — '+o.nom+' '+(o.prenom||'');if(PARTNER_ID&&ea===PARTNER_ID.toUpperCase()&&PARTNER_NOM())return ea+' — '+PARTNER_NOM();return ea;}
+function eaNorm(raw){raw=String(raw||'').trim();if(!raw)return'';var ea=eaOf(raw);if(!ea)return raw;var o=OC.find(function(x){return allEAs(x).indexOf(ea)>=0;});if(o)return ea+' — '+o.nom+' '+(o.prenom||'');if(PARTNER_ID&&ea===PARTNER_ID.toUpperCase()&&PARTNER_NOM())return ea+' — '+PARTNER_NOM();return ea;}
 
 // Aperçu en direct du message de collecte
 (function(){var e=document.getElementById('rq-pr');if(e)e.addEventListener('input',oReqPrev);})();
