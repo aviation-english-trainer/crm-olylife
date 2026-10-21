@@ -2309,7 +2309,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.22.3 · 16/10';
+var APP_VERSION='v3.22.4 · 21/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -4512,10 +4512,14 @@ function parseOlyRows(text){
 // Captures multiples : « --- capture n --- » sépare les blocs ; un bloc sans marqueur de début (adresse, écran de succès…) complète le précédent
 function impParseGroups(raw){
   var parts=raw.split(/^--- capture \d+ ---$/m).map(function(x){return x.trim();}).filter(Boolean);
-  var groups=[];
+  var groups=[],curNum='';
   parts.forEach(function(t){
-    var starts=looksOlyOrder(t)||looksOlyOrderOcr(t)||looksOlyReg(t)||looksOlyRows(t);
-    if(starts||!groups.length)groups.push(t);else groups[groups.length-1]+='\n'+t;
+    var num=(deEnt(t).match(/\b(20\d{14,})\b/)||[])[1]||'';
+    var isOrd=looksOlyOrder(t)||looksOlyOrderOcr(t);
+    // v3.22.4 — pages de commande : nouvelle fiche seulement si un AUTRE n° de commande apparaît ; sinon c'est la suite de la même page
+    var starts=isOrd?(!groups.length||(num&&num!==curNum)||(!num&&!curNum)):(looksOlyReg(t)||looksOlyRows(t));
+    if(starts||!groups.length){groups.push(t);curNum=isOrd?num:'';}
+    else{groups[groups.length-1]+='\n'+t;if(!curNum&&num)curNum=num;}
   });
   var items=[];
   groups.forEach(function(t){
@@ -4527,8 +4531,9 @@ function impParseGroups(raw){
 // v3.20.2 — page « Informations sur la commande » lue par OCR sur mobile (colonnes mélangées, libellés coupés sur plusieurs lignes)
 function looksOlyOrderOcr(text){
   var t=deEnt(text);
-  var hasNum=/\b20\d{14,}\b/.test(t),hasEA=/\b(EA|AF)\d{5,}\b/i.test(t),hasHead=/informations? (sur|de) la commande|order information|informations de base|basic information|informations sur les membres|member information/i.test(t);
-  return(hasNum&&(hasEA||hasHead))||(hasHead&&hasEA&&/@|\+\d{6,}/.test(t));
+  var hasNum=/\b20\d{14,}\b/.test(t),hasEA=/\b(EA|AF)\d{5,}\b/i.test(t),hasHead=/informations? (sur|de) la commande|order information|informations de base|basic information|informations (sur les|du) membres?|member information|mailing information|informations d'exp[ée]dition|delivery information|informations de livraison|product ordered|produits command[ée]s/i.test(t);
+  var hasTel=/@|\+\d{1,3}[\s.-]?\d{6,}/.test(t),hasTrack=/\b[A-Z]{2}\d{9}[A-Z]{2}\b/.test(t);
+  return(hasNum&&(hasEA||hasHead))||(hasHead&&hasEA&&hasTel)||(hasHead&&(hasTrack||/recipient|destinataire/i.test(t)));
 }
 function parseOlyOrderOcr(text){
   var raw=deEnt(text).replace(/ /g,' ');
@@ -4542,19 +4547,30 @@ function parseOlyOrderOcr(text){
   if(member&&cnt[member]===1){var mm=flat.match(/(?:identifiant\s*(?:de)?\s*(?:membre)?|member id)\s*[:：]?\s*((?:EA|AF)\d{5,})/i);if(mm)member=mm[1].toUpperCase();}
   var email=after(/([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/i);
   var tels=flat.match(/\+\d{1,3}[\s.-]?\d[\d\s.-]{6,}\d/g)||[];
+  if(!tels.length){var mt0=flat.match(/(?:phone|t[ée]l[ée]phone)[^\d+]{0,40}(0[1-9](?:[\s.-]?\d{2}){4}|33\s?[1-9](?:[\s.-]?\d){8})/i);if(mt0)tels=[mt0[1]];}
   var tel=tels[0]||'',recipTel=tels.length>1?tels[1]:'';
   var noTel=flat.replace(/\+\d{1,3}[\s.-]?\d[\d\s.-]{6,}\d/g,' ');
-  var montant=after(/(?:montant|amount)[^\d]{0,40}?(\d[\d\s]{0,6}[.,]\d{2})\b/i);if(montant)montant=montant.replace(/\s/g,'');
+  var montant=after(/(?:montant|amount)[^\d]{0,40}?(\d[\d\s]{0,6}[.,]\d{2})\b/i);
+  // OCR en colonnes : « Order 1650.00 / Amount: » ou « Montant de la / 1650.00 / commande: » → le nombre précède le libellé
+  if(!montant)montant=after(/(\d{2,6}[.,]\d{2})\s+(?:amount|commande)\s*[:：]/i);
+  if(montant)montant=montant.replace(/\s/g,'');
   // Nom : « Nom: MACE CARINE » (jamais « Nom du destinataire »)
-  var nomC='';for(var i=0;i<lines.length;i++){var ml=lines[i].match(/^(?:nom|name)\s*[:：]\s*(.+)$/i);if(ml&&!/destinataire|recipient/i.test(lines[i])){nomC=ml[1].replace(/\b(surnom|nickname).*$/i,'').trim();break;}}
+  var nomC='';for(var i=0;i<lines.length;i++){
+    if(/destinataire|recipient/i.test(lines[i]))continue;
+    var ml=lines[i].match(/^(?:nom|name)\s*[:：]\s*(.+)$/i);
+    if(ml){nomC=ml[1].replace(/\b(surnom|nickname).*$/i,'').trim();if(nomC)break;}
+    // « Name: » seul sur sa ligne (OCR en colonnes) → la valeur est sur la ligne suivante
+    if(/^(?:nom|name)\s*[:：]?$/i.test(lines[i])&&lines[i+1]&&/^[A-ZÀ-Ý][A-ZÀ-Ý' -]{2,}$/.test(lines[i+1].trim())&&!/^(SURNOM|NICKNAME)/i.test(lines[i+1])){nomC=lines[i+1].trim();break;}
+  }
   if(!nomC){var mn=flat.match(/\b(?:nom|name)\s*[:：]\s*([A-ZÀ-Ý][A-ZÀ-Ý' -]{2,}?)(?=\s+(?:surnom|nickname|num[ée]ro|id card|adresse|email)\b|$)/i);if(mn)nomC=mn[1].trim();}
   // Pièce d'identité : suite de 6 à 15 chiffres qui n'est ni le n° de commande ni un téléphone
-  var idcard='';var mb=noTel.match(/(?:^|[^A-Z\d])(\d{8,15})\s*(?::\s*)?(?:carte d'identit[ée]|id card)/i);if(mb&&mb[1]!==num)idcard=mb[1];
+  var idcard=after(/(?:id card number|num[ée]ro de (?:la )?pi[èe]ce d'identit[ée]|pi[èe]ce d'identit[ée])\s*[:：]?\s*([A-Z0-9]{6,15})\b/i);if(idcard&&(idcard===num||/^(EA|AF)\d+$/i.test(idcard)||/^\d{1,5}$/.test(idcard)))idcard='';
+  var mb=noTel.match(/(?:^|[^A-Z\d])(\d{8,15})\s*(?::\s*)?(?:carte d'identit[ée]|id card)/i);if(!idcard&&mb&&mb[1]!==num)idcard=mb[1];
   if(!idcard){var mid=noTel.match(/(?:carte d'identit[ée]|id card)\s*:?\s*(?:[^\dA-Z]{0,20})(?<![A-Z])(\d{8,15})\b/i);if(mid&&mid[1]!==num)idcard=mid[1];}
   if(!idcard){(noTel.match(/\b\d{6,15}\b/g)||[]).forEach(function(d){if(!idcard&&d!==num&&!/^0?[67]\d{8}$/.test(d)&&!/^\d{5}$/.test(d)&&d.indexOf(num.slice(0,8))!==0)idcard=d;});}
   var pays=after(/\b(France|Belgique|Belgium|Suisse|Switzerland|Luxembourg|Monaco|Maroc|Morocco|Tunisie|Alg[ée]rie|C[ôo]te d'Ivoire|S[ée]n[ée]gal|Cameroun|B[ée]nin|Togo|Mali|Burkina Faso|Gabon|Congo|Guin[ée]e|Niger|Madagascar|R[ée]union|Guadeloupe|Martinique|Guyane|Canada|Espagne|Spain|Italie|Italy|Portugal|Allemagne|Germany|Royaume-Uni|United Kingdom)\b/i);
   // Adresse : de « Adresse » (hors e-mail) jusqu'au nom du destinataire / numéro
-  var adr='';var ai=-1;for(var j=0;j<lines.length;j++){if(/^adresse\b/i.test(lines[j])&&!/e-?mail|courriel/i.test(lines[j])){ai=j;break;}if(/^(detailed )?address\b/i.test(lines[j])&&!/e-?mail/i.test(lines[j])){ai=j;break;}}
+  var adr='';var ai=-1;for(var j=0;j<lines.length;j++){if(/^adresse\b/i.test(lines[j])&&!/e-?mail|courriel/i.test(lines[j])){ai=j;break;}if(/^(detailed )?address\b/i.test(lines[j])&&!/e-?mail/i.test(lines[j])){ai=j;break;}if(/^detailed\s+\d/i.test(lines[j])){ai=j;break;}}
   if(ai>=0){var buf=[];for(var k=ai;k<lines.length&&k<ai+5;k++){var L=lines[k];if(k>ai&&/^(nom du|recipient|num[ée]ro|code|postal|phone|t[ée]l[ée]phone)/i.test(L))break;L=L.replace(/^adresse\b/i,'').replace(/^(detailed )?address\b/i,'').replace(/^d[ée]taill[ée]e\s*[:：]?/i,'').replace(/^[:：]\s*/,'').trim();if(L&&!/^d[ée]taill[ée]e$/i.test(L))buf.push(L);}adr=buf.join(' ').replace(/\s+,/g,',').replace(/\s+/g,' ').trim();}
   var destinataire='';for(var d=0;d<lines.length;d++){var md=lines[d].match(/^(?:nom du|recipient'?s? name)\s*[:：]?\s*(.*)$/i);if(md){destinataire=md[1].trim();if(!destinataire&&lines[d+1]&&!/^destinataire/i.test(lines[d+1]))destinataire=lines[d+1].trim();destinataire=destinataire.replace(/^destinataire\s*[:：]?\s*/i,'').trim();break;}}
   var cp=after(/\b(?:code\s*postal|postal code|code)\s*[:：]?\s*(\d{4,5})\b/i)||after(/\b(\d{5})\b/,adr);
@@ -4596,7 +4612,13 @@ function parseOlyOrderOcr(text){
 function parseOlyOrderAny(text){
   var its=looksOlyOrder(text)?parseOlyOrders(text):[];
   var weak=!its.length||(its.length===1&&!its[0].nom&&!its[0].tel&&!its[0].email);
-  if(weak&&looksOlyOrderOcr(text)){var o=parseOlyOrderOcr(text);if(o.length)return o;}
+  if(looksOlyOrderOcr(text)){
+    var o=parseOlyOrderOcr(text);
+    if(weak&&o.length)return o;
+    // v3.22.4 — texte OCR : la lecture « propre » garde ses valeurs, la lecture OCR complète les champs vides (montant, adresse, pièce d'identité…)
+    if(its.length===1&&o.length===1){var keep=its[0]._src;['montantUSD','achatsUSD','rangOly'].forEach(function(k){if(!its[0][k])delete its[0][k];});impFold(its[0],o[0]);its[0]._src=keep;}
+    if(its.length===1&&its[0].adresse)its[0].adresse=String(its[0].adresse).replace(/^(detailed|d[ée]taill[ée]e)\s*[:：]?\s*/i,'').trim();
+  }
   return its;
 }
 function looksOlyOrder(text){
