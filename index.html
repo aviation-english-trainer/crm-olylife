@@ -1383,6 +1383,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
           </div>
           <div style="display:flex;gap:8px;margin-top:14px">
             <button class="ob bgold" style="flex:2" onclick="oUserSave()">Enregistrer l'accès</button>
+            <button class="ob bgh" style="flex:1" type="button" onclick="oUserTestMail()" title="Envoie un e-mail de test aux adresses enregistrées pour cet accès">📧 Tester l'e-mail</button>
             <button class="ob bgh" style="flex:1" onclick="oUserCancel()">Annuler</button>
           </div>
         </div>
@@ -2319,7 +2320,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.23 · 21/10';
+var APP_VERSION='v3.23.1 · 21/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -2865,6 +2866,14 @@ function oUserCancel(){document.getElementById('eq-user-form').style.display='no
 function oUserDel(i){
   if(!confirm('Supprimer l\'accès de « '+USERS[i].nom+' » ?'))return;
   USERS.splice(i,1);oPushUsers();renderUsers();
+}
+function oUserTestMail(){
+  var id=val('u-id');if(!id){oT('Enregistrez d\'abord l\'accès','w');return;}
+  oT('📧 Envoi de l\'e-mail de test…','i');
+  oPostAsync_({op:'testMail',userId:id}).then(function(d){
+    if(d.ok)oT('📧 E-mail de test envoyé à '+d.dest.join(' et ')+(typeof d.quota==='number'?' · quota restant aujourd\'hui : '+d.quota:''),'s');
+    else oT(d.error==='op'?'Script serveur à mettre à jour (v3.13)':'Échec : '+(d.error||'?'),'e');
+  }).catch(function(){oT('Hors ligne','e');});
 }
 function oUserSave(){
   var nom=document.getElementById('u-nom').value.trim();
