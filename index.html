@@ -399,6 +399,12 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .jrn-acts{display:flex;flex-direction:column;gap:2px;flex-shrink:0;}
 .jrn-acts button{background:transparent;border:1px solid var(--bd);border-radius:8px;min-width:30px;min-height:30px;cursor:pointer;font-size:13px;}
 .jrn-acts button:hover{background:var(--navy3);}
+.miss-field{outline:2px solid #C63E47 !important;outline-offset:1px;background:#FFF5F5 !important;border-radius:var(--rs);}
+.ochk-row.miss-field,#opg.miss-field{padding:6px;}
+.miss-lbl{color:#C63E47 !important;}
+.miss-lbl::after{content:' ⚠️ à compléter';font-weight:700;text-transform:none;letter-spacing:0;}
+.miss-chip{display:inline-flex;align-items:center;border:1px solid #F3C1C5;background:#fff;color:#A93240;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+.miss-chip:hover{background:#FDECEE;}
 .cpt-box{border:1px solid var(--bd);border-radius:var(--r);padding:10px 12px;margin-bottom:10px;background:var(--navy3);}
 .cpt-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
 .cpt-hd button{margin-left:auto;}
@@ -2320,7 +2326,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.23.1 · 21/10';
+var APP_VERSION='v3.23.2 · 21/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -4095,26 +4101,50 @@ function jReseau(c){if(cStatut(c)!=='reseau')return null;var d=(c.statutLe||'').
 function jBdg(c){var n=jReseau(c);if(n===null)return'';var warn=n>=10&&!c.tracking;return'<span class="obdg '+(warn?'brd':'bgr')+'" title="'+n+' jour(s) depuis l\'entrée dans le réseau'+(warn?' — pas de n° de suivi : vérifiez sur le BO OlyLife':'')+'">'+(warn?'🚚 ':'')+'J+'+n+'</span>';}
 // v3.22 — fiche « dans le réseau » : champs à compléter (produits, essai, commande & logistique, installation & usage, équipe)
 var RES_CHECK=[
-  {l:'Produits',f:function(c){return!!(c.produits&&c.produits.length);}},
-  {l:'Essai de l\'appareil (oui gratuit / oui payant / non)',f:function(c){return!!c.essaiMode;}},
-  {l:'N° de commande',f:function(c){return!!c.numCommande;}},
-  {l:'Member ID OlyLife',f:function(c){return!!c.memberIdOlyLife;}},
-  {l:'Date de commande',f:function(c){return!!c.dateCommande;}},
-  {l:'Transporteur',f:function(c){return!!c.transporteur;}},
-  {l:'N° de tracking',f:function(c){return!!c.tracking;}},
-  {l:'Date de livraison',f:function(c){return!!c.dateLivraison;}},
-  {l:'Facture ajoutée et envoyée au client',f:function(c){var F=c.factures||[];return!c.tracking||(F.length>0&&F.every(function(f){return f.envoyeLe;}));}},
-  {l:'Installation confirmée',f:function(c){return!!c.installConfirm;}},
-  {l:'Notes d\'usage / protocole',f:function(c){return!!(c.notesUsage&&String(c.notesUsage).trim());}},
-  {l:'Case « devenu partenaire OlyLife »',f:function(c){return!!c.estPartenaire;}},
-  {l:'Sponsor',f:function(c){return!c.estPartenaire||!!c.sponsor;}},
-  {l:'Placement',f:function(c){return!c.estPartenaire||!!c.placement;}},
-  {l:'Côté binaire',f:function(c){return!c.estPartenaire||!!c.cote;}},
-  {l:'Génération',f:function(c){return!c.estPartenaire||!!c.generation;}}
+  {id:'opg',l:'Produits',f:function(c){return!!(c.produits&&c.produits.length);}},
+  {id:'fo-essai-mode',l:'Essai de l\'appareil (oui gratuit / oui payant / non)',f:function(c){return!!c.essaiMode;}},
+  {id:'fl-numcmd',l:'N° de commande',f:function(c){return!!c.numCommande;}},
+  {id:'fl-memberid',l:'Member ID OlyLife',f:function(c){return!!c.memberIdOlyLife;}},
+  {id:'fl-datecmd',l:'Date de commande',f:function(c){return!!c.dateCommande;}},
+  {id:'fl-transp',l:'Transporteur',f:function(c){return!!c.transporteur;}},
+  {id:'fl-tracking',l:'N° de tracking',f:function(c){return!!c.tracking;}},
+  {id:'fl-datelivr',l:'Date de livraison',f:function(c){return!!c.dateLivraison;}},
+  {id:'@fact',l:'Facture ajoutée et envoyée au client',f:function(c){var F=c.factures||[];return!c.tracking||(F.length>0&&F.every(function(f){return f.envoyeLe;}));}},
+  {id:'fi-confirm',l:'Installation confirmée',f:function(c){return!!c.installConfirm;}},
+  {id:'fi-notes',l:'Notes d\'usage / protocole',f:function(c){return!!(c.notesUsage&&String(c.notesUsage).trim());}},
+  {id:'fe-partenaire',l:'Case « devenu partenaire OlyLife »',f:function(c){return!!c.estPartenaire;}},
+  {id:'fe-sponsor',l:'Sponsor',f:function(c){return!c.estPartenaire||!!c.sponsor;}},
+  {id:'fe-placement',l:'Placement',f:function(c){return!c.estPartenaire||!!c.placement;}},
+  {id:'fe-cote',l:'Côté binaire',f:function(c){return!c.estPartenaire||!!c.cote;}},
+  {id:'fe-gen',l:'Génération',f:function(c){return!c.estPartenaire||!!c.generation;}}
 ];
 function resManque(c){if(cStatut(c)!=='reseau')return[];return RES_CHECK.filter(function(x){return!x.f(c);}).map(function(x){return x.l;});}
+function resManqueX(c){if(cStatut(c)!=='reseau')return[];return RES_CHECK.filter(function(x){return!x.f(c);});}
+// v3.23.2 — surligne dans le formulaire les champs manquants d'une fiche « dans le réseau »
+function resMarkClear(){document.querySelectorAll('.miss-field').forEach(function(e){e.classList.remove('miss-field','res-pulse');});document.querySelectorAll('.miss-lbl').forEach(function(e){e.classList.remove('miss-lbl');});}
+function resFieldEl(id){var el=document.getElementById(id);if(!el)return null;if(el.type==='checkbox')return el.closest('.ochk-row')||el;return el;}
+function resMark(c,focus){
+  resMarkClear();
+  var miss=resManqueX(c).filter(function(x){return x.id&&x.id.charAt(0)!=='@';}),first=null;
+  if(miss.some(function(x){return/^fe-(sponsor|placement|cote|gen)$/.test(x.id);})){var w=document.getElementById('feq-wrap');if(w)w.style.display='flex';}
+  miss.forEach(function(x){
+    var el=resFieldEl(x.id);if(!el)return;
+    el.classList.add('miss-field','res-pulse');
+    var g=el.closest('.ofg1');var lb=g&&g.querySelector('.ofl');if(lb)lb.classList.add('miss-lbl');
+    if(!first||x.id===focus)first=x.id===focus?el:(first||el);
+    var src=document.getElementById(x.id);
+    var off=function(){var v=src.type==='checkbox'?src.checked:(src.value||'').trim();if(x.id==='opg')v=!!document.querySelector('#opg .oprd input:checked');if(v){el.classList.remove('miss-field','res-pulse');if(lb)lb.classList.remove('miss-lbl');}};
+    if(x.id==='opg')src.addEventListener('change',off,{once:false});else{src.addEventListener('input',off);src.addEventListener('change',off);}
+  });
+  if(focus&&first)setTimeout(function(){first.scrollIntoView({behavior:'smooth',block:'center'});var f=first.querySelector?first.querySelector('input,select,textarea'):null;try{(f||first).focus({preventScroll:true});}catch(e){}},350);
+  return miss.length;
+}
+function oResGo(cid,id){
+  if(id==='@fact'){var sec=document.querySelector('#om-b .fact-sec');if(sec){sec.classList.remove('clps');sec.scrollIntoView({behavior:'smooth',block:'start'});sec.classList.add('res-pulse');setTimeout(function(){sec.classList.remove('res-pulse');},4000);}return;}
+  oClose();oEdit(cid,id||'first');
+}
 function resBdg(c,small){var m=resManque(c);if(!m.length)return'';return'<span class="obdg brd res-pulse" title="À compléter : '+esc(m.join(' · '))+'">✍️ '+(small?'':'à compléter · ')+m.length+'</span>';}
-function resBox(c){var m=resManque(c);if(!m.length)return'';return'<div class="res-box res-pulse"><span style="font-size:20px">✍️</span><div style="flex:1;min-width:0"><b>Fiche à compléter — '+m.length+' champ'+(m.length>1?'s':'')+' manquant'+(m.length>1?'s':'')+'</b><div style="font-size:12px;color:var(--t2);margin-top:3px">'+esc(m.join(' · '))+'</div></div>'+(canEditContact(c)?'<button class="ob bgold bsm" style="min-height:36px" onclick="oClose();oEdit(\''+c.id+'\')">Compléter</button>':'')+'</div>';}
+function resBox(c){var m=resManqueX(c);if(!m.length)return'';var can=canEditContact(c);return'<div class="res-box res-pulse"><span style="font-size:20px">✍️</span><div style="flex:1;min-width:0"><b>Fiche à compléter — '+m.length+' champ'+(m.length>1?'s':'')+' manquant'+(m.length>1?'s':'')+'</b><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">'+m.map(function(x){return can||x.id==='@fact'?'<button type="button" class="miss-chip" onclick="oResGo(\''+c.id+'\',\''+x.id+'\')">'+esc(x.l)+' →</button>':'<span class="miss-chip">'+esc(x.l)+'</span>';}).join('')+'</div></div>'+(can?'<button class="ob bgold bsm" style="min-height:36px" onclick="oResGo(\''+c.id+'\',\'first\')">Compléter</button>':'')+'</div>';}
 function avanceEnCours(c){return(c.avances||[]).some(function(a){return a.type!=='don'&&a.statut!=='rembourse';});}
 function avRendu(a){return(a.rembs||[]).reduce(function(t,r){return t+(+r.montant||0);},0);}
 function avReste(a){return Math.max(0,(+a.montant||0)-avRendu(a));}
@@ -4254,7 +4284,7 @@ function oClose(){oSheetClose('omo');}
 function oDel(id){var cd=OC.find(function(x){return x.id===id;});if(cd&&!canEditContact(cd)){oT('Suppression réservée au gestionnaire de la fiche ou à l\'admin','w');return;}if(!confirm('Supprimer cette fiche ?'))return;OC=OC.filter(function(c){return c.id!==id;});oPushDel([id]);oClose();oRefresh();oT('Fiche supprimée','w');}
 
 // ── ÉDITION / FORMULAIRE ───────────────────────────────────────────
-function oEdit(id){
+function oEdit(id,focus){
   var c=OC.find(function(x){return x.id===id;});if(!c)return;
   if(!canEditContact(c)){oT('Cette fiche n\'est pas modifiable avec votre accès — utilisez « Demander une modification »','w');return;}
   EID=id;
@@ -4276,8 +4306,11 @@ function oEdit(id){
   document.querySelectorAll('#opg .oprd').forEach(function(p){var cb=p.querySelector('input');cb.checked=(c.produits||[]).indexOf(cb.value)>=0;p.classList.toggle('on',cb.checked);});
   FORM_COMPTES=JSON.parse(JSON.stringify(c.comptes||[]));oCompteRender();
   oSw('nouvelle',4);document.getElementById('ocont').scrollTop=0;
+  var nm=resMark(c,focus&&focus!=='first'?focus:(focus==='first'?(resManqueX(c).filter(function(x){return x.id&&x.id.charAt(0)!=='@';})[0]||{}).id:''));
+  if(nm)oT('✍️ '+nm+' champ'+(nm>1?'s':'')+' à compléter — surligné'+(nm>1?'s':'')+' en rouge','i');
 }
 function oReset(){
+  resMarkClear();
   document.getElementById('fc-eid').value='';EID=null;
   oBuildBoList();
   ['fc-nm','fc-pr','fc-tel','fc-em','fc-pays','fc-vil','fc-adr','fc-cp','fo-bo','fl-idcard','liv-nm','liv-pr','liv-tel','liv-em','fact-adr','fact-cp','fact-vil','fact-pays','fc-obj','fl-numcmd','fl-memberid','fl-datecmd','fl-transp','fl-tracking','fl-datelivr','fi-date','fi-notes','ft-texte','fe-sponsor','fe-placement','fe-gen','fc-notes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
@@ -6703,7 +6736,7 @@ function factHtml(c){
   if(can)rows+='<div class="acc-row"><span class="em">➕</span><div class="b" style="color:var(--t3)">Déposez la facture PDF téléchargée sur le BO OlyLife : n° de document, appareil, montant et compte sont lus automatiquement, puis envoyée au client par son canal préféré ('+esc(c.canal||'WhatsApp')+').'
     +(srvOk()?'':'<br><b style="color:#C0392B">⚠️ Le script serveur doit être mis à jour (v3.13) pour stocker les factures et les mots de passe.</b>')+'</div><div class="acts"><button class="ob bgold bsm" onclick="oFactAdd(\''+c.id+'\')">🧾 Ajouter une facture</button></div></div>';
   var nb=F.filter(function(f){return!f.envoyeLe;}).length;
-  return'<div class="od-section"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">🧾 Factures & accès compte OlyLife'+(nb?' <span class="obdg brd">'+nb+' à envoyer</span>':'')+'</div><div class="od-bd">'+rows+'</div></div>';
+  return'<div class="od-section fact-sec"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">🧾 Factures & accès compte OlyLife'+(nb?' <span class="obdg brd">'+nb+' à envoyer</span>':'')+'</div><div class="od-bd">'+rows+'</div></div>';
 }
 
 // ── Mot de passe OlyLife : coffre côté serveur, jamais dans la fiche ──
