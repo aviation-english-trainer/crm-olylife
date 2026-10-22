@@ -2078,6 +2078,9 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <div><label class="ofl">Téléphone / WhatsApp</label><input type="tel" class="ofc" id="oprof-tel" placeholder="+33 6 00 00 00 00"></div>
       <div><label class="ofl">E-mail</label><input type="email" class="ofc" id="oprof-email" placeholder="prenom@gmail.com"></div>
     </div>
+    <div class="ofg1" id="oprof-wa-wrap" style="margin-top:8px"><label class="ofl">WhatsApp sur cet ordinateur</label>
+      <select class="ofc" id="oprof-wa" onchange="waDeskSet(this.value)"><option value="web">WhatsApp Web (navigateur) — emojis corrects (recommandé)</option><option value="app">Application WhatsApp — certains emojis peuvent s'afficher en �</option></select>
+      <div style="font-size:11px;color:var(--t3);margin-top:4px">L'application WhatsApp pour ordinateur abîme les emojis des messages pré-remplis (bug WhatsApp). Avec l'application, le message est aussi copié : collez-le (⌘V / Ctrl+V) à la place du texte abîmé.</div></div>
     <div class="oinst-note" id="oprof-note" style="margin-top:10px"></div>
     <button class="ob bgold bfull" style="margin-top:14px;min-height:48px" onclick="oProfSave()">Enregistrer mon profil</button>
     <button class="ob bgh bfull" style="margin-top:8px" type="button" onclick="oProfClose();oShowSetup()">⚙️ Résumé quotidien · Calendly → Réglages</button>
@@ -2329,7 +2332,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.24.1 · 22/10';
+var APP_VERSION='v3.24.2 · 22/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -7217,7 +7220,18 @@ var SEND_DIRECT=false;
 function sendPref(){try{return localStorage.getItem('owlht2_canal')||'';}catch(e){return'';}}
 function sendPrefSet(v){try{if(v)localStorage.setItem('owlht2_canal',v);else localStorage.removeItem('owlht2_canal');}catch(e){}}
 function sendParse(u){var m=String(u||'').match(/^https:\/\/wa\.me\/(\d*)\?text=(.*)$/);if(!m)return null;var t='';try{t=decodeURIComponent(m[2]);}catch(e){t=m[2];}return{num:m[1],text:t};}
-function sendOpen(url){SEND_DIRECT=true;try{window.open(url,'_blank');}finally{setTimeout(function(){SEND_DIRECT=false;},50);}}
+// v3.24.2 — WhatsApp sur ordinateur : l'application de bureau remplace les emojis « hors BMP » (👋 📄 🔐 📞…) par � dans
+// les messages pré-remplis par lien wa.me. On ouvre WhatsApp Web (emojis intacts) ; avec l'application, le texte est aussi copié.
+function isMobileDev(){var ua=navigator.userAgent||'';return/Android|iPhone|iPad|iPod|Mobile/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);}
+function waDesk(){try{return localStorage.getItem('owlht2_wa_desk')||'web';}catch(e){return'web';}}
+function waDeskSet(v){try{localStorage.setItem('owlht2_wa_desk',v);}catch(e){}oT(v==='web'?'💬 WhatsApp s\'ouvrira dans WhatsApp Web':'💬 WhatsApp s\'ouvrira dans l\'application (message aussi copié)','s');}
+function waFix(url){
+  var p=sendParse(url);if(!p||isMobileDev())return url;
+  if(waDesk()==='web')return'https://web.whatsapp.com/send?'+(p.num?'phone='+p.num+'&':'')+'text='+encodeURIComponent(p.text);
+  if(/[\uD800-\uDFFF]/.test(p.text)&&navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(p.text).then(function(){oT('📋 Message copié aussi — si des emojis s\'affichent en �, effacez et collez (⌘V / Ctrl+V)','i');},function(){});
+  return url;
+}
+function sendOpen(url){url=waFix(url);SEND_DIRECT=true;try{window.open(url,'_blank');}finally{setTimeout(function(){SEND_DIRECT=false;},50);}}
 function sendCopy(t,msg){var done=function(){oT(msg||'📋 Message copié','s');};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){prompt('Message :',t);});else prompt('Message :',t);}
 var CANAL_LBL={wa:'WhatsApp',tg:'Telegram',signal:'Signal',sms:'SMS',mail:'e-mail',copy:'copie',share:'partage'};
 function sendContactFor(num){if(!num)return null;var t9=String(num).replace(/\D/g,'').slice(-9);if(t9.length<9)return null;return OC.find(function(x){return x.tel&&tel9(x.tel)===t9;})||null;}
@@ -7720,6 +7734,7 @@ function oProfOpen(){
   document.getElementById('oprof-ver').textContent='CRM OlyLife '+APP_VERSION+(isStandalone()?' · application installée':' · navigateur');
   document.getElementById('oprof-nom').value=USER.nom||'';
   document.getElementById('oprof-tel').value=USER.tel||'';
+  var ow=document.getElementById('oprof-wa');if(ow){ow.value=waDesk();document.getElementById('oprof-wa-wrap').style.display=isMobileDev()?'none':'';}
   document.getElementById('oprof-email').value=USER.email||'';
   document.getElementById('oprof-photo').value=USER.photo||'';
   setAv('oprof-av',USER.photo,ini(USER.nom||'?'));
