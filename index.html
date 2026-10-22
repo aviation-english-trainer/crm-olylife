@@ -1346,16 +1346,19 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
           <div class="ofg">
             <div class="ofg1"><label class="ofl">Nom affiché</label><input type="text" class="ofc" id="u-nom" placeholder="Sophie MARTIN"></div>
             <div class="ofg1"><label class="ofl">Rôle</label>
-              <select class="ofc" id="u-role">
+              <select class="ofc" id="u-role" onchange="oUserRoleUi()">
                 <option value="referent">Référent — voit uniquement ses contacts référés</option>
                 <option value="gestionnaire">Gestionnaire — gère les contacts attribués</option>
                 <option value="admin">Admin — accès complet</option>
                 <option value="comite">Comité scientifique — rédige les fiches conseils et précautions, voit ses contacts</option>
               </select>
+              <label class="ochk-row" id="u-comite-row" style="margin-top:8px"><input type="checkbox" id="u-comite"><span>🔬 <b>Aussi membre du comité scientifique</b> — rédige fiches conseils et précautions, en plus de son rôle</span></label>
+              <label class="ochk-row" id="u-voitcomite-row"><input type="checkbox" id="u-voitcomite"><span>👁 Peut <b>voir le comité scientifique</b> et échanger avec ses membres (Contacts utiles)</span></label>
             </div>
+            <div class="ofg1" id="u-gests-wrap"><label class="ofl">Rattaché au(x) gestionnaire(s)</label><div id="u-gests" style="display:flex;flex-wrap:wrap;gap:8px"></div><div style="font-size:11px;color:var(--t3);margin-top:4px">Le gestionnaire voit ce référent, ses contacts et ses demandes ; il reçoit aussi ses alertes « nouvelle demande ».</div></div>
             <div class="ofg2" style="gap:10px"><div><label class="ofl">Téléphone / WhatsApp</label><input type="tel" class="ofc" id="u-tel" placeholder="+33 6 00 00 00 00"></div><div><label class="ofl">E-mail (profil)</label><input type="email" class="ofc" id="u-email" placeholder="prenom@gmail.com"></div></div>
             <div class="ofg1"><label class="ofl">Tags référent associés (séparés par des virgules)</label><input type="text" class="ofc" id="u-tags" list="ref-list" placeholder="Sophie"></div>
-            <div class="ofg1" id="u-scope-wrap"><label class="ofl">Périmètre (gestionnaire)</label><select class="ofc" id="u-scope"><option value="all">Voit tous les contacts du CRM</option><option value="equipes">Voit seulement ses équipes (tags) et les contacts qu'il suit</option></select></div>
+            <div class="ofg1" id="u-scope-wrap"><label class="ofl">Périmètre (gestionnaire)</label><select class="ofc" id="u-scope"><option value="equipes">Voit ses contacts, ceux de ses référents et de ses équipes (recommandé)</option><option value="tout">Exception : voit tous les contacts du CRM</option></select></div>
             <div class="ofg1"><label class="ofl">Code d'accès</label>
               <div style="display:flex;gap:8px"><input type="text" class="ofc" id="u-code" placeholder="A7K2MN" style="flex:1;font-family:monospace;letter-spacing:2px"><button class="ob bgh" onclick="oGenCode()" type="button">🎲</button></div>
             </div>
@@ -2326,7 +2329,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.23.2 · 21/10';
+var APP_VERSION='v3.24 · 22/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -2563,7 +2566,8 @@ function oBackupRestore(input){
 function oHideSetup(){oSheetClose('osetup');}
 function oSavePid(){PARTNER_ID=document.getElementById('o-setup-pid').value.trim();oSaveCfg();oT('ID Partenaire enregistré','s');}
 function roleLabel(r){return r==='admin'?'Admin':r==='gestionnaire'?'Gestionnaire':r==='comite'?'Comité scientifique':'Référent';}
-function canEditRes(){var r=ROLE();return r==='admin'||r==='comite';}
+function roleLabelU(u){return roleLabel(u&&u.role)+(u&&u.comite?' + comité scientifique':'');}
+function canEditRes(){var r=ROLE();return r==='admin'||r==='comite'||!!(USER&&USER.comite);}
 
 // ── RÔLES → INTERFACE ───────────────────────────────────────────────
 function applyRole(){
@@ -2787,13 +2791,13 @@ function renderUsers(){
       +'<div class="ouser-top">'
         +'<span class="ouser-av">'+uAv(u)+'</span>'
         +'<span class="ouser-nm">'+esc(u.nom)+'</span>'
-        +'<span class="obdg '+rb+'">'+roleLabel(u.role)+'</span>'
+        +'<span class="obdg '+rb+'">'+roleLabelU(u)+'</span>'
       +'</div>'
       +'<div class="ouser-meta">'
         +(isAdm?'<span class="ouser-code">'+esc(u.code||'—')+'</span>':'')
         +(u.tel||u.email?'<span>'+(u.tel?'📱 '+esc(u.tel):'')+(u.tel&&u.email?' · ':'')+(u.email?'✉️ '+esc(u.email):'')+'</span>':'')
         +(hasTag?'<span>🏷 '+esc(u.tags.join(', '))+' · <b>'+nbC+'</b> contact'+(nbC>1?'s':'')+'</span>':'')
-        +(u.role==='gestionnaire'&&u.scope==='equipes'?'<span class="obdg bor">périmètre : ses équipes</span>':'')
+        +(u.role==='gestionnaire'&&u.scope==='tout'?'<span class="obdg bor">périmètre : voit TOUT (exception)</span>':'')+(u.voitComite&&u.role!=='comite'&&!u.comite?'<span class="obdg bgr">👁 comité</span>':'')+((u.role==='referent'||u.role==='comite')&&u.gests&&u.gests.length?'<span class="obdg baq">↳ '+esc(u.gests.join(', '))+'</span>':'')
         +(hasDigest?'<span class="ouser-digest-pill" title="'+esc(u.digestEmail)+'">📧 Résumé à '+esc(u.digestHeure)+' → '+esc(u.digestEmail)+'</span>':'<span style="color:var(--t3)">📭 résumé quotidien non configuré</span>')
         +(pend?'<span class="obdg bor">⏳ En attente d\'approbation'+(u.proposePar?' · proposé par '+esc(u.proposePar):'')+'</span>':(u.actif===false?'<span style="color:#C0392B;font-weight:600">⏸ Désactivé</span>':''))
       +'</div>'
@@ -2843,7 +2847,7 @@ function oUserNew(){
   document.getElementById('u-nom').value='';
   document.getElementById('u-role').value='referent';
   document.getElementById('u-tel').value='';document.getElementById('u-email').value='';
-  document.getElementById('u-scope').value='all';
+  document.getElementById('u-scope').value='equipes';document.getElementById('u-comite').checked=false;document.getElementById('u-voitcomite').checked=false;oUserGests([]);oUserRoleUi();
   document.getElementById('u-tags').value='';
   document.getElementById('u-code').value=genCode();
   document.getElementById('u-actif').checked=true;
@@ -2858,7 +2862,7 @@ function oUserEdit(i){
   document.getElementById('u-nom').value=u.nom||'';
   document.getElementById('u-role').value=u.role||'referent';
   document.getElementById('u-tel').value=u.tel||'';document.getElementById('u-email').value=u.email||'';
-  document.getElementById('u-scope').value=u.scope||'all';
+  document.getElementById('u-scope').value=u.scope==='tout'?'tout':'equipes';document.getElementById('u-comite').checked=!!u.comite;document.getElementById('u-voitcomite').checked=!!u.voitComite;oUserGests(u.gests||(u.proposePar?[u.proposePar]:[]));oUserRoleUi();
   document.getElementById('u-tags').value=(u.tags||[]).join(', ');
   document.getElementById('u-code').value=u.code||'';
   document.getElementById('u-actif').checked=u.actif!==false;
@@ -2867,6 +2871,17 @@ function oUserEdit(i){
   document.getElementById('u-photo').value=u.photo||'';setAv('u-photo-av',u.photo,ini(u.nom||'?'));
   var f=document.getElementById('eq-user-form');f.style.display='block';
   setTimeout(function(){f.scrollIntoView({behavior:'smooth',block:'start'});},50);
+}
+function oUserGests(sel){
+  var box=document.getElementById('u-gests');if(!box)return;var me=val('u-nom');
+  var gs=USERS.filter(function(u){return u.role==='gestionnaire'&&u.actif!==false&&u.nom!==me;}).map(function(u){return u.nom;});
+  box.innerHTML=gs.length?gs.map(function(n){return'<label class="ochk-row" style="margin:0"><input type="checkbox" value="'+esc(n)+'"'+((sel||[]).indexOf(n)>=0?' checked':'')+'><span>'+esc(n)+'</span></label>';}).join(''):'<span style="font-size:12px;color:var(--t3)">Aucun gestionnaire actif.</span>';
+}
+function oUserRoleUi(){
+  var r=val('u-role');
+  var sh=function(id,on){var e=document.getElementById(id);if(e)e.style.display=on?'':'none';};
+  sh('u-comite-row',r==='gestionnaire'||r==='referent');sh('u-voitcomite-row',r==='gestionnaire'||r==='referent');
+  sh('u-gests-wrap',r==='referent'||r==='comite');sh('u-scope-wrap',r==='gestionnaire');
 }
 function oUserCancel(){document.getElementById('eq-user-form').style.display='none';}
 function oUserDel(i){
@@ -2878,7 +2893,7 @@ function oUserTestMail(){
   oT('📧 Envoi de l\'e-mail de test…','i');
   oPostAsync_({op:'testMail',userId:id}).then(function(d){
     if(d.ok)oT('📧 E-mail de test envoyé à '+d.dest.join(' et ')+(typeof d.quota==='number'?' · quota restant aujourd\'hui : '+d.quota:''),'s');
-    else oT(d.error==='op'?'Script serveur à mettre à jour (v3.13)':'Échec : '+(d.error||'?'),'e');
+    else oT(d.error==='op'?'Script serveur à mettre à jour (v3.14)':'Échec : '+(d.error||'?'),'e');
   }).catch(function(){oT('Hors ligne','e');});
 }
 function oUserSave(){
@@ -2898,7 +2913,9 @@ function oUserSave(){
     id:document.getElementById('u-id').value||('u_'+Date.now()),
     nom:nom,role:role,tags:tags,code:code,tel:tel,
     actif:document.getElementById('u-actif').checked,
-    digestEmail:digestEmail,digestHeure:digestHeure,email:uEmail,scope:document.getElementById('u-scope').value||'all',
+    digestEmail:digestEmail,digestHeure:digestHeure,email:uEmail,scope:document.getElementById('u-scope').value||'equipes',
+    comite:(role==='gestionnaire'||role==='referent')&&document.getElementById('u-comite').checked,voitComite:role!=='admin'&&role!=='comite'&&document.getElementById('u-voitcomite').checked,
+    gests:role==='referent'||role==='comite'?Array.prototype.map.call(document.querySelectorAll('#u-gests input:checked'),function(x){return x.value;}):[],
     photo:document.getElementById('u-photo').value||''
   };
   var idx=USERS.findIndex(function(u){return u.id===obj.id;});
@@ -2976,7 +2993,44 @@ var OLY_SVC={
   general:{wa:'6581395746',email:'inquirycs@olylifeint.com',fr:'Service Général OlyLife',en:'OlyLife General Inquiry'}
 };
 function olySvcWA(key,text){return'https://wa.me/'+OLY_SVC[key].wa+'?text='+encodeURIComponent(text);}
-function olySvcMail(key,subject,body){return'mailto:'+OLY_SVC[key].email+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);}
+function olySvcMail(key,subject,body,cc){return'mailto:'+OLY_SVC[key].email+'?'+(cc&&cc.length?'cc='+cc.map(encodeURIComponent).join(',')+'&':'')+'subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);}
+// v3.24 — relance logistique : e-mail avec le client et son/ses gestionnaire(s) en copie ; WhatsApp au service + message au client
+function emailDeNom(nom){if(!nom)return'';if(USER&&USER.nom===nom)return USER.email||USER.digestEmail||'';var u=USERS.find(function(x){return x.nom===nom;});if(u&&(u.email||u.digestEmail))return u.email||u.digestEmail;var e=((CFG&&CFG.equipe)||[]).find(function(x){return x.nom===nom;});return(e&&e.email)||'';}
+function logiCc(c){var out=[];var add=function(e){e=String(e||'').trim().toLowerCase();if(e&&/@/.test(e)&&out.indexOf(e)<0)out.push(e);};add(c.email);var g=suivisDe(c);if(!g.length&&USER)g=[USER.nom];g.forEach(function(n){add(emailDeNom(n));});return out;}
+function logiTexts(c){
+  var base='commande OlyLife n°'+(c.numCommande||'')+' (Member ID '+(c.memberIdOlyLife||'')+(c.prenom||c.nom?' — '+(c.nom||'')+' '+(c.prenom||''):'')+')';
+  return{wa:'Bonjour, je vous contacte au sujet de la '+base+' : le suivi n\'est toujours pas disponible. Merci de votre retour.',
+    subj:'Suivi commande OlyLife n°'+(c.numCommande||''),
+    body:'Bonjour,\n\nMerci de me communiquer le statut d\'expédition de la '+base+'.\nLe client et son gestionnaire sont en copie de ce message.\n\nCordialement,\n'+(PARTNER_NOM()||'')};
+}
+function oLogiMail(cid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;var t=logiTexts(c),cc=logiCc(c);
+  location.href=olySvcMail('logistics',t.subj,t.body,cc);
+  jrnAdd(c,'fait','📨 Logistique OlyLife relancée par e-mail'+(cc.length?' (copie : '+cc.join(', ')+')':''));oPush([c]);
+  oT('✉️ E-mail prêt'+(cc.length?' — en copie : '+cc.join(', '):' (aucune adresse de copie connue)'),'s');
+}
+function oLogiWA(cid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;var t=logiTexts(c);
+  sendOpen(olySvcWA('logistics',t.wa));
+  jrnAdd(c,'fait','📨 Logistique OlyLife relancée par WhatsApp');oPush([c]);
+  if(!c.tel){oT('Logistique relancée — pas de téléphone sur la fiche pour prévenir le client','w');return;}
+  var msg=renderTpl(tplText((c.registre&&c.registre!=='pro')?'logi_relance_client_tu':'logi_relance_client'),tplVars(c,'fr'));
+  var old=document.getElementById('ologi');if(old)old.remove();
+  var m=document.createElement('div');m.id='ologi';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:12px';
+  m.onclick=function(e){if(e.target===m)m.remove();};
+  m.innerHTML='<div style="background:#fff;border-radius:16px;padding:16px;max-width:480px;width:100%">'
+    +'<div style="font-weight:700;font-size:16px">✅ Service logistique relancé</div>'
+    +'<div style="font-size:12px;color:var(--t2);margin:2px 0 10px">Prévenez maintenant '+esc((c.prenom||'')+' '+(c.nom||''))+' (canal préféré : '+esc(c.canal||'WhatsApp')+')</div>'
+    +'<textarea class="ofc" id="ologi-t" style="min-height:150px;font-size:13px"></textarea>'
+    +'<div style="display:flex;gap:8px;margin-top:12px"><button class="ob bgh" style="flex:1" onclick="document.getElementById(\'ologi\').remove()">Plus tard</button><button class="ob bwa" style="flex:2;min-height:46px" onclick="oLogiClient(\''+cid+'\')">💬 Prévenir le client</button></div></div>';
+  document.body.appendChild(m);document.getElementById('ologi-t').value=msg;
+}
+function oLogiClient(cid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;var text=val('ologi-t'),canal=canalCode(c);
+  sendVia(canal,(c.tel||'').replace(/\D/g,''),text,c.email);
+  jrnAdd(c,'fait','💬 Client prévenu de la relance logistique ('+(CANAL_LBL[canal]||canal)+')');oPush([c]);
+  var m=document.getElementById('ologi');if(m)m.remove();oT('💬 Client prévenu','s');
+}
 function isFR(c){return(c.pays||'').toLowerCase().indexOf('france')>=0;}
 var TONES=['pro','chaleureux','equipe'];
 var TONE_LABEL={pro:'💼 Pro',chaleureux:'🤝 Chaleureux',equipe:'⚡ Équipe'};
@@ -3061,6 +3115,10 @@ var MSG_DEFAULTS={};
     t:'Bonjour {prenom} 👋\n\nComme promis, voici de quoi découvrir OlyLife tranquillement, à votre rythme 🌿\n\n🎬 *Commencez par ici* — le parcours découverte en 6 courtes vidéos (la technologie, l\'association, les appareils) :\n{lienParcours}{?liensAppareils:\n\n📖 Les appareils qui vous intéressent, expliqués sans raccourci (mode d\'emploi et consignes de sécurité compris) :\n{liensAppareils}}\n\n🧪 Et parce que la transparence compte : les certificats et rapports de test, consultables un par un :\n{lienCertificats}{?lienRdv:\n\n📅 Quand vous voudrez en parler de vive voix, choisissez un créneau (appel découverte, sans engagement) :\n{lienRdv}}\n\nPrenez le temps qu\'il vous faut — je reste disponible pour toute question 🙏\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
   MSG_DEFAULTS.decouverte_lien={g:'Découverte OlyLife',l:'Envoi du lien « dites-moi ce qui vous intéresse » (formulaire d\'une minute)',vars:['prenom','lienDecouverte','moi','role','telMoi'],
     t:'Bonjour{?prenom: {prenom}} 👋\n\nRavi de notre échange 🌿 Pour que je vous envoie les bonnes informations sur OlyLife (la technologie, les appareils, l\'association), dites-moi simplement ce qui vous intéresse — une minute, sur votre téléphone :\n{lienDecouverte}\n\nSans aucun engagement, bien sûr. À très vite !\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
+  MSG_DEFAULTS.logi_relance_client={g:'Logistique OlyLife',l:'Client prévenu de la relance du service logistique (vouvoiement)',vars:['prenom','numCommande','moi','role','telMoi'],
+    t:'Bonjour {prenom} 👋\n\nJe viens de relancer le service logistique d\'OlyLife au sujet de votre commande{?numCommande: n°{numCommande}} pour obtenir le suivi de votre colis. Je vous tiens informé(e) dès que j\'ai leur réponse.\n\nMerci pour votre patience 🙏\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
+  MSG_DEFAULTS.logi_relance_client_tu={g:'Logistique OlyLife',l:'Client prévenu de la relance du service logistique (tutoiement)',vars:['prenom','numCommande','moi','telMoi'],
+    t:'Coucou {prenom} 👋\n\nJe viens de relancer le service logistique d\'OlyLife pour ta commande{?numCommande: n°{numCommande}}, histoire d\'avoir le suivi de ton colis. Je te tiens au courant dès que j\'ai leur réponse 😊\n{moi}{?telMoi: · 📞 {telMoi}}'};
   MSG_DEFAULTS.facture_envoi={g:'Factures OlyLife',l:'Envoi de la facture (vouvoiement) + demande de changement du mot de passe',vars:['prenom','produitFacture','numFacture','montantFacture','lienFacture','transporteur','tracking','lienSuivi','demandeMdp','moi','role','telMoi'],
     t:'Bonjour {prenom} 👋\n\nVoici la facture de votre commande OlyLife{?produitFacture: — {produitFacture}}{?numFacture: (document n°{numFacture})} :\n📄 {lienFacture}{?tracking:\n\n🚚 Votre colis est expédié par {transporteur} — n° de suivi : {tracking}}{?lienSuivi:\n{lienSuivi}}{?demandeMdp:\n\n🔐 Pour votre sécurité : nous avions besoin d\'accéder à votre compte OlyLife pour récupérer ce document. Ce n\'est plus nécessaire et nous avons supprimé votre mot de passe de nos dossiers. Merci de le modifier dès maintenant depuis votre espace OlyLife.}\n\nJe reste à votre disposition pour toute question.\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
   MSG_DEFAULTS.facture_envoi_tu={g:'Factures OlyLife',l:'Envoi de la facture (tutoiement) + demande de changement du mot de passe',vars:['prenom','produitFacture','numFacture','montantFacture','lienFacture','transporteur','tracking','lienSuivi','demandeMdp','moi','role','telMoi'],
@@ -3261,7 +3319,7 @@ function oAct(){
       var waMsg='Bonjour, je vous contacte au sujet de la commande OlyLife n°'+(a.c.numCommande||'')+' (Member ID '+(a.c.memberIdOlyLife||'')+'), le suivi n\'est toujours pas disponible. Merci de votre retour.';
       var mailSubj='Suivi commande OlyLife n°'+(a.c.numCommande||'');
       var mailBody='Bonjour,\n\nMerci de me communiquer le statut d\'expédition de la commande n°'+(a.c.numCommande||'')+' (Member ID '+(a.c.memberIdOlyLife||'')+').\n\nCordialement,\n'+(PARTNER_NOM()||'');
-      extraBtn='<div class="brow"><a class="ob bgh" href="'+olySvcWA('logistics',waMsg)+'" target="_blank" rel="noopener">📨 WhatsApp Logistique OlyLife</a><a class="ob bgh" href="'+olySvcMail('logistics',mailSubj,mailBody)+'">✉️ Email Logistique</a></div>';
+      extraBtn='<div class="brow"><button type="button" class="ob bgh" onclick="oLogiWA(\''+a.c.id+'\')">📨 WhatsApp Logistique OlyLife + prévenir le client</button><button type="button" class="ob bgh" onclick="oLogiMail(\''+a.c.id+'\')">✉️ Email Logistique (client et gestionnaire en copie)</button></div>';
     }
     if(a.key.indexOf('fact_')===0){extraBtn='<div class="brow"><button type="button" class="ob bwa" onclick="oFactSend(\''+a.c.id+'\',\''+a.key.slice(5)+'\')">📤 Envoyer par '+esc(a.c.canal||'WhatsApp')+' (et effacer le mot de passe)</button></div>';}
     if(a.key==='bienvenue'){var KL=kitLinks(a.c);extraBtn='<div class="brow"><button type="button" class="ob" style="background:var(--blp);color:var(--bl);border:none" onclick="oKitMail(\''+a.c.id+'\')">✉️ E-mail de bienvenue'+(a.c.email?'':' (pas d\'adresse)')+'</button>'+(KL.lienKit?'<a class="ob bgh" href="'+esc(KL.lienKit)+'" target="_blank" rel="noopener">🧭 Page du kit</a>':'')+'</div>';}
@@ -5164,9 +5222,9 @@ function equipeContacts(){
 function renderEquipeUtiles(){
   var box=document.getElementById('uc-equipe');if(!box)return;
   var l=equipeContacts();
-  if(!l.length){box.innerHTML='<div style="color:var(--t3)">Aucun gestionnaire renseigné pour l\'instant.</div>';return;}
+  if(!l.length){box.innerHTML='<div style="color:var(--t3)">Aucun contact d\'équipe pour l\'instant.</div>';return;}
   box.innerHTML=l.map(function(u){var tel=(u.tel||'').replace(/\D/g,'');
-    return'<div style="display:flex;align-items:center;gap:10px"><span class="ouser-av" style="width:30px;height:30px;font-size:11px">'+avOf(u.photo,ini(u.nom))+'</span><div style="flex:1;min-width:0"><b>'+esc(u.nom)+'</b> <span class="obdg '+(u.role==='admin'?'bgo':'baq')+'">'+roleLabel(u.role)+'</span><div style="color:var(--t2)">'
+    return'<div style="display:flex;align-items:center;gap:10px"><span class="ouser-av" style="width:30px;height:30px;font-size:11px">'+avOf(u.photo,ini(u.nom))+'</span><div style="flex:1;min-width:0"><b>'+esc(u.nom)+'</b> <span class="obdg '+(u.role==='admin'?'bgo':u.role==='comite'||u.comite?'bgr':u.role==='referent'?'bpu':'baq')+'">'+roleLabelU(u)+'</span><div style="color:var(--t2)">'
       +(u.tel?'<a href="tel:'+esc(u.tel)+'" style="color:var(--aqua)">'+esc(u.tel)+'</a>'+(tel?' · <a href="https://wa.me/'+telE164(u.tel).replace('+','')+'" target="_blank" rel="noopener" style="color:var(--aqua)">WhatsApp</a>':''):'<span style="color:var(--t3)">téléphone non renseigné</span>')
       +(u.email?' · <a href="mailto:'+esc(u.email)+'" style="color:var(--aqua)">'+esc(u.email)+'</a>':'')+'</div></div></div>';}).join('')
     +'<div style="font-size:11px;color:var(--t3)">Chacun complète son téléphone et son e-mail dans <b>Mon profil</b> (carte en haut du menu).</div>';
@@ -6633,7 +6691,7 @@ function logiHtml(c){
     +(!c.tracking&&!(c.actions&&c.actions.logistique&&c.actions.logistique.done)?'<button class="ob bdone bsm" onclick="oDone(\''+c.id+'\',\'logistique\')">✅ Fait</button>':'')
     +(c.tracking&&!(c.actions&&c.actions.trackingEnvoye&&c.actions.trackingEnvoye.done)?'<button class="ob bdone bsm" onclick="oDone(\''+c.id+'\',\'trackingEnvoye\')">✅ Fait</button>':'')
     +'</div></div>';
-  rows+='<div class="acc-row"><span class="em">📨</span><div class="b">Relancer la logistique OlyLife<small>WhatsApp ou e-mail au service logistique, message prêt avec n° de commande et Member ID</small></div><div class="acts"><a class="ob bgh bsm" href="'+olySvcWA('logistics',waMsg)+'" target="_blank" rel="noopener">📨 WhatsApp</a><a class="ob bgh bsm" href="'+olySvcMail('logistics',mailSubj,mailBody)+'">✉️ E-mail</a></div></div>';
+  rows+='<div class="acc-row"><span class="em">📨</span><div class="b">Relancer la logistique OlyLife<small>WhatsApp : le service est relancé puis le client est prévenu · E-mail : '+(logiCc(c).length?'copie à '+esc(logiCc(c).join(', ')):'aucune adresse de copie connue')+'</small></div><div class="acts"><button class="ob bgh bsm" onclick="oLogiWA(\''+c.id+'\')">📨 WhatsApp</button><button class="ob bgh bsm" onclick="oLogiMail(\''+c.id+'\')">✉️ E-mail</button></div></div>';
   return'<div class="od-section'+(c.installConfirm?' clps':'')+'"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">🚚 Logistique — commande & messages automatisés</div><div class="od-bd">'+rows+'</div></div>';
 }
 
