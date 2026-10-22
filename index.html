@@ -2079,8 +2079,8 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <div><label class="ofl">E-mail</label><input type="email" class="ofc" id="oprof-email" placeholder="prenom@gmail.com"></div>
     </div>
     <div class="ofg1" id="oprof-wa-wrap" style="margin-top:8px"><label class="ofl">WhatsApp sur cet ordinateur</label>
-      <select class="ofc" id="oprof-wa" onchange="waDeskSet(this.value)"><option value="web">WhatsApp Web (navigateur) — emojis corrects (recommandé)</option><option value="app">Application WhatsApp — certains emojis peuvent s'afficher en �</option></select>
-      <div style="font-size:11px;color:var(--t3);margin-top:4px">L'application WhatsApp pour ordinateur abîme les emojis des messages pré-remplis (bug WhatsApp). Avec l'application, le message est aussi copié : collez-le (⌘V / Ctrl+V) à la place du texte abîmé.</div></div>
+      <select class="ofc" id="oprof-wa" onchange="waDeskSet(this.value)"><option value="app">Application WhatsApp (recommandé) — à défaut WhatsApp Web</option><option value="web">Toujours WhatsApp Web (navigateur)</option></select>
+      <div style="font-size:11px;color:var(--t3);margin-top:4px">L'application WhatsApp pour ordinateur abîme certains emojis des messages pré-remplis (bug WhatsApp) : le CRM les remplace automatiquement par des emojis compatibles (👋→✋, 📞→☎️…). Si l'application n'est pas installée, la page WhatsApp propose WhatsApp Web.</div></div>
     <div class="oinst-note" id="oprof-note" style="margin-top:10px"></div>
     <button class="ob bgold bfull" style="margin-top:14px;min-height:48px" onclick="oProfSave()">Enregistrer mon profil</button>
     <button class="ob bgh bfull" style="margin-top:8px" type="button" onclick="oProfClose();oShowSetup()">⚙️ Résumé quotidien · Calendly → Réglages</button>
@@ -2332,7 +2332,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.24.2 · 22/10';
+var APP_VERSION='v3.24.3 · 22/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -7223,13 +7223,23 @@ function sendParse(u){var m=String(u||'').match(/^https:\/\/wa\.me\/(\d*)\?text=
 // v3.24.2 — WhatsApp sur ordinateur : l'application de bureau remplace les emojis « hors BMP » (👋 📄 🔐 📞…) par � dans
 // les messages pré-remplis par lien wa.me. On ouvre WhatsApp Web (emojis intacts) ; avec l'application, le texte est aussi copié.
 function isMobileDev(){var ua=navigator.userAgent||'';return/Android|iPhone|iPad|iPod|Mobile/i.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);}
-function waDesk(){try{return localStorage.getItem('owlht2_wa_desk')||'web';}catch(e){return'web';}}
-function waDeskSet(v){try{localStorage.setItem('owlht2_wa_desk',v);}catch(e){}oT(v==='web'?'💬 WhatsApp s\'ouvrira dans WhatsApp Web':'💬 WhatsApp s\'ouvrira dans l\'application (message aussi copié)','s');}
+function waDesk(){try{return localStorage.getItem('owlht2_wa_desk')||'app';}catch(e){return'app';}}
+function waDeskSet(v){try{localStorage.setItem('owlht2_wa_desk',v);}catch(e){}oT(v==='web'?'💬 WhatsApp s\'ouvrira dans WhatsApp Web':'💬 WhatsApp s\'ouvrira dans l\'application (à défaut WhatsApp Web)','s');}
+// Emojis compatibles avec l'application WhatsApp de bureau (caractères du plan de base Unicode)
+var WA_BMP={'👋':'✋','🙂':'☺️','😊':'☺️','😄':'☺️','😉':'☺️','🙏':'✨','👇':'⬇️','👉':'➡️','📄':'➡️','📖':'➡️','🧭':'➡️','🔗':'➡️','📎':'➡️',
+  '🔐':'ℹ️','🔒':'ℹ️','🔑':'ℹ️','📞':'☎️','📱':'☎️','🚚':'✈️','📦':'✈️','🎬':'▶️','🧪':'✔️','📅':'⏰','🗓':'⏰','🎁':'⭐','🎉':'✨','🏅':'⭐',
+  '🌿':'☘️','🌱':'☘️','🍀':'☘️','💧':'✨','💬':'✉️','📨':'✉️','📧':'✉️','📋':'✍️','📝':'✍️','💶':'€','💵':'$','👍':'✌️','💪':'⚡','🔥':'⚡','👀':'❗',
+  '🤝':'✨','❤️':'❤️','💚':'❤️','😃':'☺️','😁':'☺️','🥰':'☺️','🌟':'⭐','✨':'✨','📍':'➡️','🏠':'➡️','🩺':'ℹ️','📣':'❗','🔔':'❗','⏳':'⏳','🆔':'ℹ️','💡':'✨','📲':'☎️','👤':'☺️','📥':'⬇️','💳':'€'};
+function waBmp(t){
+  t=String(t||'');
+  Object.keys(WA_BMP).forEach(function(k){if(t.indexOf(k)>=0)t=t.split(k).join(WA_BMP[k]);});
+  // tout autre emoji hors plan de base (+ sélecteurs, jointures, teintes) est retiré plutôt que d'afficher �
+  return t.replace(/(?:[\uD800-\uDBFF][\uDC00-\uDFFF])(?:️|‍|[\uD83C][\uDFFB-\uDFFF])*/g,'').replace(/[ \t]{2,}/g,' ').replace(/ +\n/g,'\n');
+}
 function waFix(url){
   var p=sendParse(url);if(!p||isMobileDev())return url;
   if(waDesk()==='web')return'https://web.whatsapp.com/send?'+(p.num?'phone='+p.num+'&':'')+'text='+encodeURIComponent(p.text);
-  if(/[\uD800-\uDFFF]/.test(p.text)&&navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(p.text).then(function(){oT('📋 Message copié aussi — si des emojis s\'affichent en �, effacez et collez (⌘V / Ctrl+V)','i');},function(){});
-  return url;
+  return'https://wa.me/'+p.num+'?text='+encodeURIComponent(waBmp(p.text));
 }
 function sendOpen(url){url=waFix(url);SEND_DIRECT=true;try{window.open(url,'_blank');}finally{setTimeout(function(){SEND_DIRECT=false;},50);}}
 function sendCopy(t,msg){var done=function(){oT(msg||'📋 Message copié','s');};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,function(){prompt('Message :',t);});else prompt('Message :',t);}
