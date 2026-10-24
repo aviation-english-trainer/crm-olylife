@@ -2339,7 +2339,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.25.1 · 25/10';
+var APP_VERSION='v3.25.2 · 25/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -7115,8 +7115,8 @@ function oSioStatus(){
     if(!d.ok){box.innerHTML='<span style="color:#C0392B">'+(d.error==='op'?'Script serveur v3.15 requis.':'Erreur : '+esc(d.error||'?'))+'</span>';return;}
     if(!d.configured){box.innerHTML='<span style="color:#C0392B">⚠️ Clé API Systeme.io absente.</span> Apps Script → ⚙️ Paramètres du projet → Propriétés du script → <code>SIO_API_KEY</code> (Systeme.io → Paramètres → Clés API publiques) et <code>SIO_HOOK_SECRET</code> (mot de passe libre).';return;}
     box.innerHTML=(d.api?'✅ API Systeme.io joignable · tags existants : '+esc((d.tags||[]).join(', ')||'aucun'):'<span style="color:#C0392B">❌ API injoignable : '+esc(d.error||'')+'</span>')
-      +'<div style="margin-top:6px">Webhook à déclarer dans Systeme.io (Paramètres → Webhooks, événements : contact désabonné, lien cliqué, campagne terminée, tag ajouté/retiré) :<br><code style="word-break:break-all">'+esc(d.hookUrl||'')+'</code></div>'
-      +'<div style="margin-top:6px;color:var(--t2)">Règles d\'automatisation à créer : tag <b>oly_decouverte</b> ajouté → inscrire à la campagne Découverte · retiré → désinscrire · tag <b>oly_reseau</b> ajouté → inscrire à la campagne Membre · tag <b>oly_stop</b> ajouté → désinscrire des deux.</div>';
+      +'<div style="margin-top:6px">Webhook à déclarer dans Systeme.io (Paramètres → Webhooks, événement : <b>Tag ajouté à un contact</b> uniquement) :<br><code style="word-break:break-all">'+esc(d.hookUrl||'')+'</code></div>'
+      +'<div style="margin-top:6px;color:var(--t2)">Règles d\'automatisation à créer : tag <b>oly_decouverte</b> ajouté → inscrire à la campagne Découverte · retiré → désinscrire · tag <b>oly_reseau</b> ajouté → inscrire à la campagne Membre · tag <b>oly_stop</b> ajouté → désinscrire des deux · <i>retour vers le CRM :</i> désabonnement des e-mails → ajouter le tag <b>oly_desinscrit</b> · campagne Découverte terminée → ajouter <b>oly_fin_decouverte</b> · campagne Membre terminée → ajouter <b>oly_fin_reseau</b>.</div>';
   }).catch(function(){box.innerHTML='Hors ligne';});
 }
 
