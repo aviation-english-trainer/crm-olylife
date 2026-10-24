@@ -1763,8 +1763,6 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
             </div></div>
           <div class="adm-sec"><h4>Signature des messages</h4><div class="hint">Ajoutée après le prénom de l'expéditeur dans les messages WhatsApp / e-mail en registre professionnel (ex. « Jean-Charles — OlyLife / WLHT »).</div>
             <div class="adm-f"><input type="text" id="adm-sign" placeholder="OlyLife / WLHT"></div></div>
-          <div class="adm-sec"><h4>📧 Campagnes e-mail — liaison Systeme.io</h4><div class="hint">Le CRM pose des tags sur le contact Systeme.io ; les règles d'automatisation Systeme.io inscrivent / désinscrivent des campagnes. Inscription uniquement avec e-mail + consentement noté.</div>
-            <div id="adm-sio" style="font-size:12px;line-height:1.6;color:var(--tx)">—</div><button class="ob bgh bsm" type="button" style="margin-top:6px" onclick="oSioStatus()">🔄 Vérifier la liaison</button></div>
           <div class="adm-sec"><h4>Automatismes côté serveur (script Google)</h4>
             <div class="hint">Sauvegarde Drive chaque nuit à <b>3h</b> · résumé quotidien par e-mail à <b>7h</b> (heure propre à chaque membre dans son profil) · rappels d'avances à <b>8h</b>. Ces horaires se changent dans Apps Script (fonction <code>installerDeclencheurs</code>).</div></div>
         </div>
@@ -1790,6 +1788,10 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       </div>
 
       <div class="adm-pane" id="adm-liens">
+        <div class="ocard" style="margin-bottom:14px">
+          <div class="adm-sec"><h4>📧 Campagnes e-mail — liaison Systeme.io</h4><div class="hint">Le CRM pose des tags sur le contact Systeme.io ; les règles d'automatisation Systeme.io inscrivent / désinscrivent des campagnes. Inscription uniquement avec e-mail + consentement noté.</div>
+            <div id="adm-sio" style="font-size:12px;line-height:1.6;color:var(--tx)">—</div><button class="ob bgh bsm" type="button" style="margin-top:6px" onclick="oSioStatus()">🔄 Vérifier la liaison</button></div>
+        </div>
         <div class="ocard" style="margin-bottom:14px">
           <div class="adm-sec"><h4>Liens de l'équipe (personnalisés)</h4>
             <div class="hint">Ajoutez vos propres raccourcis : ils apparaissent dans le menu « Liens » de la barre latérale (ordinateur, tablette) et du menu du téléphone, selon la visibilité choisie.</div>
@@ -2337,7 +2339,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.25 · 25/10';
+var APP_VERSION='v3.25.1 · 25/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -7582,7 +7584,7 @@ function oImpShots(input){
 var ADM_TAB='equipe';
 function admMove(id,hostId){var el=document.getElementById(id),host=document.getElementById(hostId);if(!el||!host)return;if(!el._ph){el._ph=document.createElement('span');el._ph.style.display='none';el.parentNode.insertBefore(el._ph,el);}if(el.parentNode!==host)host.appendChild(el);el.classList.remove('hide');}
 function admBackCards(){['eq-users-card','eq-refs-card'].forEach(function(id){var el=document.getElementById(id);if(el&&el._ph&&el.parentNode!==el._ph.parentNode)el._ph.parentNode.insertBefore(el,el._ph);});}
-function admTab(t){ADM_TAB=t;document.querySelectorAll('#adm-tabs .adm-tab').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-tab')===t);});document.querySelectorAll('#ov-admin .adm-pane').forEach(function(p){p.classList.toggle('on',p.id==='adm-'+t);});admRenderTab(t);}
+function admTab(t){ADM_TAB=t;if(t==='liens')setTimeout(oSioStatus,50);document.querySelectorAll('#adm-tabs .adm-tab').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-tab')===t);});document.querySelectorAll('#ov-admin .adm-pane').forEach(function(p){p.classList.toggle('on',p.id==='adm-'+t);});admRenderTab(t);}
 function oAdmin(){
   admMove('eq-users-card','adm-eq-host');admMove('eq-refs-card','adm-refs-host');
   renderUsers();renderRefChips();
