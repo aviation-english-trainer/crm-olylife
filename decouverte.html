@@ -77,6 +77,7 @@ input:focus,textarea:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 3
     <label style="margin-top:14px">Un mot sur votre situation ou votre question (facultatif)</label><textarea id="message" rows="2" placeholder="Ex. : je suis kiné, je cherche à comprendre le térahertz…"></textarea>
 
     <label class="chk"><input type="checkbox" id="consent"><span>J'accepte que ces informations soient transmises à mon référent Water Life High Tech pour qu'il me contacte et m'envoie de la documentation. Je peux en demander la suppression à tout moment. <b>*</b></span></label>
+    <label class="chk"><input type="checkbox" id="consentEmail"><span>📧 J'accepte de recevoir par e-mail les informations de découverte OlyLife et la lettre d'information de l'association Water Life High Tech (environ 2 à 4 e-mails par mois, désinscription en un clic à tout moment).</span></label>
 
     <div class="note">ℹ️ Les appareils OlyLife sont des appareils de bien-être, pas des dispositifs médicaux. La documentation que vous recevrez n'a pas vocation à remplacer un avis médical.</div>
 
@@ -119,7 +120,7 @@ document.getElementById('f').addEventListener('submit',function(e){
   else if(!document.getElementById('consent').checked)msg='Merci de cocher la case de consentement.';
   if(msg){err.textContent=msg;err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'center'});return;}
   var btn=document.getElementById('go');btn.disabled=true;btn.textContent='Envoi en cours…';
-  var o={op:'lead',type:'decouverte',website:v('website'),nom:v('nom'),prenom:v('prenom'),tel:v('tel'),email:v('email'),interets:interets(),message:v('message'),consent:true,lang:'fr'};
+  var o={op:'lead',type:'decouverte',website:v('website'),nom:v('nom'),prenom:v('prenom'),tel:v('tel'),email:v('email'),interets:interets(),message:v('message'),consent:true,consentEmail:document.getElementById('consentEmail').checked,lang:'fr'};
   post(o).then(function(d){
     if(!d.ok){btn.disabled=false;btn.textContent='Recevoir les informations';err.textContent=d.error==='trop'?'Trop de demandes pour l\'instant — réessayez dans une heure.':d.error==='lien'?'Ce lien n\'est plus valide.':d.error==='champs'?'Le lien utilisé attend une version plus récente du service — contactez votre référent.':'Envoi impossible pour le moment ('+(d.error||'?')+'). Réessayez ou contactez votre référent.';err.style.display='block';return;}
     document.getElementById('f').style.display='none';var ok=document.getElementById('ok');ok.style.display='block';

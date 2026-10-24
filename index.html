@@ -1537,6 +1537,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
                 <div style="font-size:11px;color:var(--t3);margin-top:4px">Dr = médecin, vétérinaire, dentiste, pharmacien · Pr = professeur de médecine / d'université · Maître = avocat, notaire, huissier.</div>
               </div>
               <div class="ofg1"><label class="ofl">Objectifs / besoins exprimés</label><textarea class="ofc" id="fc-obj" placeholder="Fatigue, douleurs, immunité..."></textarea></div>
+              <label class="ochk-row" style="margin-top:4px"><input type="checkbox" id="fc-consent"><span>📧 <b>A donné son accord pour recevoir nos e-mails</b> (campagnes d'information, newsletter) — <span id="fc-consent-info" style="color:var(--t3)">accord oral ou écrit reçu par le gestionnaire</span></span></label>
             </div>
           </div>
 
@@ -1762,6 +1763,8 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
             </div></div>
           <div class="adm-sec"><h4>Signature des messages</h4><div class="hint">Ajoutée après le prénom de l'expéditeur dans les messages WhatsApp / e-mail en registre professionnel (ex. « Jean-Charles — OlyLife / WLHT »).</div>
             <div class="adm-f"><input type="text" id="adm-sign" placeholder="OlyLife / WLHT"></div></div>
+          <div class="adm-sec"><h4>📧 Campagnes e-mail — liaison Systeme.io</h4><div class="hint">Le CRM pose des tags sur le contact Systeme.io ; les règles d'automatisation Systeme.io inscrivent / désinscrivent des campagnes. Inscription uniquement avec e-mail + consentement noté.</div>
+            <div id="adm-sio" style="font-size:12px;line-height:1.6;color:var(--tx)">—</div><button class="ob bgh bsm" type="button" style="margin-top:6px" onclick="oSioStatus()">🔄 Vérifier la liaison</button></div>
           <div class="adm-sec"><h4>Automatismes côté serveur (script Google)</h4>
             <div class="hint">Sauvegarde Drive chaque nuit à <b>3h</b> · résumé quotidien par e-mail à <b>7h</b> (heure propre à chaque membre dans son profil) · rappels d'avances à <b>8h</b>. Ces horaires se changent dans Apps Script (fonction <code>installerDeclencheurs</code>).</div></div>
         </div>
@@ -2155,6 +2158,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <div class="ofg" style="position:relative">
       <div class="ofg1"><label class="ofl">Prénom <span class="oreq">*</span></label><input type="text" class="ofc" id="dc-pr" autocomplete="off" oninput="rqSuggest(this)" onfocus="rqSuggest(this)"></div>
       <div class="ofg1"><label class="ofl">Nom</label><input type="text" class="ofc" id="dc-nm" autocomplete="off" oninput="rqSuggest(this)" onfocus="rqSuggest(this)"></div>
+      <div class="ofg1"><label class="ofl">E-mail <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--t3)">— pour la campagne e-mail</span></label><input type="email" class="ofc" id="dc-em" autocomplete="off" placeholder="prenom@email.com"></div>
       <div class="ofg1"><label class="ofl">Téléphone / WhatsApp <span class="oreq">*</span></label><input type="tel" class="ofc" id="dc-tel" placeholder="+33 6 12 34 56 78" autocomplete="off" oninput="rqSuggest(this)" onfocus="rqSuggest(this)"></div>
       <div id="dc-sugg" class="rq-sugg" style="display:none"></div>
     </div>
@@ -2162,6 +2166,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <div class="ofg1" style="margin-top:10px"><label class="ofl">Ce qui l'intéresse (plusieurs possibles)</label><div id="dc-int" style="display:flex;flex-wrap:wrap;gap:6px"></div></div>
     <div style="font-size:12px;color:var(--t3);margin-top:8px" id="dc-sign"></div>
     <label class="ochk-row" style="margin-top:10px"><input type="checkbox" id="dc-create" checked><span>Créer la fiche contact (Prospect) si elle n'existe pas encore</span></label>
+    <label class="ochk-row"><input type="checkbox" id="dc-camp"><span>📧 <b>Inscrire à la campagne e-mail « Découverte »</b> (12 mois) — la personne m'a donné son accord pour recevoir nos e-mails · nécessite un e-mail</span></label>
     <div style="display:flex;gap:8px;margin-top:14px">
       <button class="ob bwa" style="flex:1;min-height:48px" onclick="oDecSend('wa')">💬 Envoyer les infos</button>
       <button class="ob bgh" style="min-height:48px" onclick="oDecSend('copy')">📋 Copier</button>
@@ -2332,7 +2337,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.24.3 · 22/10';
+var APP_VERSION='v3.25 · 25/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -3920,6 +3925,10 @@ function oSetStatut(id,st){
   jrnAdd(c,'statut','Statut : '+STATUT_DEF[old].l+' → '+STATUT_DEF[st].l+(newEt!==c.etape?' · étape '+newEt:''));
   c.etape=newEt;
   oPush([c]);if(document.getElementById('omo').classList.contains('on'))oOpenF(id);oRefresh();oT(STATUT_DEF[st].ic+' '+STATUT_DEF[st].l,'s');
+  // v3.25 — campagnes e-mail : « Dans le réseau » bascule sur le parcours Membre, « Abandon » arrête tout
+  var cp=c.campagne||{};
+  if(st==='reseau'&&c.email&&c.emailConsent&&cp.parcours!=='reseau')setTimeout(function(){campSync(c,'reseau','passage « Dans le réseau »');},300);
+  else if(st==='abandon'&&cp.parcours&&cp.parcours!=='stop')setTimeout(function(){campSync(c,'stop','passage « Abandon »');},300);
 }
 function oRappelDone(id){
   var c=OC.find(function(x){return x.id===id;});if(!c||!c.rappel)return;
@@ -4027,7 +4036,7 @@ function cardHtml(c,showAttr){
     +'<div class="ocli-info" style="min-width:0">'
       +'<div class="ocli-name">'+esc(c.nom)+' '+esc(c.prenom||'')+'</div>'
       +'<div class="ocli-sub">'+(c.tel||'—')+(c.pays?' · '+c.pays:'')+'</div>'
-      +'<div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:4px;align-items:center">'+stBdg(c)+jBdg(c)+resBdg(c,true)
+      +'<div style="margin-top:5px;display:flex;flex-wrap:wrap;gap:4px;align-items:center">'+stBdg(c)+jBdg(c)+resBdg(c,true)+campBdg(c)
         +echeanceHtml(c)
         +eBdg(c.etape)+qBdg(c.qualification||c.qualif)
         +(showAttr&&c.suiviPar?'<span class="obdg baq">👤 '+esc(c.suiviPar)+'</span>':'')
@@ -4057,6 +4066,7 @@ function qiHtml(c){
     +li('🚚','Livraison',[c.transporteur?esc(c.transporteur):'',trk,c.dateLivraison?'livrée le '+fD(c.dateLivraison):''].filter(Boolean).join(' · '))
     +li('🧬','Sponsor / placement',[c.sponsor?esc(c.sponsor):'',c.placement?esc(c.placement):''].filter(Boolean).join(' · '))
     +li('🏅','Rang',esc(c.rangOly||''))
+    +li('📧','Campagne',(c.campagne&&c.campagne.parcours&&c.campagne.parcours!=='stop')?esc(CAMP_LBL[c.campagne.parcours]||c.campagne.parcours):'')
     +li('🧾','Factures',(c.factures||[]).map(function(f){return'<a href="'+esc(f.url)+'" target="_blank" rel="noopener" style="color:var(--aqua)">'+esc(f.produit||f.docNo||'PDF')+'</a>'+(f.envoyeLe?' ✅':'');}).join(' · '))
     +li('👤','Suivi par',esc(suivisDe(c).join(', ')))
     +li('🤝','Référé par',esc(c.refere||''))
@@ -4289,6 +4299,7 @@ function oOpenF(id){
       +(ROLE()==='admin'&&stkList().some(function(x){return(+x.qte||0)>0;})?'<button class="ob baqua bfull" style="min-height:44px;margin-top:8px" onclick="oStkOpen(\''+id+'\')">📦 Remise immédiate depuis un stock</button>':'')
     +'</div></div>'
     +decHtml(c)
+    +campHtml(c)
     +merciHtml(c)
     +kitHtml(c)
     +logiHtml(c)
@@ -4360,6 +4371,7 @@ function oEdit(id,focus){
   document.getElementById('fi-confirm').checked=!!c.installConfirm;
   document.getElementById('ft-autorise').checked=!!c.temoignageAutorise;
   document.getElementById('fe-partenaire').checked=!!c.estPartenaire;
+  document.getElementById('fc-consent').checked=!!c.emailConsent;var fci=document.getElementById('fc-consent-info');if(fci)fci.textContent=c.emailConsent?('accord noté le '+fD(String(c.emailConsentLe||'').slice(0,10))+(c.emailConsentSrc?' — '+c.emailConsentSrc:'')):(c.emailConsentRetire?'⚠️ consentement retiré le '+fD(String(c.emailConsentRetire).slice(0,10))+' (désinscription)':'accord oral ou écrit reçu par le gestionnaire');
   document.getElementById('fo-essai').checked=!!c.essaiOk;document.getElementById('fo-essai-mode').value=c.essaiMode||(c.essaiOk?'gratuit':'');document.getElementById('fo-essai-mt').value=c.essaiMontant||'';document.getElementById('fo-essai-dev').value=c.essaiDevise||'€';oTEssai();
   var rh=document.getElementById('fo-rang-hint');if(rh){var est=rangFromUSD(c.achatsUSD||c.montantUSD);rh.textContent=est?'— estimé d\'après '+(c.achatsUSD||c.montantUSD)+' USD d\'achats : '+est:'';if(est&&!c.rangOly)document.getElementById('fo-rang').value=est;}
   oSetFact(!!(c.factAdresse||c.factCp||c.factVille||c.factPays));
@@ -4381,7 +4393,7 @@ function oReset(){
   var fcra=document.getElementById('fc-ref-autre');if(fcra){fcra.value='';fcra.style.display='none';}
   document.getElementById('fc-ctags').value='';renderCtagsChips();
   document.getElementById('fe-cote').value='';document.getElementById('fe-rang').value='';
-  document.getElementById('fi-confirm').checked=false;document.getElementById('ft-autorise').checked=false;document.getElementById('fe-partenaire').checked=false;
+  document.getElementById('fi-confirm').checked=false;document.getElementById('ft-autorise').checked=false;document.getElementById('fe-partenaire').checked=false;document.getElementById('fc-consent').checked=false;var fci0=document.getElementById('fc-consent-info');if(fci0)fci0.textContent='accord oral ou écrit reçu par le gestionnaire';
   document.getElementById('fo-essai').checked=false;document.getElementById('fo-essai-mode').value='';document.getElementById('fo-essai-mt').value='';document.getElementById('fo-essai-dev').value='€';oTEssai();document.getElementById('fo-rang').value='';var rh0=document.getElementById('fo-rang-hint');if(rh0)rh0.textContent='';
   oSetFact(false);
   oTEQ();
@@ -4419,7 +4431,7 @@ function oSave(){
     refere:isRef?((USER.tags&&USER.tags[0])||USER.nom):(function(){var sv=document.getElementById('fc-ref').value;return sv==='__autre__'?(document.getElementById('fc-ref-autre').value.trim()):sv;}()),
     suivis:(function(){var l=[];document.querySelectorAll('.fc-sui:checked').forEach(function(x){l.push(x.value);});return l;}()),
     ctags:(document.getElementById('fc-ctags').value||'').split(',').map(function(t){return t.trim();}).filter(Boolean),
-    etape:document.getElementById('fc-etape').value,qualification:document.getElementById('fc-qualif').value,canal:document.getElementById('fc-canal').value,registre:document.getElementById('fc-registre').value,civilite:val('fc-civ'),objectifs:document.getElementById('fc-obj').value,
+    etape:document.getElementById('fc-etape').value,qualification:document.getElementById('fc-qualif').value,canal:document.getElementById('fc-canal').value,registre:document.getElementById('fc-registre').value,civilite:val('fc-civ'),emailConsent:document.getElementById('fc-consent').checked,objectifs:document.getElementById('fc-obj').value,
     produits:prods,
     numCommande:document.getElementById('fl-numcmd').value,memberIdOlyLife:document.getElementById('fl-memberid').value,dateCommande:document.getElementById('fl-datecmd').value,transporteur:document.getElementById('fl-transp').value,tracking:document.getElementById('fl-tracking').value,dateLivraison:document.getElementById('fl-datelivr').value,
     installConfirm:document.getElementById('fi-confirm').checked,dateInstall:document.getElementById('fi-date').value,dateReception:document.getElementById('fi-recu').value,notesUsage:document.getElementById('fi-notes').value,
@@ -4432,6 +4444,8 @@ function oSave(){
   data.suiviPar=data.suivis.join(', ');if(data.comptes===undefined)delete data.comptes;
   if(!EID)data.createdBy=PARTNER_NOM();
   var prevC=EID?OC.find(function(x){return x.id===EID;}):null;
+  if(data.emailConsent&&!(prevC&&prevC.emailConsent)){data.emailConsentLe=new Date().toISOString();data.emailConsentSrc='noté par '+(PARTNER_NOM()||'—');}
+  if(!data.emailConsent&&prevC&&prevC.emailConsent){data.emailConsentRetire=new Date().toISOString();}
   if(!prevC||prevC.etape!==data.etape){data.statut=ET2ST[data.etape]||(prevC?prevC.statut:undefined);data.statutPar=PARTNER_NOM();data.statutLe=new Date().toISOString();}
   // le parrain choisi est un membre de l'équipe avec un tag → la fiche rejoint son équipe
   if(!data.ctags.length&&data.refere){var pu=USERS.find(function(u){return u.nom===data.refere&&u.tags&&u.tags.length;});if(pu)data.ctags=[pu.tags[0]];}
@@ -4439,7 +4453,10 @@ function oSave(){
   var eid=document.getElementById('fc-eid').value;
   if(eid){var idx=OC.findIndex(function(x){return x.id===eid;});if(idx>=0){OC[idx]=Object.assign({},OC[idx],data);saved=OC[idx];oT(data.prenom+' '+data.nom+' mis à jour !','s');}}
   else{saved=Object.assign({id:'c_'+Date.now(),createdAt:new Date().toISOString().split('T')[0],actions:{}},data);OC.unshift(saved);oT('Fiche de '+data.prenom+' '+data.nom+' créée !','s');}
+  if(saved&&data.emailConsent&&!(prevC&&prevC.emailConsent))jrnAdd(saved,'systeme','📧 Consentement e-mail noté ('+data.emailConsentSrc+')');
+  if(saved&&!data.emailConsent&&prevC&&prevC.emailConsent){jrnAdd(saved,'systeme','📧 Consentement e-mail retiré');if(saved.campagne&&saved.campagne.parcours&&saved.campagne.parcours!=='stop')campSync(saved,'stop','consentement retiré');}
   if(saved)oPush([saved]);
+  if(saved&&data.emailConsent&&!(prevC&&prevC.emailConsent)&&saved.email&&!(saved.campagne&&saved.campagne.parcours))setTimeout(function(){campPropose(saved);},400);
   if(saved&&saved.essaiOk&&(saved.adresse||saved.ville)&&(!saved.geo||saved.geo.q!==geoQ(saved)))geocodeOne(saved,function(ok){if(ok)oPush([saved]);});
   oReset();oSw('contacts',1);
 }
@@ -5463,7 +5480,7 @@ function tableHtml(l){
     return'<tr class="'+(SEL[c.id]?'sel ':'')+(ACTIVE_ID===c.id?'active':'')+'" data-cid="'+c.id+'" onclick="oRowClick(event,\''+c.id+'\')" oncontextmenu="event.preventDefault();oCtxOpen(\''+c.id+'\')">'
       +'<td class="c-chkc"><input type="checkbox" '+(SEL[c.id]?'checked':'')+' onclick="event.stopPropagation();oSelToggle(\''+c.id+'\',this.checked)"></td>'
       +'<td><div class="tc"><span class="tav st-'+s+(resManque(c).length?' res-pulse av-todo':'')+'"'+(resManque(c).length?' title="À compléter : '+esc(resManque(c).join(' · '))+'"':'')+'>'+cAv(c)+'</span><div><b>'+esc(c.nom)+' '+esc(c.prenom||'')+'</b><small>'+esc(c.tel||'—')+(c.ville?' · '+esc(c.ville):c.pays?' · '+esc(c.pays):'')+'</small></div></div></td>'
-      +'<td>'+stBdg(c)+(jBdg(c)||resBdg(c,true)?'<div style="margin-top:3px;display:flex;gap:3px;flex-wrap:wrap">'+jBdg(c)+resBdg(c,true)+'</div>':'')+'</td>'
+      +'<td>'+stBdg(c)+(jBdg(c)||resBdg(c,true)||campBdg(c)?'<div style="margin-top:3px;display:flex;gap:3px;flex-wrap:wrap">'+jBdg(c)+resBdg(c,true)+campBdg(c)+'</div>':'')+'</td>'
       +'<td class="c-lg c-sp">'+(c.etape?eBdg(c.etape):'<span class="t-muted">—</span>')+'</td>'
       +'<td class="c-sp">'+(c.refere?'<div style="font-size:12.5px">'+esc(c.refere)+'</div>':'')+((c.ctags||[]).slice(0,2).map(function(t){return'<span class="obdg bpu" style="margin:2px 2px 0 0">'+esc(t)+'</span>';}).join('')||(c.refere?'':'<span class="t-muted">—</span>'))+'</td>'
       +'<td class="c-sp">'+avsHtml(c)+'</td>'
@@ -6265,11 +6282,11 @@ function oReqClose(){oSheetClose('oreq');}
 // ── Proposer la découverte (temps 1) ─────────────────────────────────
 function oDecSetInts(list){document.querySelectorAll('#dc-int input').forEach(function(x){x.checked=list.indexOf(x.value)>=0;x.parentNode.classList.toggle('on',x.checked);});}
 function oDecInts(){var l=[];document.querySelectorAll('#dc-int input:checked').forEach(function(x){l.push(x.value);});return l;}
-function oDecContact(){return{prenom:val('dc-pr').trim(),nom:val('dc-nm').trim(),tel:val('dc-tel').trim()};}
+function oDecContact(){return{prenom:val('dc-pr').trim(),nom:val('dc-nm').trim(),tel:val('dc-tel').trim(),email:val('dc-em').trim()};}
 function oDecPrev(){var e=document.getElementById('dc-prev');if(!e)return;var c=oDecContact();if(!c.prenom)c.prenom='…';e.textContent=msgDecouverte(c,oDecInts());var lk=document.getElementById('dc-link'),u=decouverteUrl(oDecContact());if(lk)lk.innerHTML=u?'<a href="'+esc(u)+'" target="_blank" style="color:var(--gold)">'+esc(u)+'</a>':'⚠️ Lien indisponible (script Google à mettre à jour, v3.9+)';}
 function oDecOpen(cid){
-  ['dc-pr','dc-nm','dc-tel'].forEach(function(id){document.getElementById(id).value='';});
-  document.getElementById('dc-create').checked=true;RQ_CID='';
+  ['dc-pr','dc-nm','dc-tel','dc-em'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('dc-create').checked=true;document.getElementById('dc-camp').checked=false;RQ_CID='';
   document.getElementById('dc-match').style.display='none';document.getElementById('dc-sugg').style.display='none';
   var box=document.getElementById('dc-int');if(!box.children.length)box.innerHTML=INTERETS.map(function(i){return'<label class="oprd" onclick="oTP(this);setTimeout(oDecPrev,0)"><input type="checkbox" value="'+esc(i)+'"> '+esc(i)+'</label>';}).join('');
   oDecSetInts([]);
@@ -6283,9 +6300,17 @@ function oDecFiche(create,ints,note){
   var t9=tel9(c.tel);
   var ex=(RQ_CID?OC.find(function(x){return x.id===RQ_CID;}):null)||OC.find(function(x){return(t9&&t9.length>=9&&tel9(x.tel)===t9)||(c.nom&&(x.nom||'').trim().toUpperCase()===c.nom.toUpperCase()&&prem(x.prenom)===prem(c.prenom));});
   var saved;
-  if(ex){var cur=interetsDe(ex);ints.forEach(function(i){if(cur.indexOf(i)<0)cur.push(i);});if(ints.length)ex.interets=cur;if(!ex.tel&&c.tel)ex.tel=c.tel;jrnAdd(ex,'note',note);saved=ex;}
-  else{saved={id:'c_'+Date.now(),createdAt:new Date().toISOString().split('T')[0],actions:{},produits:[],nom:(c.nom||'?').toUpperCase(),prenom:c.prenom,tel:c.tel,etape:'Prospect',qualification:'Tiède',canal:'WhatsApp',registre:'pro',statut:ET2ST.Prospect,statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),interets:ints,referentId:PARTNER_ID,referentNom:PARTNER_NOM(),createdBy:PARTNER_NOM()};jrnAdd(saved,'note',note);OC.unshift(saved);}
-  saved.decEnvoye=todayYMD();oPush([saved]);return saved;
+  if(ex){var cur=interetsDe(ex);ints.forEach(function(i){if(cur.indexOf(i)<0)cur.push(i);});if(ints.length)ex.interets=cur;if(!ex.tel&&c.tel)ex.tel=c.tel;if(!ex.email&&c.email)ex.email=c.email;jrnAdd(ex,'note',note);saved=ex;}
+  else{saved={id:'c_'+Date.now(),createdAt:new Date().toISOString().split('T')[0],actions:{},produits:[],nom:(c.nom||'?').toUpperCase(),prenom:c.prenom,tel:c.tel,email:c.email||'',etape:'Prospect',qualification:'Tiède',canal:'WhatsApp',registre:'pro',statut:ET2ST.Prospect,statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),interets:ints,referentId:PARTNER_ID,referentNom:PARTNER_NOM(),createdBy:PARTNER_NOM()};jrnAdd(saved,'note',note);OC.unshift(saved);}
+  saved.decEnvoye=todayYMD();
+  // v3.25 — campagne e-mail « Découverte » si demandé (consentement reçu + e-mail)
+  var dcc=document.getElementById('dc-camp');
+  if(dcc&&dcc.checked){
+    if(!saved.email){oT('📧 Pas d\'e-mail : la personne n\'est pas inscrite à la campagne','w');}
+    else{if(!saved.emailConsent){saved.emailConsent=true;saved.emailConsentLe=new Date().toISOString();saved.emailConsentSrc='accord donné à '+(PARTNER_NOM()||'—')+' (découverte)';jrnAdd(saved,'systeme','📧 Consentement e-mail noté ('+saved.emailConsentSrc+')');}
+      setTimeout(function(){campSync(saved,'decouverte','infos découverte envoyées');},300);}
+  }
+  oPush([saved]);return saved;
 }
 function oDecSend(kind){
   var c=oDecContact();if(!c.prenom||!c.tel){oT('Prénom et téléphone sont obligatoires','e');return;}
@@ -7029,6 +7054,70 @@ function impApplyCompte(item,ex,route,adds){
   delete item.montantUSD;delete item.achatsUSD;
 }
 
+// ═══════════ v3.25 — Campagnes e-mail (Systeme.io, pilotées par le CRM) ═══════════
+var CAMP_LBL={decouverte:'Découverte (prospect · 12 mois)',reseau:'Membre du réseau (12 mois)',stop:'arrêtée'};
+function campOk(){return srvNum()>=3015;}
+function campSync(c,parcours,raison){
+  if(!campOk()){oT('Campagnes e-mail : script serveur v3.15 requis','w');return Promise.resolve({ok:false});}
+  if(parcours!=='stop'&&parcours!=='pause'){if(!c.email){oT('📧 Pas d\'e-mail sur la fiche','w');return Promise.resolve({ok:false});}if(!c.emailConsent){oT('📧 Consentement e-mail non noté sur la fiche','w');return Promise.resolve({ok:false});}}
+  oT('📧 Synchronisation de la campagne…','i');
+  return oPostAsync_({op:'sioSync',contactId:c.id,parcours:parcours,raison:raison||''}).then(function(d){
+    if(d.ok){c.campagne=d.campagne||c.campagne;if(d.sioId)c.sioId=d.sioId;
+      jrnAdd(c,'systeme',({decouverte:'📧 Inscrit à la campagne « Découverte »',reseau:'📧 Basculé sur la campagne « Membre du réseau »',stop:'📧 Campagnes e-mail arrêtées',pause:'📧 Campagne mise en pause',reprise:'📧 Campagne reprise'})[parcours]+(raison?' — '+raison:''));
+      oPush([c]);oT((d.warning?'⚠️ '+d.warning:'📧 Campagne : '+(CAMP_LBL[(c.campagne||{}).parcours]||parcours)),d.warning?'w':'s');}
+    else oT('📧 Campagne non synchronisée : '+({consent:'consentement manquant',email:'e-mail manquant',op:'script serveur à mettre à jour (v3.15)',forbidden:'accès insuffisant'}[d.error]||d.error||'?'),'e');
+    if(document.getElementById('omo').classList.contains('on'))oOpenF(c.id);oRefresh();return d;
+  }).catch(function(){oT('Hors ligne — campagne non synchronisée','e');return{ok:false};});
+}
+function campPropose(c){
+  var st=cStatut(c),p=st==='reseau'?'reseau':(st==='abandon'?'':'decouverte');if(!p)return;
+  if(confirm('📧 Inscrire '+(c.prenom||'')+' '+(c.nom||'')+' à la campagne e-mail « '+CAMP_LBL[p]+' » maintenant ?'))campSync(c,p,'inscription manuelle');
+}
+function oCampConsent(cid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c||!canEditContact(c))return;
+  var src=prompt('Comment l\'accord de '+(c.prenom||'')+' '+(c.nom||'')+' pour recevoir nos e-mails a-t-il été reçu ?','oral, lors de notre échange du '+fD(todayYMD()));
+  if(src==null)return;
+  c.emailConsent=true;c.emailConsentLe=new Date().toISOString();c.emailConsentSrc=(src.trim()||'accord reçu')+' — noté par '+(PARTNER_NOM()||'—');delete c.emailConsentRetire;
+  jrnAdd(c,'systeme','📧 Consentement e-mail noté ('+c.emailConsentSrc+')');oPush([c]);oOpenF(cid);
+  if(c.email&&!(c.campagne&&c.campagne.parcours))setTimeout(function(){campPropose(c);},300);
+}
+function campHtml(c){
+  var r=ROLE();if(r==='referent')return'';
+  var cp=c.campagne||{},st=cStatut(c),can=canEditContact(c),ok=campOk();
+  var state;
+  if(!c.email)state='<span style="color:var(--t3)">Pas d\'e-mail sur la fiche — ajoutez-le (Modifier) pour pouvoir l\'inscrire.</span>';
+  else if(!c.emailConsent)state=(c.emailConsentRetire?'<span style="color:#C0392B">⛔ Consentement retiré le '+fD(String(c.emailConsentRetire).slice(0,10))+' (désinscription)</span>':'<span style="color:#C0392B">⚠️ Consentement e-mail non noté</span>')+' — aucun envoi tant qu\'il n\'est pas enregistré.';
+  else state='✅ Consentement noté le '+fD(String(c.emailConsentLe||'').slice(0,10))+(c.emailConsentSrc?' <span style="color:var(--t3)">('+esc(c.emailConsentSrc)+')</span>':'');
+  var camp=cp.parcours&&cp.parcours!=='stop'?'<b>'+(CAMP_LBL[cp.parcours]||cp.parcours)+'</b>'+(cp.pause?' · <span style="color:#C0392B">en pause depuis le '+fD(String(cp.pause).slice(0,10))+'</span>':'')+(cp.depuis?' · depuis le '+fD(String(cp.depuis).slice(0,10)):'')
+    :(cp.parcours==='stop'?'<span style="color:var(--t3)">Campagnes arrêtées'+(cp.depuis?' le '+fD(String(cp.depuis).slice(0,10)):'')+'</span>':'<span style="color:var(--t3)">Pas encore inscrit à une campagne</span>');
+  var last=cp.lastEvent?'<div style="font-size:11px;color:var(--t3)">Dernier événement Systeme.io : '+esc(String(cp.lastEvent.type).replace(/[._]/g,' '))+(cp.lastEvent.tag?' — '+esc(cp.lastEvent.tag):'')+' · '+fDT(cp.lastEvent.ts)+'</div>':'';
+  var acts='';
+  if(can){
+    if(!c.emailConsent&&c.email)acts+='<button class="ob bgh bsm" onclick="oCampConsent(\''+c.id+'\')">✍️ Noter le consentement</button>';
+    if(c.email&&c.emailConsent){
+      var want=st==='reseau'?'reseau':'decouverte';
+      if(cp.parcours!==want&&st!=='abandon')acts+='<button class="ob bgold bsm" onclick="campSync(OC.find(function(x){return x.id===\''+c.id+'\';}),\''+want+'\',\'inscription manuelle\')">📧 Inscrire — '+(CAMP_LBL[want].split(' (')[0])+'</button>';
+      if(cp.parcours&&cp.parcours!=='stop'){acts+=cp.pause?'<button class="ob bgh bsm" onclick="campSync(OC.find(function(x){return x.id===\''+c.id+'\';}),\'reprise\',\'\')">▶️ Reprendre</button>':'<button class="ob bgh bsm" onclick="campSync(OC.find(function(x){return x.id===\''+c.id+'\';}),\'pause\',\'\')">⏸ Pause</button>';
+        acts+='<button class="ob bgh bsm" onclick="if(confirm(\'Arrêter toutes les campagnes e-mail pour ce contact ?\'))campSync(OC.find(function(x){return x.id===\''+c.id+'\';}),\'stop\',\'arrêt manuel\')">⏹ Arrêter</button>';}
+    }
+  }
+  return'<div class="od-section'+(cp.parcours&&cp.parcours!=='stop'?' clps':'')+'"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">📧 Campagne e-mail'+(cp.parcours&&cp.parcours!=='stop'?' <span class="obdg bgr">'+(cp.pause?'⏸ pause':'● active')+'</span>':'')+'</div><div class="od-bd">'
+    +'<div class="acc-row"><span class="em">📧</span><div class="b">'+camp+'<small>'+state+'</small>'+last+(ok?'':'<small style="color:#C0392B">⚠️ Script serveur v3.15 requis pour piloter Systeme.io.</small>')+'</div><div class="acts">'+acts+'</div></div>'
+    +'</div></div>';
+}
+function campBdg(c){var cp=c.campagne||{};if(!cp.parcours||cp.parcours==='stop')return'';return'<span class="obdg '+(cp.pause?'bor':'baq')+'" title="Campagne e-mail : '+esc(CAMP_LBL[cp.parcours]||cp.parcours)+'">📧'+(cp.pause?' ⏸':'')+'</span>';}
+// Administration : état de la liaison Systeme.io
+function oSioStatus(){
+  var box=document.getElementById('adm-sio');if(!box)return;box.innerHTML='<span style="color:var(--t3)">Vérification…</span>';
+  oPostAsync_({op:'sioStatus'}).then(function(d){
+    if(!d.ok){box.innerHTML='<span style="color:#C0392B">'+(d.error==='op'?'Script serveur v3.15 requis.':'Erreur : '+esc(d.error||'?'))+'</span>';return;}
+    if(!d.configured){box.innerHTML='<span style="color:#C0392B">⚠️ Clé API Systeme.io absente.</span> Apps Script → ⚙️ Paramètres du projet → Propriétés du script → <code>SIO_API_KEY</code> (Systeme.io → Paramètres → Clés API publiques) et <code>SIO_HOOK_SECRET</code> (mot de passe libre).';return;}
+    box.innerHTML=(d.api?'✅ API Systeme.io joignable · tags existants : '+esc((d.tags||[]).join(', ')||'aucun'):'<span style="color:#C0392B">❌ API injoignable : '+esc(d.error||'')+'</span>')
+      +'<div style="margin-top:6px">Webhook à déclarer dans Systeme.io (Paramètres → Webhooks, événements : contact désabonné, lien cliqué, campagne terminée, tag ajouté/retiré) :<br><code style="word-break:break-all">'+esc(d.hookUrl||'')+'</code></div>'
+      +'<div style="margin-top:6px;color:var(--t2)">Règles d\'automatisation à créer : tag <b>oly_decouverte</b> ajouté → inscrire à la campagne Découverte · retiré → désinscrire · tag <b>oly_reseau</b> ajouté → inscrire à la campagne Membre · tag <b>oly_stop</b> ajouté → désinscrire des deux.</div>';
+  }).catch(function(){box.innerHTML='Hors ligne';});
+}
+
 // ── Fiche : bloc Accompagnement ───────────────────────────────────
 function accHtml(c){
   var isRef=(ROLE()==='referent');
@@ -7337,7 +7426,7 @@ function oLeadsRender(){
           +'<span>📦 <b>'+esc([l.adresse,l.cp,l.ville,l.pays].filter(Boolean).join(', ')||'—')+'</b></span>')
         +(l.factAdresse?'<span>🧾 <b>'+esc([l.factAdresse,l.factCp,l.factVille,l.factPays].filter(Boolean).join(', '))+'</b></span>':'')
         +(l.message?'<span style="grid-column:1/-1">💬 '+esc(l.message)+'</span>':'')
-        +'<span>'+(l.consent?'✅ consentement donné':'<span style="color:var(--rd)">⚠️ sans consentement</span>')+'</span>'
+        +'<span>'+(l.consent?'✅ consentement donné':'<span style="color:var(--rd)">⚠️ sans consentement</span>')+(l.consentEmail?' · 📧 accepte nos e-mails':'')+'</span>'
       +'</div>'
       +'<div class="ld-acts">'
         +(l.statut!=='traite'?(canAssign?'<select id="ld-suivi-'+l.id+'"><option value="">Suivi par… (facultatif)</option>'+(CFG.suiveurs||[]).map(function(x){return'<option>'+esc(x)+'</option>';}).join('')+'</select>':'')
@@ -7392,6 +7481,7 @@ function oLeadCreate(id){
     ?{nom:(l.nom||'?').toUpperCase(),prenom:l.prenom||'',tel:normPhone(l.tel),email:l.email||'',refere:tag,ctags:tag?[tag]:[],canal:'Lien découverte',qualification:'Tiède',etape:'Prospect',statut:ET2ST.Prospect,statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),interets:l.interets||[],notes:'Demande de découverte reçue via le lien de '+(l.userNom||'')+' le '+fD((l.ts||'').slice(0,10))+((l.interets||[]).length?' · intérêts : '+l.interets.join(', '):'')+(l.message?'\nMessage : '+l.message:'')}
     :{nom:(l.nom||'').toUpperCase(),prenom:l.prenom||'',tel:normPhone(l.tel),email:l.email||'',pays:l.pays||'France',adresse:l.adresse||'',cp:l.cp||'',ville:l.ville||'',factAdresse:l.factAdresse||'',factCp:l.factCp||'',factVille:l.factVille||'',factPays:l.factPays||'',refere:tag,ctags:tag?[tag]:[],canal:'QR code',qualification:'Chaud',etape:'Achat en cours',statut:'close',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:'Demande d\'inscription reçue via le QR code de '+(l.userNom||'')+' le '+fD((l.ts||'').slice(0,10))+(l.pieceType?' · '+l.pieceType:'')+(l.message?'\nMessage : '+l.message:'')};
   if(suivi)item.suiviPar=suivi;
+  if(l.consentEmail&&l.email){item.emailConsent=true;item.emailConsentLe=l.ts||new Date().toISOString();item.emailConsentSrc=isDec?'formulaire découverte (lien de '+(l.userNom||'')+')':'formulaire d\'inscription (QR de '+(l.userNom||'')+')';}
   var ex=impFindExisting(item),c;
   if(ex){
     c=ex;var adds=[];
@@ -7403,7 +7493,9 @@ function oLeadCreate(id){
     jrnAdd(c,'note',isDec?'🌱 Fiche créée depuis une demande de découverte ('+(l.userNom||'')+')':'📥 Fiche créée depuis une demande d\'inscription QR ('+(l.userNom||'')+')');
     OC.unshift(c);
   }
+  if(item.emailConsent&&!c.emailConsentLe){c.emailConsent=true;c.emailConsentLe=item.emailConsentLe;c.emailConsentSrc=item.emailConsentSrc;jrnAdd(c,'systeme','📧 Consentement e-mail reçu via le '+item.emailConsentSrc);}
   oPush([c]);
+  if(isDec&&c.email&&c.emailConsent&&!(c.campagne&&c.campagne.parcours))setTimeout(function(){campSync(c,'decouverte','demande de découverte intégrée');},500);
   oPostAsync_({op:'leadDone',id:id,action:'traite',ficheId:c.id,suiviPar:suivisDe(c).join(', ')}).then(function(){l.statut='traite';l.traitePar=PARTNER_NOM();l.traiteLe=new Date().toISOString();l.suiviPar=suivisDe(c).join(', ');LEADS_NEW=LEADS.filter(function(x){return x.statut!=='traite';}).length;navBadges();oLeadsRender();}).catch(function(){});
   emojiBurst(isDec?['🌱','✨']:['📥','✨']);oT(isDec?(ex?'🔗 Fiche complétée — envoyez-lui les infos découverte depuis la fiche':'➕ Fiche Prospect créée — envoyez-lui les infos découverte depuis la fiche'):(ex?'🔗 Fiche complétée — pensez à récupérer le mot de passe avant de créer le compte OlyLife':'➕ Fiche créée — pensez à récupérer le mot de passe avant de créer le compte OlyLife'),'s');
   oRefresh();oOpenF(c.id);

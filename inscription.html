@@ -106,6 +106,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--g);box-s
     <label style="margin-top:14px">Message (facultatif)</label><textarea id="message" rows="2" placeholder="Une précision, une question…"></textarea>
 
     <label class="chk"><input type="checkbox" id="consent"><span>J'accepte que ces informations soient transmises à mon référent Water Life High Tech et utilisées uniquement pour mon inscription OlyLife et le suivi de ma commande. Je peux en demander la suppression à tout moment. <b>*</b></span></label>
+    <label class="chk"><input type="checkbox" id="consentEmail"><span>📧 J'accepte de recevoir par e-mail les informations de la Team Water Life High Tech : formation, rendez-vous Zoom, lettre d'information (désinscription en un clic à tout moment).</span></label>
 
     <div class="pay">💳 <b>Paiement :</b> la commande se règle en dollars US auprès d'OlyLife (plateforme à l'étranger). Si votre banque bloque le paiement par sécurité, signalez-le simplement à votre référent : une autre méthode via l'association Water Life High Tech (compte français, carte ou virement) vous sera proposée.</div>
 
@@ -171,7 +172,7 @@ document.getElementById('f').addEventListener('submit',function(e){
   else if(!document.getElementById('consent').checked)msg='Merci de cocher la case de consentement.';
   if(msg){err.textContent=msg;err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'center'});return;}
   var btn=document.getElementById('go');btn.disabled=true;btn.textContent='Envoi en cours…';
-  var o={op:'lead',website:v('website'),nom:v('nom'),prenom:v('prenom'),pieceType:v('pieceType'),pieceId:v('pieceId').toUpperCase(),tel:v('tel'),email:v('email'),adresse:v('adresse'),cp:v('cp'),ville:v('ville'),pays:v('pays'),mdp:v('mdp'),message:v('message'),consent:true,lang:'fr'};
+  var o={op:'lead',website:v('website'),nom:v('nom'),prenom:v('prenom'),pieceType:v('pieceType'),pieceId:v('pieceId').toUpperCase(),tel:v('tel'),email:v('email'),adresse:v('adresse'),cp:v('cp'),ville:v('ville'),pays:v('pays'),mdp:v('mdp'),message:v('message'),consent:true,consentEmail:document.getElementById('consentEmail').checked,lang:'fr'};
   if(document.getElementById('factDiff').checked){o.factAdresse=v('factAdresse');o.factCp=v('factCp');o.factVille=v('factVille');o.factPays=v('factPays');}
   post(o).then(function(d){
     if(!d.ok){btn.disabled=false;btn.textContent='Envoyer mes informations';err.textContent=d.error==='trop'?'Trop de demandes pour l\'instant — réessayez dans une heure.':d.error==='lien'?'Ce lien n\'est plus valide.':'Envoi impossible pour le moment ('+(d.error||'?')+'). Réessayez ou contactez votre référent.';err.style.display='block';return;}
