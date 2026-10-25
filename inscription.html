@@ -27,6 +27,9 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--g);box-s
 .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .chk{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;margin-top:12px}
 .chk input{width:22px;height:22px;min-height:0;margin:1px 0 0;flex-shrink:0}
+.via{display:none;margin-top:14px;padding:12px;border:1.5px dashed #2E8B57;border-radius:12px;background:#F3FAF5}
+.via.on{display:block}.via h3{margin:0 0 4px;font-size:14px;color:#126A3C}.via p{margin:0 0 8px;font-size:12px;color:#5B6770;line-height:1.45}
+.chk.hl{padding:10px 12px;border-radius:12px;background:#FFF8E6;border:1.5px solid #E8C25A}
 .btn{width:100%;border:none;border-radius:14px;background:linear-gradient(120deg,#C9A84C,#B38F35);color:#1E2B10;font:inherit;font-weight:700;font-size:16px;padding:16px;cursor:pointer;margin-top:6px;min-height:54px}
 .btn:disabled{opacity:.6}
 .btn.wa{background:#25D366;color:#fff}
@@ -103,10 +106,19 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--g);box-s
       <div><label>Confirmation <b>*</b></label><input id="mdp2" type="text" autocomplete="off" autocapitalize="none" required></div>
     </div>
 
+    <div class="via" id="via">
+      <h3>🤝 Par qui avez-vous entendu parler de nous ?</h3>
+      <p>Pour vous mettre en relation avec la bonne personne de l'équipe. Son prénom et son téléphone suffisent ; le nom aide, sans être obligatoire.</p>
+      <div class="row">
+        <div><label>Son prénom <b>*</b></label><input id="viaPrenom" placeholder="Prénom" autocomplete="off"></div>
+        <div><label>Son nom <span style="font-weight:500;color:#5B6770">(recommandé)</span></label><input id="viaNom" placeholder="NOM" autocomplete="off"></div>
+      </div>
+      <label>Son téléphone / WhatsApp <b>*</b></label><input id="viaTel" type="tel" placeholder="+33 6 …" autocomplete="off">
+    </div>
     <label style="margin-top:14px">Message (facultatif)</label><textarea id="message" rows="2" placeholder="Une précision, une question…"></textarea>
 
     <label class="chk"><input type="checkbox" id="consent"><span>J'accepte que ces informations soient transmises à mon référent Water Life High Tech et utilisées uniquement pour mon inscription OlyLife et le suivi de ma commande. Je peux en demander la suppression à tout moment. <b>*</b></span></label>
-    <label class="chk"><input type="checkbox" id="consentEmail"><span>📧 J'accepte de recevoir par e-mail les informations de la Team Water Life High Tech : formation, rendez-vous Zoom, lettre d'information (désinscription en un clic à tout moment).</span></label>
+    <label class="chk hl"><input type="checkbox" id="consentEmail"><span>📧 <b>Oui, je souhaite recevoir les e-mails de la Team Water Life High Tech</b> : formation, rendez-vous Zoom, lettre d'information. Désinscription en un clic, à tout moment. <i>(Sans cette case, aucun e-mail ne vous sera envoyé.)</i></span></label>
 
     <div class="pay">💳 <b>Paiement :</b> la commande se règle en dollars US auprès d'OlyLife (plateforme à l'étranger). Si votre banque bloque le paiement par sécurité, signalez-le simplement à votre référent : une autre méthode via l'association Water Life High Tech (compte français, carte ou virement) vous sera proposée.</div>
 
@@ -158,7 +170,7 @@ var R=(new URLSearchParams(location.search).get('r')||'').trim(),REF=null;
 function post(o){o.r=R;return fetch(GAS,{method:'POST',body:JSON.stringify(o)}).then(function(r){return r.text();}).then(function(t){try{return JSON.parse(t);}catch(e){return{ok:false,error:'reponse'};}});}
 function showBad(){document.getElementById('f').style.display='none';document.getElementById('bad').style.display='block';document.getElementById('by').textContent='Lien invalide';}
 if(!R){showBad();}
-else post({op:'leadInfo'}).then(function(d){if(!d.ok){showBad();return;}REF=d;document.getElementById('by').textContent='Transmis par '+d.nom+(d.role==='admin'?' — Water Life High Tech':'');if(d.support&&d.support.tel){WA_SUPPORT=d.support;document.getElementById('wa-nom').textContent=d.support.nom||'Jean-Charles';}}).catch(function(){document.getElementById('by').textContent='Water Life High Tech';});
+else post({op:'leadInfo'}).then(function(d){if(!d.ok){showBad();return;}REF=d;document.getElementById('by').textContent='Transmis par '+d.nom+(d.role==='admin'?' — Water Life High Tech':'');if(d.support&&d.support.tel){WA_SUPPORT=d.support;document.getElementById('wa-nom').textContent=d.support.nom||'Jean-Charles';}if(d.role==='admin')document.getElementById('via').classList.add('on');}).catch(function(){document.getElementById('by').textContent='Water Life High Tech';});
 function v(id){return (document.getElementById(id).value||'').trim();}
 document.getElementById('f').addEventListener('submit',function(e){
   e.preventDefault();var err=document.getElementById('err');err.style.display='none';
@@ -170,9 +182,10 @@ document.getElementById('f').addEventListener('submit',function(e){
   else if(v('mdp').length<8||!/[A-Za-z]/.test(v('mdp'))||!/\d/.test(v('mdp')))msg='Le mot de passe doit faire au moins 8 caractères avec des lettres et des chiffres.';
   else if(v('mdp')!==v('mdp2'))msg='Les deux mots de passe ne sont pas identiques.';
   else if(!document.getElementById('consent').checked)msg='Merci de cocher la case de consentement.';
+  else if(document.getElementById('via').classList.contains('on')&&(!v('viaPrenom')||!v('viaTel')))msg='Merci d\'indiquer le prénom et le téléphone de la personne qui vous a parlé de nous.';
   if(msg){err.textContent=msg;err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'center'});return;}
   var btn=document.getElementById('go');btn.disabled=true;btn.textContent='Envoi en cours…';
-  var o={op:'lead',website:v('website'),nom:v('nom'),prenom:v('prenom'),pieceType:v('pieceType'),pieceId:v('pieceId').toUpperCase(),tel:v('tel'),email:v('email'),adresse:v('adresse'),cp:v('cp'),ville:v('ville'),pays:v('pays'),mdp:v('mdp'),message:v('message'),consent:true,consentEmail:document.getElementById('consentEmail').checked,lang:'fr'};
+  var o={op:'lead',website:v('website'),nom:v('nom'),prenom:v('prenom'),pieceType:v('pieceType'),pieceId:v('pieceId').toUpperCase(),tel:v('tel'),email:v('email'),adresse:v('adresse'),cp:v('cp'),ville:v('ville'),pays:v('pays'),mdp:v('mdp'),message:v('message'),consent:true,consentEmail:document.getElementById('consentEmail').checked,lang:'fr',viaPrenom:v('viaPrenom'),viaNom:v('viaNom'),viaTel:v('viaTel')};
   if(document.getElementById('factDiff').checked){o.factAdresse=v('factAdresse');o.factCp=v('factCp');o.factVille=v('factVille');o.factPays=v('factPays');}
   post(o).then(function(d){
     if(!d.ok){btn.disabled=false;btn.textContent='Envoyer mes informations';err.textContent=d.error==='trop'?'Trop de demandes pour l\'instant — réessayez dans une heure.':d.error==='lien'?'Ce lien n\'est plus valide.':'Envoi impossible pour le moment ('+(d.error||'?')+'). Réessayez ou contactez votre référent.';err.style.display='block';return;}

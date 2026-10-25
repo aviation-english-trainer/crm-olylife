@@ -2339,7 +2339,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.25.2 · 25/10';
+var APP_VERSION='v3.26 · 25/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 
@@ -2487,7 +2487,7 @@ function oPost_(payload,silent){
     .then(function(r){return r.text();})
     .then(function(txt){
       var d={};try{d=JSON.parse(txt);}catch(e){}
-      if(d.ok){oSyncDot('ok');}
+      if(d.ok){oSyncDot('ok');if(d.camp)campApplySrv(d.camp);}
       else{
         oSyncDot('err');
         if(d.error==='auth'||d.error==='session'){oSessionLost();}
@@ -4458,7 +4458,6 @@ function oSave(){
   if(saved&&data.emailConsent&&!(prevC&&prevC.emailConsent))jrnAdd(saved,'systeme','📧 Consentement e-mail noté ('+data.emailConsentSrc+')');
   if(saved&&!data.emailConsent&&prevC&&prevC.emailConsent){jrnAdd(saved,'systeme','📧 Consentement e-mail retiré');if(saved.campagne&&saved.campagne.parcours&&saved.campagne.parcours!=='stop')campSync(saved,'stop','consentement retiré');}
   if(saved)oPush([saved]);
-  if(saved&&data.emailConsent&&!(prevC&&prevC.emailConsent)&&saved.email&&!(saved.campagne&&saved.campagne.parcours))setTimeout(function(){campPropose(saved);},400);
   if(saved&&saved.essaiOk&&(saved.adresse||saved.ville)&&(!saved.geo||saved.geo.q!==geoQ(saved)))geocodeOne(saved,function(ok){if(ok)oPush([saved]);});
   oReset();oSw('contacts',1);
 }
@@ -6310,7 +6309,7 @@ function oDecFiche(create,ints,note){
   if(dcc&&dcc.checked){
     if(!saved.email){oT('📧 Pas d\'e-mail : la personne n\'est pas inscrite à la campagne','w');}
     else{if(!saved.emailConsent){saved.emailConsent=true;saved.emailConsentLe=new Date().toISOString();saved.emailConsentSrc='accord donné à '+(PARTNER_NOM()||'—')+' (découverte)';jrnAdd(saved,'systeme','📧 Consentement e-mail noté ('+saved.emailConsentSrc+')');}
-      setTimeout(function(){campSync(saved,'decouverte','infos découverte envoyées');},300);}
+      }   // v3.26 — l'inscription à « Découverte » est faite par le serveur à l'enregistrement
   }
   oPush([saved]);return saved;
 }
@@ -7071,6 +7070,17 @@ function campSync(c,parcours,raison){
     if(document.getElementById('omo').classList.contains('on'))oOpenF(c.id);oRefresh();return d;
   }).catch(function(){oT('Hors ligne — campagne non synchronisée','e');return{ok:false};});
 }
+// v3.26 — le serveur inscrit lui-même (À contacter / En cours / Prêt + e-mail + consentement) et renvoie le résultat : on l'applique à la copie locale
+function campApplySrv(list){
+  var touched=[];(list||[]).forEach(function(u){var c=OC.find(function(x){return x.id===u.id;});if(!c)return;
+    if(u.campagne)c.campagne=u.campagne;if(u.sioId)c.sioId=u.sioId;if(u.sioEmail)c.sioEmail=u.sioEmail;
+    c.journal=c.journal||[];(u.journal||[]).forEach(function(j){if(!c.journal.some(function(x){return x.id===j.id;}))c.journal.push(j);});
+    touched.push(c);});
+  if(!touched.length)return;oSaveCache();
+  touched.forEach(function(c){var p=(c.campagne||{}).parcours;if(p&&p!=='stop')oT('📧 '+(c.prenom||'')+' '+(c.nom||'')+' : campagne « '+(CAMP_LBL[p]||p).split(' (')[0]+' » (automatique)','s');});
+  var mo=document.getElementById('omo');if(mo&&mo.classList.contains('on')&&typeof ACTIVE_ID!=='undefined'&&touched.some(function(c){return c.id===ACTIVE_ID;}))oOpenF(ACTIVE_ID);
+  oRefresh();
+}
 function campPropose(c){
   var st=cStatut(c),p=st==='reseau'?'reseau':(st==='abandon'?'':'decouverte');if(!p)return;
   if(confirm('📧 Inscrire '+(c.prenom||'')+' '+(c.nom||'')+' à la campagne e-mail « '+CAMP_LBL[p]+' » maintenant ?'))campSync(c,p,'inscription manuelle');
@@ -7080,8 +7090,7 @@ function oCampConsent(cid){
   var src=prompt('Comment l\'accord de '+(c.prenom||'')+' '+(c.nom||'')+' pour recevoir nos e-mails a-t-il été reçu ?','oral, lors de notre échange du '+fD(todayYMD()));
   if(src==null)return;
   c.emailConsent=true;c.emailConsentLe=new Date().toISOString();c.emailConsentSrc=(src.trim()||'accord reçu')+' — noté par '+(PARTNER_NOM()||'—');delete c.emailConsentRetire;
-  jrnAdd(c,'systeme','📧 Consentement e-mail noté ('+c.emailConsentSrc+')');oPush([c]);oOpenF(cid);
-  if(c.email&&!(c.campagne&&c.campagne.parcours))setTimeout(function(){campPropose(c);},300);
+  jrnAdd(c,'systeme','📧 Consentement e-mail noté ('+c.emailConsentSrc+')');oPush([c]);oOpenF(cid);   // v3.26 — inscription automatique côté serveur
 }
 function campHtml(c){
   var r=ROLE();if(r==='referent')return'';
@@ -7090,7 +7099,7 @@ function campHtml(c){
   if(!c.email)state='<span style="color:var(--t3)">Pas d\'e-mail sur la fiche — ajoutez-le (Modifier) pour pouvoir l\'inscrire.</span>';
   else if(!c.emailConsent)state=(c.emailConsentRetire?'<span style="color:#C0392B">⛔ Consentement retiré le '+fD(String(c.emailConsentRetire).slice(0,10))+' (désinscription)</span>':'<span style="color:#C0392B">⚠️ Consentement e-mail non noté</span>')+' — aucun envoi tant qu\'il n\'est pas enregistré.';
   else state='✅ Consentement noté le '+fD(String(c.emailConsentLe||'').slice(0,10))+(c.emailConsentSrc?' <span style="color:var(--t3)">('+esc(c.emailConsentSrc)+')</span>':'');
-  var camp=cp.parcours&&cp.parcours!=='stop'?'<b>'+(CAMP_LBL[cp.parcours]||cp.parcours)+'</b>'+(cp.pause?' · <span style="color:#C0392B">en pause depuis le '+fD(String(cp.pause).slice(0,10))+'</span>':'')+(cp.depuis?' · depuis le '+fD(String(cp.depuis).slice(0,10)):'')
+  var camp=cp.parcours&&cp.parcours!=='stop'?'<b>'+(CAMP_LBL[cp.parcours]||cp.parcours)+'</b>'+(cp.pause?' · <span style="color:#C0392B">en pause depuis le '+fD(String(cp.pause).slice(0,10))+'</span>':'')+(cp.depuis?' · depuis le '+fD(String(cp.depuis).slice(0,10)):'')+(cp.encours?' · <span class="obdg bbl" title="Tag oly_encours : reçoit l\'invitation hebdomadaire au Zoom du comité">📺 Zoom hebdo</span>':'')
     :(cp.parcours==='stop'?'<span style="color:var(--t3)">Campagnes arrêtées'+(cp.depuis?' le '+fD(String(cp.depuis).slice(0,10)):'')+'</span>':'<span style="color:var(--t3)">Pas encore inscrit à une campagne</span>');
   var last=cp.lastEvent?'<div style="font-size:11px;color:var(--t3)">Dernier événement Systeme.io : '+esc(String(cp.lastEvent.type).replace(/[._]/g,' '))+(cp.lastEvent.tag?' — '+esc(cp.lastEvent.tag):'')+' · '+fDT(cp.lastEvent.ts)+'</div>':'';
   var acts='';
@@ -7109,6 +7118,17 @@ function campHtml(c){
 }
 function campBdg(c){var cp=c.campagne||{};if(!cp.parcours||cp.parcours==='stop')return'';return'<span class="obdg '+(cp.pause?'bor':'baq')+'" title="Campagne e-mail : '+esc(CAMP_LBL[cp.parcours]||cp.parcours)+'">📧'+(cp.pause?' ⏸':'')+'</span>';}
 // Administration : état de la liaison Systeme.io
+function oSioBulk(btn){
+  var elig=OC.filter(function(c){var st=cStatut(c);return c.email&&c.emailConsent&&st!=='reseau'&&st!=='abandon'&&!(c.campagne&&c.campagne.parcours);});
+  if(!elig.length){oT('Aucun contact consentant non inscrit','i');return;}
+  if(!confirm('Inscrire maintenant '+elig.length+' contact(s) à la campagne « Découverte » ?\n(e-mail + consentement notés · statut À contacter, En cours ou Prêt)\n\nLes contacts sans consentement ne sont jamais inscrits.'))return;
+  btn.disabled=true;var info=document.getElementById('adm-sio-bulk');info.textContent='Inscription en cours…';
+  oPostAsync_({op:'sioBulk'}).then(function(d){btn.disabled=false;
+    if(!d.ok){info.textContent='';oT('Rattrapage impossible : '+(d.error==='op'?'script serveur v3.16 requis':d.error||'?'),'e');return;}
+    info.textContent=d.inscrits+' inscrit(s)'+(d.reste?' · '+d.reste+' restant(s) — cliquez à nouveau':'');oT('📧 '+d.inscrits+' contact(s) inscrit(s)','s');
+    setTimeout(function(){location.reload();},1800);
+  }).catch(function(){btn.disabled=false;info.textContent='';oT('Hors ligne','e');});
+}
 function oSioStatus(){
   var box=document.getElementById('adm-sio');if(!box)return;box.innerHTML='<span style="color:var(--t3)">Vérification…</span>';
   oPostAsync_({op:'sioStatus'}).then(function(d){
@@ -7116,7 +7136,9 @@ function oSioStatus(){
     if(!d.configured){box.innerHTML='<span style="color:#C0392B">⚠️ Clé API Systeme.io absente.</span> Apps Script → ⚙️ Paramètres du projet → Propriétés du script → <code>SIO_API_KEY</code> (Systeme.io → Paramètres → Clés API publiques) et <code>SIO_HOOK_SECRET</code> (mot de passe libre).';return;}
     box.innerHTML=(d.api?'✅ API Systeme.io joignable · tags existants : '+esc((d.tags||[]).join(', ')||'aucun'):'<span style="color:#C0392B">❌ API injoignable : '+esc(d.error||'')+'</span>')
       +'<div style="margin-top:6px">Webhook à déclarer dans Systeme.io (Paramètres → Webhooks, événement : <b>Tag ajouté à un contact</b> uniquement) :<br><code style="word-break:break-all">'+esc(d.hookUrl||'')+'</code></div>'
-      +'<div style="margin-top:6px;color:var(--t2)">Règles d\'automatisation à créer : tag <b>oly_decouverte</b> ajouté → inscrire à la campagne Découverte · retiré → désinscrire · tag <b>oly_reseau</b> ajouté → inscrire à la campagne Membre · tag <b>oly_stop</b> ajouté → désinscrire des deux · <i>retour vers le CRM :</i> désabonnement des e-mails → ajouter le tag <b>oly_desinscrit</b> · campagne Découverte terminée → ajouter <b>oly_fin_decouverte</b> · campagne Membre terminée → ajouter <b>oly_fin_reseau</b>.</div>';
+      +'<div style="margin-top:6px;color:var(--t2)">Règles d\'automatisation à créer : tag <b>oly_decouverte</b> ajouté → inscrire à la campagne Découverte · retiré → désinscrire · tag <b>oly_reseau</b> ajouté → inscrire à la campagne Membre · tag <b>oly_stop</b> ajouté → désinscrire des deux · <i>retour vers le CRM :</i> désabonnement des e-mails → ajouter le tag <b>oly_desinscrit</b> · campagne Découverte terminée → ajouter <b>oly_fin_decouverte</b> · campagne Membre terminée → ajouter <b>oly_fin_reseau</b>.</div>'
+      +'<div style="margin-top:6px;color:var(--t2)">📺 <b>Newsletter hebdomadaire Zoom</b> : pas de règle — au moment d\'envoyer, filtrez les destinataires sur le tag <b>oly_encours</b> (contacts « En cours » : RDV pris ou échange engagé). Le CRM pose et retire ce tag tout seul.</div>'
+      +'<div style="margin-top:8px">Depuis la v3.26, tout contact <b>À contacter / En cours / Prêt</b> ayant un e-mail et un consentement noté est inscrit à « Découverte » automatiquement à l\'enregistrement. Pour les fiches déjà en base : <button class="ob bgold bsm" onclick="oSioBulk(this)">📧 Inscrire les contacts consentants non inscrits</button> <span id="adm-sio-bulk" style="color:var(--t3)"></span></div>';
   }).catch(function(){box.innerHTML='Hors ligne';});
 }
 
@@ -7428,6 +7450,7 @@ function oLeadsRender(){
           +'<span>📦 <b>'+esc([l.adresse,l.cp,l.ville,l.pays].filter(Boolean).join(', ')||'—')+'</b></span>')
         +(l.factAdresse?'<span>🧾 <b>'+esc([l.factAdresse,l.factCp,l.factVille,l.factPays].filter(Boolean).join(', '))+'</b></span>':'')
         +(l.message?'<span style="grid-column:1/-1">💬 '+esc(l.message)+'</span>':'')
+        +leadViaHtml(l)
         +'<span>'+(l.consent?'✅ consentement donné':'<span style="color:var(--rd)">⚠️ sans consentement</span>')+(l.consentEmail?' · 📧 accepte nos e-mails':'')+'</span>'
       +'</div>'
       +'<div class="ld-acts">'
@@ -7440,6 +7463,16 @@ function oLeadsRender(){
         +(isAdm?'<button class="ob bsm" style="min-height:40px;background:var(--rdp);color:var(--rd);border:none;margin-left:auto" onclick="oLeadDel(\''+l.id+'\')">🗑</button>':'')
       +'</div></div>';
   }).join('');
+}
+// v3.26 — « Par qui en avez-vous entendu parler ? » (formulaire ouvert avec le lien de l'admin)
+function leadViaHtml(l){
+  var v=l.via;if(!v)return'';
+  var who=esc([v.prenom,v.nom].filter(Boolean).join(' '))+(v.tel?' · '+esc(v.tel):'');
+  var roles={admin:'administrateur',gestionnaire:'gestionnaire',referent:'référent',client:'client du réseau',contact:'contact du CRM'};
+  var st=v.match?'<span class="obdg bgr">✅ reconnu : '+esc(v.matchNom)+' ('+(roles[v.matchRole]||v.matchRole)+(v.matchTag?' · équipe '+esc(v.matchTag):'')+')</span>'+(v.prenomOk?'':' <span class="obdg brd" title="Le prénom donné ne correspond pas à la fiche trouvée pour ce numéro">⚠️ prénom différent</span>')
+    :'<span class="obdg bor" title="Aucun référent, gestionnaire ou contact du CRM n\'a ce numéro">❔ non reconnu — rattachez la fiche à la main</span>';
+  var lien=l.lienDe&&l.lienDe!==l.userNom?' <small style="color:var(--t3)">(lien de '+esc(l.lienDe)+', demande transmise à '+esc(l.userNom||'')+')</small>':'';
+  return'<span style="grid-column:1/-1">🤝 De la part de : <b>'+who+'</b> '+st+lien+(v.matchContactId?' <button class="ob bgh bsm" style="min-height:28px;padding:2px 8px" onclick="oOpenF(\''+esc(v.matchContactId)+'\')">👁 sa fiche</button>':'')+'</span>';
 }
 // v3.21 — vérification : la fiche est-elle bien rattachée à la personne qui a transmis le lien ?
 function leadAttribOk(l,ex){
@@ -7483,6 +7516,7 @@ function oLeadCreate(id){
     ?{nom:(l.nom||'?').toUpperCase(),prenom:l.prenom||'',tel:normPhone(l.tel),email:l.email||'',refere:tag,ctags:tag?[tag]:[],canal:'Lien découverte',qualification:'Tiède',etape:'Prospect',statut:ET2ST.Prospect,statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),interets:l.interets||[],notes:'Demande de découverte reçue via le lien de '+(l.userNom||'')+' le '+fD((l.ts||'').slice(0,10))+((l.interets||[]).length?' · intérêts : '+l.interets.join(', '):'')+(l.message?'\nMessage : '+l.message:'')}
     :{nom:(l.nom||'').toUpperCase(),prenom:l.prenom||'',tel:normPhone(l.tel),email:l.email||'',pays:l.pays||'France',adresse:l.adresse||'',cp:l.cp||'',ville:l.ville||'',factAdresse:l.factAdresse||'',factCp:l.factCp||'',factVille:l.factVille||'',factPays:l.factPays||'',refere:tag,ctags:tag?[tag]:[],canal:'QR code',qualification:'Chaud',etape:'Achat en cours',statut:'close',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:'Demande d\'inscription reçue via le QR code de '+(l.userNom||'')+' le '+fD((l.ts||'').slice(0,10))+(l.pieceType?' · '+l.pieceType:'')+(l.message?'\nMessage : '+l.message:'')};
   if(suivi)item.suiviPar=suivi;
+  if(l.via){var vv=l.via,vwho=[vv.prenom,vv.nom].filter(Boolean).join(' ')+(vv.tel?' ('+vv.tel+')':'');item.notes+='\nDe la part de : '+vwho+(vv.match?' — reconnu : '+vv.matchNom:' — non reconnu dans le CRM');item.recommandePar=vv.match?vv.matchNom:vwho;if(!suivi&&vv.matchSuivi)item.suiviPar=vv.matchSuivi;}
   if(l.consentEmail&&l.email){item.emailConsent=true;item.emailConsentLe=l.ts||new Date().toISOString();item.emailConsentSrc=isDec?'formulaire découverte (lien de '+(l.userNom||'')+')':'formulaire d\'inscription (QR de '+(l.userNom||'')+')';}
   var ex=impFindExisting(item),c;
   if(ex){
@@ -7496,8 +7530,8 @@ function oLeadCreate(id){
     OC.unshift(c);
   }
   if(item.emailConsent&&!c.emailConsentLe){c.emailConsent=true;c.emailConsentLe=item.emailConsentLe;c.emailConsentSrc=item.emailConsentSrc;jrnAdd(c,'systeme','📧 Consentement e-mail reçu via le '+item.emailConsentSrc);}
-  oPush([c]);
-  if(isDec&&c.email&&c.emailConsent&&!(c.campagne&&c.campagne.parcours))setTimeout(function(){campSync(c,'decouverte','demande de découverte intégrée');},500);
+  if(l.via)jrnAdd(c,'note','🤝 Venu(e) de la part de '+[l.via.prenom,l.via.nom].filter(Boolean).join(' ')+(l.via.match?' (reconnu : '+l.via.matchNom+')':' (non reconnu dans le CRM)'));
+  oPush([c]);   // v3.26 — inscription « Découverte » automatique côté serveur (e-mail + consentement)
   oPostAsync_({op:'leadDone',id:id,action:'traite',ficheId:c.id,suiviPar:suivisDe(c).join(', ')}).then(function(){l.statut='traite';l.traitePar=PARTNER_NOM();l.traiteLe=new Date().toISOString();l.suiviPar=suivisDe(c).join(', ');LEADS_NEW=LEADS.filter(function(x){return x.statut!=='traite';}).length;navBadges();oLeadsRender();}).catch(function(){});
   emojiBurst(isDec?['🌱','✨']:['📥','✨']);oT(isDec?(ex?'🔗 Fiche complétée — envoyez-lui les infos découverte depuis la fiche':'➕ Fiche Prospect créée — envoyez-lui les infos découverte depuis la fiche'):(ex?'🔗 Fiche complétée — pensez à récupérer le mot de passe avant de créer le compte OlyLife':'➕ Fiche créée — pensez à récupérer le mot de passe avant de créer le compte OlyLife'),'s');
   oRefresh();oOpenF(c.id);
