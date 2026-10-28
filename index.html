@@ -1178,6 +1178,11 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 
     <!-- DASHBOARD -->
     <div class="ov on" id="ov-dashboard">
+      <div id="d-calnudge" class="hide" style="margin:0 0 12px;padding:12px 14px;border-radius:14px;background:linear-gradient(135deg,#E8F5EC,#F6FAF6);border:1px solid #BFE3CC;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <span style="font-size:22px">📅</span>
+        <div style="flex:1;min-width:200px;font-size:12.5px;line-height:1.45;color:#1E2B23"><b>Votre lien Calendly personnel n'est pas encore renseigné.</b><br>Tant qu'il manque, vos messages pré-remplis proposent l'agenda de Jean-Charles. Un compte <b>gratuit</b> suffit — 3 minutes.</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="ob bgold bsm" type="button" onclick="oCalGuide()">Créer mon Calendly</button><button class="ob bgh bsm" type="button" onclick="oProfOpen()">J'ai déjà mon lien</button><button class="ob bgh bsm" type="button" onclick="oCalNudgeLater()" title="Rappel dans 7 jours">Plus tard</button></div>
+      </div>
       <div class="ocard hide" id="d-refhello" style="padding:16px;background:var(--orwbg);border:1px dashed var(--orw)">
         <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--orwtx);font-weight:700" id="d-refhello-t">Bienvenue</div>
         <div style="font-size:12px;color:var(--t2);margin-top:4px;line-height:1.6">Voici le suivi des contacts que vous avez référés à l'équipe WLHT. Merci pour votre confiance !</div>
@@ -1363,6 +1368,11 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
               <div style="display:flex;gap:8px"><input type="text" class="ofc" id="u-code" placeholder="A7K2MN" style="flex:1;font-family:monospace;letter-spacing:2px"><button class="ob bgh" onclick="oGenCode()" type="button">🎲</button></div>
             </div>
             <label class="ochk-row"><input type="checkbox" id="u-actif" checked><span>Accès actif</span></label>
+            <div style="margin-top:12px;padding:12px;background:rgba(18,106,60,.07);border-radius:10px;border:1px solid rgba(18,106,60,.18)" id="u-cal-wrap">
+              <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">📅 Prise de rendez-vous — lien Calendly personnel</div>
+              <input type="url" class="ofc" id="u-cal" placeholder="https://calendly.com/prenom-nom/rdv-olylife">
+              <div style="font-size:11.5px;color:var(--t2);margin-top:6px;line-height:1.5">Ce lien remplace celui de Jean-Charles dans <b>tous les messages pré-remplis</b> (WhatsApp, e-mail…) et dans « 📅 RDV ». <b>Sans lien, l'agenda de Jean-Charles est utilisé par défaut.</b> Le compte Calendly <b>gratuit</b> suffit. <button type="button" class="ob bgh bsm" style="min-height:30px" onclick="oCalGuide()">ℹ️ Comment créer son Calendly</button></div>
+            </div>
             <input type="hidden" id="u-photo">
             <div class="uphoto-row"><span class="ouser-av" id="u-photo-av">·</span><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="ob bgh" type="button" onclick="oUserPhoto()">📷 Photo de profil</button><button class="ob bgh" type="button" onclick="oUserPhotoRm()">🗑</button></div></div>
             <div style="margin-top:14px;padding:12px;background:rgba(var(--gold-rgb,18,106,60),.07);border-radius:10px;border:1px solid rgba(var(--gold-rgb,18,106,60),.18)">
@@ -1701,6 +1711,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
         <button class="adm-tab" data-tab="donnees" onclick="admTab('donnees')">🗄️ Données & maintenance</button>
         <button class="adm-tab" data-tab="ressources" onclick="admTab('ressources')">📚 Ressources à valider<span class="n" id="adm-n-res" style="display:none"></span></button>
         <button class="adm-tab" data-tab="journal" onclick="admTab('journal')">📜 Journal</button>
+        <button class="adm-tab hide" data-tab="droits" id="adm-tab-droits" onclick="admTab('droits')">👑 Super-admin</button>
       </div>
 
       <div class="adm-pane on" id="adm-equipe">
@@ -1841,6 +1852,18 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
         </div>
       </div>
 
+      <div class="adm-pane" id="adm-droits">
+        <div class="ocard" style="margin-bottom:14px">
+          <div class="adm-sec"><h4>👑 Administrateurs</h4><div class="hint">Vous êtes le <b>super-admin</b> (compte du script Google). Vous seul pouvez créer, modifier ou retirer un administrateur. Les admins ont tous les droits de la colonne « Admin » ci-dessous, mais ne peuvent ni créer d'admin ni toucher à cette page.</div>
+            <div id="adm-admins-list" style="margin-top:8px"></div>
+            <button class="ob bgold bsm" type="button" style="margin-top:8px" onclick="oAdminNew()">➕ Créer un administrateur</button></div>
+        </div>
+        <div class="ocard" style="margin-bottom:14px">
+          <div class="adm-sec"><h4>🔐 Droits par rôle</h4><div class="hint">Cochez ce que chaque rôle peut faire. La colonne <b>Clients / prospects</b> règle ce que le CRM fait automatiquement pour eux (formulaires publics, campagnes, e-mails d'avance). Les cases grisées sont réservées au super-admin. Les changements s'appliquent à la prochaine ouverture de l'app chez chaque membre.</div>
+            <div id="adm-droits-grid" style="overflow-x:auto;margin-top:8px"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="ob bgold" type="button" onclick="admDroitsSave()">💾 Enregistrer les droits</button><button class="ob bgh" type="button" onclick="admDroitsReset()">↺ Valeurs par défaut</button></div></div>
+        </div>
+      </div>
       <div class="adm-pane" id="adm-journal">
         <div class="ocard" style="margin-bottom:14px"><div class="adm-sec"><h4>Journal d'administration</h4><div class="hint">Qui a fait quoi : accès créés, codes régénérés, rôles, paramètres, sauvegardes, restaurations. Conservé côté serveur (500 dernières entrées).</div><div class="adm-log" id="adm-journal-box">Chargement…</div></div></div>
       </div>
@@ -2088,6 +2111,12 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <div class="ofg1" id="oprof-wa-wrap" style="margin-top:8px"><label class="ofl">WhatsApp sur cet ordinateur</label>
       <select class="ofc" id="oprof-wa" onchange="waDeskSet(this.value)"><option value="app">Application WhatsApp (recommandé) — à défaut WhatsApp Web</option><option value="web">Toujours WhatsApp Web (navigateur)</option></select>
       <div style="font-size:11px;color:var(--t3);margin-top:4px">L'application WhatsApp pour ordinateur abîme certains emojis des messages pré-remplis (bug WhatsApp) : le CRM les remplace automatiquement par des emojis compatibles (👋→✋, 📞→☎️…). Si l'application n'est pas installée, la page WhatsApp propose WhatsApp Web.</div></div>
+    <div style="margin-top:12px;padding:12px;background:rgba(18,106,60,.07);border-radius:12px;border:1px solid rgba(18,106,60,.18)">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">📅 Mon lien Calendly (prise de rendez-vous)</div>
+      <input type="url" class="ofc" id="oprof-cal" placeholder="https://calendly.com/prenom-nom/rdv-olylife">
+      <div id="oprof-cal-st" style="font-size:11.5px;line-height:1.5;margin-top:6px;color:var(--t2)"></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button type="button" class="ob bgh bsm" onclick="oCalGuide()">ℹ️ Créer mon Calendly gratuit</button><button type="button" class="ob bgh bsm" onclick="window.open('https://calendly.com/signup','_blank')">↗ calendly.com/signup</button></div>
+    </div>
     <div class="oinst-note" id="oprof-note" style="margin-top:10px"></div>
     <button class="ob bgold bfull" style="margin-top:14px;min-height:48px" onclick="oProfSave()">Enregistrer mon profil</button>
     <button class="ob bgh bfull" style="margin-top:8px" type="button" onclick="oProfClose();oShowSetup()">⚙️ Résumé quotidien · Calendly → Réglages</button>
@@ -2341,9 +2370,44 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.27 · 28/10';
+var APP_VERSION='v3.28 · 28/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
+// ── v3.28 — Super-admin & droits par rôle ──────────────────────────
+// Le super-admin est le compte « root » (code admin du script, Jean-Charles). Lui seul crée / modifie les administrateurs
+// et règle la matrice des droits (Administration → 👑 Super-admin). La matrice est stockée dans CFG.params.droits.
+function IS_SUPER(){return !!(USER&&(USER.id==='root'||USER.superAdmin));}
+var DROITS_ROLES=[['admin','Admin'],['gestionnaire','Gestionnaire'],['referent','Référent'],['comite','Comité'],['client','Clients / prospects']];
+var DROITS_DEF=[
+  {k:'administration',l:'Menu Administration (paramètres, messages, liens, données)',d:{admin:1,gestionnaire:0,referent:0,comite:0}},
+  {k:'equipe',l:'Gérer les accès de l\'équipe (gestionnaires, référents, comité)',d:{admin:1,gestionnaire:0,referent:0,comite:0}},
+  {k:'admins',l:'Créer / modifier des administrateurs',lock:'👑 super-admin uniquement',d:{admin:0,gestionnaire:0,referent:0,comite:0}},
+  {k:'statut',l:'Modifier le statut / l\'étape des fiches (pipeline, glisser-déposer)',d:{admin:1,gestionnaire:1,referent:0,comite:0}},
+  {k:'rappels',l:'Marquer les rappels comme faits',d:{admin:1,gestionnaire:1,referent:0,comite:0}},
+  {k:'journal',l:'Modifier / supprimer des observations du journal',d:{admin:1,gestionnaire:1,referent:0,comite:1}},
+  {k:'attribuer',l:'Attribuer une fiche ou une demande à un gestionnaire',d:{admin:1,gestionnaire:1,referent:0,comite:0}},
+  {k:'avances',l:'Avances & dons : enregistrer, rembourser, supprimer',d:{admin:1,gestionnaire:1,referent:0,comite:0}},
+  {k:'factures',l:'Factures, mot de passe client, suivi de commande',d:{admin:1,gestionnaire:1,referent:0,comite:0}},
+  {k:'messagesGroupe',l:'Envoi groupé de messages',d:{admin:1,gestionnaire:1,referent:0,comite:0}},
+  {k:'temoignagesPublier',l:'Publier un témoignage (après vérification)',d:{admin:1,gestionnaire:1,referent:0,comite:1}},
+  {k:'importer',l:'Imports (BO OlyLife, fichiers)',d:{admin:1,gestionnaire:0,referent:0,comite:0}},
+  {k:'stock',l:'Stock de machines (remises immédiates)',d:{admin:1,gestionnaire:0,referent:0,comite:0}},
+  {k:'identifiants',l:'Voir les pièces d\'identité en clair',d:{admin:1,gestionnaire:0,referent:0,comite:0}},
+  {k:'formInscription',l:'Formulaire d\'inscription public (QR code / lien)',d:{client:1}},
+  {k:'formDecouverte',l:'Formulaire découverte (1 minute)',d:{client:1}},
+  {k:'campagnes',l:'Inscription automatique aux campagnes e-mail (avec consentement)',d:{client:1}},
+  {k:'annonceAvances',l:'E-mail d\'annonce d\'une avance / d\'un don',d:{client:1}},
+  {k:'rappelsAvances',l:'Rappel courtois par e-mail avant l\'échéance (J-3, veille, J)',d:{client:1}}
+];
+function droitsCfg(){return(CFG&&CFG.params&&CFG.params.droits)||{};}
+function canRole(role,k){
+  var def=DROITS_DEF.find(function(x){return x.k===k;});if(!def)return false;
+  if(def.lock)return role==='super';
+  var cfg=droitsCfg()[role];
+  if(cfg&&cfg[k]!==undefined)return !!cfg[k];
+  return !!def.d[role];
+}
+function can(k){if(!USER)return false;if(IS_SUPER())return true;return canRole(ROLE(),k);}
 
 // ── CONTACTS RÉFÉRENTS THIERRY GIL (données initiales) ──────────────
 var SEED_THIERRY=[
@@ -2494,6 +2558,7 @@ function oPost_(payload,silent){
         oSyncDot('err');
         if(d.error==='auth'||d.error==='session'){oSessionLost();}
         else if(d.error==='busy'){if(!silent)oT('Serveur occupé — réessayez dans un instant','w');}
+        else if(d.error==='super_admin'){oT('👑 Réservé au super-admin : seul Jean-Charles peut créer ou modifier un administrateur','e');try{oPull();}catch(e){}}
         else if(d.error==='op'){if(!silent)oT('Le script Google n\'est pas à jour — collez la dernière version (Réglages → aide)','e');}
         else if(!silent)oT('Écriture refusée : '+(d.error||'?'),'e');
       }
@@ -2518,7 +2583,7 @@ function oShowSetup(){
   document.getElementById('os-url-txt').textContent=GAS_URL||'—';
   document.getElementById('os-ver').textContent='Version '+APP_VERSION+(isStandalone()?' · application installée':' · navigateur');
   document.getElementById('os-code').textContent=CODE||'—';
-  document.getElementById('os-admin-tools').style.display=ROLE()==='admin'?'block':'none';
+  document.getElementById('os-admin-tools').style.display=can('administration')?'block':'none';
   document.getElementById('os-gest-tools').style.display=ROLE()!=='referent'?'block':'none';
   document.getElementById('os-install-btn').style.display=(!isStandalone()&&isMobileDevice())?'inline-flex':'none';
   if(ROLE()==='admin')document.getElementById('os-backup-info').textContent=OC.length+' contacts · '+USERS.length+' accès · '+(CFG.referents||[]).length+' référents';
@@ -2585,7 +2650,7 @@ function canEditRes(){var r=ROLE();return r==='admin'||r==='comite'||!!(USER&&US
 function applyRole(){
   var r=ROLE();
   var isRef=(r==='referent'||r==='comite');
-  var isAdmin=(r==='admin');
+  var isAdmin=can('administration');
   // Navigation
   document.querySelectorAll('[data-nav="actions"],[data-nav="equipe"]').forEach(function(b){b.classList.toggle('hide',isRef);});
   var sa=document.getElementById('sd-admin');if(sa)sa.classList.toggle('hide',!isAdmin);
@@ -2594,6 +2659,7 @@ function applyRole(){
   if(!isAdmin&&CUR_VIEW==='admin')oSw('dashboard');
   var sun=document.getElementById('sd-un');if(sun){sun.textContent=USER.nom||'—';document.getElementById('sd-ur').textContent=roleLabel(r)+(VIEW_AS_NOM?' · vue '+VIEW_AS_NOM:'');setAv('sd-av',USER.photo,ini(USER.nom||'?'));sun.innerHTML=esc(USER.nom||'—')+'<span class="vpill">'+esc(APP_VERSION.split(' ')[0])+'</span>';}
   // Dashboard
+  try{oCalNudge();}catch(e){}
   document.getElementById('d-refhello').classList.toggle('hide',!isRef);
   if(isRef)document.getElementById('d-refhello-t').textContent='Bienvenue, '+USER.nom;
   // Contacts : filtres avancés + import
@@ -2602,7 +2668,7 @@ function applyRole(){
   var ib2=document.getElementById('oimp-btn2');if(ib2)ib2.style.display='inline-flex';
   var sdi=document.getElementById('sd-imp');if(sdi)sdi.classList.remove('hide');
   // Équipe : cartes admin
-  document.getElementById('eq-users-card').classList.toggle('hide',isRef);
+  document.getElementById('eq-users-card').classList.toggle('hide',isRef||!can('equipe'));
   document.getElementById('ofilter-vue').classList.toggle('hide',isRef);
   ['eq-btn-digest','eq-btn-add'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display=isAdmin?'':'none';});
   var ea=document.getElementById('eq-admin-tools');if(ea)ea.style.display=isAdmin?'flex':'none';
@@ -2798,7 +2864,7 @@ function renderUsers(){
     var firstTag=hasTag?u.tags[0]:'';
     var nbC=hasTag?oContactsRef(firstTag).length:0;
     var hasDigest=!!(u.digestEmail&&u.digestHeure);
-    var isAdm=ROLE()==='admin';var pend=!!u.pending;
+    var isAdm=can('equipe');var pend=!!u.pending;var lockAdm=(u.role==='admin'&&!IS_SUPER());
     return'<div class="ouser-row'+(u.actif===false?' ouser-off':'')+'">'
       +'<div class="ouser-top">'
         +'<span class="ouser-av">'+uAv(u)+'</span>'
@@ -2820,10 +2886,10 @@ function renderUsers(){
           :'<button class="oua e" style="opacity:.4" disabled><span>👁</span>Session</button>')
         +(isAdm?'<button class="oua d'+(hasDigest?'':' off')+'" onclick="oDigestModal('+i+')"><span>📧</span>Digest</button>':'')
         +(isAdm||u.tel?'<button class="oua w" onclick="oInviteUser('+i+')"><span>📲</span>Inviter</button>':'')
-        +(isAdm?'<button class="oua e" onclick="oUserEdit('+i+')"><span>✏️</span>Modifier</button>':'')
+        +(isAdm&&!lockAdm?'<button class="oua e" onclick="oUserEdit('+i+')"><span>✏️</span>Modifier</button>':(lockAdm?'<button class="oua e" style="opacity:.5" disabled title="Géré par le super-admin"><span>👑</span>Super-admin</button>':''))
         +(isAdm?'<button class="oua v" onclick="oUserSessions('+i+')"><span>📱</span>'+(u.sessions?u.sessions+' appareil'+(u.sessions>1?'s':''):'Appareils')+'</button>':'')
         +(isAdm?'<button class="oua e" onclick="oUserQr('+i+')"><span>📲</span>QR code</button>':'')
-        +(isAdm?'<button class="oua x" onclick="oUserDel('+i+')"><span>🗑</span>Retirer</button>':'')
+        +(isAdm&&!lockAdm?'<button class="oua x" onclick="oUserDel('+i+')"><span>🗑</span>Retirer</button>':'')
       +'</div>'
     +'</div>';
   }).join('');
@@ -2866,6 +2932,8 @@ function oUserNew(){
   document.getElementById('u-digest-email').value='';
   document.getElementById('u-digest-heure').value='';
   document.getElementById('u-photo').value='';setAv('u-photo-av','','·');
+  document.getElementById('u-cal').value='';
+  oUserRoleOpts();
   document.getElementById('eq-user-form').style.display='block';
 }
 function oUserEdit(i){
@@ -2881,6 +2949,8 @@ function oUserEdit(i){
   document.getElementById('u-digest-email').value=u.digestEmail||'';
   document.getElementById('u-digest-heure').value=u.digestHeure||'';
   document.getElementById('u-photo').value=u.photo||'';setAv('u-photo-av',u.photo,ini(u.nom||'?'));
+  document.getElementById('u-cal').value=u.calendlyUrl||'';
+  oUserRoleOpts();
   var f=document.getElementById('eq-user-form');f.style.display='block';
   setTimeout(function(){f.scrollIntoView({behavior:'smooth',block:'start'});},50);
 }
@@ -2889,6 +2959,7 @@ function oUserGests(sel){
   var gs=USERS.filter(function(u){return u.role==='gestionnaire'&&u.actif!==false&&u.nom!==me;}).map(function(u){return u.nom;});
   box.innerHTML=gs.length?gs.map(function(n){return'<label class="ochk-row" style="margin:0"><input type="checkbox" value="'+esc(n)+'"'+((sel||[]).indexOf(n)>=0?' checked':'')+'><span>'+esc(n)+'</span></label>';}).join(''):'<span style="font-size:12px;color:var(--t3)">Aucun gestionnaire actif.</span>';
 }
+function oUserRoleOpts(){var sel=document.getElementById('u-role');if(!sel)return;var o=sel.querySelector('option[value="admin"]');if(o){o.disabled=!IS_SUPER();o.textContent=IS_SUPER()?'Admin — accès complet (créé par le super-admin)':'Admin — réservé au super-admin (Jean-Charles)';}}
 function oUserRoleUi(){
   var r=val('u-role');
   var sh=function(id,on){var e=document.getElementById(id);if(e)e.style.display=on?'':'none';};
@@ -2930,8 +3001,13 @@ function oUserSave(){
     gests:role==='referent'||role==='comite'?Array.prototype.map.call(document.querySelectorAll('#u-gests input:checked'),function(x){return x.value;}):[],
     photo:document.getElementById('u-photo').value||''
   };
+  var calu=(val('u-cal')||'').trim();
+  if(calu&&!/^https:\/\/(www\.)?calendly\.com\/.+/i.test(calu)){oT('Le lien Calendly doit commencer par https://calendly.com/','e');return;}
+  obj.calendlyUrl=calu;
   var idx=USERS.findIndex(function(u){return u.id===obj.id;});
-  if(idx>=0){var old=USERS[idx];['calendlyUrl','pending','proposePar','proposeLe'].forEach(function(k){if(old[k]!==undefined&&obj[k]===undefined)obj[k]=old[k];});}
+  if(idx>=0){var old=USERS[idx];['pending','proposePar','proposeLe'].forEach(function(k){if(old[k]!==undefined&&obj[k]===undefined)obj[k]=old[k];});
+    if(old.role==='admin'&&!IS_SUPER()){oT('Seul le super-admin peut modifier un accès administrateur','e');return;}}
+  if(role==='admin'&&!IS_SUPER()){oT('Seul le super-admin (Jean-Charles) peut créer un administrateur','e');return;}
   if(idx>=0)USERS[idx]=obj;else USERS.push(obj);
   // Les tags de la personne rejoignent la liste des référents (toutes catégories)
   var addedT=false;tags.forEach(function(t){if(CFG.referents.indexOf(t)<0){CFG.referents.push(t);addedT=true;}});
@@ -3125,7 +3201,7 @@ var MSG_DEFAULTS={};
   MSG_DEFAULTS.prec_envoi={g:'Utilisations & précautions',l:'Envoi des précautions d\'un appareil',vars:['prenom','appareil','interdits','duree','precautions','moi'],
     t:'Bonjour {prenom} 🌿\n\nComme promis, voici les points essentiels d\'utilisation et de sécurité de votre {appareil}, issus du manuel officiel OlyLife :\n\n{?interdits:⛔ *Ne pas utiliser / demander un avis médical si :*\n{interdits}\n\n}{?duree:⏱ *Durée & fréquence :*\n{duree}\n\n}{?precautions:⚠️ *Précautions :*\n{precautions}\n\n}📄 La notice complète est dans la boîte — gardez-la à portée de main. Au moindre doute, parlez-en à votre médecin : les appareils OlyLife ne sont pas des dispositifs médicaux et ne remplacent pas un avis médical.\n\nJe reste disponible pour toute question 🙏\n{moi} — Water Life High Tech'};
   MSG_DEFAULTS.equipe_invitation={g:'Équipe',l:'Invitation d\'un membre de l\'équipe (code d\'accès)',vars:['nom','lienApp','code','role','moi'],
-    t:'Bonjour {nom} 👋\n\nJe t\'invite à rejoindre notre CRM OlyLife — WLHT, l\'outil de suivi partagé de notre équipe.\n\n📲 *Accéder à l\'application :*\n{lienApp}\n\n🔑 *Ton code d\'accès :* {code}\n👤 *Ton rôle :* {role}\n\n📥 *Pour installer l\'app sur ton téléphone :*\n• *Android (Chrome) :* Ouvre le lien → 3 points en haut à droite → « Ajouter à l\'écran d\'accueil »\n• *iPhone (Safari) :* Ouvre le lien → icône Partager ↑ → « Sur l\'écran d\'accueil »\n\nL\'app fonctionne comme une vraie appli, sans téléchargement depuis les stores. 🌿\n\nÀ bientôt,\n{moi}'};
+    t:'Bonjour {nom} 👋\n\nJe t\'invite à rejoindre notre CRM OlyLife — WLHT, l\'outil de suivi partagé de notre équipe.\n\n📲 *Accéder à l\'application :*\n{lienApp}\n\n🔑 *Ton code d\'accès :* {code}\n👤 *Ton rôle :* {role}\n\n📥 *Pour installer l\'app sur ton téléphone :*\n• *Android (Chrome) :* Ouvre le lien → 3 points en haut à droite → « Ajouter à l\'écran d\'accueil »\n• *iPhone (Safari) :* Ouvre le lien → icône Partager ↑ → « Sur l\'écran d\'accueil »\n\nL\'app fonctionne comme une vraie appli, sans téléchargement depuis les stores. 🌿\n\n📅 *Ton lien de rendez-vous :* crée ton compte Calendly *gratuit* (https://calendly.com/signup), un seul type de RDV « Rendez-vous OlyLife » suffit, puis colle ton lien dans *Mon profil*. Sans lien, c\'est mon agenda qui sera proposé par défaut dans tes messages.\n\nÀ bientôt,\n{moi}'};
   MSG_DEFAULTS.bienvenue_kit={g:'Réception de l\'appareil',l:'Félicitations + kit de bienvenue (notice FR, vidéo, page)',vars:['prenom','appareil','lienKit','lienNotice','lienVideo','reglesOr','moi','role','telMoi'],
     t:'🎉 Félicitations {prenom} ! Votre {appareil} est bien arrivé 🌿{?lienKit:\n\n🧭 Votre page de bienvenue (premiers pas, règles d\'or, entretien, vidéo et notice en français) : {lienKit}}{?reglesOr:\n\n{reglesOr}}\n\nJe vous appelle dans les prochains jours pour la mise en route, et je reste disponible dès maintenant pour toute question 🙏\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
   MSG_DEFAULTS.commande_merci={g:'Commande OlyLife',l:'Merci pour la commande + premières infos (appareil, contact du gestionnaire, la société)',vars:['prenom','appareil','numCommande','gest','telGest','emailGest','liensAppareils','lienParcours','lienCertificats','lienRdv','moi','role','telMoi'],
@@ -3166,7 +3242,7 @@ function tplVars(c,lang,tone){
   return{prenom:nomAdresse(c,tone),prenomSeul:prenom1(c),civilite:c.civilite||'',nom:c.nom||'',numCommande:c.numCommande||'',logistique:OLY_SVC.logistics[lang]||OLY_SVC.logistics.fr,transporteur:c.transporteur||'—',tracking:c.tracking||'—',lienSuivi:suiviTxt(c)||url||'',
     tipLivraison:isFR(c)?(lang==='en'?'DHL Parcel: 01 80 14 63 32 · Colissimo/La Poste: 09 72 72 12 13. ':'DHL Parcel : 01 80 14 63 32 · Colissimo/La Poste : 09 72 72 12 13. '):'',
     sav:OLY_SVC.aftersales[lang]||OLY_SVC.aftersales.fr,savEmail:OLY_SVC.aftersales.email,moi:PARTNER_NOM()||'L\'équipe WLHT',
-    role:roleLabel(ROLE()),telMoi:(USER&&USER.tel)||'',nomComplet:[(tone==='pro'?c.civilite:''),prenom1(c),c.nom||''].filter(Boolean).join(' ').trim(),lienInscription:inscriptionUrl(),sansLien:inscriptionUrl()?'':'1'};
+    role:roleLabel(ROLE()),telMoi:(USER&&USER.tel)||'',lienRdv:rdvUrl(),nomComplet:[(tone==='pro'?c.civilite:''),prenom1(c),c.nom||''].filter(Boolean).join(' ').trim(),lienInscription:inscriptionUrl(),sansLien:inscriptionUrl()?'':'1'};
 }
 function msgTpl(prefix,c,lang,tone,extra){
   lang=lang||'fr';tone=tone||c.registre||'pro';
@@ -3451,7 +3527,7 @@ function oContactsRef(tag){
 
 // ── IMPORT SEED CONTACTS THIERRY (si tag Thierry présent dans USERS et contacts absents) ──
 function oMergeSeedThierry(manual){
-  if(ROLE()!=='admin'){if(manual)oT('Réservé à l\'admin','e');return;} // seul l'admin déclenche l'import
+  if(!can('importer')){if(manual)oT('Réservé à l\'admin','e');return;} // seul l'admin déclenche l'import
   // Détecte l'accès de Thierry Gil quel que soit son tag (DrThierry, Thierry, Gil…)
   var thUser=null;
   for(var k=0;k<USERS.length;k++){var u=USERS[k];if(/thierry|gil/i.test((u.nom||'')+' '+(u.tags||[]).join(' '))){thUser=u;break;}}
@@ -3727,7 +3803,7 @@ function dupKey(c){
   return n==='|'?null:'n:'+n;
 }
 function oDedup(manual){
-  if(ROLE()!=='admin'){if(manual)oT('Réservé à l\'admin','e');return 0;}
+  if(!can('importer')){if(manual)oT('Réservé à l\'admin','e');return 0;}
   var groups={};
   OC.forEach(function(c){var k=dupKey(c);if(!k)return;(groups[k]=groups[k]||[]).push(c);});
   var toDel=[],toUpd=[];
@@ -3801,10 +3877,10 @@ var JRN_IC={appel:'📞',note:'📝',statut:'🎯',rappel:'⏰',fait:'✅',syste
 function jrnHtml(c){
   var j=(c.journal||[]).slice().sort(function(a,b){return new Date(b.ts)-new Date(a.ts);});
   if(!j.length)return'<div style="padding:14px 16px;font-size:12px;color:var(--t3)">Aucune action enregistrée pour l\'instant — ce contact est <b style="color:#C63E47">à contacter</b>.</div>';
-  var can=jrnCanEdit(c);
+  var canE=jrnCanEdit(c),canJ=can('journal');
   return j.map(function(e){
     var mine=e.auteur===PARTNER_NOM();
-    var btns=(can||(mine&&ROLE()!=='referent'))?'<div class="jrn-acts"><button type="button" title="Modifier cette observation" onclick="oJrnEdit(\''+c.id+'\',\''+e.id+'\')">✏️</button><button type="button" title="Supprimer cette observation" onclick="oJrnDel(\''+c.id+'\',\''+e.id+'\')">🗑</button></div>'
+    var btns=(canE||(mine&&canJ))?'<div class="jrn-acts"><button type="button" title="Modifier cette observation" onclick="oJrnEdit(\''+c.id+'\',\''+e.id+'\')">✏️</button><button type="button" title="Supprimer cette observation" onclick="oJrnDel(\''+c.id+'\',\''+e.id+'\')">🗑</button></div>'
       :(ROLE()==='referent'&&mine?'<div class="jrn-acts"><button type="button" title="Demander une correction au gestionnaire" onclick="oReqModif(\''+c.id+'\')">📨</button></div>':'');
     return'<div class="jrn-it"><div class="jrn-ic">'+(JRN_IC[e.type]||'•')+'</div><div style="flex:1;min-width:0">'
       +'<div class="jrn-dt">'+fDTfull(e.ts)+' · <span class="jrn-au">'+esc(e.auteur)+'</span>'+(e.role?' <span style="opacity:.7">('+roleLabel(e.role)+')</span>':'')+(e.editLe?' <span style="opacity:.7">· modifié le '+fDT(e.editLe)+(e.editPar?' par '+esc(e.editPar):'')+'</span>':'')+'</div>'
@@ -3816,7 +3892,7 @@ function jrnCanEdit(c){return canEditContact(c);}
 function oJrnEdit(cid,eid){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
   var e=(c.journal||[]).find(function(x){return x.id===eid;});if(!e)return;
-  if(!(jrnCanEdit(c)||(e.auteur===PARTNER_NOM()&&ROLE()!=='referent'))){oT('Modification réservée au gestionnaire de la fiche','w');return;}
+  if(!(jrnCanEdit(c)||(e.auteur===PARTNER_NOM()&&can('journal')))){oT('Modification réservée au gestionnaire de la fiche','w');return;}
   var t=prompt('Corriger l\'observation :',e.texte);if(t==null)return;t=t.trim();if(!t||t===e.texte)return;
   e.texteAvant=e.texteAvant||e.texte;e.texte=t;e.editLe=new Date().toISOString();e.editPar=PARTNER_NOM();
   oPush([c]);oT('✏️ Observation corrigée','s');if(document.getElementById('omo').classList.contains('on'))oOpenF(cid);oRefresh();
@@ -3824,7 +3900,7 @@ function oJrnEdit(cid,eid){
 function oJrnDel(cid,eid){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
   var e=(c.journal||[]).find(function(x){return x.id===eid;});if(!e)return;
-  if(!(jrnCanEdit(c)||(e.auteur===PARTNER_NOM()&&ROLE()!=='referent'))){oT('Suppression réservée au gestionnaire de la fiche','w');return;}
+  if(!(jrnCanEdit(c)||(e.auteur===PARTNER_NOM()&&can('journal')))){oT('Suppression réservée au gestionnaire de la fiche','w');return;}
   if(!confirm('Supprimer cette observation ?\n« '+e.texte.slice(0,120)+' »'))return;
   c.journal=c.journal.filter(function(x){return x.id!==eid;});
   var lastE=c.journal.slice().sort(function(a,b){return new Date(b.ts)-new Date(a.ts);})[0];c.lastActivity=lastE?lastE.ts:'';
@@ -3875,7 +3951,7 @@ function rapBox(c,withBtns){
     +(c.rappel.texte?'<div>'+esc(c.rappel.texte)+'</div>':'')
     +'<div style="color:var(--t3);font-size:11px">Pour : <b>'+esc(c.rappel.pour||'— non attribué —')+'</b> · créé par '+esc(c.rappel.par||'—')+'</div></div>'
     +(withBtns?'<a class="ob bgh bsm" style="min-height:36px" href="'+gcalUrl(c)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Ajouter à mon Google Agenda">📅</a>':'')
-    +(withBtns&&ROLE()!=='referent'?'<button class="ob bdone bsm" style="min-height:36px" onclick="event.stopPropagation();oRappelDone(\''+c.id+'\')">✅ Fait</button>':'')
+    +(withBtns&&can('rappels')?'<button class="ob bdone bsm" style="min-height:36px" onclick="event.stopPropagation();oRappelDone(\''+c.id+'\')">✅ Fait</button>':'')
     +'</div>';
 }
 
@@ -3965,7 +4041,7 @@ function rapItem(c){
     +'</div>'
     +'<a class="ob bgh bsm" href="'+gcalUrl(c)+'" target="_blank" rel="noopener" style="min-height:36px" title="Google Agenda">📅</a>'
     +(c.tel?'<a class="ob bph bsm" href="tel:'+c.tel+'" onclick="event.stopPropagation()" style="min-height:36px">📞</a>':'')
-    +(ROLE()!=='referent'?'<button class="ob bdone bsm" style="min-height:36px" onclick="oRappelDone(\''+c.id+'\')">✅</button>':'')
+    +(can('rappels')?'<button class="ob bdone bsm" style="min-height:36px" onclick="oRappelDone(\''+c.id+'\')">✅</button>':'')
   +'</div>';
 }
 function renderRappels(){
@@ -4254,7 +4330,7 @@ function avStBdg(a){
     :'<span class="obdg bgo">échéance '+fD(a.echeance)+'</span>');
 }
 function avRowHtml(c,a,vuePayeur){
-  var isRef=(ROLE()==='referent'),done=a.statut==='rembourse'||a.type==='don',rd=avRendu(a),pct=a.montant?Math.min(100,Math.round(rd/a.montant*100)):0;
+  var isRef=!can('avances'),done=a.statut==='rembourse'||a.type==='don',rd=avRendu(a),pct=a.montant?Math.min(100,Math.round(rd/a.montant*100)):0;
   return'<div class="av-it"><div class="av-b"><span class="av-m">'+esc(String(a.montant))+' '+esc(a.devise||'€')+'</span> '+avStBdg(a)
     +(a.type!=='don'&&rd>0&&!done?'<div class="av-bar"><i style="width:'+pct+'%"></i></div>':'')
     +'<small>'+(a.type==='don'?'Donné':'Avancé')+' le '+fD(a.date)+(a.motif?' · '+esc(a.motif):'')
@@ -4279,7 +4355,7 @@ function avDonneesHtml(c){
   return odSec('💸 Avances / dons consentis ('+rows.length+')',rows.join('')+(tl?'<div style="padding:10px 16px;font-size:12px;color:var(--t2);border-top:1px solid var(--bd)"><b>Reste à récupérer :</b> '+tl+'</div>':''),true);
 }
 function avListHtml(c){
-  var avs=c.avances||[],isRef=(ROLE()==='referent');
+  var avs=c.avances||[],isRef=!can('avances');
   var rows=avs.map(function(a){return avRowHtml(c,a,false);}).join('');
   return rows+(isRef?'':'<div style="padding:10px 16px"><button class="ob baqua bsm" onclick="oAvOpen(\''+c.id+'\')">➕ Avance ou don</button></div>');
 }
@@ -4310,7 +4386,7 @@ function oOpenF(id){
       +rapBox(c,true)
       +rdvBox(c)
       +'<button class="ob bgold bfull" style="min-height:48px" onclick="oOpenSuivi(\''+id+'\')">📞 Valider un contact / ajouter une observation</button>'
-      +(ROLE()==='admin'&&stkList().some(function(x){return(+x.qte||0)>0;})?'<button class="ob baqua bfull" style="min-height:44px;margin-top:8px" onclick="oStkOpen(\''+id+'\')">📦 Remise immédiate depuis un stock</button>':'')
+      +(can('stock')&&stkList().some(function(x){return(+x.qte||0)>0;})?'<button class="ob baqua bfull" style="min-height:44px;margin-top:8px" onclick="oStkOpen(\''+id+'\')">📦 Remise immédiate depuis un stock</button>':'')
     +'</div></div>'
     +decHtml(c)
     +campHtml(c)
@@ -4321,7 +4397,7 @@ function oOpenF(id){
     +factHtml(c)
     +accHtml(c)
     +odSec('Journal des actions ('+((c.journal||[]).length)+')',jrnHtml(c),true)
-    +((c.avances&&c.avances.length)||!isRef?odSec('💶 Avances / dons reçus'+((c.avances||[]).length?' ('+c.avances.length+')':''),avListHtml(c),avanceEnCours(c)):'')
+    +((c.avances&&c.avances.length)||can('avances')?odSec('💶 Avances / dons reçus'+((c.avances||[]).length?' ('+c.avances.length+')':''),avListHtml(c),avanceEnCours(c)):'')
     +avDonneesHtml(c)
     +odSec('Informations',
       '<div class="od-row"><span class="od-lbl">Téléphone</span><span class="od-val">'+(c.tel||'—')+'</span></div>'
@@ -5180,7 +5256,7 @@ function oRefreshView(v){
   if(v==='dashboard')oDash();else if(v==='contacts')oCli();else if(v==='pipeline')oPipe();
   else if(v==='agenda')oAgenda();else if(v==='actions')oAct();
   else if(v==='equipe'){admBackCards();oEq();oLoadMyDigest();var ve=document.getElementById('eq-version');if(ve)ve.textContent=APP_VERSION;}
-  else if(v==='admin'){if(ROLE()!=='admin'){oSw('dashboard');return;}oAdmin();}
+  else if(v==='admin'){if(!can('administration')){oSw('dashboard');return;}oAdmin();}
   else if(v==='demandes'){oLeads();}
   else if(v==='carte')oCarte();else if(v==='genea')oGenea();
   else if(v==='temoignages')oTemView();else if(v==='protocoles')oProtoView();else if(v==='precautions')oPrecView();
@@ -5307,7 +5383,7 @@ function agRow(e){
     +'<div class="ag-rt">'+(late?'<b style="color:var(--rd)">'+fD(e.date)+'</b> · ':'')+esc(e.titre)+(e.qui?' · 👤 '+esc(e.qui):'')+(e.lieu?' · '+esc(e.lieu):'')+'</div></div>'
     +(e.type==='rdv'&&e.url?'<a class="ob bgh bsm" href="'+esc(e.url)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">Rejoindre</a>':'')
     +(c.tel?'<a class="ob bph bsm" href="tel:'+esc(c.tel)+'" onclick="event.stopPropagation()" title="Appeler">📞</a>':'')
-    +(e.type==='rappel'&&ROLE()!=='referent'?'<button class="ob bdone bsm" title="Rappel fait" onclick="event.stopPropagation();oRappelDone(\''+c.id+'\')">✅</button>':'')
+    +(e.type==='rappel'&&can('rappels')?'<button class="ob bdone bsm" title="Rappel fait" onclick="event.stopPropagation();oRappelDone(\''+c.id+'\')">✅</button>':'')
   +'</div>';
 }
 function renderDay(sc,ev){
@@ -5598,7 +5674,7 @@ function oPipe(){
 }
 function kbCard(c){
   var last=lastMeaningful(c);
-  return'<div class="kb-card" draggable="'+(ROLE()!=='referent')+'" data-cid="'+c.id+'" ondragstart="oKbStart(event,\''+c.id+'\')" onclick="oCardClick(event,\''+c.id+'\')">'
+  return'<div class="kb-card" draggable="'+can('statut')+'" data-cid="'+c.id+'" ondragstart="oKbStart(event,\''+c.id+'\')" onclick="oCardClick(event,\''+c.id+'\')">'
     +'<div class="kb-n">'+esc(c.nom)+' '+esc(c.prenom||'')+'</div>'
     +'<div class="kb-s">'+esc(c.tel||'—')+(c.ville?' · '+esc(c.ville):'')+(c.refere?' · 🏷 '+esc(c.refere):'')+'</div>'
     +(last?'<div class="kb-l">'+(JRN_IC[last.type]||'•')+' '+esc(last.texte)+'</div>':'<div class="kb-l" style="color:var(--rd)">Jamais contacté'+(c.createdAt?' · ajouté '+rel(c.createdAt):'')+'</div>')
@@ -5610,7 +5686,7 @@ function oKbDrop(e,col){e.preventDefault();col.classList.remove('drop');var id=K
 function oMoveStatut(id,st){
   var c=OC.find(function(x){return x.id===id;});if(!c)return;
   var old=cStatut(c);if(old===st)return;
-  if(ROLE()==='referent'){oT('Le statut est mis à jour par les gestionnaires','w');return;}
+  if(!can('statut')){oT('Le statut est mis à jour par les gestionnaires','w');return;}
   if(old==='afaire'){oOpenSuivi(id,st);oT('Premier contact : ajoutez l\'observation (obligatoire)','i');return;}
   oSetStatut(id,st);
 }
@@ -6695,7 +6771,7 @@ function oTemOpen(cid,tid){
   document.getElementById('tem-consent').checked=!!(t&&t.consent);document.getElementById('tem-affich').value=t?(t.affich||'prenom'):'prenom';
   document.getElementById('tem-consent-date').value=t?(t.consentDate||''):'';document.getElementById('tem-visage').checked=!!(t&&t.visage);
   document.getElementById('tem-statut').value=t?(t.statut||'brouillon'):'brouillon';
-  document.getElementById('tem-statut').querySelector('[value=publie]').disabled=ROLE()==='referent';
+  document.getElementById('tem-statut').querySelector('[value=publie]').disabled=!can('temoignagesPublier');
   document.getElementById('tem-del').style.display=t?'':'none';
   document.getElementById('tem-audio-prev').innerHTML=t&&t.type==='audio'&&t.url?temEmbed(t):'';
   TEM_DEL_URL='';document.getElementById('tem-audio-del').style.display=(t&&t.type==='audio'&&t.url)?'':'none';document.getElementById('tem-rec').textContent=(t&&t.type==='audio'&&t.url)?'🎙 Réenregistrer':'🎙 Démarrer l\'enregistrement';
@@ -6765,7 +6841,7 @@ function oTemConsent(){
 
 // ── Fiche : bloc Logistique (messages automatisés) ────────────────
 function logiHtml(c){
-  if(!c.numCommande||ROLE()==='referent')return'';
+  if(!c.numCommande||!can('factures'))return'';
   var base=c.dateCommande||c.createdAt,age=base?-diffD(base):null;
   var st=c.installConfirm?'<span class="obdg bgr">✅ installé</span>':c.tracking?'<span class="obdg baq">🚚 expédié'+(c.transporteur?' · '+esc(c.transporteur):'')+'</span>':(age!==null&&age>=SEUIL_LOGISTIQUE?'<span class="obdg brd">⏳ sans tracking depuis '+age+' j</span>':'<span class="obdg bor">⏳ en préparation'+(age!==null?' · J+'+age:'')+'</span>');
   var waMsg='Bonjour, je vous contacte au sujet de la commande OlyLife n°'+(c.numCommande||'')+' (Member ID '+(c.memberIdOlyLife||'')+'), le suivi n\'est toujours pas disponible. Merci de votre retour.';
@@ -7246,6 +7322,50 @@ var INTERETS=['Tera-P90+','Galaxy G-One','Vitality Wand','Shaken Massager','La t
 function tunnelUrl(slug,c){var q=[];if(c&&c.prenom)q.push('p='+encodeURIComponent(c.prenom));if(c&&c.nom)q.push('n='+encodeURIComponent(c.nom));if(USER&&USER.nom)q.push('d='+encodeURIComponent(USER.nom));var w=USER&&USER.tel?String(USER.tel).replace(/\D/g,''):'';if(w&&w.charAt(0)==='0')w='';if(w)q.push('w='+w);if(USER&&USER.email)q.push('e='+encodeURIComponent(USER.email));return TUNNEL_BASE+slug+(q.length?'?'+q.join('&'):'');}
 function decouverteUrl(c){var tok=(USER&&USER.pubToken)||'';if(!tok)return'';return SITE_URL+'decouverte.html?r='+encodeURIComponent(tok)+(c&&c.prenom?'&p='+encodeURIComponent(c.prenom):'');}
 function rdvUrl(){return(USER&&USER.calendlyUrl)||((CFG.params&&CFG.params.liens&&CFG.params.liens.rdvDecouverte)||'')||RDV_DEFAULT;}
+// ── v3.28 — Calendly personnel : bandeau d'accueil + fenêtre d'aide (compte gratuit) ──
+var CAL_SIGNUP='https://calendly.com/signup';
+var CAL_FREE_FEATURES=[
+  '<b>1 type d\'événement</b> actif (« En privé : seulement 1 ») — ce sera votre <b>Rendez-vous OlyLife</b>.',
+  '<b>Sondages de réunion</b> (proposer plusieurs créneaux et laisser choisir).',
+  '<b>Notifications e-mail</b> pour les réservations et les annulations.',
+  '<b>Profils de contacts</b>, historique, notes, rappels et champs personnalisés ; réservation depuis le profil d\'un contact.',
+  '<b>Image de marque</b> sur la page de réservation (photo, couleurs).',
+  'Connexion <b>Zoom, Google Meet, Microsoft Teams</b> et autres outils de visio.',
+  '<b>1 calendrier connecté</b> (Google, Outlook, iCloud) pour exclure vos créneaux déjà pris.',
+  'Assistance par e-mail · suppression des données sur demande (conformité).'
+];
+var CAL_FREE_LIMITS='Non inclus en gratuit (offre Standard, 10 €/mois) : rappels et suivis e-mail automatiques, plusieurs types de RDV, suppression de la marque Calendly, paiements à la réservation, plusieurs calendriers. <b>Inutile pour démarrer</b> : le CRM envoie déjà ses propres rappels.';
+function oCalNudge(){
+  var b=document.getElementById('d-calnudge');if(!b)return;
+  var r=ROLE(),ok=USER&&!USER.calendlyUrl&&(r==='admin'||r==='gestionnaire'||r==='referent');
+  var later=0;try{var v=localStorage.getItem('owlht2_calnudge');if(v==='done')ok=false;else if(v)later=+v||0;}catch(e){}
+  if(later&&Date.now()<later)ok=false;
+  b.classList.toggle('hide',!ok);
+}
+function oCalNudgeLater(){try{localStorage.setItem('owlht2_calnudge',String(Date.now()+7*86400000));}catch(e){}oCalNudge();oT('Je vous le rappellerai dans 7 jours','i');}
+function oCalGuide(){
+  var old=document.getElementById('ocalguide');if(old)old.remove();
+  var m=document.createElement('div');m.id='ocalguide';m.style.cssText='position:fixed;inset:0;z-index:2200;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
+  var moi=USER&&USER.id==='root';
+  m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:18px 16px 30px;width:100%;max-width:560px;max-height:90vh;overflow:auto">'
+    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:16px">📅 Votre Calendly personnel en 3 minutes</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'ocalguide\').remove()">✕</button></div>'
+    +'<div style="margin-top:10px;padding:10px 12px;border-radius:10px;background:#FFF7E0;border:1px solid #F1DFA0;font-size:12.5px;line-height:1.5">⚠️ <b>Sans lien personnel, c\'est l\'agenda de Jean-Charles qui est proposé par défaut</b> dans tous vos messages pré-remplis (WhatsApp, e-mail, « 📅 RDV »). Avec votre lien, vos contacts réservent directement <b>avec vous</b>.</div>'
+    +'<div style="margin-top:12px;font-size:13px;line-height:1.6"><b>L\'inscription gratuite suffit.</b> Elle permet de créer <b>un premier type de rendez-vous</b> — celui-ci sera <b>forcément votre rendez-vous OlyLife</b>.</div>'
+    +'<ol style="margin:10px 0 0 18px;padding:0;font-size:13px;line-height:1.7">'
+      +'<li>Ouvrez <a href="'+CAL_SIGNUP+'" target="_blank" rel="noopener"><b>calendly.com/signup</b></a> et créez votre compte (Google ou e-mail), <b>offre gratuite</b>.</li>'
+      +'<li>Connectez votre agenda (Google / Outlook / iCloud) pour éviter les doublons.</li>'
+      +'<li>Créez votre type d\'événement : nom <b>« Rendez-vous OlyLife »</b>, durée 30 min, lieu : téléphone ou visio (Zoom / Google Meet).</li>'
+      +'<li>Copiez votre lien (bouton « Copier le lien » / Partager) : il ressemble à <code>https://calendly.com/votre-nom/rendez-vous-olylife</code>.</li>'
+      +'<li>Collez-le dans <b>Mon profil → Mon lien Calendly</b>, puis « Enregistrer ». C\'est tout 🌿</li>'
+    +'</ol>'
+    +'<div style="margin-top:12px;font-size:12px;font-weight:700;color:var(--gold)">Ce que permet le compte gratuit</div>'
+    +'<ul style="margin:6px 0 0 18px;padding:0;font-size:12.5px;line-height:1.6;color:#2B3A31">'+CAL_FREE_FEATURES.map(function(f){return'<li>'+f+'</li>';}).join('')+'</ul>'
+    +'<div style="margin-top:8px;font-size:11.5px;color:var(--t3);line-height:1.5">'+CAL_FREE_LIMITS+' <a href="https://calendly.com/app/payments/offerings?planSelection=true" target="_blank" rel="noopener">Comparer les offres ↗</a></div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px"><a class="ob bgold" style="flex:2;text-decoration:none;text-align:center" href="'+CAL_SIGNUP+'" target="_blank" rel="noopener">↗ Créer mon compte Calendly gratuit</a><button class="ob bgh" style="flex:1" type="button" onclick="document.getElementById(\'ocalguide\').remove();oProfOpen()">Coller mon lien</button></div>'
+    +(moi?'<div style="font-size:11px;color:var(--t3);margin-top:10px">Vous êtes le super-admin : votre agenda sert de repli pour toute l\'équipe.</div>':'')
+    +'</div>';
+  document.body.appendChild(m);
+}
 function interetsDe(c){var l=(c&&c.interets)||[];return Array.isArray(l)?l:String(l).split(',').map(function(s){return s.trim();}).filter(Boolean);}
 function decVars(c,interets){
   var v=tplVars(c||{},'fr');var ints=interets||interetsDe(c);
@@ -7279,7 +7399,7 @@ function msgMerci(c,devs){
   return renderTpl(tplText('commande_merci'),v);
 }
 function merciHtml(c){
-  if(ROLE()==='referent'||ROLE()==='comite')return'';
+  if(!can('messagesGroupe'))return'';
   if(!(c.numCommande||(c.produits&&c.produits.length)||c.etape==='Client'))return'';
   var pre=devKeysOf(c),done=c.actions&&c.actions.merci&&c.actions.merci.done;
   var chips=DEV_RX.map(function(d){return'<label class="ochk-row" style="font-size:13px"><input type="checkbox" class="mc-dev" data-k="'+esc(d[0])+'"'+(pre.indexOf(d[0])>=0?' checked':'')+'><span>'+esc(d[0])+'</span></label>';}).join('');
@@ -7489,7 +7609,7 @@ function leadById(id){return LEADS.find(function(l){return l.id===id;});}
 function oLeadsRender(){
   var box=document.getElementById('ld-list');if(!box)return;
   var showDone=document.getElementById('ld-showdone').checked;
-  var canAssign=ROLE()==='admin'||ROLE()==='gestionnaire',isAdm=ROLE()==='admin';
+  var canAssign=can('attribuer'),isAdm=ROLE()==='admin';
   // v3.21 — barre de filtres (admin / gestionnaire) : par personne qui a transmis le lien, par type
   var bar=document.getElementById('ld-bar'),fo=document.getElementById('ld-fown'),ft=document.getElementById('ld-ftype');
   var owners={};LEADS.forEach(function(l){var k=l.userNom||'?';owners[k]=owners[k]||{n:0,nw:0};owners[k].n++;if(l.statut!=='traite')owners[k].nw++;});
@@ -7689,11 +7809,45 @@ function admBackCards(){['eq-users-card','eq-refs-card'].forEach(function(id){va
 function admTab(t){ADM_TAB=t;if(t==='liens')setTimeout(oSioStatus,50);document.querySelectorAll('#adm-tabs .adm-tab').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-tab')===t);});document.querySelectorAll('#ov-admin .adm-pane').forEach(function(p){p.classList.toggle('on',p.id==='adm-'+t);});admRenderTab(t);}
 function oAdmin(){
   admMove('eq-users-card','adm-eq-host');admMove('eq-refs-card','adm-refs-host');
+  var td=document.getElementById('adm-tab-droits');if(td)td.classList.toggle('hide',!IS_SUPER());
   renderUsers();renderRefChips();
   var pend=USERS.filter(function(u){return u.pending;}).length;var ne=document.getElementById('adm-n-equipe');ne.textContent=pend;ne.style.display=pend?'':'none';
   var nres=admResPending();var nr=document.getElementById('adm-n-res');nr.textContent=nres;nr.style.display=nres?'':'none';
   admTab(ADM_TAB);
 }
+// v3.28 — onglet 👑 Super-admin : administrateurs + matrice des droits
+function admDroitsRender(){
+  if(!IS_SUPER())return;
+  var w=document.getElementById('adm-droits-warn');if(!w){w=document.createElement('div');w.id='adm-droits-warn';w.style.cssText='font-size:12px;color:#C0392B;margin-bottom:8px';document.getElementById('adm-droits').insertBefore(w,document.getElementById('adm-droits').firstChild);}
+  w.textContent=srvNum()>=3019?'':'⚠️ Script Google à mettre à jour (v3.19) : sans lui, la protection des administrateurs et les droits « clients » ne sont pas appliqués côté serveur.';
+  var adms=USERS.filter(function(u){return u.role==='admin';});
+  document.getElementById('adm-admins-list').innerHTML='<div class="ouser-row" style="background:rgba(18,106,60,.06)"><div class="ouser-top"><span class="ouser-av">'+(USER.photo?'<img src="'+USER.photo+'" alt="">':ini(USER.nom||'?'))+'</span><span class="ouser-nm">'+esc(USER.nom)+'</span><span class="obdg bgo">👑 Super-admin</span></div></div>'
+    +(adms.length?adms.map(function(u){var i=USERS.indexOf(u);return'<div class="ouser-row'+(u.actif===false?' ouser-off':'')+'"><div class="ouser-top"><span class="ouser-av">'+uAv(u)+'</span><span class="ouser-nm">'+esc(u.nom)+'</span><span class="obdg bgo">Admin</span>'+(u.actif===false?'<span style="color:#C0392B;font-weight:600;font-size:12px">⏸ Désactivé</span>':'')+'</div><div class="ouser-meta">'+(u.tel?'<span>📱 '+esc(u.tel)+'</span>':'')+(u.email?'<span>✉️ '+esc(u.email)+'</span>':'')+'<span class="ouser-code">'+esc(u.code||'—')+'</span></div><div class="ouser-actions" style="grid-template-columns:repeat(3,1fr)"><button class="oua e" onclick="admTab(\'equipe\');oUserEdit('+i+')"><span>✏️</span>Modifier</button><button class="oua w" onclick="oInviteUser('+i+')"><span>📲</span>Inviter</button><button class="oua x" onclick="oUserDel('+i+')"><span>🗑</span>Retirer</button></div></div>';}).join(''):'<div style="font-size:12px;color:var(--t3);padding:8px 0">Aucun autre administrateur pour l\'instant.</div>');
+  var cfg=droitsCfg();
+  var h='<table style="border-collapse:collapse;width:100%;min-width:640px;font-size:12.5px"><thead><tr><th style="text-align:left;padding:6px 8px;border-bottom:2px solid var(--bd)">Droit</th>'+DROITS_ROLES.map(function(r){return'<th style="padding:6px 4px;border-bottom:2px solid var(--bd);white-space:nowrap">'+r[1]+'</th>';}).join('')+'</tr></thead><tbody>';
+  DROITS_DEF.forEach(function(d){
+    var isClient=d.d.client!==undefined;
+    h+='<tr><td style="padding:7px 8px;border-bottom:1px solid var(--bd);line-height:1.35">'+d.l+(d.lock?'<br><small style="color:var(--t3)">'+d.lock+'</small>':'')+'</td>';
+    DROITS_ROLES.forEach(function(r){
+      var role=r[0],applies=isClient?role==='client':role!=='client';
+      if(!applies||d.lock){h+='<td style="text-align:center;padding:7px 4px;border-bottom:1px solid var(--bd);color:var(--t3)">'+(d.lock&&role==='admin'?'🔒':'—')+'</td>';return;}
+      var on=(cfg[role]&&cfg[role][d.k]!==undefined)?!!cfg[role][d.k]:!!d.d[role];
+      h+='<td style="text-align:center;padding:7px 4px;border-bottom:1px solid var(--bd)"><input type="checkbox" class="dr-cb" data-role="'+role+'" data-k="'+d.k+'"'+(on?' checked':'')+' style="width:18px;height:18px"></td>';
+    });
+    h+='</tr>';
+  });
+  h+='</tbody></table>';
+  document.getElementById('adm-droits-grid').innerHTML=h;
+}
+function admDroitsSave(){
+  if(!IS_SUPER()){oT('Réservé au super-admin','e');return;}
+  var out={};document.querySelectorAll('#adm-droits-grid .dr-cb').forEach(function(cb){var r=cb.getAttribute('data-role'),k=cb.getAttribute('data-k');(out[r]=out[r]||{})[k]=cb.checked?1:0;});
+  var P=CFG.params||{};P.droits=out;CFG.params=P;oSaveCache();
+  oPost_({op:'saveConfig',config:{params:P}});applyRole();
+  oT('👑 Droits enregistrés — appliqués à la prochaine ouverture chez chaque membre','s');
+}
+function admDroitsReset(){if(!confirm('Revenir aux droits par défaut ?'))return;var P=CFG.params||{};delete P.droits;CFG.params=P;oSaveCache();oPost_({op:'saveConfig',config:{params:P}});admDroitsRender();applyRole();oT('↺ Droits par défaut rétablis','s');}
+function oAdminNew(){if(!IS_SUPER()){oT('Réservé au super-admin','e');return;}admTab('equipe');oUserNew();document.getElementById('u-role').value='admin';oUserRoleUi();oT('Renseignez le nom, le téléphone et le code d\'accès du nouvel administrateur','i');}
 function admResPending(){var r=resGet();return r.protocoles.filter(function(p){return p.statut!=='valide';}).length+temAll().filter(function(x){return x.t.statut==='avalider';}).length;}
 function admRenderTab(t){
   var P=CFG.params||{};
@@ -7739,6 +7893,7 @@ function admRenderTab(t){
     document.getElementById('adm-res-tem').innerHTML=tm.length?tm.map(function(x){var c=x.c,t=x.t;return'<div class="adm-row"><span>'+temIcon(t.type)+'</span><div class="b"><b>'+esc(c.prenom+' '+c.nom)+'</b><small>'+(t.appareil?esc(t.appareil.split('(')[0].trim())+' · ':'')+(t.consent?'consentement ✅':'<span style="color:#C63E47">sans consentement</span>')+(t.texte?' · « '+esc(t.texte.slice(0,70))+(t.texte.length>70?'…':'')+' »':'')+'</small></div><button class="ob bgh bsm" onclick="oTemOpen(\''+c.id+'\',\''+t.id+'\')">✏️ Ouvrir</button></div>';}).join(''):'<div style="font-size:12px;color:var(--t3)">Aucun témoignage en attente.</div>';
   }
   if(t==='journal'){admJournalLoad();}
+  if(t==='droits'){admDroitsRender();}
 }
 function admProtoValide(id){var p=protoById(id);if(!p)return;if(confCheck([p.titre,p.objectif,p.programme,p.conseils,p.precautions].join(' ')).length&&!confirm('Des termes sensibles sont présents dans cette fiche. Valider quand même ?'))return;p.statut='valide';p.majLe=todayYMD();p.majPar=PARTNER_NOM();resSave();oT('✅ Fiche validée — visible par toute l\'équipe','s');oAdmin();}
 function admJournalLoad(){
@@ -7895,7 +8050,7 @@ function oRestore(id,name){
   if(prompt('Pour confirmer, tapez RESTAURER :')!=='RESTAURER')return;
   oPostAsync_({op:'restoreBackup',id:id}).then(function(d){if(d.ok){oT('✅ Restauration effectuée — '+d.contacts+' contacts','s');setTimeout(function(){location.reload();},900);}else oT('Échec : '+(d.error||'?'),'e');});
 }
-function maskIdView(v){if(!v)return'';if(ROLE()==='admin')return v;return/^••••/.test(v)?v:'••••'+String(v).slice(-4);}
+function maskIdView(v){if(!v)return'';if(can('identifiants'))return v;return/^••••/.test(v)?v:'••••'+String(v).slice(-4);}
 
 // ── Photos de profil · Mon profil · émojis (v3.6) ───────────────────
 function pickPhoto(cb,size){
@@ -7951,18 +8106,25 @@ function oProfOpen(){
   var pr=document.getElementById('oprof-pin-row');if(pr)pr.innerHTML=pinStored()?'<span>🔒 Verrou PIN actif à l\'ouverture</span><button class="ob bgh bsm" type="button" onclick="oPinSet()">Changer</button><button class="ob bgh bsm" type="button" onclick="oPinRemove()">Retirer</button>':'<span>Pas de verrou PIN — conseillé si votre téléphone n\'est pas verrouillé</span><button class="ob bgh bsm" type="button" onclick="oPinSet()">🔒 Activer un PIN</button>';
   oSessList('', 'oprof-sess');
   var pc=document.getElementById('oprof-canal');if(pc)pc.value=sendPref();
+  var oc=document.getElementById('oprof-cal');if(oc){oc.value=USER.calendlyUrl||'';}oProfCalSt();
   oSheetOpen('oprof');
 }
+function oProfCalSt(){var st=document.getElementById('oprof-cal-st');if(!st)return;st.innerHTML=USER.calendlyUrl?'✅ Vos messages et « 📅 RDV » utilisent <b>votre</b> agenda.':'ℹ️ <b>Sans lien personnel, l\'agenda de Jean-Charles est utilisé par défaut</b> dans vos messages. Un compte Calendly <b>gratuit</b> suffit (un type de RDV, forcément OlyLife).';}
 function oProfClose(){oSheetClose('oprof');}
 function oProfPhoto(){pickPhoto(function(data){document.getElementById('oprof-photo').value=data;setAv('oprof-av',data,'');document.getElementById('oprof-rm').style.display='';emojiBurst(['📸','✨','⭐']);});}
 function oProfPhotoRm(){document.getElementById('oprof-photo').value='';setAv('oprof-av','',ini(USER.nom||'?'));document.getElementById('oprof-rm').style.display='none';}
 function oProfSave(){
   if(!USER)return;
-  USER.tel=(val('oprof-tel')||'').trim();USER.email=(val('oprof-email')||'').trim();USER.photo=val('oprof-photo')||'';
+  var calu=(val('oprof-cal')||'').trim();
+  if(calu&&!/^https:\/\/(www\.)?calendly\.com\/.+/i.test(calu)){oT('Le lien Calendly doit commencer par https://calendly.com/','e');return;}
+  var calNew=!!calu&&calu!==(USER.calendlyUrl||'');
+  USER.tel=(val('oprof-tel')||'').trim();USER.email=(val('oprof-email')||'').trim();USER.photo=val('oprof-photo')||'';USER.calendlyUrl=calu;
   if(USER.email&&!USER.digestEmail)USER.digestEmail=USER.email;
-  var me=USERS.find(function(u){return u.id===USER.id;});if(me){me.tel=USER.tel;me.email=USER.email;me.photo=USER.photo;if(me.email&&!me.digestEmail)me.digestEmail=me.email;}
+  var me=USERS.find(function(u){return u.id===USER.id;});if(me){me.tel=USER.tel;me.email=USER.email;me.photo=USER.photo;me.calendlyUrl=calu;if(me.email&&!me.digestEmail)me.digestEmail=me.email;}
+  var cu=document.getElementById('my-cal-url');if(cu)cu.value=calu;
   oSaveCache();
-  oPost_({op:'saveMyProfile',tel:USER.tel,email:USER.email,photo:USER.photo});
+  oPost_({op:'saveMyProfile',tel:USER.tel,email:USER.email,photo:USER.photo,calendlyUrl:calu});
+  if(calNew){try{localStorage.setItem('owlht2_calnudge','done');}catch(e){}oCalNudge();emojiBurst(['📅','✨','🌿']);}
   applyRole();if(typeof renderUsers==='function')renderUsers();
   oProfClose();emojiBurst();oT('✨ Profil enregistré','s');
 }
@@ -8043,7 +8205,7 @@ function oStkOpen(cid){
 }
 function oStkClose(){oSheetClose('ostk');}
 function oStkGive(){
-  if(ROLE()!=='admin'){oT('Réservé à l\'admin (gestion du stock)','e');return;}
+  if(!can('stock')){oT('Réservé à l\'admin (gestion du stock)','e');return;}
   var cid=document.getElementById('ostk-cid').value;
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
   var lid=val('ostk-line');
