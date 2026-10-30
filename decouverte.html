@@ -67,12 +67,14 @@ input:focus,textarea:focus{outline:none;border-color:var(--g);box-shadow:0 0 0 3
     <label>E-mail (facultatif)</label><input id="email" type="email" autocomplete="email" placeholder="vous@email.com">
     <div class="via" id="via">
       <h3>🤝 Par qui avez-vous entendu parler de nous ?</h3>
-      <p>Pour vous mettre en relation avec la bonne personne de l'équipe. Son prénom et son téléphone suffisent ; le nom aide, sans être obligatoire.</p>
+      <p>Pour vous mettre en relation avec la bonne personne de l'équipe et la remercier. Son prénom, son téléphone et son e-mail sont nécessaires ; le nom aide, sans être obligatoire.</p>
       <div class="row">
         <div><label>Son prénom <b>*</b></label><input id="viaPrenom" placeholder="Prénom" autocomplete="off"></div>
         <div><label>Son nom <span style="font-weight:500;color:#5B6770">(recommandé)</span></label><input id="viaNom" placeholder="NOM" autocomplete="off"></div>
       </div>
       <label>Son téléphone / WhatsApp <b>*</b></label><input id="viaTel" type="tel" placeholder="+33 6 …" autocomplete="off">
+      <label>Son e-mail <b>*</b></label><input id="viaEmail" type="email" placeholder="prenom@exemple.com" autocomplete="off" inputmode="email">
+      <p style="margin:6px 0 0;font-size:11.5px;color:#5B6770">Cette personne recevra un simple e-mail de remerciement avec vos nom, prénom, e-mail et téléphone — rien d'autre.</p>
     </div>
 
     <h2 style="margin-top:16px"><span class="n">2</span>Ce qui vous intéresse <span style="font-weight:500;color:var(--t3);font-size:12px">— plusieurs choix possibles</span></h2>
@@ -130,10 +132,11 @@ document.getElementById('f').addEventListener('submit',function(e){
   else if(v('email')&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('email')))msg='L\'adresse e-mail ne semble pas valide.';
   else if(!interets().length)msg='Cochez au moins un centre d\'intérêt (« Je ne sais pas encore » convient très bien).';
   else if(!document.getElementById('consent').checked)msg='Merci de cocher la case de consentement.';
-  else if(document.getElementById('via').classList.contains('on')&&(!v('viaPrenom')||!v('viaTel')))msg='Merci d\'indiquer le prénom et le téléphone de la personne qui vous a parlé de nous.';
+  else if(document.getElementById('via').classList.contains('on')&&(!v('viaPrenom')||!v('viaTel')||!v('viaEmail')))msg='Merci d\'indiquer le prénom, le téléphone et l\'e-mail de la personne qui vous a parlé de nous.';
+  else if(document.getElementById('via').classList.contains('on')&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('viaEmail')))msg='L\'e-mail de la personne qui vous a parlé de nous ne semble pas valide.';
   if(msg){err.textContent=msg;err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'center'});return;}
   var btn=document.getElementById('go');btn.disabled=true;btn.textContent='Envoi en cours…';
-  var o={op:'lead',type:'decouverte',website:v('website'),nom:v('nom'),prenom:v('prenom'),tel:v('tel'),email:v('email'),interets:interets(),message:v('message'),consent:true,consentEmail:document.getElementById('consentEmail').checked,lang:'fr',viaPrenom:v('viaPrenom'),viaNom:v('viaNom'),viaTel:v('viaTel')};
+  var o={op:'lead',type:'decouverte',website:v('website'),nom:v('nom'),prenom:v('prenom'),tel:v('tel'),email:v('email'),interets:interets(),message:v('message'),consent:true,consentEmail:document.getElementById('consentEmail').checked,lang:'fr',viaPrenom:v('viaPrenom'),viaNom:v('viaNom'),viaTel:v('viaTel'),viaEmail:v('viaEmail')};
   post(o).then(function(d){
     if(!d.ok){btn.disabled=false;btn.textContent='Recevoir les informations';err.textContent=d.error==='trop'?'Trop de demandes pour l\'instant — réessayez dans une heure.':d.error==='lien'?'Ce lien n\'est plus valide.':d.error==='champs'?'Le lien utilisé attend une version plus récente du service — contactez votre référent.':'Envoi impossible pour le moment ('+(d.error||'?')+'). Réessayez ou contactez votre référent.';err.style.display='block';return;}
     document.getElementById('f').style.display='none';var ok=document.getElementById('ok');ok.style.display='block';

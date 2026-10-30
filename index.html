@@ -2383,7 +2383,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.29 · 30/10';
+var APP_VERSION='v3.29.1 · 30/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -7766,6 +7766,7 @@ function oLeadsRender(){
           :'<span>🪪 '+esc(l.pieceType||'Pièce')+' <b>'+esc(l.pieceId||'—')+'</b></span>'
           +'<span>📦 <b>'+esc([l.adresse,l.cp,l.ville,l.pays].filter(Boolean).join(', ')||'—')+'</b></span>')
         +(l.factAdresse?'<span>🧾 <b>'+esc([l.factAdresse,l.factCp,l.factVille,l.factPays].filter(Boolean).join(', '))+'</b></span>':'')
+        +(l.alerteA&&l.alerteA.length?'<span style="grid-column:1/-1;color:var(--t2)">✉️ Alerte envoyée à : <b>'+esc(l.alerteA.join(', '))+'</b>'+(l.recapEnvoye?' · récapitulatif envoyé au demandeur':'')+(l.viaMerciEnvoye?' · merci envoyé à '+esc(l.viaMerciEnvoye):'')+'</span>':'')
         +(l.message?'<span style="grid-column:1/-1">💬 '+esc(l.message)+'</span>':'')
         +leadViaHtml(l)
         +'<span>'+(l.consent?'✅ consentement donné':'<span style="color:var(--rd)">⚠️ sans consentement</span>')+(l.consentEmail?' · 📧 accepte nos e-mails':'')+'</span>'
@@ -7784,7 +7785,7 @@ function oLeadsRender(){
 // v3.26 — « Par qui en avez-vous entendu parler ? » (formulaire ouvert avec le lien de l'admin)
 function leadViaHtml(l){
   var v=l.via;if(!v)return'';
-  var who=esc([v.prenom,v.nom].filter(Boolean).join(' '))+(v.tel?' · '+esc(v.tel):'');
+  var who=esc([v.prenom,v.nom].filter(Boolean).join(' '))+(v.tel?' · '+esc(v.tel):'')+(v.email?' · '+esc(v.email):'');
   var roles={admin:'administrateur',gestionnaire:'gestionnaire',referent:'référent',client:'client du réseau',contact:'contact du CRM'};
   var st=v.match?'<span class="obdg bgr">✅ reconnu : '+esc(v.matchNom)+' ('+(roles[v.matchRole]||v.matchRole)+(v.matchTag?' · équipe '+esc(v.matchTag):'')+')</span>'+(v.prenomOk?'':' <span class="obdg brd" title="Le prénom donné ne correspond pas à la fiche trouvée pour ce numéro">⚠️ prénom différent</span>')
     :'<span class="obdg bor" title="Aucun référent, gestionnaire ou contact du CRM n\'a ce numéro">❔ non reconnu — rattachez la fiche à la main</span>';
@@ -7831,7 +7832,7 @@ function oLeadCreate(id){
   var owner=USERS.find(function(u){return u.id===l.userId;});var tag=l.tag||(owner&&owner.tags&&owner.tags[0])||l.userNom||'';
   var item=isDec
     ?{nom:(l.nom||'?').toUpperCase(),prenom:l.prenom||'',tel:normPhone(l.tel),email:l.email||'',refere:tag,ctags:tag?[tag]:[],canal:'Lien découverte',qualification:'Tiède',etape:'Prospect',statut:ET2ST.Prospect,statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),interets:l.interets||[],notes:'Demande de découverte reçue via le lien de '+(l.userNom||'')+' le '+fD((l.ts||'').slice(0,10))+((l.interets||[]).length?' · intérêts : '+l.interets.join(', '):'')+(l.message?'\nMessage : '+l.message:'')}
-    :{nom:(l.nom||'').toUpperCase(),prenom:l.prenom||'',tel:normPhone(l.tel),email:l.email||'',pays:l.pays||'France',adresse:l.adresse||'',cp:l.cp||'',ville:l.ville||'',factAdresse:l.factAdresse||'',factCp:l.factCp||'',factVille:l.factVille||'',factPays:l.factPays||'',refere:tag,ctags:tag?[tag]:[],canal:'QR code',qualification:'Chaud',etape:'Achat en cours',statut:'close',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:'Demande d\'inscription reçue via le QR code de '+(l.userNom||'')+' le '+fD((l.ts||'').slice(0,10))+(l.pieceType?' · '+l.pieceType:'')+(l.message?'\nMessage : '+l.message:'')};
+    :{nom:(l.nom||'').toUpperCase(),prenom:l.prenom||'',tel:normPhone(l.tel),email:l.email||'',pays:l.pays||'France',adresse:l.adresse||'',cp:l.cp||'',ville:l.ville||'',factAdresse:l.factAdresse||'',factCp:l.factCp||'',factVille:l.factVille||'',factPays:l.factPays||'',pieceId:(l.pieceId&&!/^••••/.test(l.pieceId))?l.pieceId:'',pieceType:l.pieceType||'',refere:tag,ctags:tag?[tag]:[],canal:'QR code',qualification:'Chaud',etape:'Achat en cours',statut:'close',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:'Demande d\'inscription reçue via le QR code de '+(l.userNom||'')+' le '+fD((l.ts||'').slice(0,10))+(l.pieceType?' · '+l.pieceType:'')+(l.message?'\nMessage : '+l.message:'')};
   if(suivi)item.suiviPar=suivi;
   if(l.via){var vv=l.via,vwho=[vv.prenom,vv.nom].filter(Boolean).join(' ')+(vv.tel?' ('+vv.tel+')':'');item.notes+='\nDe la part de : '+vwho+(vv.match?' — reconnu : '+vv.matchNom:' — non reconnu dans le CRM');item.recommandePar=vv.match?vv.matchNom:vwho;if(!suivi&&vv.matchSuivi)item.suiviPar=vv.matchSuivi;}
   if(l.consentEmail&&l.email){item.emailConsent=true;item.emailConsentLe=l.ts||new Date().toISOString();item.emailConsentSrc=isDec?'formulaire découverte (lien de '+(l.userNom||'')+')':'formulaire d\'inscription (QR de '+(l.userNom||'')+')';}

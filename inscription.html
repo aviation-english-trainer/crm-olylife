@@ -108,12 +108,14 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--g);box-s
 
     <div class="via" id="via">
       <h3>🤝 Par qui avez-vous entendu parler de nous ?</h3>
-      <p>Pour vous mettre en relation avec la bonne personne de l'équipe. Son prénom et son téléphone suffisent ; le nom aide, sans être obligatoire.</p>
+      <p>Pour vous mettre en relation avec la bonne personne de l'équipe et la remercier. Son prénom, son téléphone et son e-mail sont nécessaires ; le nom aide, sans être obligatoire.</p>
       <div class="row">
         <div><label>Son prénom <b>*</b></label><input id="viaPrenom" placeholder="Prénom" autocomplete="off"></div>
         <div><label>Son nom <span style="font-weight:500;color:#5B6770">(recommandé)</span></label><input id="viaNom" placeholder="NOM" autocomplete="off"></div>
       </div>
       <label>Son téléphone / WhatsApp <b>*</b></label><input id="viaTel" type="tel" placeholder="+33 6 …" autocomplete="off">
+      <label>Son e-mail <b>*</b></label><input id="viaEmail" type="email" placeholder="prenom@exemple.com" autocomplete="off" inputmode="email">
+      <p style="margin:6px 0 0;font-size:11.5px;color:#5B6770">Cette personne recevra un simple e-mail de remerciement avec vos nom, prénom, e-mail et téléphone — rien d'autre.</p>
     </div>
     <label style="margin-top:14px">Message (facultatif)</label><textarea id="message" rows="2" placeholder="Une précision, une question…"></textarea>
 
@@ -182,10 +184,11 @@ document.getElementById('f').addEventListener('submit',function(e){
   else if(v('mdp').length<8||!/[A-Za-z]/.test(v('mdp'))||!/\d/.test(v('mdp')))msg='Le mot de passe doit faire au moins 8 caractères avec des lettres et des chiffres.';
   else if(v('mdp')!==v('mdp2'))msg='Les deux mots de passe ne sont pas identiques.';
   else if(!document.getElementById('consent').checked)msg='Merci de cocher la case de consentement.';
-  else if(document.getElementById('via').classList.contains('on')&&(!v('viaPrenom')||!v('viaTel')))msg='Merci d\'indiquer le prénom et le téléphone de la personne qui vous a parlé de nous.';
+  else if(document.getElementById('via').classList.contains('on')&&(!v('viaPrenom')||!v('viaTel')||!v('viaEmail')))msg='Merci d\'indiquer le prénom, le téléphone et l\'e-mail de la personne qui vous a parlé de nous.';
+  else if(document.getElementById('via').classList.contains('on')&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('viaEmail')))msg='L\'e-mail de la personne qui vous a parlé de nous ne semble pas valide.';
   if(msg){err.textContent=msg;err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'center'});return;}
   var btn=document.getElementById('go');btn.disabled=true;btn.textContent='Envoi en cours…';
-  var o={op:'lead',website:v('website'),nom:v('nom'),prenom:v('prenom'),pieceType:v('pieceType'),pieceId:v('pieceId').toUpperCase(),tel:v('tel'),email:v('email'),adresse:v('adresse'),cp:v('cp'),ville:v('ville'),pays:v('pays'),mdp:v('mdp'),message:v('message'),consent:true,consentEmail:document.getElementById('consentEmail').checked,lang:'fr',viaPrenom:v('viaPrenom'),viaNom:v('viaNom'),viaTel:v('viaTel')};
+  var o={op:'lead',website:v('website'),nom:v('nom'),prenom:v('prenom'),pieceType:v('pieceType'),pieceId:v('pieceId').toUpperCase(),tel:v('tel'),email:v('email'),adresse:v('adresse'),cp:v('cp'),ville:v('ville'),pays:v('pays'),mdp:v('mdp'),message:v('message'),consent:true,consentEmail:document.getElementById('consentEmail').checked,lang:'fr',viaPrenom:v('viaPrenom'),viaNom:v('viaNom'),viaTel:v('viaTel'),viaEmail:v('viaEmail')};
   if(document.getElementById('factDiff').checked){o.factAdresse=v('factAdresse');o.factCp=v('factCp');o.factVille=v('factVille');o.factPays=v('factPays');}
   post(o).then(function(d){
     if(!d.ok){btn.disabled=false;btn.textContent='Envoyer mes informations';err.textContent=d.error==='trop'?'Trop de demandes pour l\'instant — réessayez dans une heure.':d.error==='lien'?'Ce lien n\'est plus valide.':'Envoi impossible pour le moment ('+(d.error||'?')+'). Réessayez ou contactez votre référent.';err.style.display='block';return;}
