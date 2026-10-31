@@ -1509,18 +1509,19 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
           <div class="ofg1"><label class="ofl">E-mail</label><input type="email" class="ofc" id="fc-em" placeholder="contact@email.com"></div>
           <div class="ofg1"><label class="ofl">Pays</label><input type="text" class="ofc" id="fc-pays" placeholder="France"></div>
           <div class="ofg1"><label class="ofl">Ville</label><input type="text" class="ofc" id="fc-vil" placeholder="Paris"></div>
-          <div class="ofg1"><label class="ofl">📦 Adresse de livraison</label><input type="text" class="ofc" id="fc-adr" placeholder="81 Chemin de Crémat, BAT 1" autocomplete="off"></div>
-          <div class="ofg1"><label class="ofl">Code postal (livraison)</label><input type="text" class="ofc" id="fc-cp" placeholder="06200" autocomplete="off"></div>
-          <div class="ofg1"><label class="ofl">Destinataire de la livraison <span style="color:var(--t3);font-weight:400;font-size:11px">— seulement si différent du contact</span></label>
-            <div style="display:flex;gap:8px"><input type="text" class="ofc" id="liv-nm" placeholder="Nom" style="flex:1"><input type="text" class="ofc" id="liv-pr" placeholder="Prénom" style="flex:1"></div>
-            <div style="display:flex;gap:8px;margin-top:6px"><input type="tel" class="ofc" id="liv-tel" placeholder="Téléphone livraison" style="flex:1"><input type="email" class="ofc" id="liv-em" placeholder="Email livraison" style="flex:1"></div>
-          </div>
-          <div class="ofg1">
-            <button type="button" class="ob bgh bsm" id="btn-fact" onclick="oToggleFact()">🧾 Adresse de facturation différente ▾</button>
-            <div id="fact-wrap" style="display:none;flex-direction:column;gap:8px;margin-top:8px;padding:12px;background:var(--navy3);border:1.5px dashed var(--bd);border-radius:var(--rs)">
-              <input type="text" class="ofc" id="fact-adr" placeholder="Adresse de facturation">
-              <div style="display:flex;gap:8px"><input type="text" class="ofc" id="fact-cp" placeholder="CP" style="flex:0 0 90px"><input type="text" class="ofc" id="fact-vil" placeholder="Ville" style="flex:1"></div>
-              <input type="text" class="ofc" id="fact-pays" placeholder="Pays">
+          <div class="ofg1"><label class="ofl">🧾 Adresse <span style="color:var(--t3);font-weight:400;font-size:11px">— adresse de facturation, et de livraison par défaut</span></label><input type="text" class="ofc" id="fc-adr" placeholder="81 Chemin de Crémat, BAT 1" autocomplete="off"></div>
+          <div class="ofg1"><label class="ofl">Code postal</label><input type="text" class="ofc" id="fc-cp" placeholder="06200" autocomplete="off"></div>
+          <div class="ofg1" style="grid-column:1/-1">
+            <button type="button" class="ob bgh bsm" id="btn-liv" onclick="oToggleLiv()">📦 Livraison à une autre adresse ou à une autre personne ▾</button>
+            <div id="liv-wrap" style="display:none;flex-direction:column;gap:8px;margin-top:8px;padding:12px;background:var(--navy3);border:1.5px dashed var(--bd);border-radius:var(--rs)">
+              <div style="font-size:11px;font-weight:700;color:var(--t2);letter-spacing:.3px">DESTINATAIRE <span style="font-weight:400">— seulement si différent du contact</span></div>
+              <div style="display:flex;gap:8px"><input type="text" class="ofc" id="liv-nm" placeholder="Nom" style="flex:1"><input type="text" class="ofc" id="liv-pr" placeholder="Prénom" style="flex:1"></div>
+              <div style="display:flex;gap:8px"><input type="tel" class="ofc" id="liv-tel" placeholder="Téléphone livraison" style="flex:1"><input type="email" class="ofc" id="liv-em" placeholder="E-mail livraison" style="flex:1"></div>
+              <div style="font-size:11px;font-weight:700;color:var(--t2);letter-spacing:.3px;margin-top:4px">ADRESSE DE LIVRAISON <span style="font-weight:400">— seulement si différente de l'adresse ci-dessus</span></div>
+              <input type="text" class="ofc" id="liv-adr" placeholder="Adresse de livraison" autocomplete="off">
+              <div style="display:flex;gap:8px"><input type="text" class="ofc" id="liv-cp" placeholder="CP" style="flex:0 0 90px"><input type="text" class="ofc" id="liv-vil" placeholder="Ville" style="flex:1"></div>
+              <input type="text" class="ofc" id="liv-pays" placeholder="Pays">
+              <input type="hidden" id="fact-adr"><input type="hidden" id="fact-cp"><input type="hidden" id="fact-vil"><input type="hidden" id="fact-pays">
             </div>
           </div>
           <div class="ofg1" id="fg-ref"><label class="ofl">Référé par</label>
@@ -2385,7 +2386,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.29.2 · 31/10';
+var APP_VERSION='v3.29.3 · 31/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -4483,10 +4484,11 @@ function oOpenF(id){
       +((c.ctags&&c.ctags.length)?'<div class="od-row"><span class="od-lbl">Tags</span><span class="od-val" style="display:flex;flex-wrap:wrap;gap:4px">'+c.ctags.map(function(t){return'<span class="obdg bpu">'+esc(t)+'</span>';}).join('')+'</span></div>':'')
       +'<div class="od-row"><span class="od-lbl">Canal</span><span class="od-val">'+(c.canal||'—')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">Registre</span><span class="od-val">'+(TONE_LABEL[c.registre]||TONE_LABEL.pro)+'</span></div>',false)
-    +((c.adresse||c.cp||c.essaiOk||c.factAdresse||c.livNom)?odSec('📦 Livraison · 🧾 Facturation',
-      '<div class="od-row"><span class="od-lbl">📦 Livraison</span><span class="od-val">'+esc([c.adresse,(c.cp||'')+' '+(c.ville||''),c.pays].map(function(x){return String(x||'').trim();}).filter(Boolean).join(', ')||'—')+'</span></div>'
+    +((c.adresse||c.cp||c.essaiOk||c.factAdresse||c.livNom||c.livAdresse)?odSec('🧾 Adresse · 📦 Livraison',
+      '<div class="od-row"><span class="od-lbl">🧾 Adresse (facturation)</span><span class="od-val">'+esc([c.adresse,(c.cp||'')+' '+(c.ville||''),c.pays].map(function(x){return String(x||'').trim();}).filter(Boolean).join(', ')||'—')+'</span></div>'
+      +'<div class="od-row"><span class="od-lbl">📦 Livraison</span><span class="od-val">'+((c.livAdresse||c.livCp||c.livVille||c.livPays)?esc([c.livAdresse,(c.livCp||'')+' '+(c.livVille||''),c.livPays].map(function(x){return String(x||'').trim();}).filter(Boolean).join(', ')):'<span class="t-muted">même adresse</span>')+'</span></div>'
       +((c.livNom||c.livPrenom||c.livTel||c.livEmail)?'<div class="od-row"><span class="od-lbl">Destinataire</span><span class="od-val">'+esc(((c.livNom||'')+' '+(c.livPrenom||'')).trim())+(c.livTel?' · '+esc(c.livTel):'')+(c.livEmail?' · '+esc(c.livEmail):'')+'</span></div>':'')
-      +'<div class="od-row"><span class="od-lbl">🧾 Facturation</span><span class="od-val">'+((c.factAdresse||c.factCp||c.factVille||c.factPays)?esc([c.factAdresse,(c.factCp||'')+' '+(c.factVille||''),c.factPays].map(function(x){return String(x||'').trim();}).filter(Boolean).join(', ')):'<span class="t-muted">identique à la livraison</span>')+'</span></div>'
+      +((c.factAdresse||c.factCp||c.factVille||c.factPays)?'<div class="od-row"><span class="od-lbl">Ancienne adresse de facturation</span><span class="od-val">'+esc([c.factAdresse,(c.factCp||'')+' '+(c.factVille||''),c.factPays].map(function(x){return String(x||'').trim();}).filter(Boolean).join(', '))+' <span class="t-muted">(saisie avant la v3.29.3 — à reporter dans l\'adresse si besoin)</span></span></div>':'')
       +'<div class="od-row"><span class="od-lbl">Essai de l\'appareil</span><span class="od-val">'+(c.essaiOk?'✅ accepte de faire essayer — '+essaiLbl(c):c.essaiMode==='non'?'Non':'—')+'</span></div>'
       +(c.geo?'<div class="od-row"><span class="od-lbl">Carte</span><span class="od-val"><a style="color:var(--aqua);cursor:pointer" onclick="oClose();oSw(\'carte\')">Voir sur la carte ↗</a></span></div>':''),false):'')
     +((c.memberIdOlyLife||c.numCommande||c.rangOly||c.boCompte||c.pieceId)?odSec('🟢 OlyLife — compte & commande',
@@ -4530,7 +4532,7 @@ function oEdit(id,focus){
   document.getElementById('obtn-save').textContent='Enregistrer les modifications';
   document.getElementById('fc-eid').value=id;
   oBuildBoList();
-  var map={'fc-nm':c.nom,'fc-pr':c.prenom,'fc-tel':c.tel,'fc-em':c.email,'fc-pays':c.pays,'fc-vil':c.ville,'fc-adr':c.adresse,'fc-cp':c.cp,'fo-rang':c.rangOly,'fo-bo':c.boCompte,'fl-idcard':c.pieceId,'liv-nm':c.livNom,'liv-pr':c.livPrenom,'liv-tel':c.livTel,'liv-em':c.livEmail,'fact-adr':c.factAdresse,'fact-cp':c.factCp,'fact-vil':c.factVille,'fact-pays':c.factPays,'fc-ref':c.refere,'fc-suivi':c.suiviPar,'fc-etape':c.etape,'fc-qualif':c.qualification,'fc-canal':c.canal,'fc-registre':c.registre,'fc-civ':c.civilite,'fc-obj':c.objectifs,'fl-numcmd':c.numCommande,'fl-memberid':c.memberIdOlyLife,'fl-datecmd':c.dateCommande,'fl-transp':c.transporteur,'fl-tracking':c.tracking,'fl-datelivr':c.dateLivraison,'fi-date':c.dateInstall,'fi-recu':c.dateReception,'fi-notes':c.notesUsage,'ft-texte':c.temoignageTexte,'fe-sponsor':c.sponsor,'fe-placement':c.placement,'fe-cote':c.cote,'fe-gen':c.generation,'fe-rang':c.rang,'fc-notes':c.notes};
+  var map={'fc-nm':c.nom,'fc-pr':c.prenom,'fc-tel':c.tel,'fc-em':c.email,'fc-pays':c.pays,'fc-vil':c.ville,'fc-adr':c.adresse,'fc-cp':c.cp,'fo-rang':c.rangOly,'fo-bo':c.boCompte,'fl-idcard':c.pieceId,'liv-nm':c.livNom,'liv-pr':c.livPrenom,'liv-tel':c.livTel,'liv-em':c.livEmail,'liv-adr':c.livAdresse,'liv-cp':c.livCp,'liv-vil':c.livVille,'liv-pays':c.livPays,'fact-adr':c.factAdresse,'fact-cp':c.factCp,'fact-vil':c.factVille,'fact-pays':c.factPays,'fc-ref':c.refere,'fc-suivi':c.suiviPar,'fc-etape':c.etape,'fc-qualif':c.qualification,'fc-canal':c.canal,'fc-registre':c.registre,'fc-civ':c.civilite,'fc-obj':c.objectifs,'fl-numcmd':c.numCommande,'fl-memberid':c.memberIdOlyLife,'fl-datecmd':c.dateCommande,'fl-transp':c.transporteur,'fl-tracking':c.tracking,'fl-datelivr':c.dateLivraison,'fi-date':c.dateInstall,'fi-recu':c.dateReception,'fi-notes':c.notesUsage,'ft-texte':c.temoignageTexte,'fe-sponsor':c.sponsor,'fe-placement':c.placement,'fe-cote':c.cote,'fe-gen':c.generation,'fe-rang':c.rang,'fc-notes':c.notes};
   Object.keys(map).forEach(function(k){var el=document.getElementById(k);if(!el)return;if(k==='fc-ref'){var refVal=map[k]||'';var found=false;for(var i=0;i<el.options.length;i++){if(el.options[i].value===refVal){el.value=refVal;found=true;break;}}if(!found&&refVal){var opt=document.createElement('option');opt.value=refVal;opt.textContent=refVal;el.insertBefore(opt,el.options[el.options.length-1]);el.value=refVal;}document.getElementById('fc-ref-autre').style.display='none';}else{el.value=map[k]||'';}});
   document.getElementById('fc-ctags').value=(c.ctags||[]).join(', ');renderCtagsChips();updateRefListByTags((c.ctags||[]));
   var cs=suivisDe(c);document.querySelectorAll('.fc-sui').forEach(function(x){x.checked=cs.indexOf(x.value)>=0;x.parentNode.classList.toggle('on',x.checked);});
@@ -4540,7 +4542,7 @@ function oEdit(id,focus){
   document.getElementById('fc-consent').checked=!!c.emailConsent;var fci=document.getElementById('fc-consent-info');if(fci)fci.textContent=c.emailConsent?('accord noté le '+fD(String(c.emailConsentLe||'').slice(0,10))+(c.emailConsentSrc?' — '+c.emailConsentSrc:'')):(c.emailConsentRetire?'⚠️ consentement retiré le '+fD(String(c.emailConsentRetire).slice(0,10))+' (désinscription)':'accord oral ou écrit reçu par le gestionnaire');
   document.getElementById('fo-essai').checked=!!c.essaiOk;document.getElementById('fo-essai-mode').value=c.essaiMode||(c.essaiOk?'gratuit':'');document.getElementById('fo-essai-mt').value=c.essaiMontant||'';document.getElementById('fo-essai-dev').value=c.essaiDevise||'€';oTEssai();
   var rh=document.getElementById('fo-rang-hint');if(rh){var est=rangFromUSD(c.achatsUSD||c.montantUSD);rh.textContent=est?'— estimé d\'après '+(c.achatsUSD||c.montantUSD)+' USD d\'achats : '+est:'';if(est&&!c.rangOly)document.getElementById('fo-rang').value=est;}
-  oSetFact(!!(c.factAdresse||c.factCp||c.factVille||c.factPays));
+  oSetLiv(!!(c.livNom||c.livPrenom||c.livTel||c.livEmail||c.livAdresse||c.livCp||c.livVille||c.livPays));
   oTEQ();
   document.querySelectorAll('#opg .oprd').forEach(function(p){var cb=p.querySelector('input');cb.checked=(c.produits||[]).indexOf(cb.value)>=0;p.classList.toggle('on',cb.checked);});
   FORM_COMPTES=JSON.parse(JSON.stringify(c.comptes||[]));oCompteRender();
@@ -4552,7 +4554,7 @@ function oReset(){
   resMarkClear();
   document.getElementById('fc-eid').value='';EID=null;
   oBuildBoList();
-  ['fc-nm','fc-pr','fc-tel','fc-em','fc-pays','fc-vil','fc-adr','fc-cp','fo-bo','fl-idcard','liv-nm','liv-pr','liv-tel','liv-em','fact-adr','fact-cp','fact-vil','fact-pays','fc-obj','fl-numcmd','fl-memberid','fl-datecmd','fl-transp','fl-tracking','fl-datelivr','fi-date','fi-notes','ft-texte','fe-sponsor','fe-placement','fe-gen','fc-notes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  ['fc-nm','fc-pr','fc-tel','fc-em','fc-pays','fc-vil','fc-adr','fc-cp','fo-bo','fl-idcard','liv-nm','liv-pr','liv-tel','liv-em','liv-adr','liv-cp','liv-vil','liv-pays','fact-adr','fact-cp','fact-vil','fact-pays','fc-obj','fl-numcmd','fl-memberid','fl-datecmd','fl-transp','fl-tracking','fl-datelivr','fi-date','fi-notes','ft-texte','fe-sponsor','fe-placement','fe-gen','fc-notes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('fc-etape').value='Prospect';document.getElementById('fc-qualif').value='Chaud';document.getElementById('fc-canal').value='WhatsApp';document.getElementById('fc-registre').value='pro';document.getElementById('fc-civ').value='';
   document.getElementById('fc-suivi').value='';document.querySelectorAll('.fc-sui').forEach(function(x){x.checked=false;x.parentNode.classList.remove('on');});
   document.getElementById('fc-ref').value='';
@@ -4591,7 +4593,7 @@ function oSave(){
   var data={
     nom:nm.toUpperCase(),prenom:pr,tel:tel,email:document.getElementById('fc-em').value,pays:document.getElementById('fc-pays').value,ville:document.getElementById('fc-vil').value,
     adresse:val('fc-adr'),cp:val('fc-cp'),rangOly:val('fo-rang'),pieceId:val('fl-idcard'),essaiOk:(function(){var m=val('fo-essai-mode');return m==='gratuit'||m==='payant';}()),essaiMode:val('fo-essai-mode'),essaiMontant:val('fo-essai-mode')==='payant'?(parseFloat(val('fo-essai-mt'))||0):0,essaiDevise:val('fo-essai-dev'),
-    livNom:val('liv-nm'),livPrenom:val('liv-pr'),livTel:val('liv-tel'),livEmail:val('liv-em'),
+    livNom:val('liv-nm'),livPrenom:val('liv-pr'),livTel:val('liv-tel'),livEmail:val('liv-em'),livAdresse:val('liv-adr'),livCp:val('liv-cp'),livVille:val('liv-vil'),livPays:val('liv-pays'),
     factAdresse:val('fact-adr'),factCp:val('fact-cp'),factVille:val('fact-vil'),factPays:val('fact-pays'),
     boCompte:(function(){var raw=val('fo-bo').trim();if(!raw)return'';var ea=(raw.match(/EA\d+/i)||[])[0];if(ea){ea=ea.toUpperCase();var o=OC.find(function(x){return String(x.memberIdOlyLife||'').toUpperCase()===ea;});if(o)return ea+' — '+o.nom+' '+(o.prenom||'');}return raw;}()),
     refere:isRef?((USER.tags&&USER.tags[0])||USER.nom):(function(){var sv=document.getElementById('fc-ref').value;return sv==='__autre__'?(document.getElementById('fc-ref-autre').value.trim()):sv;}()),
@@ -6060,8 +6062,9 @@ function oInstallSkip(){
 // ═══════════════════════════════════════════════════════════════════
 // v3.1 — TIROIR · AVANCES · CARTE · GÉNÉALOGIE · COLLECTE D'INFOS
 // ═══════════════════════════════════════════════════════════════════
-function oSetFact(on){var w=document.getElementById('fact-wrap');var b=document.getElementById('btn-fact');if(!w||!b)return;w.style.display=on?'flex':'none';b.textContent=on?'🧾 Adresse de facturation différente ▴':'🧾 Adresse de facturation différente ▾';}
-function oToggleFact(){var w=document.getElementById('fact-wrap');oSetFact(w&&w.style.display==='none');}
+function oSetLiv(on){var w=document.getElementById('liv-wrap');var b=document.getElementById('btn-liv');if(!w||!b)return;w.style.display=on?'flex':'none';b.textContent=on?'📦 Livraison à une autre adresse ou à une autre personne ▴':'📦 Livraison à une autre adresse ou à une autre personne ▾';}
+function oToggleLiv(){var w=document.getElementById('liv-wrap');oSetLiv(w&&w.style.display==='none');}
+function oSetFact(on){oSetLiv(on);}function oToggleFact(){oToggleLiv();}
 var TUNNELS_URL='https://team-waterlifehightech.com/app-tunnels/';
 var BOFFICE_URL='https://www.team-waterlifehightech.com/bo-office/';
 function oTunnels(){window.open(TUNNELS_URL,'_blank');}
@@ -7775,8 +7778,8 @@ function oLeadsRender(){
         +'<span>📞 <b>'+esc(l.tel||'—')+'</b></span><span>✉️ <b>'+esc(l.email||'—')+'</b></span>'
         +(isDec?'<span style="grid-column:1/-1">🌱 Intérêts : <b>'+esc((l.interets||[]).join(', ')||'—')+'</b></span>'
           :'<span>🪪 '+esc(l.pieceType||'Pièce')+' <b>'+esc(l.pieceId||'—')+'</b></span>'
-          +'<span>📦 <b>'+esc([l.adresse,l.cp,l.ville,l.pays].filter(Boolean).join(', ')||'—')+'</b></span>')
-        +(l.factAdresse?'<span>🧾 <b>'+esc([l.factAdresse,l.factCp,l.factVille,l.factPays].filter(Boolean).join(', '))+'</b></span>':'')
+          +'<span>🧾 <b>'+esc([l.adresse,l.cp,l.ville,l.pays].filter(Boolean).join(', ')||'—')+'</b></span>')
+        +((l.livAdresse||l.factAdresse||l.livNom)?'<span>📦 Livraison : <b>'+esc([[l.livNom,l.livPrenom].filter(Boolean).join(' '),l.livTel,l.livAdresse||l.factAdresse,l.livCp||l.factCp,l.livVille||l.factVille,l.livPays||l.factPays].filter(Boolean).join(', '))+'</b></span>':'')
         +(l.alerteA&&l.alerteA.length?'<span style="grid-column:1/-1;color:var(--t2)">✉️ Alerte envoyée à : <b>'+esc(l.alerteA.join(', '))+'</b>'+(l.recapEnvoye?' · récapitulatif envoyé au demandeur':'')+(l.viaMerciEnvoye?' · merci envoyé à '+esc(l.viaMerciEnvoye):'')+'</span>':'')
         +(l.message?'<span style="grid-column:1/-1">💬 '+esc(l.message)+'</span>':'')
         +leadViaHtml(l)
@@ -7843,7 +7846,7 @@ function oLeadCreate(id){
   var owner=USERS.find(function(u){return u.id===l.userId;});var tag=l.tag||(owner&&owner.tags&&owner.tags[0])||l.userNom||'';
   var item=isDec
     ?{nom:(l.nom||'?').toUpperCase(),prenom:l.prenom||'',tel:normPhone(l.tel),email:l.email||'',refere:tag,ctags:tag?[tag]:[],canal:'Lien découverte',qualification:'Tiède',etape:'Prospect',statut:ET2ST.Prospect,statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),interets:l.interets||[],notes:'Demande de découverte reçue via le lien de '+(l.userNom||'')+' le '+fD((l.ts||'').slice(0,10))+((l.interets||[]).length?' · intérêts : '+l.interets.join(', '):'')+(l.message?'\nMessage : '+l.message:'')}
-    :{nom:(l.nom||'').toUpperCase(),prenom:l.prenom||'',tel:normPhone(l.tel),email:l.email||'',pays:l.pays||'France',adresse:l.adresse||'',cp:l.cp||'',ville:l.ville||'',factAdresse:l.factAdresse||'',factCp:l.factCp||'',factVille:l.factVille||'',factPays:l.factPays||'',pieceId:(l.pieceId&&!/^••••/.test(l.pieceId))?l.pieceId:'',pieceType:l.pieceType||'',refere:tag,ctags:tag?[tag]:[],canal:'QR code',qualification:'Chaud',etape:'Achat en cours',statut:'close',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:'Demande d\'inscription reçue via le QR code de '+(l.userNom||'')+' le '+fD((l.ts||'').slice(0,10))+(l.pieceType?' · '+l.pieceType:'')+(l.message?'\nMessage : '+l.message:'')};
+    :{nom:(l.nom||'').toUpperCase(),prenom:l.prenom||'',tel:normPhone(l.tel),email:l.email||'',pays:l.pays||'France',adresse:l.adresse||'',cp:l.cp||'',ville:l.ville||'',livAdresse:l.livAdresse||l.factAdresse||'',livCp:l.livCp||l.factCp||'',livVille:l.livVille||l.factVille||'',livPays:l.livPays||l.factPays||'',livNom:l.livNom||'',livPrenom:l.livPrenom||'',livTel:l.livTel||'',livEmail:l.livEmail||'',pieceId:(l.pieceId&&!/^••••/.test(l.pieceId))?l.pieceId:'',pieceType:l.pieceType||'',refere:tag,ctags:tag?[tag]:[],canal:'QR code',qualification:'Chaud',etape:'Achat en cours',statut:'close',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:'Demande d\'inscription reçue via le QR code de '+(l.userNom||'')+' le '+fD((l.ts||'').slice(0,10))+(l.pieceType?' · '+l.pieceType:'')+(l.message?'\nMessage : '+l.message:'')};
   if(suivi)item.suiviPar=suivi;
   if(l.via){var vv=l.via,vwho=[vv.prenom,vv.nom].filter(Boolean).join(' ')+(vv.tel?' ('+vv.tel+')':'');item.notes+='\nDe la part de : '+vwho+(vv.match?' — reconnu : '+vv.matchNom:' — non reconnu dans le CRM');item.recommandePar=vv.match?vv.matchNom:vwho;if(!suivi&&vv.matchSuivi)item.suiviPar=vv.matchSuivi;}
   if(l.consentEmail&&l.email){item.emailConsent=true;item.emailConsentLe=l.ts||new Date().toISOString();item.emailConsentSrc=isDec?'formulaire découverte (lien de '+(l.userNom||'')+')':'formulaire d\'inscription (QR de '+(l.userNom||'')+')';}

@@ -85,18 +85,21 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--g);box-s
     <label>Téléphone / WhatsApp <b>*</b></label><input id="tel" type="tel" autocomplete="tel" placeholder="+33 6 12 34 56 78" required>
     <label>Adresse e-mail <b>*</b></label><input id="email" type="email" autocomplete="email" placeholder="vous@email.com" required>
 
-    <h2 style="margin-top:16px"><span class="n">3</span>Adresse de livraison</h2>
+    <h2 style="margin-top:16px"><span class="n">3</span>Votre adresse <span style="font-weight:500;color:var(--t3);font-size:12px">— facturation, et livraison sauf indication contraire</span></h2>
     <label>Adresse <b>*</b></label><input id="adresse" autocomplete="street-address" placeholder="4 chemin de la Gardette" required>
     <div class="row">
       <div><label>Code postal <b>*</b></label><input id="cp" autocomplete="postal-code" inputmode="numeric" placeholder="05000" required></div>
       <div><label>Ville <b>*</b></label><input id="ville" autocomplete="address-level2" placeholder="Gap" required></div>
     </div>
     <label>Pays <b>*</b></label><input id="pays" autocomplete="country-name" value="France" required>
-    <label class="chk" style="margin-top:12px"><input type="checkbox" id="factDiff" onchange="document.getElementById('fact').style.display=this.checked?'block':'none'"><span>L'adresse de facturation est différente</span></label>
-    <div id="fact">
-      <label>Adresse de facturation</label><input id="factAdresse" placeholder="Adresse">
-      <div class="row"><div><label>Code postal</label><input id="factCp"></div><div><label>Ville</label><input id="factVille"></div></div>
-      <label>Pays</label><input id="factPays" value="France">
+    <label class="chk" style="margin-top:12px"><input type="checkbox" id="livDiff" onchange="document.getElementById('liv').style.display=this.checked?'block':'none'"><span>📦 Livrer à une autre adresse ou à une autre personne</span></label>
+    <div id="liv" style="display:none">
+      <div class="row"><div><label>Nom du destinataire</label><input id="livNom" placeholder="NOM" autocomplete="off"></div><div><label>Prénom</label><input id="livPrenom" placeholder="Prénom" autocomplete="off"></div></div>
+      <div class="row"><div><label>Téléphone du destinataire</label><input id="livTel" type="tel" placeholder="+33 6 …" autocomplete="off"></div><div><label>E-mail du destinataire</label><input id="livEmail" type="email" placeholder="prenom@exemple.com" autocomplete="off"></div></div>
+      <label>Adresse de livraison</label><input id="livAdresse" placeholder="Adresse" autocomplete="off">
+      <div class="row"><div><label>Code postal</label><input id="livCp" inputmode="numeric"></div><div><label>Ville</label><input id="livVille"></div></div>
+      <label>Pays</label><input id="livPays" value="France">
+      <p class="hint" style="margin-top:6px;font-size:12px">Laissez vide ce qui est identique : la facture reste à votre nom et à votre adresse.</p>
     </div>
 
     <h2 style="margin-top:16px"><span class="n">4</span>Mot de passe souhaité pour votre compte OlyLife</h2>
@@ -189,7 +192,8 @@ document.getElementById('f').addEventListener('submit',function(e){
   if(msg){err.textContent=msg;err.style.display='block';err.scrollIntoView({behavior:'smooth',block:'center'});return;}
   var btn=document.getElementById('go');btn.disabled=true;btn.textContent='Envoi en cours…';
   var o={op:'lead',website:v('website'),nom:v('nom'),prenom:v('prenom'),pieceType:v('pieceType'),pieceId:v('pieceId').toUpperCase(),tel:v('tel'),email:v('email'),adresse:v('adresse'),cp:v('cp'),ville:v('ville'),pays:v('pays'),mdp:v('mdp'),message:v('message'),consent:true,consentEmail:document.getElementById('consentEmail').checked,lang:'fr',viaPrenom:v('viaPrenom'),viaNom:v('viaNom'),viaTel:v('viaTel'),viaEmail:v('viaEmail')};
-  if(document.getElementById('factDiff').checked){o.factAdresse=v('factAdresse');o.factCp=v('factCp');o.factVille=v('factVille');o.factPays=v('factPays');}
+  if(document.getElementById('livDiff').checked){o.livNom=v('livNom');o.livPrenom=v('livPrenom');o.livTel=v('livTel');o.livEmail=v('livEmail');o.livAdresse=v('livAdresse');o.livCp=v('livCp');o.livVille=v('livVille');o.livPays=v('livPays');
+    /* compatibilité script < v3.22 : les champs fact* servent de transport pour la livraison */ o.factAdresse=o.livAdresse;o.factCp=o.livCp;o.factVille=o.livVille;o.factPays=o.livPays;o.livFlag=1;}
   post(o).then(function(d){
     if(!d.ok){btn.disabled=false;btn.textContent='Envoyer mes informations';err.textContent=d.error==='trop'?'Trop de demandes pour l\'instant — réessayez dans une heure.':d.error==='lien'?'Ce lien n\'est plus valide.':'Envoi impossible pour le moment ('+(d.error||'?')+'). Réessayez ou contactez votre référent.';err.style.display='block';return;}
     try{sessionStorage.setItem('wlht_ins',JSON.stringify({prenom:v('prenom'),nom:v('nom'),tel:v('tel'),email:v('email')}));}catch(e){}
