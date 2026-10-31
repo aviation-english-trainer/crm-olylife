@@ -5,6 +5,7 @@
 //         · inscription seulement si e-mail + consentement tracé (emailConsent, emailConsentLe, emailConsentSrc)
 //         · passage « Dans le réseau » / « Abandon » → bascule automatique de parcours côté serveur
 //         · webhook Systeme.io « Tag ajouté » : oly_desinscrit (règle « désabonné ») → consentement retiré ; oly_fin_* → campagne terminée
+// v3.23 · ZOOM : lien Zoom personnel par membre (zoomUrl — Mon profil / formulaire d'accès), repli config.params.liens.zoom.
 // v3.22 · ADRESSES : une seule adresse (facturation = livraison par défaut) ; livraison à une autre adresse / autre
 //         personne (livNom, livPrenom, livTel, livEmail, livAdresse, livCp, livVille, livPays) reçue du formulaire d'inscription
 //         et reportée dans la fiche à l'intégration. Les anciens champs fact* restent acceptés (compatibilité).
@@ -161,7 +162,7 @@ function findUser_(db, code) {
     var rd = {};
     try { rd = JSON.parse(PropertiesService.getScriptProperties().getProperty('root_digest') || '{}'); } catch (e) {}
     var rp = (db.config && db.config.rootProfile) || {};   // v3.5 — photo / tél / email de l'admin principal
-    return { id: 'root', nom: ADMIN_NOM, role: 'admin', superAdmin: true, tags: [], digestEmail: rd.email || MON_EMAIL, digestHeure: rd.heure || '07:00', calendlyUrl: rd.cal || '', photo: rp.photo || '', tel: rp.tel || '', email: rp.email || '' };
+    return { id: 'root', nom: ADMIN_NOM, role: 'admin', superAdmin: true, tags: [], digestEmail: rd.email || MON_EMAIL, digestHeure: rd.heure || '07:00', calendlyUrl: rd.cal || '', zoomUrl: rp.zoomUrl || '', photo: rp.photo || '', tel: rp.tel || '', email: rp.email || '' };
   }
   var users = db.users || [];
   for (var i = 0; i < users.length; i++) {
@@ -255,7 +256,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.22';
+var SRV_VERSION = '3.23';
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
@@ -305,7 +306,7 @@ function payload_(db, user) {
   if (user.role !== 'admin') contacts = contacts.map(function (c) { if (!c.pieceId) return c; var cc = {}; for (var k in c) cc[k] = c[k]; cc.pieceId = maskId_(c.pieceId); return cc; });
   var res = {
     ok: true,
-    user: { id: user.id, nom: user.nom, role: user.role, tags: user.tags || [], tel: user.tel || '', email: user.email || '', photo: user.photo || '', digestEmail: user.digestEmail || '', digestHeure: user.digestHeure || '', calendlyUrl: user.calendlyUrl || '', scope: user.scope === 'tout' ? 'tout' : 'equipes', comite: !!user.comite, voitComite: !!user.voitComite, pubToken: pubTokenOf_(db, user), superAdmin: !!user.superAdmin, push: user.push !== false },
+    user: { id: user.id, nom: user.nom, role: user.role, tags: user.tags || [], tel: user.tel || '', email: user.email || '', photo: user.photo || '', digestEmail: user.digestEmail || '', digestHeure: user.digestHeure || '', calendlyUrl: user.calendlyUrl || '', scope: user.scope === 'tout' ? 'tout' : 'equipes', comite: !!user.comite, voitComite: !!user.voitComite, pubToken: pubTokenOf_(db, user), superAdmin: !!user.superAdmin, push: user.push !== false, zoomUrl: user.zoomUrl || '' },
     contacts: contacts,
     config: { srv: SRV_VERSION, referents: referentsFor_(db, user), suiveurs: suiveursFor_(db, user), stocks: db.config.stocks || [], ressources: db.config.ressources || {}, equipe: equipe_(db, user), sessionJours: SESSION_JOURS, params: db.config.params || {}, leadsNew: leadsFor_(db, user).filter(function (l) { return l.statut !== 'traite'; }).length }
   };
@@ -824,7 +825,8 @@ function doPost(e) {
           tel: u.tel || '', email: u.email || '', photo: u.photo || '', digestEmail: u.digestEmail || '', digestHeure: u.digestHeure || '',
           pending: !!u.pending, proposePar: u.proposePar || '', proposeLe: u.proposeLe || '', calendlyUrl: u.calendlyUrl || '', scope: u.scope === 'tout' ? 'tout' : 'equipes',
           comite: !!u.comite, voitComite: !!u.voitComite, gests: (u.gests || []).filter(Boolean),
-          push: (oldU[u.id] && oldU[u.id].push !== undefined) ? oldU[u.id].push : (u.push !== false)   // v3.20 — préférence push conservée côté serveur
+          push: (oldU[u.id] && oldU[u.id].push !== undefined) ? oldU[u.id].push : (u.push !== false),   // v3.20 — préférence push conservée côté serveur
+          zoomUrl: /^https:\/\/([a-z0-9-]+\.)?zoom\.(us|com)\//i.test(String(u.zoomUrl || '')) ? u.zoomUrl : ''   // v3.23
         };
       });
       // journal d'administration : créations, suppressions, désactivations, codes, rôles
@@ -884,13 +886,15 @@ function doPost(e) {
       // v3.5 — chaque utilisateur met à jour sa photo, son téléphone et son email
       var pf = { photo: String(req.photo || '').slice(0, 60000), tel: req.tel || '', email: req.email || '' };
       var calOk = /^https:\/\/(www\.)?calendly\.com\//i.test(String(req.calendlyUrl || ''));
+      var zoomOk = /^https:\/\/([a-z0-9-]+\.)?zoom\.(us|com)\//i.test(String(req.zoomUrl || ''));   // v3.23
       if (req.push !== undefined && user.id !== 'root') { for (var pu2 = 0; pu2 < db.users.length; pu2++) if (db.users[pu2].id === user.id) db.users[pu2].push = !!req.push; }   // v3.20 — préférence notifications push
       if (user.id === 'root') {
         db.config.rootProfile = pf;
         if (req.calendlyUrl !== undefined) { var rdc = {}; try { rdc = JSON.parse(PropertiesService.getScriptProperties().getProperty('root_digest') || '{}'); } catch (e) {} rdc.cal = calOk ? req.calendlyUrl : ''; PropertiesService.getScriptProperties().setProperty('root_digest', JSON.stringify(rdc)); }   // v3.19
+        if (req.zoomUrl !== undefined) db.config.rootProfile.zoomUrl = zoomOk ? req.zoomUrl : '';   // v3.23
       } else {
         for (var pi = 0; pi < db.users.length; pi++) {
-          if (db.users[pi].id === user.id) { db.users[pi].photo = pf.photo; db.users[pi].tel = pf.tel; db.users[pi].email = pf.email; if (pf.email && !db.users[pi].digestEmail) db.users[pi].digestEmail = pf.email; if (req.calendlyUrl !== undefined) db.users[pi].calendlyUrl = calOk ? req.calendlyUrl : ''; }   // v3.6 / v3.19 — e-mail → résumé quotidien ; lien Calendly personnel
+          if (db.users[pi].id === user.id) { db.users[pi].photo = pf.photo; db.users[pi].tel = pf.tel; db.users[pi].email = pf.email; if (pf.email && !db.users[pi].digestEmail) db.users[pi].digestEmail = pf.email; if (req.calendlyUrl !== undefined) db.users[pi].calendlyUrl = calOk ? req.calendlyUrl : ''; if (req.zoomUrl !== undefined) db.users[pi].zoomUrl = zoomOk ? req.zoomUrl : ''; }   // v3.6 / v3.19 — e-mail → résumé quotidien ; lien Calendly personnel
         }
       }
     }

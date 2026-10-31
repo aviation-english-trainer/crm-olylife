@@ -1382,6 +1382,8 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
             <div style="margin-top:12px;padding:12px;background:rgba(18,106,60,.07);border-radius:10px;border:1px solid rgba(18,106,60,.18)" id="u-cal-wrap">
               <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">📅 Prise de rendez-vous — lien Calendly personnel</div>
               <input type="url" class="ofc" id="u-cal" placeholder="https://calendly.com/prenom-nom/rdv-olylife">
+              <div style="font-size:12px;font-weight:700;color:var(--gold);margin:10px 0 6px">🎥 Lien Zoom personnel (salle permanente)</div>
+              <input type="url" class="ofc" id="u-zoom" placeholder="https://us05web.zoom.us/j/…?pwd=…">
               <div style="font-size:11.5px;color:var(--t2);margin-top:6px;line-height:1.5">Ce lien remplace celui de Jean-Charles dans <b>tous les messages pré-remplis</b> (WhatsApp, e-mail…) et dans « 📅 RDV ». <b>Sans lien, l'agenda de Jean-Charles est utilisé par défaut.</b> Le compte Calendly <b>gratuit</b> suffit. <button type="button" class="ob bgh bsm" style="min-height:30px" onclick="oCalGuide()">ℹ️ Comment créer son Calendly</button></div>
             </div>
             <input type="hidden" id="u-photo">
@@ -1828,6 +1830,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
               <div class="adm-f"><label>OlyNation — site de l'équipe</label><input type="url" id="adm-l-olynation"></div>
               <div class="adm-f"><label>App Tunnels — Un lien, un client</label><input type="url" id="adm-l-tunnels"></div>
               <div class="adm-f"><label>Chaîne YouTube WaterLifeHighTech (témoignages vidéo)</label><input type="url" id="adm-l-youtube" placeholder="https://www.youtube.com/@…"></div>
+              <div class="adm-f"><label>🎥 Zoom de l'association (repli si le membre n'a pas renseigné son propre lien)</label><input type="url" id="adm-l-zoom" placeholder="https://us05web.zoom.us/j/…?pwd=…"></div>
               <div class="adm-grid"><div class="adm-f"><label>Assistance WhatsApp du formulaire d'inscription — numéro (international, sans +)</label><input type="tel" id="adm-l-watel" placeholder="33651001085"></div><div class="adm-f"><label>Prénom affiché dans la bulle « Écrivez à … »</label><input type="text" id="adm-l-wanom" placeholder="Jean-Charles"></div></div>
               <div class="adm-f" style="margin-top:10px"><label>🔔 Notifications push — OneSignal <b>App ID</b> (gratuit · onesignal.com → votre app → Settings → Keys &amp; IDs)</label><input type="text" id="adm-l-onesignal" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"><div class="hint" style="margin-top:4px">La <b>clé REST API</b> ne se colle jamais ici : propriété de script <code>ONESIGNAL_KEY</code> dans Apps Script (Paramètres du projet → Propriétés du script). Chaque membre active ensuite les notifications depuis <b>Mon profil</b>. Sur iPhone, l'app doit être installée sur l'écran d'accueil.</div></div>
             </div></div>
@@ -2130,6 +2133,11 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <div id="oprof-cal-st" style="font-size:11.5px;line-height:1.5;margin-top:6px;color:var(--t2)"></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button type="button" class="ob bgh bsm" onclick="oCalGuide()">ℹ️ Créer mon Calendly gratuit</button><button type="button" class="ob bgh bsm" onclick="window.open('https://calendly.com/signup','_blank')">↗ calendly.com/signup</button></div>
     </div>
+    <div style="margin-top:12px;padding:12px;background:rgba(18,106,60,.07);border-radius:12px;border:1px solid rgba(18,106,60,.18)">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">🎥 Mon lien Zoom (salle de réunion personnelle)</div>
+      <input type="url" class="ofc" id="oprof-zoom" placeholder="https://us05web.zoom.us/j/1234567890?pwd=…">
+      <div style="font-size:11.5px;line-height:1.5;margin-top:6px;color:var(--t2)">Sur la fiche d'un contact, le bouton <b>🎥 Zoom</b> envoie une invitation déjà rédigée avec ce lien, par son canal préféré, et ouvre votre salle. Dans Zoom : Profil → « ID de réunion personnelle » → copier le lien d'invitation (compte gratuit : 40 min par réunion).</div>
+    </div>
     <div class="oinst-note" id="oprof-note" style="margin-top:10px"></div>
     <button class="ob bgold bfull" style="margin-top:14px;min-height:48px" onclick="oProfSave()">Enregistrer mon profil</button>
     <button class="ob bgh bfull" style="margin-top:8px" type="button" onclick="oProfClose();oShowSetup()">⚙️ Résumé quotidien · Calendly → Réglages</button>
@@ -2386,7 +2394,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.29.3 · 31/10';
+var APP_VERSION='v3.30 · 31/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -3001,7 +3009,7 @@ function oUserNew(){
   document.getElementById('u-digest-email').value='';
   document.getElementById('u-digest-heure').value='';
   document.getElementById('u-photo').value='';setAv('u-photo-av','','·');
-  document.getElementById('u-cal').value='';
+  document.getElementById('u-cal').value='';document.getElementById('u-zoom').value='';
   oUserRoleOpts();
   document.getElementById('eq-user-form').style.display='block';
 }
@@ -3018,7 +3026,7 @@ function oUserEdit(i){
   document.getElementById('u-digest-email').value=u.digestEmail||'';
   document.getElementById('u-digest-heure').value=u.digestHeure||'';
   document.getElementById('u-photo').value=u.photo||'';setAv('u-photo-av',u.photo,ini(u.nom||'?'));
-  document.getElementById('u-cal').value=u.calendlyUrl||'';
+  document.getElementById('u-cal').value=u.calendlyUrl||'';document.getElementById('u-zoom').value=u.zoomUrl||'';
   oUserRoleOpts();
   var f=document.getElementById('eq-user-form');f.style.display='block';
   setTimeout(function(){f.scrollIntoView({behavior:'smooth',block:'start'});},50);
@@ -3073,6 +3081,7 @@ function oUserSave(){
   var calu=(val('u-cal')||'').trim();
   if(calu&&!/^https:\/\/(www\.)?calendly\.com\/.+/i.test(calu)){oT('Le lien Calendly doit commencer par https://calendly.com/','e');return;}
   obj.calendlyUrl=calu;
+  var zu=(val('u-zoom')||'').trim();if(zu&&!/^https:\/\/([a-z0-9-]+\.)?zoom\.(us|com)\//i.test(zu)){oT('Le lien Zoom doit commencer par https://…zoom.us/','e');return;}obj.zoomUrl=zu;
   var idx=USERS.findIndex(function(u){return u.id===obj.id;});
   if(idx>=0){var old=USERS[idx];['pending','proposePar','proposeLe'].forEach(function(k){if(old[k]!==undefined&&obj[k]===undefined)obj[k]=old[k];});
     if(old.role==='admin'&&!IS_SUPER()){oT('Seul le super-admin peut modifier un accès administrateur','e');return;}}
@@ -3258,6 +3267,9 @@ var MSG_DEFAULTS={};
     t:'Bonjour {prenom}, j\'espère que vous allez bien 🌿\n\nPetit rappel amical concernant l\'avance de {montant} {devise} du {date}{?motif: pour votre {motif}}{?rendu: (déjà rendu : {rendu} {devise}, reste {reste} {devise})} : le remboursement est prévu le {echeance}.\n\nMerci de me confirmer que c\'est toujours bon pour vous. Belle journée !\n{moi} — Water Life High Tech'};
   MSG_DEFAULTS.avance_payeur={g:'Avances d\'argent',l:'Information à la personne qui a avancé',vars:['payeur','montant','devise','date','client','motif','echeance','rendu','reste','moi'],
     t:'Bonjour {payeur} 🌿\n\nPetit point sur l\'avance de {montant} {devise} que vous avez faite le {date} à {client}{?motif: pour {motif}} : le remboursement est prévu le {echeance}{?rendu: (déjà rendu : {rendu} {devise}, reste {reste} {devise})}.\n\nJe vous tiens informé(e) dès que c\'est réglé. Merci pour votre confiance 🙏\n{moi} — Water Life High Tech'};
+  // v3.30 — invitation Zoom (salle personnelle du gestionnaire, tous canaux)
+  MSG_DEFAULTS.zoom_invitation={g:'Rendez-vous',l:'Invitation à une visio Zoom (lien personnel)',vars:['prenom','quand','lienZoom','moi','telMoi'],
+    t:'Bonjour {prenom} 🌿\n\nComme convenu, voici le lien de notre visio Zoom{?quand: — {quand}} :\n{lienZoom}\n\nUn clic suffit (l\'application Zoom s\'ouvre, ou le navigateur). Pensez à activer micro et caméra 🙂 Si besoin, je reste joignable{?telMoi: au {telMoi}}.\n\nÀ tout de suite !\n{moi} — Water Life High Tech'};
   // v3.29 — demande de consentement e-mail à la personne elle-même (lien personnel, tous canaux)
   MSG_DEFAULTS.consent_demande={g:'Campagnes e-mail',l:'Demande de consentement e-mail (lien à cliquer)',vars:['prenom','lienConsent','moi'],
     t:'Bonjour {prenom} 🌿\n\nPour vous envoyer nos informations OlyLife par e-mail (découverte des appareils, retours d\'expérience, invitations aux visios), j\'ai besoin de votre accord — c\'est la règle et c\'est normal.\n\n👉 Un clic suffit, 20 secondes :\n{lienConsent}\n\nVous pourrez vous désinscrire à tout moment, en un clic aussi. Merci 🙏\n{moi} — Water Life High Tech'};
@@ -3293,7 +3305,7 @@ var MSG_DEFAULTS={};
   MSG_DEFAULTS.inscription_infos={g:'Inscription OlyLife',l:'Demande des informations d\'inscription',vars:['nomComplet','prenom','nom','lienInscription','moi','role','telMoi'],
     t:'Bonjour {nomComplet} 👋\n\nPour créer votre compte OlyLife et passer votre commande, j\'ai besoin de quelques informations.{?lienInscription:\n\n✅ *Le plus simple* : remplissez ce formulaire sécurisé (2 minutes, sur votre téléphone) — il m\'arrive directement :\n{lienInscription}\n\n📋 À avoir sous la main : votre passeport (ou carte nationale d\'identité — permis et autres cartes refusés, sauf carte de résident), votre adresse de livraison (et de facturation si différente), votre e-mail, et un mot de passe d\'au moins 8 caractères (lettres et chiffres) que vous pourrez modifier ensuite.\n\n✍️ Vous préférez répondre ici ? Envoyez-moi alors EN UN SEUL MESSAGE :}{?sansLien:\n\nMerci de me renvoyer EN UN SEUL MESSAGE les informations suivantes :}\n\n1️⃣ Votre identité EXACTEMENT comme sur votre PASSEPORT (tous les noms et tous les prénoms) + le numéro du passeport.\n   ➡️ Pas de passeport ? La carte nationale d\'identité est acceptée. (Permis de conduire et autres cartes refusés — sauf carte de résident pour les personnes étrangères.)\n2️⃣ Votre adresse postale complète de livraison — et l\'adresse de facturation si elle est différente.\n3️⃣ Votre adresse e-mail.\n4️⃣ Un mot de passe d\'au moins 8 caractères (lettres et chiffres ; symboles possibles mais non obligatoires) — vous pourrez le modifier ensuite.\n\n💳 *Paiement* : la commande se règle en dollars US auprès d\'OlyLife (plateforme à l\'étranger). Il arrive que la banque émettrice bloque la carte par sécurité. Si c\'est le cas, dites-le-moi simplement : je vous transmets une autre méthode via notre association Water Life High Tech (compte français), par carte bancaire ou virement.\n\n🔒 Ces informations restent strictement confidentielles : elles servent uniquement à votre enregistrement officiel OlyLife.\n\nMerci beaucoup, à très vite !\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
 })();
-var MSG_VAR_HELP={lienConsent:'lien personnel de consentement e-mail (page consentement.html, 20 secondes)',lienFacture:'lien de la facture PDF (Drive, lecture seule)',numFacture:'n° de document de la facture',produitFacture:'appareil facturé',montantFacture:'montant total de la facture',demandeMdp:'(case) phrase « vous pouvez conserver ou modifier votre mot de passe »',compte:'ID membre du compte facturé',prenom:'forme d\'adresse selon le registre : premier prénom (tutoiement / équipe) ou titre + premier prénom + NOM (professionnel)',prenomSeul:'premier prénom seulement',civilite:'titre de la fiche (Dr, Pr, Maître…)',gest:'nom du gestionnaire qui suit la fiche (sinon vous)',telGest:'téléphone du gestionnaire',emailGest:'e-mail du gestionnaire',appareil:'nom de l\'appareil reçu',lienKit:'page de bienvenue (vidéo, premiers pas, règles d\'or)',lienNotice:'notice en français (PDF)',lienVideo:'vidéo de prise en main (YouTube)',reglesOr:'règles d\'or de l\'appareil (texte)',nomComplet:'prénom + nom (ou seulement ce qui est rempli)',lienInscription:'votre lien personnel du formulaire d\'inscription (celui de votre QR code)',lienDecouverte:'votre lien personnel du formulaire découverte (1 minute : prénom, WhatsApp, intérêts)',lienParcours:'parcours découverte OlyLife (6 vidéos), personnalisé à votre nom',liensAppareils:'pages des appareils cochés (une ligne par appareil)',lienCertificats:'certificats et rapports de test',lienRdv:'votre lien de rendez-vous (Calendly de Mon profil, sinon l\'appel découverte WLHT)',interets:'centres d\'intérêt cochés',sansLien:'vrai seulement si le lien n\'est pas disponible (bloc de repli)',role:'votre rôle (admin, gestionnaire, référent…)',telMoi:'votre téléphone (Mon profil)',prenom:'prénom du contact',nom:'nom',numCommande:'n° de commande',logistique:'Service Logistique OlyLife',transporteur:'transporteur',tracking:'n° de suivi',lienSuivi:'lien de suivi du colis',tipLivraison:'numéros utiles DHL / Colissimo (France)',sav:'Service Après-Vente OlyLife',savEmail:'e-mail du SAV',montant:'montant',devise:'devise',date:'date de l\'avance',motif:'motif',rendu:'déjà remboursé',reste:'reste à rembourser',echeance:'date d\'échéance',payeur:'prénom de la personne qui a avancé',client:'nom du client',moi:'votre nom (expéditeur)',jours:'nombre de jours',programme:'titre de la fiche conseils',rythme:'durée, fréquence',appareil:'nom de l\'appareil',interdits:'contre-indications (manuel)',duree:'durée & fréquence (manuel)',precautions:'précautions (manuel)',lienApp:'lien de l\'application',code:'code d\'accès',role:'rôle'};
+var MSG_VAR_HELP={lienZoom:'votre lien Zoom personnel (Mon profil), sinon le Zoom de l\'association',quand:'date et heure choisies pour la visio (vide = maintenant)',lienConsent:'lien personnel de consentement e-mail (page consentement.html, 20 secondes)',lienFacture:'lien de la facture PDF (Drive, lecture seule)',numFacture:'n° de document de la facture',produitFacture:'appareil facturé',montantFacture:'montant total de la facture',demandeMdp:'(case) phrase « vous pouvez conserver ou modifier votre mot de passe »',compte:'ID membre du compte facturé',prenom:'forme d\'adresse selon le registre : premier prénom (tutoiement / équipe) ou titre + premier prénom + NOM (professionnel)',prenomSeul:'premier prénom seulement',civilite:'titre de la fiche (Dr, Pr, Maître…)',gest:'nom du gestionnaire qui suit la fiche (sinon vous)',telGest:'téléphone du gestionnaire',emailGest:'e-mail du gestionnaire',appareil:'nom de l\'appareil reçu',lienKit:'page de bienvenue (vidéo, premiers pas, règles d\'or)',lienNotice:'notice en français (PDF)',lienVideo:'vidéo de prise en main (YouTube)',reglesOr:'règles d\'or de l\'appareil (texte)',nomComplet:'prénom + nom (ou seulement ce qui est rempli)',lienInscription:'votre lien personnel du formulaire d\'inscription (celui de votre QR code)',lienDecouverte:'votre lien personnel du formulaire découverte (1 minute : prénom, WhatsApp, intérêts)',lienParcours:'parcours découverte OlyLife (6 vidéos), personnalisé à votre nom',liensAppareils:'pages des appareils cochés (une ligne par appareil)',lienCertificats:'certificats et rapports de test',lienRdv:'votre lien de rendez-vous (Calendly de Mon profil, sinon l\'appel découverte WLHT)',interets:'centres d\'intérêt cochés',sansLien:'vrai seulement si le lien n\'est pas disponible (bloc de repli)',role:'votre rôle (admin, gestionnaire, référent…)',telMoi:'votre téléphone (Mon profil)',prenom:'prénom du contact',nom:'nom',numCommande:'n° de commande',logistique:'Service Logistique OlyLife',transporteur:'transporteur',tracking:'n° de suivi',lienSuivi:'lien de suivi du colis',tipLivraison:'numéros utiles DHL / Colissimo (France)',sav:'Service Après-Vente OlyLife',savEmail:'e-mail du SAV',montant:'montant',devise:'devise',date:'date de l\'avance',motif:'motif',rendu:'déjà remboursé',reste:'reste à rembourser',echeance:'date d\'échéance',payeur:'prénom de la personne qui a avancé',client:'nom du client',moi:'votre nom (expéditeur)',jours:'nombre de jours',programme:'titre de la fiche conseils',rythme:'durée, fréquence',appareil:'nom de l\'appareil',interdits:'contre-indications (manuel)',duree:'durée & fréquence (manuel)',precautions:'précautions (manuel)',lienApp:'lien de l\'application',code:'code d\'accès',role:'rôle'};
 function renderTpl(t,v){
   v=v||{};
   return String(t||'').replace(/\{\?(\w+):((?:[^{}]|\{\w+\})*)\}/g,function(m,k,inner){return v[k]?inner.replace(/\{(\w+)\}/g,function(_,n){return v[n]!=null?v[n]:'';}):'';})
@@ -4455,6 +4467,7 @@ function oOpenF(id){
       +(c.tel?'<a class="ob bph" href="tel:'+c.tel+'" style="flex:1">Appel</a>':'')
       +(c.email?'<a class="ob bem" href="mailto:'+c.email+'" style="flex:1">Email</a>':'')
       +'<button class="ob baqua" style="flex:1" onclick="oCalOpen(\''+id+'\')">📅 RDV</button>'
+      +'<button class="ob" style="flex:1;background:#2D8CFF;color:#fff" onclick="oZoomOpen(\''+id+'\')">🎥 Zoom</button>'
     +'</div>'
     +resBox(c)
     +'<div class="od-section"><div class="od-sec-ttl">Suivi du contact</div><div style="padding:12px 16px">'
@@ -7423,6 +7436,44 @@ var INTERETS=['Tera-P90+','Galaxy G-One','Vitality Wand','Shaken Massager','La t
 // Lien tunnel personnalisé — même convention que l'App Tunnels : p prénom client, n nom, d nom du référent, w WhatsApp (chiffres, indicatif), e e-mail
 function tunnelUrl(slug,c){var q=[];if(c&&c.prenom)q.push('p='+encodeURIComponent(c.prenom));if(c&&c.nom)q.push('n='+encodeURIComponent(c.nom));if(USER&&USER.nom)q.push('d='+encodeURIComponent(USER.nom));var w=USER&&USER.tel?String(USER.tel).replace(/\D/g,''):'';if(w&&w.charAt(0)==='0')w='';if(w)q.push('w='+w);if(USER&&USER.email)q.push('e='+encodeURIComponent(USER.email));return TUNNEL_BASE+slug+(q.length?'?'+q.join('&'):'');}
 function decouverteUrl(c){var tok=(USER&&USER.pubToken)||'';if(!tok)return'';return SITE_URL+'decouverte.html?r='+encodeURIComponent(tok)+(c&&c.prenom?'&p='+encodeURIComponent(c.prenom):'');}
+// ── v3.30 — Zoom : invitation pré-rédigée depuis la fiche, lien personnel du gestionnaire ──
+function zoomUrl(){return(USER&&USER.zoomUrl)||((CFG.params&&CFG.params.liens&&CFG.params.liens.zoom)||'');}
+function oZoomOpen(cid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var url=zoomUrl();
+  var old=document.getElementById('ozoom');if(old)old.remove();
+  var m=document.createElement('div');m.id='ozoom';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
+  var canal=canalCode(c),nom=((c.prenom||'')+' '+(c.nom||'')).trim();
+  m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:520px;max-height:90vh;overflow:auto">'
+    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">🎥 Visio Zoom avec '+esc(nom)+'</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'ozoom\').remove()">✕</button></div>'
+    +(url?'<div style="font-size:12px;color:var(--t2);margin:6px 0 10px">Lien utilisé : <span style="word-break:break-all">'+esc(url)+'</span>'+(USER&&USER.zoomUrl?' <span class="obdg bgr">votre salle</span>':' <span class="obdg bor">Zoom de l\'association</span>')+'</div>'
+        :'<div style="margin:8px 0 10px;padding:10px 12px;border-radius:10px;background:#FFF7E0;border:1px solid #F1DFA0;font-size:12.5px;line-height:1.5">⚠️ Aucun lien Zoom : ajoutez le vôtre dans <b>Mon profil → Mon lien Zoom</b>'+(IS_SUPER()?' (ou le Zoom de l\'association dans Administration → Liens)':'')+'. <button type="button" class="ob bgh bsm" onclick="document.getElementById(\'ozoom\').remove();oProfOpen()">Ouvrir Mon profil</button></div>')
+    +'<div class="ofg2" style="gap:8px"><div><label class="ofl">Date (facultatif)</label><input type="date" class="ofc" id="zoom-d"></div><div><label class="ofl">Heure</label><input type="time" class="ofc" id="zoom-h"></div></div>'
+    +'<div style="font-size:11px;color:var(--t3);margin-top:4px">Vide = « maintenant ». La date et l\'heure sont reprises dans le message.</div>'
+    +'<label class="ofl" style="margin-top:10px">Message</label><textarea class="ofc" id="zoom-txt" style="min-height:150px;font-size:13px;line-height:1.5"></textarea>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">'
+      +'<button type="button" class="ob '+(canal==='wa'?'bwa':'bgold')+'" style="flex:2" '+(url?'':'disabled')+' onclick="oZoomSend(\''+c.id+'\')">📤 Envoyer l\'invitation ('+esc(CANAL_LBL[canal]||canal)+')</button>'
+      +'<button type="button" class="ob bgh" style="flex:1" '+(url?'':'disabled')+' onclick="window.open(\''+esc(url)+'\',\'_blank\');oZoomLog(\''+c.id+'\',\'ouvert\')">🎥 Ouvrir ma salle</button>'
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--t3);margin-top:8px">Le texte vient du modèle « Invitation à une visio Zoom » (Administration → Messages). Chaque envoi est noté dans le journal du contact.</div></div>';
+  document.body.appendChild(m);
+  var refresh=function(){document.getElementById('zoom-txt').value=zoomMsg(c);};
+  document.getElementById('zoom-d').onchange=refresh;document.getElementById('zoom-h').onchange=refresh;refresh();
+}
+function zoomQuand(){var d=val('zoom-d'),h=val('zoom-h');if(!d&&!h)return'';var t='';if(d){var dd=new Date(d+'T12:00:00');t=dd.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});}if(h)t+=(t?' à ':'à ')+h.replace(':','h');return t.trim();}
+function zoomMsg(c){var v=tplVars(c,'fr');v.lienZoom=zoomUrl();v.quand=zoomQuand();return renderTpl(tplText('zoom_invitation'),v);}
+function oZoomSend(cid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var text=val('zoom-txt')||zoomMsg(c),canal=canalCode(c),num=String(c.tel||'').replace(/\D/g,'');
+  if((canal==='wa'||canal==='sms'||canal==='signal')&&!num){if(c.email)canal='mail';else{sendCopy(text,'📋 Pas de téléphone ni d\'e-mail : message copié');return;}}
+  if(canal==='mail'&&!c.email){if(num)canal='wa';else{sendCopy(text,'📋 Message copié');return;}}
+  sendVia(canal,num,text,c.email);
+  var q=zoomQuand();
+  var e=jrnAdd(c,'rdv','🎥 Invitation Zoom envoyée par '+(CANAL_LBL[canal]||canal)+(q?' — visio '+q:' — visio immédiate')+(USER&&USER.zoomUrl?'':' (Zoom de l\'association)'));
+  var d=val('zoom-d');if(d){c.rdvs=c.rdvs||[];c.rdvs.push({uri:'zoom_'+Date.now(),source:'zoom',nom:'Visio Zoom',start:d+'T'+(val('zoom-h')||'09:00')+':00',host:PARTNER_NOM(),joinUrl:zoomUrl(),statut:'active',par:PARTNER_NOM()});}
+  oPush([c]);var b=document.getElementById('ozoom');if(b)b.remove();oOpenF(cid);oT('🎥 Invitation Zoom envoyée','s');
+}
+function oZoomLog(cid,quoi){var c=OC.find(function(x){return x.id===cid;});if(!c)return;jrnAdd(c,'rdv','🎥 Salle Zoom ouverte pour la visio');oPush([c]);}
 function rdvUrl(){return(USER&&USER.calendlyUrl)||((CFG.params&&CFG.params.liens&&CFG.params.liens.rdvDecouverte)||'')||RDV_DEFAULT;}
 // ── v3.29 — Notifications push (OneSignal, gratuit) : alertes même app fermée ──
 var PUSH_READY=false,PUSH_LOADING=false;
@@ -8020,7 +8071,7 @@ function admRenderTab(t){
   if(t==='messages'){admMsgFill();}
   if(t==='liens'){
     admLpRender(LIENS_PERSO);
-    document.getElementById('adm-l-boffice').value=BOFFICE_URL;var _pl=(CFG.params&&CFG.params.liens)||{};document.getElementById('adm-l-watel').value=_pl.waSupportTel||'33651001085';document.getElementById('adm-l-wanom').value=_pl.waSupportNom||'Jean-Charles';var _os=document.getElementById('adm-l-onesignal');if(_os)_os.value=_pl.onesignalAppId||'';document.getElementById('adm-l-boly').value=BOLY_URL;document.getElementById('adm-l-olynation').value=OLYNATION_URL;document.getElementById('adm-l-tunnels').value=TUNNELS_URL;document.getElementById('adm-l-youtube').value=YOUTUBE_URL;
+    document.getElementById('adm-l-boffice').value=BOFFICE_URL;var _pl=(CFG.params&&CFG.params.liens)||{};document.getElementById('adm-l-watel').value=_pl.waSupportTel||'33651001085';document.getElementById('adm-l-wanom').value=_pl.waSupportNom||'Jean-Charles';var _os=document.getElementById('adm-l-onesignal');if(_os)_os.value=_pl.onesignalAppId||'';document.getElementById('adm-l-boly').value=BOLY_URL;document.getElementById('adm-l-olynation').value=OLYNATION_URL;document.getElementById('adm-l-tunnels').value=TUNNELS_URL;document.getElementById('adm-l-youtube').value=YOUTUBE_URL;var _zz=document.getElementById('adm-l-zoom');if(_zz)_zz.value=_pl.zoom||'';
     var cal=USERS.filter(function(u){return u.calendlyUrl;}).length;
     document.getElementById('adm-integ').innerHTML='📅 <b>Calendly</b> : '+cal+' membre(s) avec un lien de prise de RDV (chacun le renseigne dans Réglages ; la synchronisation des RDV se fait côté script toutes les heures).<br>🗺️ <b>Carte</b> : géolocalisation des adresses via OpenStreetMap (gratuit, sans clé).<br>📧 <b>Résumé quotidien</b> : envoyé par le script Google avec l\'adresse e-mail du profil de chaque membre.<br>🔐 <b>Serveur</b> : <span style="word-break:break-all">'+esc(GAS_URL)+'</span>';
   }
@@ -8121,7 +8172,7 @@ function admSaveParams(){
   var lines=function(id){return document.getElementById(id).value.split('\n').map(function(x){return x.trim();}).filter(Boolean);};
   if(ADM_TAB==='catalogue'){var pr=lines('adm-produits'),th=lines('adm-themes');if(!pr.length){oT('Il faut au moins un produit','w');return;}P.produits=pr;P.themes=th.length?th:THEMES;P.rangs={p2:n('adm-r-p2'),p3:n('adm-r-p3'),p4:n('adm-r-p4'),p5:n('adm-r-p5')};if(!(P.rangs.p2<P.rangs.p3&&P.rangs.p3<P.rangs.p4&&P.rangs.p4<P.rangs.p5)){oT('Les seuils de rang doivent être croissants','w');return;}}
   if(ADM_TAB==='relances'){P.relances={j1:n('adm-j1'),j2:n('adm-j2'),j3:n('adm-j3')};if(!(P.relances.j1<P.relances.j2&&P.relances.j2<P.relances.j3)){oT('Les rappels doivent être croissants (ex. 2, 5, 12)','w');return;}P.logistique=n('adm-logi');P.install=n('adm-inst');P.temoignage=n('adm-tem');P.protoPoints=[n('adm-pp1'),n('adm-pp2')];P.signature=document.getElementById('adm-sign').value.trim()||'OlyLife / WLHT';}
-  if(ADM_TAB==='liens'){P.liens={boffice:document.getElementById('adm-l-boffice').value.trim(),boly:document.getElementById('adm-l-boly').value.trim(),olynation:document.getElementById('adm-l-olynation').value.trim(),tunnels:document.getElementById('adm-l-tunnels').value.trim(),youtube:document.getElementById('adm-l-youtube').value.trim(),waSupportTel:document.getElementById('adm-l-watel').value.replace(/\D/g,''),waSupportNom:document.getElementById('adm-l-wanom').value.trim(),onesignalAppId:(document.getElementById('adm-l-onesignal').value||'').trim()};
+  if(ADM_TAB==='liens'){P.liens={boffice:document.getElementById('adm-l-boffice').value.trim(),boly:document.getElementById('adm-l-boly').value.trim(),olynation:document.getElementById('adm-l-olynation').value.trim(),tunnels:document.getElementById('adm-l-tunnels').value.trim(),youtube:document.getElementById('adm-l-youtube').value.trim(),zoom:(document.getElementById('adm-l-zoom').value||'').trim(),waSupportTel:document.getElementById('adm-l-watel').value.replace(/\D/g,''),waSupportNom:document.getElementById('adm-l-wanom').value.trim(),onesignalAppId:(document.getElementById('adm-l-onesignal').value||'').trim()};
     var lp=admLpCollect().filter(function(l){return l.label||l.url;});for(var i=0;i<lp.length;i++){if(!lp[i].label||!/^https?:\/\//.test(lp[i].url)){oT('Lien '+(i+1)+' : libellé et adresse https:// obligatoires','w');return;}}P.liensPerso=lp;}
   CFG.params=P;applyParams();oSaveCache();
   oPost_({op:'saveConfig',config:{params:P}});
@@ -8251,6 +8302,7 @@ function oProfOpen(){
   oSessList('', 'oprof-sess');
   var pc=document.getElementById('oprof-canal');if(pc)pc.value=sendPref();
   var oc=document.getElementById('oprof-cal');if(oc){oc.value=USER.calendlyUrl||'';}oProfCalSt();
+  var oz=document.getElementById('oprof-zoom');if(oz)oz.value=USER.zoomUrl||'';
   pushProfSt();
   oSheetOpen('oprof');
 }
@@ -8263,12 +8315,14 @@ function oProfSave(){
   var calu=(val('oprof-cal')||'').trim();
   if(calu&&!/^https:\/\/(www\.)?calendly\.com\/.+/i.test(calu)){oT('Le lien Calendly doit commencer par https://calendly.com/','e');return;}
   var calNew=!!calu&&calu!==(USER.calendlyUrl||'');
-  USER.tel=(val('oprof-tel')||'').trim();USER.email=(val('oprof-email')||'').trim();USER.photo=val('oprof-photo')||'';USER.calendlyUrl=calu;
+  var zoomu=(val('oprof-zoom')||'').trim();
+  if(zoomu&&!/^https:\/\/([a-z0-9-]+\.)?zoom\.(us|com)\//i.test(zoomu)){oT('Le lien Zoom doit commencer par https://…zoom.us/','e');return;}
+  USER.tel=(val('oprof-tel')||'').trim();USER.email=(val('oprof-email')||'').trim();USER.photo=val('oprof-photo')||'';USER.calendlyUrl=calu;USER.zoomUrl=zoomu;
   if(USER.email&&!USER.digestEmail)USER.digestEmail=USER.email;
-  var me=USERS.find(function(u){return u.id===USER.id;});if(me){me.tel=USER.tel;me.email=USER.email;me.photo=USER.photo;me.calendlyUrl=calu;if(me.email&&!me.digestEmail)me.digestEmail=me.email;}
+  var me=USERS.find(function(u){return u.id===USER.id;});if(me){me.tel=USER.tel;me.email=USER.email;me.photo=USER.photo;me.calendlyUrl=calu;me.zoomUrl=zoomu;if(me.email&&!me.digestEmail)me.digestEmail=me.email;}
   var cu=document.getElementById('my-cal-url');if(cu)cu.value=calu;
   oSaveCache();
-  oPost_({op:'saveMyProfile',tel:USER.tel,email:USER.email,photo:USER.photo,calendlyUrl:calu,push:USER.push!==false});
+  oPost_({op:'saveMyProfile',tel:USER.tel,email:USER.email,photo:USER.photo,calendlyUrl:calu,zoomUrl:zoomu,push:USER.push!==false});
   if(calNew){try{localStorage.setItem('owlht2_calnudge','done');}catch(e){}oCalNudge();emojiBurst(['📅','✨','🌿']);}
   applyRole();if(typeof renderUsers==='function')renderUsers();
   oProfClose();emojiBurst();oT('✨ Profil enregistré','s');
