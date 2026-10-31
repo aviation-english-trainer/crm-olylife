@@ -5,6 +5,7 @@
 //         · inscription seulement si e-mail + consentement tracé (emailConsent, emailConsentLe, emailConsentSrc)
 //         · passage « Dans le réseau » / « Abandon » → bascule automatique de parcours côté serveur
 //         · webhook Systeme.io « Tag ajouté » : oly_desinscrit (règle « désabonné ») → consentement retiré ; oly_fin_* → campagne terminée
+// v3.24 · ZOOM : op zoomAgenda — événement Google Agenda « 🎥 Visio Zoom » (lien en lieu, invitation au contact et au gestionnaire, rappel 30 min).
 // v3.23 · ZOOM : lien Zoom personnel par membre (zoomUrl — Mon profil / formulaire d'accès), repli config.params.liens.zoom.
 // v3.22 · ADRESSES : une seule adresse (facturation = livraison par défaut) ; livraison à une autre adresse / autre
 //         personne (livNom, livPrenom, livTel, livEmail, livAdresse, livCp, livVille, livPays) reçue du formulaire d'inscription
@@ -256,7 +257,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.23';
+var SRV_VERSION = '3.24';
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
@@ -868,6 +869,11 @@ function doPost(e) {
       var res = syncCalendly();
       return out_(res);
     }
+    else if (op === 'zoomAgenda') {                                                     // v3.24
+      var zr = { ok: false };
+      try { zr = zoomAgenda_(db, user, req); } catch (e) { Logger.log('zoomAgenda : ' + e); zr = { ok: false, error: String(e) }; }
+      saveDB_(db); return out_(zr);
+    }
     else if (op === 'rappelAgenda') {
       // Événement Google Agenda (agenda du compte WLHT) + invitations aux personnes concernées
       try { rappelAgenda_(db, user, req); } catch (e) { Logger.log('Agenda : ' + e); }
@@ -1246,6 +1252,36 @@ function rappelAgenda_(db, user, req) {
   if (!c.rappel) c.rappel = r;
   c.rappel.eventId = ev.getId();
   c._agendaEventId = ev.getId();
+}
+// v3.24 — Visio Zoom planifiée depuis la fiche : événement dans l'agenda Google du compte WLHT,
+// invitations au gestionnaire (celui qui envoie) + gestionnaires du contact + contact (s'il a un e-mail)
+function zoomAgenda_(db, user, req) {
+  var c = contactById_(db, String(req.contactId || '')); if (!c) return { ok: false, error: 'introuvable' };
+  if (user.role !== 'admin' && !isVisible_(c, user)) return { ok: false, error: 'forbidden' };
+  var url = String(req.url || ''); if (!/^https:\/\/([a-z0-9-]+\.)?zoom\.(us|com)\//i.test(url)) return { ok: false, error: 'lien' };
+  var d = String(req.date || ''), hm = String(req.heure || '10:00').split(':');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return { ok: false, error: 'date' };
+  var start = new Date(d + 'T00:00:00'); start.setHours(parseInt(hm[0], 10) || 10, parseInt(hm[1], 10) || 0, 0, 0);
+  var duree = Math.min(180, Math.max(15, parseInt(req.duree, 10) || 45));
+  var end = new Date(start.getTime() + duree * 60000);
+  var cal = CalendarApp.getDefaultCalendar();
+  var nomC = ((c.prenom || '') + ' ' + (c.nom || '')).trim();
+  var titre = '🎥 Visio Zoom — ' + nomC + ' (avec ' + user.nom + ')';
+  var desc = 'Lien Zoom : ' + url + '\n' + (c.tel ? 'Tél : ' + c.tel + '\n' : '') + 'Organisé par : ' + user.nom + (user.tel ? ' · ' + user.tel : '') + '\nOuvrir la fiche : https://crm.team-waterlifehightech.com/';
+  var guests = [], me = Session.getEffectiveUser().getEmail();
+  var add = function (em) { em = String(em || '').trim().toLowerCase(); if (em && em !== me && guests.indexOf(em) < 0) guests.push(em); };
+  add(user.email || user.digestEmail || emailDe_(db, user.nom));
+  suivis_(c).forEach(function (nm) { add(emailDe_(db, nm)); });
+  if (req.inviterContact !== false) add(c.email);
+  var ev = cal.createEvent(titre, start, end, { description: desc, location: url, guests: guests.join(','), sendInvites: guests.length > 0 });
+  try { ev.addPopupReminder(30); ev.addEmailReminder(60); } catch (e) {}
+  c.journal = c.journal || [];
+  c.journal.push({ id: 'j_' + Date.now() + '_z', ts: now_(), auteur: user.nom, role: user.role, type: 'rdv', texte: '📆 Visio Zoom ajoutée à l\'agenda Google (' + Utilities.formatDate(start, FUSEAU, 'dd/MM HH:mm') + ', ' + duree + ' min)' + (guests.length ? ' — invitations : ' + guests.join(', ') : '') });
+  c.rdvs = c.rdvs || [];
+  var r = c.rdvs.filter(function (x) { return x.source === 'zoom' && x.start && x.start.indexOf(d) === 0; })[0];
+  if (r) r.eventId = ev.getId();
+  try { pushSend_(db, usersByNoms_(db, suivis_(c)).concat([user]), '📆 Visio Zoom planifiée', nomC + ' — ' + Utilities.formatDate(start, FUSEAU, 'EEE dd/MM HH:mm'), ''); } catch (e) {}
+  return { ok: true, eventId: ev.getId(), guests: guests, journal: c.journal.slice(-1) };
 }
 // ═══════════════ v3.15 — SYSTEME.IO (API publique) ═══════════════
 var SIO_BASE = 'https://api.systeme.io';

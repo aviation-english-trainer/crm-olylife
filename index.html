@@ -2394,7 +2394,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.30 · 31/10';
+var APP_VERSION='v3.30.1 · 31/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -7450,6 +7450,7 @@ function oZoomOpen(cid){
         :'<div style="margin:8px 0 10px;padding:10px 12px;border-radius:10px;background:#FFF7E0;border:1px solid #F1DFA0;font-size:12.5px;line-height:1.5">⚠️ Aucun lien Zoom : ajoutez le vôtre dans <b>Mon profil → Mon lien Zoom</b>'+(IS_SUPER()?' (ou le Zoom de l\'association dans Administration → Liens)':'')+'. <button type="button" class="ob bgh bsm" onclick="document.getElementById(\'ozoom\').remove();oProfOpen()">Ouvrir Mon profil</button></div>')
     +'<div class="ofg2" style="gap:8px"><div><label class="ofl">Date (facultatif)</label><input type="date" class="ofc" id="zoom-d"></div><div><label class="ofl">Heure</label><input type="time" class="ofc" id="zoom-h"></div></div>'
     +'<div style="font-size:11px;color:var(--t3);margin-top:4px">Vide = « maintenant ». La date et l\'heure sont reprises dans le message.</div>'
+    +'<label class="ochk-row" style="margin-top:8px;font-size:12px" id="zoom-ag-row"><input type="checkbox" id="zoom-ag" checked><span>📆 Ajouter la visio à l\'<b>agenda Google</b> (notification, invitation au contact'+(c.email?' — '+esc(c.email):' — pas d\'e-mail sur la fiche, invitation à vous seul')+', rappel 30 min avant)</span></label>'
     +'<label class="ofl" style="margin-top:10px">Message</label><textarea class="ofc" id="zoom-txt" style="min-height:150px;font-size:13px;line-height:1.5"></textarea>'
     +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">'
       +'<button type="button" class="ob '+(canal==='wa'?'bwa':'bgold')+'" style="flex:2" '+(url?'':'disabled')+' onclick="oZoomSend(\''+c.id+'\')">📤 Envoyer l\'invitation ('+esc(CANAL_LBL[canal]||canal)+')</button>'
@@ -7470,8 +7471,16 @@ function oZoomSend(cid){
   sendVia(canal,num,text,c.email);
   var q=zoomQuand();
   var e=jrnAdd(c,'rdv','🎥 Invitation Zoom envoyée par '+(CANAL_LBL[canal]||canal)+(q?' — visio '+q:' — visio immédiate')+(USER&&USER.zoomUrl?'':' (Zoom de l\'association)'));
-  var d=val('zoom-d');if(d){c.rdvs=c.rdvs||[];c.rdvs.push({uri:'zoom_'+Date.now(),source:'zoom',nom:'Visio Zoom',start:d+'T'+(val('zoom-h')||'09:00')+':00',host:PARTNER_NOM(),joinUrl:zoomUrl(),statut:'active',par:PARTNER_NOM()});}
+  var d=val('zoom-d'),h=val('zoom-h')||'10:00',ag=d&&document.getElementById('zoom-ag')&&document.getElementById('zoom-ag').checked;
+  if(d){c.rdvs=c.rdvs||[];c.rdvs.push({uri:'zoom_'+Date.now(),source:'zoom',nom:'Visio Zoom',start:d+'T'+h+':00',host:PARTNER_NOM(),joinUrl:zoomUrl(),statut:'active',par:PARTNER_NOM()});}
   oPush([c]);var b=document.getElementById('ozoom');if(b)b.remove();oOpenF(cid);oT('🎥 Invitation Zoom envoyée','s');
+  if(ag){
+    if(srvNum()<3024){oT('📆 Agenda Google : script serveur v3.24 requis','w');return;}
+    oPostAsync_({op:'zoomAgenda',contactId:cid,date:d,heure:h,duree:45,url:zoomUrl(),inviterContact:true}).then(function(r){
+      if(r&&r.ok){(r.journal||[]).forEach(function(j){if(!c.journal.some(function(x){return x.id===j.id;}))c.journal.push(j);});oSaveCache();oOpenF(cid);oT('📆 Visio ajoutée à l\'agenda Google'+(r.guests&&r.guests.length?' — invitations : '+r.guests.join(', '):''),'s');}
+      else oT('📆 Agenda : '+((r&&r.error)||'impossible'),'e');
+    }).catch(function(){oT('📆 Agenda : hors ligne — réessayez depuis la fiche','w');});
+  }
 }
 function oZoomLog(cid,quoi){var c=OC.find(function(x){return x.id===cid;});if(!c)return;jrnAdd(c,'rdv','🎥 Salle Zoom ouverte pour la visio');oPush([c]);}
 function rdvUrl(){return(USER&&USER.calendlyUrl)||((CFG.params&&CFG.params.liens&&CFG.params.liens.rdvDecouverte)||'')||RDV_DEFAULT;}
