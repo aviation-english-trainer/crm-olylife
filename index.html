@@ -399,7 +399,7 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .proto-field b{flex:0 0 130px;color:var(--t3);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;padding-top:2px;}
 .proto-field span{flex:1;color:var(--tx);white-space:pre-wrap;line-height:1.5;}
 .disclaimer{font-size:11.5px;color:var(--t2);background:var(--navy3);border:1px dashed var(--bd);border-radius:10px;padding:10px 12px;line-height:1.5;margin-top:10px;}
-.acc-row{display:flex;align-items:flex-start;gap:10px;padding:10px 16px;border-bottom:1px solid var(--bd);}
+.acc-row{display:flex;align-items:flex-start;gap:10px;padding:10px 16px;border-bottom:1px solid var(--bd);flex-wrap:wrap;}
 .acc-row:last-child{border-bottom:none;}
 @keyframes resPulse{0%,100%{box-shadow:0 0 0 0 rgba(198,62,71,.55);}50%{box-shadow:0 0 0 7px rgba(198,62,71,0);}}
 .res-pulse{animation:resPulse 1.7s ease-out infinite;}
@@ -425,10 +425,12 @@ textarea.ofc{resize:vertical;min-height:76px;}
 tr.qi-row td{background:var(--navy3);padding:8px 14px 10px 54px;font-size:12px;line-height:1.7;}
 tr.qi-row td>div{overflow-wrap:anywhere;}
 .acc-row .em{font-size:18px;flex-shrink:0;width:26px;text-align:center;}
-.acc-row .b{flex:1;min-width:0;font-size:13px;line-height:1.5;color:var(--tx);}
+.acc-row .b{flex:1 1 240px;min-width:220px;font-size:13px;line-height:1.5;color:var(--tx);overflow-wrap:anywhere;}
 .acc-row .b small{display:block;color:var(--t3);font-size:11.5px;}
-.acc-row .acts{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end;}
-@media (max-width:759px){.acc-row{flex-wrap:wrap;}.acc-row .b{flex:1 1 calc(100% - 40px);}.acc-row .acts{flex:0 0 100%;justify-content:flex-start;gap:6px;margin-top:8px;padding-left:34px;}.acc-row .acts .ob{min-height:40px;}}
+.acc-row .acts{display:flex;gap:4px;flex:0 1 auto;min-width:0;flex-wrap:wrap;justify-content:flex-end;margin-left:auto;}
+.acc-row .acts .ob{white-space:nowrap;}
+.acc-row .st-chip{white-space:normal;}
+@media (max-width:759px){.acc-row .b{flex:1 1 calc(100% - 40px);min-width:0;}.acc-row .acts{flex:0 0 100%;justify-content:flex-start;gap:6px;margin-top:8px;padding-left:34px;margin-left:0;}.acc-row .acts .ob{min-height:40px;}}
 #otem,#oproto,#oprec{display:none;position:fixed;inset:0;background:rgba(246,250,246,.86);backdrop-filter:blur(3px);z-index:500;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 #otem.on,#oproto.on,#oprec.on{display:block;}
 .chk-list{display:flex;flex-wrap:wrap;gap:6px;}
@@ -2383,7 +2385,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.29.1 · 30/10';
+var APP_VERSION='v3.29.2 · 31/10';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -4341,7 +4343,7 @@ var RES_CHECK=[
   {id:'fl-transp',l:'Transporteur',f:function(c){return!!c.transporteur;}},
   {id:'fl-tracking',l:'N° de tracking',f:function(c){return!!c.tracking;}},
   {id:'fl-datelivr',l:'Date de livraison',f:function(c){return!!c.dateLivraison;}},
-  {id:'@fact',l:'Facture ajoutée et envoyée au client',f:function(c){var F=c.factures||[];return!c.tracking||(F.length>0&&F.every(function(f){return f.envoyeLe;}));}},
+  {id:'@fact',l:'Facture ajoutée et envoyée au client',f:function(c){if(c.factureNonRequise)return true;var F=c.factures||[];return!c.tracking||(F.length>0&&F.every(function(f){return f.envoyeLe;}));}},
   {id:'fi-confirm',l:'Installation confirmée',f:function(c){return!!c.installConfirm;}},
   {id:'fi-notes',l:'Notes d\'usage / protocole',f:function(c){return!!(c.notesUsage&&String(c.notesUsage).trim());}},
   {id:'fe-partenaire',l:'Case « devenu partenaire OlyLife »',f:function(c){return!!c.estPartenaire;}},
@@ -7029,8 +7031,10 @@ function factHtml(c){
       +'<a class="ob bgh bsm" href="'+esc(f.url)+'" target="_blank" rel="noopener" title="Ouvrir la facture">📄</a>'
       +(can?'<button class="ob '+(f.envoyeLe?'bgh':'bwa')+' bsm" onclick="oFactSend(\''+c.id+'\',\''+f.id+'\')">'+(f.envoyeLe?'↻ Renvoyer':'📤 Envoyer')+'</button><button class="ob bgh bsm" title="Supprimer" onclick="oFactDel(\''+c.id+'\',\''+f.id+'\')">🗑</button>':'')+'</div></div>';
   });
-  if(can)rows+='<div class="acc-row"><span class="em">➕</span><div class="b" style="color:var(--t3)">Déposez la facture PDF téléchargée sur le BO OlyLife : n° de document, appareil, montant et compte sont lus automatiquement, puis envoyée au client par son canal préféré ('+esc(c.canal||'WhatsApp')+').'
-    +(srvOk()?'':'<br><b style="color:#C0392B">⚠️ Le script serveur doit être mis à jour (v3.13) pour stocker les factures et les mots de passe.</b>')+'</div><div class="acts"><button class="ob bgold bsm" onclick="oFactAdd(\''+c.id+'\')">🧾 Ajouter une facture</button></div></div>';
+  var nr=c.factureNonRequise;
+  if(nr)rows+='<div class="'+accCls(true)+'"><span class="em">🧾</span><div class="b">Pas de facture à envoyer pour cette fiche'+stChip(true,nr.par,nr.le,'Noté')+(nr.motif?'<small>'+esc(nr.motif)+'</small>':'')+'</div>'+(can?'<div class="acts"><button class="ob bgh bsm" onclick="oFactNonRequise(\''+c.id+'\',false)">↩ Finalement, il faut une facture</button></div>':'')+'</div>';
+  if(can&&!nr)rows+='<div class="'+(F.length||!c.tracking?'acc-row':accCls(false))+'"><span class="em">➕</span><div class="b" style="color:var(--t3)">Déposez la facture PDF téléchargée sur le BO OlyLife : n° de document, appareil, montant et compte sont lus automatiquement, puis envoyée au client par son canal préféré ('+esc(c.canal||'WhatsApp')+').'
+    +(srvOk()?'':'<br><b style="color:#C0392B">⚠️ Le script serveur doit être mis à jour (v3.13) pour stocker les factures et les mots de passe.</b>')+'</div><div class="acts"><button class="ob bgold bsm" onclick="oFactAdd(\''+c.id+'\')">🧾 Ajouter une facture</button>'+(F.length?'':'<button class="ob bgh bsm" title="Commande passée directement par le client, facture déjà en sa possession, etc. : la fiche n\'est plus signalée comme incomplète" onclick="oFactNonRequise(\''+c.id+'\',true)">🚫 Pas besoin d\'envoyer de facture</button>')+'</div></div>';
   var nb=F.filter(function(f){return!f.envoyeLe;}).length;
   return'<div class="od-section fact-sec"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">🧾 Factures & accès compte OlyLife'+(nb?' <span class="obdg brd">'+nb+' à envoyer</span>':'')+'</div><div class="od-bd">'+rows+'</div></div>';
 }
@@ -7112,6 +7116,13 @@ function parseFacture(t){
   };
 }
 function abToB64(buf){var b=new Uint8Array(buf),s='',CH=0x8000;for(var i=0;i<b.length;i+=CH)s+=String.fromCharCode.apply(null,b.subarray(i,i+CH));return btoa(s);}
+// v3.29.2 — « pas besoin d'envoyer de facture » : la fiche n'est plus signalée incomplète pour ce point
+function oFactNonRequise(cid,on){
+  var c=OC.find(function(x){return x.id===cid;});if(!c||!canEditContact(c))return;
+  if(on){var m=prompt('Pourquoi aucune facture n\'est à envoyer ? (facultatif)','Commande passée directement par le client sur son BO');if(m===null)return;c.factureNonRequise={le:new Date().toISOString(),par:PARTNER_NOM(),motif:(m||'').trim()};jrnAdd(c,'fait','🧾 Pas de facture à envoyer'+(m?' — '+m.trim():''));}
+  else{delete c.factureNonRequise;jrnAdd(c,'note','🧾 Facture à nouveau attendue pour cette fiche');}
+  oPush([c]);oOpenF(cid);oRefresh();
+}
 function oFactAdd(cid){
   var c=OC.find(function(x){return x.id===cid;});if(!c||!canEditContact(c))return;
   if(!srvOk()){oT('Mettez d\'abord à jour le script serveur (v3.13) pour pouvoir stocker les factures','e');return;}
