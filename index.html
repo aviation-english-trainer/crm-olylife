@@ -1112,6 +1112,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <div class="os-block-ttl" style="margin-top:24px">Serveur</div>
       <div class="os-txt" style="word-break:break-all;font-size:11px" id="os-url-txt">—</div>
       <div class="os-txt" style="font-size:11px" id="os-ver">—</div>
+      <button class="ob bgh bsm" type="button" style="margin-top:6px" onclick="oCheckUpdate()">🔄 Vérifier les mises à jour</button>
 
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:20px">
         <button class="ob baqua bfull" onclick="oHideSetup();oOpenImport()">⇪ Importer des contacts en masse</button>
@@ -2399,7 +2400,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.30.5 · 01/11';
+var APP_VERSION='v3.30.6 · 01/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -6022,7 +6023,10 @@ window.addEventListener('popstate',function(){
 var deferredPrompt=null,APP_INSTALLED=false;
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
-    navigator.serviceWorker.register('sw.js').then(function(reg){
+    navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(function(reg){
+      SW_REG=reg;
+      // v3.30.6 — recherche de mise à jour au retour sur l'app et toutes les 30 min
+      try{document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')reg.update().catch(function(){});});setInterval(function(){reg.update().catch(function(){});},30*60000);}catch(e){}
       reg.addEventListener('updatefound',function(){
         var nw=reg.installing;if(!nw)return;
         nw.addEventListener('statechange',function(){
@@ -6031,6 +6035,22 @@ if('serviceWorker' in navigator){
       });
     }).catch(function(){});
   });
+}
+var SW_REG=null;
+// v3.30.6 — Réglages → « Vérifier les mises à jour » : force la recherche, puis nettoie et recharge si rien ne vient
+function oCheckUpdate(){
+  oT('🔄 Recherche d\'une nouvelle version…','i');
+  var done=false;
+  var hard=function(){if(done)return;done=true;
+    var p=Promise.resolve();
+    try{if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)p=navigator.serviceWorker.getRegistrations().then(function(rs){return Promise.all(rs.filter(function(r){return !/onesignal/i.test(r.scope);}).map(function(r){return r.unregister();}));});}catch(e){}
+    p.then(function(){if(window.caches)return caches.keys().then(function(ks){return Promise.all(ks.filter(function(k){return /crm-olylife/.test(k);}).map(function(k){return caches.delete(k);}));});})
+     .then(function(){location.replace(location.pathname+'?maj='+Date.now());}).catch(function(){location.reload();});
+  };
+  try{
+    if(SW_REG){SW_REG.update().then(function(){setTimeout(function(){if(SW_REG.waiting){done=true;oUpdateNow();}else hard();},2500);}).catch(hard);}
+    else hard();
+  }catch(e){hard();}
 }
 var GO_TARGET=(function(){try{var m=location.search.match(/[?&]go=([a-z]+)/);var t=m?m[1]:'';return['demandes','contacts','dashboard','pipeline','agenda','actions','carte','equipe'].indexOf(t)>=0?t:'';}catch(e){return'';}})();
 var GO_USED=false;
