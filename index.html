@@ -2398,7 +2398,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.30.2 · 31/10';
+var APP_VERSION='v3.30.3 · 01/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -7453,20 +7453,30 @@ function oZoomOpen(cid){
     +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">🎥 Visio Zoom avec '+esc(nom)+'</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'ozoom\').remove()">✕</button></div>'
     +(url?'<div style="font-size:12px;color:var(--t2);margin:6px 0 10px">Lien utilisé : <span style="word-break:break-all">'+esc(url)+'</span>'+(USER&&USER.zoomUrl?' <span class="obdg bgr">votre salle</span>':' <span class="obdg bor">Zoom de l\'association</span>')+'</div>'
         :'<div style="margin:8px 0 10px;padding:10px 12px;border-radius:10px;background:#FFF7E0;border:1px solid #F1DFA0;font-size:12.5px;line-height:1.5">⚠️ Aucun lien Zoom : ajoutez le vôtre dans <b>Mon profil → Mon lien Zoom</b>'+(IS_SUPER()?' (ou le Zoom de l\'association dans Administration → Liens)':'')+'. <button type="button" class="ob bgh bsm" onclick="document.getElementById(\'ozoom\').remove();oProfOpen()">Ouvrir Mon profil</button></div>')
-    +'<div class="ofg2" style="gap:8px"><div><label class="ofl">Date (facultatif)</label><input type="date" class="ofc" id="zoom-d"></div><div><label class="ofl">Heure</label><input type="time" class="ofc" id="zoom-h"></div></div>'
-    +'<div style="font-size:11px;color:var(--t3);margin-top:4px">Vide = « maintenant ». La date et l\'heure sont reprises dans le message.</div>'
-    +'<label class="ochk-row" style="margin-top:8px;font-size:12px" id="zoom-ag-row"><input type="checkbox" id="zoom-ag" checked><span>📆 Ajouter la visio à l\'<b>agenda Google</b> (notification, invitation au contact'+(c.email?' — '+esc(c.email):' — pas d\'e-mail sur la fiche, invitation à vous seul')+', rappel 30 min avant)</span></label>'
+    +'<div class="av-seg" style="margin-top:4px"><button type="button" id="zoom-m-now" class="on" onclick="oZoomMode(\'now\')">⚡ Maintenant<br><small style="font-weight:400">j\'ouvre ma salle, le client me rejoint</small></button><button type="button" id="zoom-m-later" onclick="oZoomMode(\'later\')">📅 Plus tard<br><small style="font-weight:400">date et heure convenues</small></button></div>'
+    +'<div id="zoom-later" style="display:none"><div class="ofg2" style="gap:8px;margin-top:8px"><div><label class="ofl">Date</label><input type="date" class="ofc" id="zoom-d"></div><div><label class="ofl">Heure</label><input type="time" class="ofc" id="zoom-h"></div></div>'
+    +'<div style="font-size:11px;color:var(--t3);margin-top:4px">La date et l\'heure sont reprises dans le message.</div></div>'
+    +'<label class="ochk-row" style="margin-top:8px;font-size:12px;display:none" id="zoom-ag-row"><input type="checkbox" id="zoom-ag" checked><span>📆 Ajouter la visio à l\'<b>agenda Google</b> (notification, invitation au contact'+(c.email?' — '+esc(c.email):' — pas d\'e-mail sur la fiche, invitation à vous seul')+', rappel 30 min avant)</span></label>'
     +'<label class="ofl" style="margin-top:10px">Message</label><textarea class="ofc" id="zoom-txt" style="min-height:150px;font-size:13px;line-height:1.5"></textarea>'
     +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">'
-      +'<button type="button" class="ob '+(canal==='wa'?'bwa':'bgold')+'" style="flex:2" '+(url?'':'disabled')+' onclick="oZoomSend(\''+c.id+'\')">📤 Envoyer l\'invitation ('+esc(CANAL_LBL[canal]||canal)+')</button>'
+      +'<button type="button" class="ob '+(canal==='wa'?'bwa':'bgold')+'" style="flex:2" id="zoom-send" '+(url?'':'disabled')+' onclick="oZoomSend(\''+c.id+'\')">📤 Envoyer et ouvrir ma salle ('+esc(CANAL_LBL[canal]||canal)+')</button>'
       +'<button type="button" class="ob bgh" style="flex:1" '+(url?'':'disabled')+' onclick="window.open(\''+esc(url)+'\',\'_blank\');oZoomLog(\''+c.id+'\',\'ouvert\')">🎥 Ouvrir ma salle</button>'
     +'</div>'
     +'<div style="font-size:11px;color:var(--t3);margin-top:8px">Le texte vient du modèle « Invitation à une visio Zoom » (Administration → Messages). Chaque envoi est noté dans le journal du contact.</div></div>';
   document.body.appendChild(m);
   var refresh=function(){document.getElementById('zoom-txt').value=zoomMsg(c);};
-  document.getElementById('zoom-d').onchange=refresh;document.getElementById('zoom-h').onchange=refresh;refresh();
+  document.getElementById('zoom-d').onchange=refresh;document.getElementById('zoom-h').onchange=refresh;m._refresh=refresh;m._canal=canal;ZOOM_MODE='now';refresh();
 }
-function zoomQuand(){var d=val('zoom-d'),h=val('zoom-h');if(!d&&!h)return'';var t='';if(d){var dd=new Date(d+'T12:00:00');t=dd.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});}if(h)t+=(t?' à ':'à ')+h.replace(':','h');return t.trim();}
+var ZOOM_MODE='now';
+function oZoomMode(mode){
+  ZOOM_MODE=mode;var m=document.getElementById('ozoom');if(!m)return;
+  document.getElementById('zoom-m-now').classList.toggle('on',mode==='now');document.getElementById('zoom-m-later').classList.toggle('on',mode==='later');
+  document.getElementById('zoom-later').style.display=mode==='later'?'':'none';document.getElementById('zoom-ag-row').style.display=mode==='later'?'':'none';
+  if(mode==='now'){document.getElementById('zoom-d').value='';document.getElementById('zoom-h').value='';}
+  var sb=document.getElementById('zoom-send');if(sb)sb.textContent=mode==='now'?'📤 Envoyer et ouvrir ma salle ('+(CANAL_LBL[m._canal]||m._canal)+')':'📤 Envoyer l\'invitation ('+(CANAL_LBL[m._canal]||m._canal)+')';
+  if(m._refresh)m._refresh();
+}
+function zoomQuand(){if(ZOOM_MODE==='now')return'maintenant, je vous attends dans la salle';var d=val('zoom-d'),h=val('zoom-h');if(!d&&!h)return'';var t='';if(d){var dd=new Date(d+'T12:00:00');t=dd.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});}if(h)t+=(t?' à ':'à ')+h.replace(':','h');return t.trim();}
 function zoomMsg(c){var v=tplVars(c,'fr');v.lienZoom=zoomUrl();v.quand=zoomQuand();return renderTpl(tplText('zoom_invitation'),v);}
 function oZoomSend(cid){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
@@ -7474,8 +7484,9 @@ function oZoomSend(cid){
   if((canal==='wa'||canal==='sms'||canal==='signal')&&!num){if(c.email)canal='mail';else{sendCopy(text,'📋 Pas de téléphone ni d\'e-mail : message copié');return;}}
   if(canal==='mail'&&!c.email){if(num)canal='wa';else{sendCopy(text,'📋 Message copié');return;}}
   sendVia(canal,num,text,c.email);
+  if(ZOOM_MODE==='now'&&zoomUrl())setTimeout(function(){window.open(zoomUrl(),'_blank');},600);   // le gestionnaire entre dans sa salle avant le client
   var q=zoomQuand();
-  var e=jrnAdd(c,'rdv','🎥 Invitation Zoom envoyée par '+(CANAL_LBL[canal]||canal)+(q?' — visio '+q:' — visio immédiate')+(USER&&USER.zoomUrl?'':' (Zoom de l\'association)'));
+  var e=jrnAdd(c,'rdv','🎥 Invitation Zoom envoyée par '+(CANAL_LBL[canal]||canal)+(ZOOM_MODE==='now'?' — visio immédiate (salle ouverte)':(q?' — visio '+q:''))+(USER&&USER.zoomUrl?'':' (Zoom de l\'association)'));
   var d=val('zoom-d'),h=val('zoom-h')||'10:00',ag=d&&document.getElementById('zoom-ag')&&document.getElementById('zoom-ag').checked;
   if(d){c.rdvs=c.rdvs||[];c.rdvs.push({uri:'zoom_'+Date.now(),source:'zoom',nom:'Visio Zoom',start:d+'T'+h+':00',host:PARTNER_NOM(),joinUrl:zoomUrl(),statut:'active',par:PARTNER_NOM()});}
   oPush([c]);var b=document.getElementById('ozoom');if(b)b.remove();oOpenF(cid);oT('🎥 Invitation Zoom envoyée','s');
