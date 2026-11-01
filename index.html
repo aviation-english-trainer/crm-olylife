@@ -2399,7 +2399,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.30.4 · 01/11';
+var APP_VERSION='v3.30.5 · 01/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -2540,7 +2540,7 @@ function oApplyPayload(d){
       oSaveCache();oHideLogin();oSyncDot('ok');obBadge();
       oT('Bonjour '+USER.nom+' — '+OC.length+' contact(s)','s');
       setTimeout(obFlush,600);
-      applyRole();populateRefUI();oRefresh();oMergeSeedThierry();if(ROLE()==='admin'){var _fp=fixProduits(true);if(_fp)oT('🧹 '+_fp+' fiche(s) : noms de gestionnaires retirés des produits','w');oDedup(false);var _np=fichesParasites().length;if(_np)oT('🧽 '+_np+' fiche(s) parasite(s) détectée(s) — Équipe → « Nettoyer les fiches d\'import raté »','w');}
+      applyRole();populateRefUI();oRefresh();oMergeSeedThierry();if(ROLE()==='admin'){var _fp=fixProduits(true);if(_fp)oT('🧹 '+_fp+' fiche(s) : noms de gestionnaires retirés des produits','w');var _np=fichesParasites().length;if(_np)oT('🧽 '+_np+' fiche(s) parasite(s) détectée(s) — Équipe → « Nettoyer les fiches d\'import raté »','w');}
 }
 function oPullOffline(){
   oSyncDot('err');oLoader(false);
@@ -3892,8 +3892,11 @@ function dupKey(c){
   return n==='|'?null:'n:'+n;
 }
 var DUP_CONFLITS=[],DUP_WARNED=false;
+function oDedupScan(){var groups={};DUP_CONFLITS=[];OC.forEach(function(c){var k=dupKey(c);if(!k)return;(groups[k]=groups[k]||[]).push(c);});
+  Object.keys(groups).forEach(function(k){var g=groups[k];if(g.length<2||k.charAt(0)!=='t')return;var clusters=[];g.forEach(function(d){var cl=clusters.find(function(c){return impNamesOk(d,c[0])||impEmailEq(d,c[0]);});if(cl)cl.push(d);else clusters.push([d]);});
+    if(clusters.length>1)DUP_CONFLITS.push({tel:g[0].tel,fiches:g.map(function(d){return{id:d.id,nom:((d.nom||'')+' '+(d.prenom||'')).trim(),ea:d.memberIdOlyLife||'',num:d.numCommande||''};})});});}
 function oDupConflits(){
-  oDedup(false);
+  oDedupScan();
   var old=document.getElementById('odupc');if(old)old.remove();
   var m=document.createElement('div');m.id='odupc';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
   m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:560px;max-height:88vh;overflow:auto">'
