@@ -1851,6 +1851,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
             <div class="adm-btns">
               <button class="ob" style="background:var(--pu);color:#fff;border:none" onclick="oOpenImport()">⇪ Importer des contacts</button>
               <button class="ob" style="background:#C63E47;color:#fff;border:none" onclick="oDedup(true)">🧹 Supprimer les doublons</button>
+              <button class="ob bgh" onclick="oDupConflits()">☎️ Téléphones partagés</button>
               <button class="ob" style="background:#E8A020;color:#fff;border:none" onclick="oCleanupParasites()">🧽 Nettoyer les fiches d'import raté</button>
               <button class="ob baqua" onclick="oGeoRun()">📍 Géolocaliser les adresses manquantes</button>
             </div></div>
@@ -2398,7 +2399,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.30.3 · 01/11';
+var APP_VERSION='v3.30.4 · 01/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -3890,13 +3891,32 @@ function dupKey(c){
   var n=((c.nom||'')+'|'+(c.prenom||'')).toUpperCase().replace(/\s+/g,' ').trim();
   return n==='|'?null:'n:'+n;
 }
+var DUP_CONFLITS=[],DUP_WARNED=false;
+function oDupConflits(){
+  oDedup(false);
+  var old=document.getElementById('odupc');if(old)old.remove();
+  var m=document.createElement('div');m.id='odupc';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
+  m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:560px;max-height:88vh;overflow:auto">'
+    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">☎️ Téléphones partagés par des personnes différentes</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'odupc\').remove()">✕</button></div>'
+    +'<div style="font-size:12px;color:var(--t2);margin:6px 0 10px">Ces fiches ont le même numéro mais des noms différents : elles ne sont pas fusionnées. Souvent, une ligne de livraison a été rattachée à la mauvaise personne — ouvrez les fiches et corrigez le numéro, l\'ID membre ou la commande.</div>'
+    +(DUP_CONFLITS.length?DUP_CONFLITS.map(function(x){return'<div class="acc-row todo"><span class="em">☎️</span><div class="b"><b>'+esc(x.tel||'')+'</b><br>'+x.fiches.map(function(f){return'<button type="button" class="ob bgh bsm" style="margin:4px 4px 0 0" onclick="document.getElementById(\'odupc\').remove();oOpenF(\''+f.id+'\')">👁 '+esc(f.nom)+(f.ea?' · '+esc(f.ea):'')+(f.num?' · n°'+esc(f.num):'')+'</button>';}).join('')+'</div></div>';}).join(''):'<div style="font-size:13px;color:var(--t3);padding:10px 0">Aucun conflit — tout est propre ✅</div>')
+    +'</div>';
+  document.body.appendChild(m);
+}
 function oDedup(manual){
   if(!can('importer')){if(manual)oT('Réservé à l\'admin','e');return 0;}
   var groups={};
   OC.forEach(function(c){var k=dupKey(c);if(!k)return;(groups[k]=groups[k]||[]).push(c);});
-  var toDel=[],toUpd=[];
+  var toDel=[],toUpd=[];DUP_CONFLITS=[];
   Object.keys(groups).forEach(function(k){
     var g=groups[k];if(g.length<2)return;
+    // v3.30.4 — un même téléphone ne suffit pas : deux personnes différentes (nom ou e-mail incompatibles) ne sont JAMAIS fusionnées
+    var clusters=[g];
+    if(k.charAt(0)==='t'){
+      clusters=[];g.forEach(function(d){var cl=clusters.find(function(c){return impNamesOk(d,c[0])||impEmailEq(d,c[0]);});if(cl)cl.push(d);else clusters.push([d]);});
+      if(clusters.length>1)DUP_CONFLITS.push({tel:g[0].tel,fiches:g.map(function(d){return{id:d.id,nom:((d.nom||'')+' '+(d.prenom||'')).trim(),ea:d.memberIdOlyLife||'',num:d.numCommande||''};})});
+    }
+    clusters.forEach(function(g){if(g.length<2)return;
     // on garde le plus riche (journal, puis le plus ancien)
     g.sort(function(a,b){var ja=(a.journal||[]).length,jb=(b.journal||[]).length;if(ja!==jb)return jb-ja;return(a.createdAt||a.id||'').localeCompare(b.createdAt||b.id||'');});
     var keep=g[0];
@@ -3910,7 +3930,9 @@ function oDedup(manual){
       toDel.push(d.id);
     });
     toUpd.push(keep);
+    });
   });
+  if(DUP_CONFLITS.length&&(manual||!DUP_WARNED)){DUP_WARNED=true;oT('☎️ '+DUP_CONFLITS.length+' numéro(s) partagé(s) par des personnes différentes — non fusionnés. Voir Administration → Données → « Téléphones partagés »','w');}
   if(!toDel.length){if(manual)oT('Aucun doublon détecté','s');return 0;}
   if(manual&&!confirm(toDel.length+' doublon(s) détecté(s). Les supprimer en conservant la fiche la plus complète ?'))return 0;
   OC=OC.filter(function(c){return toDel.indexOf(c.id)<0;});
