@@ -1653,11 +1653,16 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <div class="ocard" style="padding:14px 16px;margin-bottom:12px">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
           <div style="font-size:13px;color:var(--t2);line-height:1.6;flex:1;min-width:220px">🗺️ <b>Appareils à l'essai près de chez vous.</b> Seuls les contacts ayant coché « accepte de faire essayer son appareil » dans leur fiche apparaissent ici.</div>
-          <button class="ob baqua" onclick="oGeoRun()" id="btn-geo">📍 Géolocaliser les adresses</button>
+          <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="ob baqua" onclick="oGeoRun()" id="btn-geo">📍 Géolocaliser les adresses</button><button class="ob bgold" id="btn-exadd" onclick="oExOpen()">🤝 Ajouter un point d'essai hors réseau</button></div>
         </div>
         <div class="map-count" id="carte-count"></div>
       </div>
       <div id="carte-map"></div>
+      <div class="ocard" style="margin-top:12px;padding:14px 16px" id="ex-card">
+        <div style="font-size:13px;font-weight:700;color:var(--gold)">🤝 Points d'essai hors réseau <span style="font-weight:400;color:var(--t3)">— crossline, upline, amis distributeurs : pas de fiche contact, juste un lieu où faire essayer</span></div>
+        <div id="ex-pend"></div>
+        <div id="ex-list" style="margin-top:8px"></div>
+      </div>
     </div>
 
     <!-- GÉNÉALOGIE -->
@@ -2400,7 +2405,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.31 · 02/11';
+var APP_VERSION='v3.32 · 02/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -6052,7 +6057,7 @@ function oCheckUpdate(){
     else hard();
   }catch(e){hard();}
 }
-var GO_TARGET=(function(){try{var m=location.search.match(/[?&]go=([a-z]+)/);var t=m?m[1]:'';return['demandes','contacts','dashboard','pipeline','agenda','actions','carte','equipe'].indexOf(t)>=0?t:'';}catch(e){return'';}})();
+var GO_TARGET=(function(){try{var m=location.search.match(/[?&]go=([a-z]+)/);var t=m?m[1]:'';return['demandes','contacts','dashboard','pipeline','agenda','actions','carte','equipe','admin'].indexOf(t)>=0?t:'';}catch(e){return'';}})();
 var GO_USED=false;
 function oGoDeep(){
   if(!GO_TARGET)return;var t=GO_TARGET;GO_TARGET='';GO_USED=true;
@@ -6395,8 +6400,67 @@ function oAgendaStatus(){
 function essaiContacts(){
   var mine=OC.filter(function(c){return c.essaiOk;}),ids={};mine.forEach(function(c){ids[c.id]=1;});
   var ext=((CFG&&CFG.essais)||[]).filter(function(e){return e&&!ids[e.id];}).map(function(e){var o=Object.assign({},e);o._ext=true;o.essaiOk=true;o.suiviPar=(e.suivis||[]).join(', ');return o;});
-  return mine.concat(ext);
+  var hors=exList().filter(function(e){return e.statut==='valide';}).map(function(e){var o=Object.assign({},e);o._hors=true;o.essaiOk=true;o.suivis=e.via?[e.via]:[];return o;});
+  return mine.concat(ext).concat(hors);
 }
+// ── v3.32 — Points d'essai hors réseau (crossline / upline) : CFG.params.essaisExt, visibles par toute l'équipe ──
+function exList(){return(CFG&&CFG.params&&CFG.params.essaisExt)||[];}
+function exCan(){return !!USER;}   // tout membre peut proposer ; l'admin valide
+function exVisible(e){return e.statut==='valide'||ROLE()==='admin'||e.ajoutePar===PARTNER_NOM();}
+function exCanEdit(e){return ROLE()==='admin'||e.ajoutePar===PARTNER_NOM();}
+function exSt(e){return e.statut==='valide'?'<span class="obdg bgr">✅ validé'+(e.validePar?' · '+esc(e.validePar):'')+'</span>':e.statut==='refuse'?'<span class="obdg brd">⛔ refusé'+(e.motifRefus?' · '+esc(e.motifRefus):'')+'</span>':'<span class="obdg bor">⏳ en attente de validation admin</span>';}
+function oExValide(id,ok){if(ROLE()!=='admin')return;var l=exList().slice(),e=l.find(function(x){return x.id===id;});if(!e)return;if(ok){e.statut='valide';e.validePar=PARTNER_NOM();e.valideLe=new Date().toISOString();e.motifRefus='';}else{var m=prompt('Motif du refus (facultatif, visible par '+(e.ajoutePar||'le proposant')+') :','');if(m===null)return;e.statut='refuse';e.motifRefus=(m||'').trim();}exSave(l,ok?'✅ Point validé — visible par toute l\'équipe':'⛔ Point refusé');}
+function exPendingCount(){return ROLE()==='admin'?exList().filter(function(e){return e.statut!=='valide'&&e.statut!=='refuse';}).length:0;}
+function exSave(list,msg){CFG.params=CFG.params||{};CFG.params.essaisExt=list;oSaveCache();return oPostAsync_({op:'saveEssaisExt',essaisExt:list}).then(function(d){if(d&&d.ok){if(d.essaisExt){CFG.params.essaisExt=d.essaisExt;oSaveCache();}oT(msg||'🤝 Points d\'essai enregistrés','s');}else oT('Enregistrement refusé : '+((d&&d.error)||'script v3.27 requis'),'e');oCarte();}).catch(function(){oT('Hors ligne — réessayez','w');});}
+function exRender(){
+  var box=document.getElementById('ex-list');if(!box)return;var l=exList().filter(exVisible),can=exCan();
+  l.sort(function(a,b){var ra=a.statut==='valide'?1:a.statut==='refuse'?2:0,rb=b.statut==='valide'?1:b.statut==='refuse'?2:0;return ra-rb;});
+  var ba=document.getElementById('btn-exadd');if(ba)ba.style.display=can?'':'none';
+  var pend=exPendingCount();var hd=document.getElementById('ex-pend');if(hd)hd.innerHTML=pend?'<div style="margin-top:8px;padding:8px 12px;border-radius:10px;background:#FFF7E0;border:1px solid #F1DFA0;font-size:12.5px">⏳ <b>'+pend+'</b> proposition(s) à vérifier : validez-les pour qu\'elles apparaissent sur la carte de toute l\'équipe.</div>':'';
+  box.innerHTML=l.length?l.map(function(e){var mine=exCanEdit(e);return'<div class="acc-row'+(e.statut==='valide'?' ok':e.statut==='refuse'?'':' todo')+'"><span class="em">🤝</span><div class="b"><b>'+esc(((e.prenom||'')+' '+(e.nom||'')).trim())+'</b> <span class="obdg '+(e.lien==='upline'?'bgo':'baq')+'">'+esc(e.lien==='upline'?'upline':e.lien==='crossline'?'crossline':'hors réseau')+'</span> '+exSt(e)
+    +'<small>'+esc([e.ville,e.pays].filter(Boolean).join(' · '))+' · '+esc((e.produits||[]).join(', ')||'appareil OlyLife')+' · '+(e.essaiMode==='payant'?'💶 essai payant'+(e.essaiMontant?' '+e.essaiMontant+' '+(e.essaiDevise||'€'):''):'🎁 essai gratuit')+(e.via?' · connu de <b>'+esc(e.via)+'</b>':'')+(e.tel?' · contact direct accepté':' · passer par '+esc(e.via||'l\'équipe'))+(e.geo?'':' · <span style="color:#C0392B">non géolocalisé</span>')+' · proposé par '+esc(e.ajoutePar||'—')+'</small></div>'
+    +'<div class="acts">'+(ROLE()==='admin'&&e.statut!=='valide'?'<button class="ob bgold bsm" onclick="oExValide(\''+e.id+'\',true)">✅ Valider</button>':'')+(ROLE()==='admin'&&e.statut!=='refuse'?'<button class="ob bgh bsm" onclick="oExValide(\''+e.id+'\',false)">⛔ Refuser</button>':'')+(mine?'<button class="ob bgh bsm" onclick="oExOpen(\''+e.id+'\')">✏️</button><button class="ob bgh bsm" onclick="oExDel(\''+e.id+'\')">🗑</button>':'')+'</div></div>';}).join('')
+    :'<div style="font-size:12px;color:var(--t3)">Aucun point hors réseau pour l\'instant.'+(can?' Ajoutez un distributeur crossline ou upline qui accepte de faire une démonstration.':'')+'</div>';
+}
+function oExOpen(id){
+  if(!exCan()){oT('Réservé aux gestionnaires et à l\'admin','w');return;}
+  var e=id?exList().find(function(x){return x.id===id;}):null;e=e||{};
+  var old=document.getElementById('oexf');if(old)old.remove();
+  var m=document.createElement('div');m.id='oexf';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(ev){if(ev.target===m)m.remove();};
+  var gests=[USER&&USER.nom].concat(USERS.filter(function(u){return u.role!=='referent'&&u.actif!==false;}).map(function(u){return u.nom;})).filter(function(v,i,a){return v&&a.indexOf(v)===i;});
+  var I=function(id,l,v,ph,type){return'<div class="ofg1"><label class="ofl">'+l+'</label><input type="'+(type||'text')+'" class="ofc" id="'+id+'" value="'+esc(v||'')+'"'+(ph?' placeholder="'+esc(ph)+'"':'')+'></div>';};
+  m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:560px;max-height:90vh;overflow:auto">'
+    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">🤝 '+(e.id?'Modifier le':'Nouveau')+' point d\'essai hors réseau</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'oexf\').remove()">✕</button></div>'
+    +'<div style="font-size:12px;color:var(--t2);margin:6px 0 10px">Une personne hors de notre lignée (crossline, upline, ami distributeur) qui accepte de faire essayer son appareil. Aucune fiche contact n\'est créée : juste un point sur la carte.'+(ROLE()==='admin'?'':' <b>Votre proposition sera vérifiée par l\'admin</b> avant d\'apparaître pour toute l\'équipe.')+'</div>'
+    +'<div class="ofg2" style="gap:8px">'+I('ex-pr','Prénom',e.prenom,'Marie')+I('ex-nm','Nom',e.nom,'DUPONT')+'</div>'
+    +'<div class="ofg2" style="gap:8px"><div class="ofg1"><label class="ofl">Lien avec nous</label><select class="ofc" id="ex-lien"><option value="crossline"'+(e.lien==='crossline'?' selected':'')+'>Crossline</option><option value="upline"'+(e.lien==='upline'?' selected':'')+'>Upline</option><option value="autre"'+(e.lien==='autre'?' selected':'')+'>Autre</option></select></div>'
+    +'<div class="ofg1"><label class="ofl">Connu(e) de — membre WLHT qui fait le lien</label><select class="ofc" id="ex-via">'+gests.map(function(n){return'<option'+((e.via||PARTNER_NOM())===n?' selected':'')+'>'+esc(n)+'</option>';}).join('')+'</select></div></div>'
+    +'<div class="ofg2" style="gap:8px">'+I('ex-adr','Adresse (facultatif)',e.adresse,'12 rue des Lilas')+I('ex-cp','Code postal',e.cp,'69003')+'</div>'
+    +'<div class="ofg2" style="gap:8px">'+I('ex-vil','Ville',e.ville,'Lyon')+I('ex-pays','Pays',e.pays||'France','France')+'</div>'
+    +I('ex-prod','Appareils (séparés par des virgules)',(e.produits||[]).join(', '),'THz Tera-P90+, Galaxy G-One')
+    +'<div class="ofg2" style="gap:8px"><div class="ofg1"><label class="ofl">Essai</label><select class="ofc" id="ex-mode" onchange="document.getElementById(\'ex-mt-w\').style.display=this.value===\'payant\'?\'\':\'none\'"><option value="gratuit"'+(e.essaiMode!=='payant'?' selected':'')+'>🎁 Gratuit</option><option value="payant"'+(e.essaiMode==='payant'?' selected':'')+'>💶 Payant</option></select></div>'
+    +'<div class="ofg1" id="ex-mt-w" style="'+(e.essaiMode==='payant'?'':'display:none')+'"><label class="ofl">Montant</label><div style="display:flex;gap:6px"><input type="number" class="ofc" id="ex-mt" value="'+(e.essaiMontant||'')+'" style="flex:1"><select class="ofc" id="ex-dev" style="flex:0 0 80px"><option'+((e.essaiDevise||'€')==='€'?' selected':'')+'>€</option><option'+(e.essaiDevise==='FCFA'?' selected':'')+'>FCFA</option><option'+(e.essaiDevise==='USD'?' selected':'')+'>USD</option><option'+(e.essaiDevise==='MAD'?' selected':'')+'>MAD</option></select></div></div></div>'
+    +I('ex-tel','Téléphone — seulement si la personne accepte d\'être contactée directement par l\'équipe',e.tel,'+33 6 …','tel')
+    +'<div style="font-size:11px;color:var(--t3);margin-top:-4px">Sans téléphone, l\'équipe passera par « '+esc(e.via||PARTNER_NOM())+' » pour organiser l\'essai.</div>'
+    +I('ex-notes','Notes (créneaux, conditions…)',e.notes,'Plutôt le week-end')
+    +'<div style="display:flex;gap:8px;margin-top:12px"><button type="button" class="ob bgold" style="flex:2" onclick="oExSave(\''+(e.id||'')+'\')">💾 Enregistrer et placer sur la carte</button><button type="button" class="ob bgh" style="flex:1" onclick="document.getElementById(\'oexf\').remove()">Annuler</button></div></div>';
+  document.body.appendChild(m);
+}
+function oExSave(id){
+  var pr=val('ex-pr').trim(),nm=val('ex-nm').trim(),vil=val('ex-vil').trim();
+  if(!pr&&!nm){oT('Indiquez au moins un prénom ou un nom','e');return;}
+  if(!vil){oT('Indiquez la ville (pour la carte)','e');return;}
+  var l=exList().slice(),e=id?l.find(function(x){return x.id===id;}):null;
+  if(!e){e={id:'ex_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),ajoutePar:PARTNER_NOM(),le:new Date().toISOString()};l.push(e);}
+  var prev=geoQ(e);
+  e.prenom=pr;e.nom=nm.toUpperCase();e.lien=val('ex-lien');e.via=val('ex-via');e.adresse=val('ex-adr').trim();e.cp=val('ex-cp').trim();e.ville=vil;e.pays=val('ex-pays').trim()||'France';
+  e.produits=val('ex-prod').split(',').map(function(x){return x.trim();}).filter(Boolean);e.essaiMode=val('ex-mode');e.essaiMontant=e.essaiMode==='payant'?(parseFloat(val('ex-mt'))||0):0;e.essaiDevise=val('ex-dev');e.tel=normPhone(val('ex-tel').trim());e.notes=val('ex-notes').trim();
+  var b=document.getElementById('oexf');if(b)b.remove();
+  if(ROLE()==='admin'&&!e.statut){e.statut='valide';e.validePar=PARTNER_NOM();e.valideLe=new Date().toISOString();}
+  var fin=function(){exSave(l,ROLE()==='admin'?'🤝 '+(pr||nm)+' placé(e) sur la carte':'🤝 Proposition envoyée — l\'admin la vérifie avant publication');};
+  if(!e.geo||geoQ(e)!==prev){oT('📍 Géolocalisation…','i');geocodeOne(e,function(){fin();});}else fin();
+}
+function oExDel(id){var e=exList().find(function(x){return x.id===id;});if(!e||!exCanEdit(e))return;if(!confirm('Retirer '+((e.prenom||'')+' '+(e.nom||'')).trim()+' de la carte ?'))return;exSave(exList().filter(function(x){return x.id!==id;}),'Point retiré');}
 function oTEssai(){var m=document.getElementById('fo-essai-mode'),w=document.getElementById('fo-essai-mt-wrap');if(m&&w)w.style.display=m.value==='payant'?'':'none';}
 // Libellé de l'essai (gratuit / payant + montant)
 function essaiLbl(c){if(!c||!c.essaiOk)return'';if(c.essaiMode==='payant')return'essai payant'+(c.essaiMontant?' · '+c.essaiMontant+' '+(c.essaiDevise||'€'):'');return'essai gratuit';}
@@ -6423,7 +6487,7 @@ function geocodeOne(c,cb){
     }).catch(function(){cb(false);});
 }
 function oGeoRun(){
-  var todo=essaiContacts().filter(function(c){return!c._ext&&(c.adresse||c.ville)&&(!c.geo||c.geo.q!==geoQ(c));});
+  var todo=essaiContacts().filter(function(c){return!c._ext&&!c._hors&&(c.adresse||c.ville)&&(!c.geo||c.geo.q!==geoQ(c));});
   var btn=document.getElementById('btn-geo');
   if(!todo.length){oT('Toutes les adresses sont déjà géolocalisées','s');return;}
   var i=0,okN=0,ch=[];
@@ -6442,11 +6506,11 @@ function oMapWA(id){var c=OC.find(function(x){return x.id===id;});if(!c||!c.tel)
 function oCarte(){
   var list=essaiContacts();
   var located=list.filter(function(c){return c.geo&&c.geo.lat;});
-  var togeo=list.filter(function(c){return!c._ext&&(c.adresse||c.ville)&&(!c.geo||c.geo.q!==geoQ(c));});
-  var noaddr=list.filter(function(c){return!c._ext&&!c.adresse&&!c.ville;});
-  var nbExt=list.filter(function(c){return c._ext;}).length;
+  var togeo=list.filter(function(c){return!c._ext&&!c._hors&&(c.adresse||c.ville)&&(!c.geo||c.geo.q!==geoQ(c));});
+  var noaddr=list.filter(function(c){return!c._ext&&!c._hors&&!c.adresse&&!c.ville;});
+  var nbExt=list.filter(function(c){return c._ext;}).length,nbHors=list.filter(function(c){return c._hors;}).length;exRender();
   var equipNon=OC.filter(function(c){return!c.essaiOk&&(c.produits&&c.produits.length)&&!mtEstEA(c);});
-  document.getElementById('carte-count').innerHTML='<b>'+list.length+'</b> contact(s) acceptent de faire essayer leur appareil · <b>'+located.length+'</b> sur la carte'+(nbExt?' · dont <b>'+nbExt+'</b> suivi(s) par d\'autres membres de l\'équipe':'')
+  document.getElementById('carte-count').innerHTML='<b>'+list.length+'</b> contact(s) acceptent de faire essayer leur appareil · <b>'+located.length+'</b> sur la carte'+(nbExt?' · dont <b>'+nbExt+'</b> suivi(s) par d\'autres membres de l\'équipe':'')+(nbHors?' · <b>'+nbHors+'</b> point(s) hors réseau 🤝':'')
     +(togeo.length?' · <b style="color:var(--gold)">'+togeo.length+'</b> à géolocaliser (bouton ci-dessus)':'')
     +(noaddr.length?' · <b style="color:var(--rd)">'+noaddr.length+'</b> sans adresse (à compléter dans la fiche)':'')
     +(equipNon.length?'<div style="margin-top:6px;font-size:12px;color:var(--t2)">ℹ️ <b>'+equipNon.length+'</b> contact(s) équipé(s) d\'un appareil n\'ont pas la case « accepte de faire essayer son appareil » cochée : '+equipNon.slice(0,6).map(function(c){return'<a style="color:var(--aqua);cursor:pointer" onclick="oOpenF(\''+c.id+'\')">'+esc(c.nom+' '+(c.prenom||''))+'</a>';}).join(', ')+(equipNon.length>6?'…':'')+' — cochez-la dans leur fiche (Modifier → Livraison) pour les voir ici.</div>':'');
@@ -6461,12 +6525,18 @@ function oCarte(){
     var pts=[];
     located.forEach(function(c){
       var apps=(c.produits||[]).map(function(p){return'<span class="map-bdg">'+esc(p.split('(')[0].trim())+'</span>';}).join('')||'<span class="map-bdg">Appareil OlyLife</span>';apps+='<span class="map-bdg" style="background:'+(c.essaiMode==='payant'?'#FFF3E0':'#E8F5E9')+'">'+(c.essaiMode==='payant'?'💶 ':'🎁 ')+essaiLbl(c)+'</span>';
-      var gest=(c._ext?(c.suivis||[]):suivisDe(c)).filter(Boolean);
+      var gest=((c._ext||c._hors)?(c.suivis||[]):suivisDe(c)).filter(Boolean);
+      if(c._hors){apps+='<span class="map-bdg" style="background:#FFF4E0">🤝 '+(c.lien==='upline'?'upline':c.lien==='crossline'?'crossline':'hors réseau')+'</span>';}
       var html='<b>'+esc(c.nom+' '+(c.prenom||''))+'</b><br><small style="color:#777">'+esc((c.ville||'')+(c.pays?' · '+c.pays:''))+(c.geo.approx?' (position approximative)':'')+'</small><div style="margin-top:4px">'+apps+'</div>'
-        +(c._ext
+        +(c._hors
+          ?('<div style="font-size:12px;margin-top:6px">'+(c.notes?esc(c.notes)+'<br>':'')+'Connu(e) de <b>'+esc(gest.join(', ')||'l\'équipe')+'</b>.</div>'
+            +(c.tel?'<a class="ob bwa" style="margin-top:6px;text-decoration:none;display:block;text-align:center" href="'+mkWA(c.tel,'Bonjour '+(c.prenom||'')+' 🌿 '+(PARTNER_NOM()||'')+' (Water Life High Tech), de la part de '+(c.via||'l\'équipe')+'. J\'accompagne une personne près de chez vous qui aimerait essayer votre '+((c.produits||[])[0]||'appareil OlyLife')+' : auriez-vous un créneau ? Merci beaucoup !')+'" target="_blank" rel="noopener">💬 Écrire directement</a>':'')
+            +gest.map(function(n){if(n===PARTNER_NOM())return'';var u=USERS.find(function(x){return x.nom===n;})||((USER&&USER.nom===n)?USER:null);var t=u&&u.tel?String(u.tel).replace(/\D/g,''):'';return t?'<a class="ob bgh" style="margin-top:6px;text-decoration:none;display:block;text-align:center" href="'+mkWA(t,'Bonjour '+n.split(' ')[0]+' 🌿 '+(PARTNER_NOM()||'')+' ici. Pourrais-tu organiser un essai chez '+(c.prenom||c.nom)+' ('+(c.ville||'')+') pour une personne que j\'accompagne ? Merci !')+'" target="_blank" rel="noopener">💬 Demander à '+esc(n.split(' ')[0])+'</a>':'';}).join('')
+            +(exCan()?'<button class="ob bgh" style="margin-top:6px" onclick="oExOpen(\''+c.id+'\')">✏️ Modifier</button>':''))
+          :c._ext
           ?'<div style="font-size:12px;margin-top:6px">Suivi par <b>'+esc(gest.join(', ')||'l\'équipe WLHT')+'</b> — passez par '+(gest.length>1?'eux':'lui')+' pour la mise en relation.</div>'+gest.map(function(n){var u=USERS.find(function(x){return x.nom===n;})||((USER&&USER.nom===n)?USER:null);var t=u&&u.tel?String(u.tel).replace(/\D/g,''):'';return t?'<a class="ob bwa" style="margin-top:6px;text-decoration:none;display:block;text-align:center" href="'+mkWA(t,'Bonjour '+n.split(' ')[0]+' 🌿 '+(PARTNER_NOM()||'')+' ici. J\'accompagne une personne près de '+(c.ville||'chez '+c.prenom)+' : pourrais-tu organiser un essai de l\'appareil de '+(c.prenom||c.nom)+' ? Merci !')+'" target="_blank" rel="noopener">💬 Écrire à '+esc(n.split(' ')[0])+'</a>':'';}).join('')
           :(c.tel?'<button class="ob bwa" onclick="oMapWA(\''+c.id+'\')">💬 Demander une mise en relation</button>':'')+'<button class="ob bgh" style="margin-top:6px" onclick="oOpenF(\''+c.id+'\')">Ouvrir la fiche</button>');
-      var m=L.marker([c.geo.lat,c.geo.lng],{icon:L.divIcon({className:'map-pin',html:'<span>📍</span>',iconSize:[34,34],iconAnchor:[17,32],popupAnchor:[0,-30]})}).addTo(MAP).bindPopup(html);
+      var m=L.marker([c.geo.lat,c.geo.lng],{icon:L.divIcon({className:'map-pin',html:'<span>'+(c._hors?'🤝':'📍')+'</span>',iconSize:[34,34],iconAnchor:[17,32],popupAnchor:[0,-30]})}).addTo(MAP).bindPopup(html);
       MAP_MK.push(m);pts.push([c.geo.lat,c.geo.lng]);
     });
     setTimeout(function(){MAP.invalidateSize();if(pts.length)MAP.fitBounds(pts,{padding:[36,36],maxZoom:11});},80);

@@ -5,6 +5,8 @@
 //         · inscription seulement si e-mail + consentement tracé (emailConsent, emailConsentLe, emailConsentSrc)
 //         · passage « Dans le réseau » / « Abandon » → bascule automatique de parcours côté serveur
 //         · webhook Systeme.io « Tag ajouté » : oly_desinscrit (règle « désabonné ») → consentement retiré ; oly_fin_* → campagne terminée
+// v3.27 · POINTS D'ESSAI HORS RÉSEAU (crossline / upline) : op saveEssaisExt (admin + gestionnaire) → config.params.essaisExt,
+//         visibles par toute l'équipe sur la carte, sans fiche contact.
 // v3.26 · CARTE DES ESSAIS : config.essais = tous les contacts « accepte de faire essayer » (données réduites : nom, ville,
 //         position, appareils, mode d'essai, gestionnaire), visibles par tous les membres quel que soit leur périmètre.
 // v3.25 · Connexion : code d'accès accepté quelle que soit la casse, espaces ignorés.
@@ -260,7 +262,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.26';
+var SRV_VERSION = '3.27';
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
@@ -1030,6 +1032,31 @@ function doPost(e) {
       if (!tst.ok) return out_({ ok: true, configured: true, api: false, error: tst.error, hookUrl: hookUrl });
       var names = (tst.data && tst.data.items ? tst.data.items : []).map(function (t) { return t.name; });
       return out_({ ok: true, configured: true, api: true, tags: names, hookUrl: hookUrl, quota: UrlFetchApp ? undefined : undefined });
+    }
+    else if (op === 'saveEssaisExt') {                                                 // v3.27 — proposition par tout membre, validation par l'admin
+      db.config.params = db.config.params || {};
+      var oldL = db.config.params.essaisExt || [], oldMap = {}; oldL.forEach(function (x) { if (x && x.id) oldMap[x.id] = x; });
+      var lst = Array.isArray(req.essaisExt) ? req.essaisExt.slice(0, 500) : [];
+      var isAdm = user.role === 'admin', nouveaux = [];
+      var clean = lst.map(function (x) { x = x || {}; var o = oldMap[x.id];
+        var e = { id: String(x.id || ('ex_' + Date.now())).slice(0, 40), prenom: String(x.prenom || '').slice(0, 80), nom: String(x.nom || '').slice(0, 80), tel: String(x.tel || '').slice(0, 30), ville: String(x.ville || '').slice(0, 80), cp: String(x.cp || '').slice(0, 12), pays: String(x.pays || '').slice(0, 60), adresse: String(x.adresse || '').slice(0, 200), produits: (x.produits || []).slice(0, 10), essaiMode: x.essaiMode === 'payant' ? 'payant' : 'gratuit', essaiMontant: +x.essaiMontant || 0, essaiDevise: String(x.essaiDevise || '€').slice(0, 6), lien: String(x.lien || '').slice(0, 20), via: String(x.via || '').slice(0, 80), notes: String(x.notes || '').slice(0, 500), geo: x.geo || null, ajoutePar: String((o && o.ajoutePar) || x.ajoutePar || user.nom).slice(0, 80), le: String((o && o.le) || x.le || now_()).slice(0, 30), statut: String(x.statut || 'propose'), validePar: String(x.validePar || '').slice(0, 80), valideLe: String(x.valideLe || '').slice(0, 30), motifRefus: String(x.motifRefus || '').slice(0, 200) };
+        if (!isAdm) {                                                                    // un membre ne peut ni valider ni toucher aux points des autres
+          if (o && o.ajoutePar !== user.nom) return o;
+          e.statut = 'propose'; e.validePar = ''; e.valideLe = ''; e.motifRefus = '';
+          if (!o) nouveaux.push(e);
+        } else if (e.statut === 'valide' && !(o && o.statut === 'valide')) { e.validePar = user.nom; e.valideLe = now_(); }
+        return e; });
+      if (!isAdm) oldL.forEach(function (o) { if (o && o.ajoutePar !== user.nom && !clean.some(function (e) { return e.id === o.id; })) clean.push(o); });   // pas de suppression des points des autres
+      db.config.params.essaisExt = clean;
+      adminLog_(db, user.nom, 'points d\'essai hors réseau', clean.length + ' point(s)' + (nouveaux.length ? ' · ' + nouveaux.length + ' proposé(s)' : ''));
+      if (nouveaux.length) {                                                             // alerte à l'admin : e-mail + push
+        try { var rdx = {}; try { rdx = JSON.parse(PropertiesService.getScriptProperties().getProperty('root_digest') || '{}'); } catch (e0) {}
+          var adm = rdx.email || MON_EMAIL, lignes = nouveaux.map(function (e) { return '<li><b>' + e.prenom + ' ' + e.nom + '</b> — ' + [e.ville, e.pays].filter(Boolean).join(', ') + ' · ' + (e.produits || []).join(', ') + ' · ' + (e.essaiMode === 'payant' ? 'essai payant' : 'essai gratuit') + ' · ' + (e.lien || '') + (e.via ? ' · connu de ' + e.via : '') + '</li>'; }).join('');
+          MailApp.sendEmail({ to: adm, subject: '🤝 CRM OlyLife — ' + nouveaux.length + ' point(s) d\'essai hors réseau à valider (' + user.nom + ')', htmlBody: avMailShell_('🤝 Point d\'essai à valider', 'proposé par ' + user.nom, '#126A3C', '<ul>' + lignes + '</ul><p>Validez ou refusez dans <b>Carte des essais → Points hors réseau</b> (ou Administration).</p>' + avBtn_('https://crm.team-waterlifehightech.com/?go=carte', 'Ouvrir la carte', '#126A3C'), 'CRM OlyLife — WLHT'), name: 'CRM OlyLife — WLHT' });
+          pushSend_(db, [{ id: 'root' }], '🤝 Point d\'essai à valider', nouveaux.map(function (e) { return e.prenom + ' ' + e.nom + ' (' + e.ville + ')'; }).join(', ') + ' — proposé par ' + user.nom, '');
+        } catch (ne) { Logger.log('essaisExt alerte : ' + ne); }
+      }
+      saveDB_(db); return out_({ ok: true, n: clean.length, essaisExt: clean });
     }
     else if (op === 'saveConfig') {
       if (user.role !== 'admin') return out_({ ok: false, error: 'forbidden' });
