@@ -2400,7 +2400,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.30.6 · 01/11';
+var APP_VERSION='v3.30.7 · 02/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -2502,7 +2502,7 @@ function oShowLogin(msg){
 function oHideLogin(){document.getElementById('ologin').classList.remove('on');setTimeout(function(){oGoDeep();oInstallGate();},400);}
 function oLogin(){
   var u=(DEFAULT_GAS_URL||document.getElementById('ol-url').value.trim());
-  var c=document.getElementById('ol-code').value.trim();
+  var c=document.getElementById('ol-code').value.replace(/\s+/g,'').toUpperCase();   // v3.30.7 — majuscules/minuscules et espaces ignorés
   var err=document.getElementById('ol-err');
   if(!u||u.indexOf('script.google.com')<0||u.indexOf('/exec')<0){err.textContent='URL invalide — elle doit contenir script.google.com et se terminer par /exec.';err.style.display='block';return;}
   if(!c){err.textContent='Saisissez votre code d\'accès.';err.style.display='block';return;}

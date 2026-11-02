@@ -5,6 +5,7 @@
 //         · inscription seulement si e-mail + consentement tracé (emailConsent, emailConsentLe, emailConsentSrc)
 //         · passage « Dans le réseau » / « Abandon » → bascule automatique de parcours côté serveur
 //         · webhook Systeme.io « Tag ajouté » : oly_desinscrit (règle « désabonné ») → consentement retiré ; oly_fin_* → campagne terminée
+// v3.25 · Connexion : code d'accès accepté quelle que soit la casse, espaces ignorés.
 // v3.24 · ZOOM : op zoomAgenda — événement Google Agenda « 🎥 Visio Zoom » (lien en lieu, invitation au contact et au gestionnaire, rappel 30 min).
 // v3.23 · ZOOM : lien Zoom personnel par membre (zoomUrl — Mon profil / formulaire d'accès), repli config.params.liens.zoom.
 // v3.22 · ADRESSES : une seule adresse (facturation = livraison par défaut) ; livraison à une autre adresse / autre
@@ -158,8 +159,8 @@ function saveDB_(db) {
 // ── UTILISATEURS & DROITS ───────────────────────────────────────────
 function findUser_(db, code) {
   if (!code) return null;
-  code = String(code).trim();
-  if (code === ADMIN_CODE) {
+  code = String(code).replace(/\s+/g, '').toUpperCase();   // v3.25 — code d'accès insensible à la casse et aux espaces
+  if (code === String(ADMIN_CODE).toUpperCase()) {
     var rd = {};
     try { rd = JSON.parse(PropertiesService.getScriptProperties().getProperty('root_digest') || '{}'); } catch (e) {}
     var rp = (db.config && db.config.rootProfile) || {};   // v3.5 — photo / tél / email de l'admin principal
@@ -167,7 +168,7 @@ function findUser_(db, code) {
   }
   var users = db.users || [];
   for (var i = 0; i < users.length; i++) {
-    if (users[i] && users[i].code && String(users[i].code).trim() === code && users[i].actif !== false) {
+    if (users[i] && users[i].code && String(users[i].code).replace(/\s+/g, '').toUpperCase() === code && users[i].actif !== false) {
       return users[i];
     }
   }
@@ -257,7 +258,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.24';
+var SRV_VERSION = '3.25';
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
