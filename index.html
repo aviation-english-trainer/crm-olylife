@@ -2400,7 +2400,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.30.7 · 02/11';
+var APP_VERSION='v3.31 · 02/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -6391,7 +6391,12 @@ function oAgendaStatus(){
     +'<div style="margin-top:4px">'+(cal?'✅ <b>Rendez-vous</b> : vos RDV sont réservés sur <b>votre Calendly</b> — ils tombent dans l\'agenda relié à votre compte Calendly et remontent dans la fiche du contact.':'ℹ️ <b>Rendez-vous</b> : sans lien Calendly personnel, les RDV sont pris sur l\'agenda de Jean-Charles (vous êtes invité(e) par e-mail quand vous suivez le contact).')+'</div>'
     +'<div style="margin-top:4px;color:var(--t3)">Le résumé quotidien par e-mail utilise la même adresse, à l\'heure choisie ci-dessus.</div>';
 }
-function essaiContacts(){return OC.filter(function(c){return c.essaiOk;});}
+// v3.31 — la carte des essais montre TOUTE l'équipe : fiches de mon périmètre (complètes) + annuaire serveur (réduit) pour les autres
+function essaiContacts(){
+  var mine=OC.filter(function(c){return c.essaiOk;}),ids={};mine.forEach(function(c){ids[c.id]=1;});
+  var ext=((CFG&&CFG.essais)||[]).filter(function(e){return e&&!ids[e.id];}).map(function(e){var o=Object.assign({},e);o._ext=true;o.essaiOk=true;o.suiviPar=(e.suivis||[]).join(', ');return o;});
+  return mine.concat(ext);
+}
 function oTEssai(){var m=document.getElementById('fo-essai-mode'),w=document.getElementById('fo-essai-mt-wrap');if(m&&w)w.style.display=m.value==='payant'?'':'none';}
 // Libellé de l'essai (gratuit / payant + montant)
 function essaiLbl(c){if(!c||!c.essaiOk)return'';if(c.essaiMode==='payant')return'essai payant'+(c.essaiMontant?' · '+c.essaiMontant+' '+(c.essaiDevise||'€'):'');return'essai gratuit';}
@@ -6418,7 +6423,7 @@ function geocodeOne(c,cb){
     }).catch(function(){cb(false);});
 }
 function oGeoRun(){
-  var todo=essaiContacts().filter(function(c){return(c.adresse||c.ville)&&(!c.geo||c.geo.q!==geoQ(c));});
+  var todo=essaiContacts().filter(function(c){return!c._ext&&(c.adresse||c.ville)&&(!c.geo||c.geo.q!==geoQ(c));});
   var btn=document.getElementById('btn-geo');
   if(!todo.length){oT('Toutes les adresses sont déjà géolocalisées','s');return;}
   var i=0,okN=0,ch=[];
@@ -6437,10 +6442,11 @@ function oMapWA(id){var c=OC.find(function(x){return x.id===id;});if(!c||!c.tel)
 function oCarte(){
   var list=essaiContacts();
   var located=list.filter(function(c){return c.geo&&c.geo.lat;});
-  var togeo=list.filter(function(c){return(c.adresse||c.ville)&&(!c.geo||c.geo.q!==geoQ(c));});
-  var noaddr=list.filter(function(c){return!c.adresse&&!c.ville;});
+  var togeo=list.filter(function(c){return!c._ext&&(c.adresse||c.ville)&&(!c.geo||c.geo.q!==geoQ(c));});
+  var noaddr=list.filter(function(c){return!c._ext&&!c.adresse&&!c.ville;});
+  var nbExt=list.filter(function(c){return c._ext;}).length;
   var equipNon=OC.filter(function(c){return!c.essaiOk&&(c.produits&&c.produits.length)&&!mtEstEA(c);});
-  document.getElementById('carte-count').innerHTML='<b>'+list.length+'</b> contact(s) acceptent de faire essayer leur appareil · <b>'+located.length+'</b> sur la carte'
+  document.getElementById('carte-count').innerHTML='<b>'+list.length+'</b> contact(s) acceptent de faire essayer leur appareil · <b>'+located.length+'</b> sur la carte'+(nbExt?' · dont <b>'+nbExt+'</b> suivi(s) par d\'autres membres de l\'équipe':'')
     +(togeo.length?' · <b style="color:var(--gold)">'+togeo.length+'</b> à géolocaliser (bouton ci-dessus)':'')
     +(noaddr.length?' · <b style="color:var(--rd)">'+noaddr.length+'</b> sans adresse (à compléter dans la fiche)':'')
     +(equipNon.length?'<div style="margin-top:6px;font-size:12px;color:var(--t2)">ℹ️ <b>'+equipNon.length+'</b> contact(s) équipé(s) d\'un appareil n\'ont pas la case « accepte de faire essayer son appareil » cochée : '+equipNon.slice(0,6).map(function(c){return'<a style="color:var(--aqua);cursor:pointer" onclick="oOpenF(\''+c.id+'\')">'+esc(c.nom+' '+(c.prenom||''))+'</a>';}).join(', ')+(equipNon.length>6?'…':'')+' — cochez-la dans leur fiche (Modifier → Livraison) pour les voir ici.</div>':'');
@@ -6455,9 +6461,11 @@ function oCarte(){
     var pts=[];
     located.forEach(function(c){
       var apps=(c.produits||[]).map(function(p){return'<span class="map-bdg">'+esc(p.split('(')[0].trim())+'</span>';}).join('')||'<span class="map-bdg">Appareil OlyLife</span>';apps+='<span class="map-bdg" style="background:'+(c.essaiMode==='payant'?'#FFF3E0':'#E8F5E9')+'">'+(c.essaiMode==='payant'?'💶 ':'🎁 ')+essaiLbl(c)+'</span>';
+      var gest=(c._ext?(c.suivis||[]):suivisDe(c)).filter(Boolean);
       var html='<b>'+esc(c.nom+' '+(c.prenom||''))+'</b><br><small style="color:#777">'+esc((c.ville||'')+(c.pays?' · '+c.pays:''))+(c.geo.approx?' (position approximative)':'')+'</small><div style="margin-top:4px">'+apps+'</div>'
-        +(c.tel?'<button class="ob bwa" onclick="oMapWA(\''+c.id+'\')">💬 Demander une mise en relation</button>':'')
-        +'<button class="ob bgh" style="margin-top:6px" onclick="oOpenF(\''+c.id+'\')">Ouvrir la fiche</button>';
+        +(c._ext
+          ?'<div style="font-size:12px;margin-top:6px">Suivi par <b>'+esc(gest.join(', ')||'l\'équipe WLHT')+'</b> — passez par '+(gest.length>1?'eux':'lui')+' pour la mise en relation.</div>'+gest.map(function(n){var u=USERS.find(function(x){return x.nom===n;})||((USER&&USER.nom===n)?USER:null);var t=u&&u.tel?String(u.tel).replace(/\D/g,''):'';return t?'<a class="ob bwa" style="margin-top:6px;text-decoration:none;display:block;text-align:center" href="'+mkWA(t,'Bonjour '+n.split(' ')[0]+' 🌿 '+(PARTNER_NOM()||'')+' ici. J\'accompagne une personne près de '+(c.ville||'chez '+c.prenom)+' : pourrais-tu organiser un essai de l\'appareil de '+(c.prenom||c.nom)+' ? Merci !')+'" target="_blank" rel="noopener">💬 Écrire à '+esc(n.split(' ')[0])+'</a>':'';}).join('')
+          :(c.tel?'<button class="ob bwa" onclick="oMapWA(\''+c.id+'\')">💬 Demander une mise en relation</button>':'')+'<button class="ob bgh" style="margin-top:6px" onclick="oOpenF(\''+c.id+'\')">Ouvrir la fiche</button>');
       var m=L.marker([c.geo.lat,c.geo.lng],{icon:L.divIcon({className:'map-pin',html:'<span>📍</span>',iconSize:[34,34],iconAnchor:[17,32],popupAnchor:[0,-30]})}).addTo(MAP).bindPopup(html);
       MAP_MK.push(m);pts.push([c.geo.lat,c.geo.lng]);
     });

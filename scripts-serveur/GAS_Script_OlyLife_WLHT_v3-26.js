@@ -5,6 +5,8 @@
 //         · inscription seulement si e-mail + consentement tracé (emailConsent, emailConsentLe, emailConsentSrc)
 //         · passage « Dans le réseau » / « Abandon » → bascule automatique de parcours côté serveur
 //         · webhook Systeme.io « Tag ajouté » : oly_desinscrit (règle « désabonné ») → consentement retiré ; oly_fin_* → campagne terminée
+// v3.26 · CARTE DES ESSAIS : config.essais = tous les contacts « accepte de faire essayer » (données réduites : nom, ville,
+//         position, appareils, mode d'essai, gestionnaire), visibles par tous les membres quel que soit leur périmètre.
 // v3.25 · Connexion : code d'accès accepté quelle que soit la casse, espaces ignorés.
 // v3.24 · ZOOM : op zoomAgenda — événement Google Agenda « 🎥 Visio Zoom » (lien en lieu, invitation au contact et au gestionnaire, rappel 30 min).
 // v3.23 · ZOOM : lien Zoom personnel par membre (zoomUrl — Mon profil / formulaire d'accès), repli config.params.liens.zoom.
@@ -258,7 +260,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.25';
+var SRV_VERSION = '3.26';
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
@@ -310,7 +312,7 @@ function payload_(db, user) {
     ok: true,
     user: { id: user.id, nom: user.nom, role: user.role, tags: user.tags || [], tel: user.tel || '', email: user.email || '', photo: user.photo || '', digestEmail: user.digestEmail || '', digestHeure: user.digestHeure || '', calendlyUrl: user.calendlyUrl || '', scope: user.scope === 'tout' ? 'tout' : 'equipes', comite: !!user.comite, voitComite: !!user.voitComite, pubToken: pubTokenOf_(db, user), superAdmin: !!user.superAdmin, push: user.push !== false, zoomUrl: user.zoomUrl || '' },
     contacts: contacts,
-    config: { srv: SRV_VERSION, referents: referentsFor_(db, user), suiveurs: suiveursFor_(db, user), stocks: db.config.stocks || [], ressources: db.config.ressources || {}, equipe: equipe_(db, user), sessionJours: SESSION_JOURS, params: db.config.params || {}, leadsNew: leadsFor_(db, user).filter(function (l) { return l.statut !== 'traite'; }).length }
+    config: { srv: SRV_VERSION, referents: referentsFor_(db, user), suiveurs: suiveursFor_(db, user), stocks: db.config.stocks || [], ressources: db.config.ressources || {}, equipe: equipe_(db, user), sessionJours: SESSION_JOURS, params: db.config.params || {}, essais: essaisPublics_(db), leadsNew: leadsFor_(db, user).filter(function (l) { return l.statut !== 'traite'; }).length }
   };
   if (user.role === 'admin') {
     res.users = (db.users || []).map(function (u) {
@@ -327,6 +329,15 @@ function payload_(db, user) {
 }
 
 // ── QR CODE D'INSCRIPTION & DEMANDES REÇUES (v3.9) ─────────────────
+// v3.26 — annuaire des essais (toute l'équipe) : pas de téléphone ni d'e-mail, le gestionnaire sert d'intermédiaire
+function essaisPublics_(db) {
+  var out = [];
+  (db.contacts || []).forEach(function (c) {
+    if (!c || !c.essaiOk) return;
+    out.push({ id: c.id, nom: c.nom || '', prenom: c.prenom || '', ville: c.ville || '', cp: c.cp || '', pays: c.pays || '', geo: c.geo || null, produits: c.produits || [], essaiMode: c.essaiMode || '', essaiMontant: c.essaiMontant || 0, essaiDevise: c.essaiDevise || '', suivis: suivis_(c) });
+  });
+  return out;
+}
 function pubTokenOf_(db, user) {
   if (user.id === 'root') {
     db.config.rootProfile = db.config.rootProfile || {};
