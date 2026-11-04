@@ -2374,7 +2374,7 @@ var LOGO_B64='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABWCAYAAAAwu5OI
 document.querySelectorAll('.wlht-logo').forEach(function(im){im.src=LOGO_B64;});
 
 // ── DONNÉES DE RÉFÉRENCE ─────────────────────────────────────────────
-var PRODUCTS=['Tera-P90+ (PEMF/Terahertz)','Tera-P90 (PEMF/Terahertz)','Frost Age (soin visage)','Revitaluxe (massage)','Shaken Massager (ceinture abdo)','Galaxy G-One (yeux)','Vitality Wand (douleurs ciblées)','Bama Air','SkyLine','SpringWater'];
+var PRODUCTS=['Tera-P90+ (PEMF/Terahertz)','Tera-P90 (PEMF/Terahertz)','Frost Age (soin visage)','Revitaluxe (massage)','Shaken Massager (ceinture abdo)','Galaxy G1-MAX (yeux & sommeil)','Galaxy G-One (yeux)','Vitality Wand (douleurs ciblées)','Bama Air','SkyLine','SpringWater'];
 var ETAPE_BADGE={'Prospect':'bbl','Relance en cours':'bor','Achat en cours':'bgo','Client':'bgr','Partenaire équipe':'bpu','Abandon':'bgy','Closing / Devis':'bgo','Client - Logistique':'baq','Client - Installation':'baq','Client actif':'bgr','Ambassadeur':'bgo','Inactif':'bgy'};
 var QUALIF_BADGE={'Chaud':'brd','Tiède':'bor','Froid':'bgy'};
 var RELANCE_STEPS=[{k:'j2',d:2,l:'J+2 — 1er rappel'},{k:'j5',d:5,l:'J+5 — 2e rappel'},{k:'j12',d:12,l:'J+12 — dernier rappel'}];
@@ -2406,7 +2406,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.33.3 · 04/11';
+var APP_VERSION='v3.34 · 04/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -7573,8 +7573,8 @@ var KITS={
 // ── PARCOURS DÉCOUVERTE (v3.20) ─────────────────────────────────────
 var TUNNEL_BASE='https://www.waterlifehightech.com/';
 var RDV_DEFAULT='https://calendly.com/waterlifehightech/appel_decouverte_olylife';
-var DECOUV={parcours:{l:'Parcours découverte OlyLife (6 vidéos)',slug:'olylife_waterlifehightech'},'Tera-P90+':{l:'Tera-P90+ (la pédale)',slug:'pedale_p90plus'},'Galaxy G-One':{l:'Galaxy G-One (masque oculaire)',slug:'galaxy-g-one'},'Vitality Wand':{l:'Vitality Wand (baguette)',slug:'vitality'},'Shaken Massager':{l:'Shaken Massager',slug:'olylife_shaken'},certifs:{l:'Certificats et rapports de test',slug:'olylife_certificats'}};
-var INTERETS=['Tera-P90+','Galaxy G-One','Vitality Wand','Shaken Massager','La technologie','L\'association / l\'opportunité','Je ne sais pas encore'];
+var DECOUV={parcours:{l:'Parcours découverte OlyLife (6 vidéos)',slug:'olylife_waterlifehightech'},'Tera-P90+':{l:'Tera-P90+ (la pédale)',slug:'pedale_p90plus'},'Galaxy G1-MAX':{l:'Galaxy G1-MAX (masque yeux & sommeil — disponible début 2027)',slug:'galaxy_g1_max'},'Galaxy G-One':{l:'Galaxy G-One (masque oculaire)',slug:'galaxy_g1_max'},'Vitality Wand':{l:'Vitality Wand (baguette)',slug:'vitality'},'Shaken Massager':{l:'Shaken Massager',slug:'olylife_shaken'},certifs:{l:'Certificats et rapports de test',slug:'olylife_certificats'}};
+var INTERETS=['Tera-P90+','Galaxy G1-MAX','Vitality Wand','Shaken Massager','La technologie','L\'association / l\'opportunité','Je ne sais pas encore'];
 // Lien tunnel personnalisé — même convention que l'App Tunnels : p prénom client, n nom, d nom du référent, w WhatsApp (chiffres, indicatif), e e-mail
 function tunnelUrl(slug,c){var q=[];if(c&&c.prenom)q.push('p='+encodeURIComponent(c.prenom));if(c&&c.nom)q.push('n='+encodeURIComponent(c.nom));if(USER&&USER.nom)q.push('d='+encodeURIComponent(USER.nom));var w=USER&&USER.tel?String(USER.tel).replace(/\D/g,''):'';if(w&&w.charAt(0)==='0')w='';if(w)q.push('w='+w);if(USER&&USER.email)q.push('e='+encodeURIComponent(USER.email));return TUNNEL_BASE+slug+(q.length?'?'+q.join('&'):'');}
 function decouverteUrl(c){var tok=(USER&&USER.pubToken)||'';if(!tok)return'';return SITE_URL+'decouverte.html?r='+encodeURIComponent(tok)+(c&&c.prenom?'&p='+encodeURIComponent(c.prenom):'');}
@@ -7807,7 +7807,7 @@ function kitLinks(c){
 }
 function dateRecu(c){return c.dateReception||c.dateInstall||'';}
 // ── Merci pour la commande (v3.21) ──────────────────────────────────
-var DEV_RX=[['Tera-P90+',/p90/i],['Galaxy G-One',/galaxy|g-?one/i],['Vitality Wand',/vitality|wand/i],['Shaken Massager',/shaken|massag/i]];
+var DEV_RX=[['Tera-P90+',/p90/i],['Galaxy G1-MAX',/g1.?max/i],['Galaxy G-One',/g-?one|galaxy(?!.*g1)/i],['Vitality Wand',/vitality|wand/i],['Shaken Massager',/shaken|massag/i]];
 function devKeysOf(c){var out=[];(c&&c.produits||[]).forEach(function(pn){DEV_RX.forEach(function(d){if(d[1].test(pn)&&out.indexOf(d[0])<0)out.push(d[0]);});});return out;}
 function gestOf(c){
   var nm=(suivisDe(c)||[])[0]||PARTNER_NOM()||'';var eq=(typeof equipeContacts==='function'?equipeContacts():[]).find(function(x){return x.nom===nm;});
