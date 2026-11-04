@@ -2406,7 +2406,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.33.2 · 04/11';
+var APP_VERSION='v3.33.3 · 04/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -7981,7 +7981,7 @@ function sendAttachToggle(k){var m=document.getElementById('osend');if(!m)return
 function sendVia(canal,num,text,email){
   var plus=num?'+'+num:'';
   if(canal==='wa'){sendOpen('https://wa.me/'+num+'?text='+encodeURIComponent(text));}
-  else if(canal==='tg'){sendCopy(text,'✈️ Telegram : le message est copié — collez-le dans la conversation'+(num?' de +'+num:'')+' si le champ n\'est pas déjà rempli');sendOpen(num?'https://t.me/+'+num+'?text='+encodeURIComponent(text):'https://t.me/share/url?url='+encodeURIComponent(text));}
+  else if(canal==='tg'){sendCopy(text,'✈️ Telegram : le message est copié — collez-le dans la conversation'+(num?' de +'+num:'')+' si le champ n\'est pas déjà rempli');sendOpen(num?'tg://resolve?phone='+num+'&text='+encodeURIComponent(text):'tg://msg_url?url='+encodeURIComponent(text));}
   else if(canal==='signal'){sendCopy(text,'📋 Message copié — collez-le dans Signal');if(num)sendOpen('https://signal.me/#p/'+plus);}
   else if(canal==='sms'){location.href='sms:'+plus+'?&body='+encodeURIComponent(text);}
   else if(canal==='mail'){location.href='mailto:'+(email||'')+'?subject='+encodeURIComponent('OlyLife — Water Life High Tech')+'&body='+encodeURIComponent(text);}
