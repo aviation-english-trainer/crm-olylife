@@ -2406,7 +2406,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.33 · 04/11';
+var APP_VERSION='v3.33.1 · 04/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -5208,6 +5208,15 @@ function impMergeSame(items){
 function oImpAnalyse(){
   var raw=document.getElementById('oimp-ta').value.trim();
   if(!raw){oT('Collez d\'abord des données à analyser','e');return;}
+  // v3.33.1 — un relevé « Bonus Statement » n'est pas une liste de contacts : on renvoie vers la fiche du membre
+  if(/bonus statement|performance bonus/i.test(raw)){var cr=commParse(raw);if(cr.rows.length){
+    var ea=cr.rows[0].ea,who=ea?OC.find(function(c){return String(c.memberIdOlyLife||'').toUpperCase()===ea||(c.comptes||[]).some(function(k){return String(k.memberIdOlyLife||'').toUpperCase()===ea;});}):null;
+    var card=document.getElementById('oimp-prev-card'),prev=document.getElementById('oimp-prev');card.style.display='block';document.getElementById('oimp-go').style.display='none';
+    document.getElementById('oimp-prev-ttl').textContent='Relevé de commissions détecté';
+    prev.innerHTML='<div style="padding:14px 16px;font-size:13px;line-height:1.6">💶 Ceci est un <b>Bonus Statement</b>'+(ea?' du compte <b>'+esc(ea)+'</b>':'')+' ('+cr.rows.length+' ligne'+(cr.rows.length>1?'s':'')+'), pas une liste de contacts.<br>'
+      +(who?'Il correspond à la fiche de <b>'+esc((who.prenom||'')+' '+(who.nom||''))+'</b>.<div style="margin-top:10px"><button class="ob bgold" onclick="IMP_COMM_PASTE=document.getElementById(\'oimp-ta\').value;oClose&&oClose();oOpenF(\''+who.id+'\');setTimeout(function(){oCommOpen(\''+who.id+'\');},400)">🎉 Ouvrir « Première commission » sur sa fiche (relevé pré-rempli)</button></div>'
+        :'<span style="color:#C0392B">Aucune fiche ne porte cet ID membre.</span> Ouvrez la fiche de la personne → section OlyLife → <b>🎉 Expliquer la première commission</b>, puis collez-y le relevé.')+'</div>';
+    return;}}
   var items=[];
   if(raw.charAt(0)==='['){
     try{items=JSON.parse(raw);if(!Array.isArray(items))throw 0;}catch(e){oT('JSON invalide — un tableau [{...}] est attendu','e');return;}
@@ -7602,7 +7611,9 @@ function oCommOpen(cid){
     +'<div style="display:flex;gap:8px;margin-top:12px"><button type="button" class="ob '+(canal==='wa'?'bwa':'bgold')+'" style="flex:2" onclick="oCommSend(\''+c.id+'\')">📤 Envoyer ('+esc(CANAL_LBL[canal]||canal)+')</button><button type="button" class="ob bgh" style="flex:1" onclick="sendCopy(document.getElementById(\'comm-txt\').value)">📋 Copier</button></div>'
     +'<div style="font-size:11px;color:var(--t3);margin-top:8px">Rappel conformité : chiffres bruts en dollars, aucune promesse de revenus, le plan n\'est pas détaillé par écrit — le tunnel et le rendez-vous servent à ça. Modèle modifiable dans Administration → Messages.</div></div>';
   document.body.appendChild(m);m._cid=cid;commRefresh();
+  if(typeof IMP_COMM_PASTE==='string'&&IMP_COMM_PASTE){document.getElementById('comm-ta').value=IMP_COMM_PASTE;IMP_COMM_PASTE='';commFromPaste();}
 }
+var IMP_COMM_PASTE='';
 function commFromPaste(){
   var r=commParse(val('comm-ta')),box=document.getElementById('comm-rows');
   if(!r.rows.length){box.innerHTML='<span style="color:#C0392B">Aucune ligne de relevé reconnue.</span>';return;}
