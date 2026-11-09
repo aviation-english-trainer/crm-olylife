@@ -2407,7 +2407,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.35 · 04/11';
+var APP_VERSION='v3.35.1 · 09/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -5230,6 +5230,14 @@ function oImpAnalyse(){
       items=impParseGroups(raw);
       oT('📷 '+items.length+' fiche(s) lue(s) dans les captures — vérifiez avant d\'importer','s');
     }else{
+      // v3.35.1 — formulaire BO copié AVANT soumission : les valeurs tapées dans les champs ne sont pas copiées
+      if(/Member Report submission|Membership Order/i.test(raw)&&/Name\s*[：:]\s*\n/.test(raw)&&/Phone Number\s*[：:]\s*\n/.test(raw)){
+        var card=document.getElementById('oimp-prev-card'),prev=document.getElementById('oimp-prev');card.style.display='block';document.getElementById('oimp-go').style.display='none';document.getElementById('oimp-prev-ttl').textContent='Formulaire BO copié à vide';
+        prev.innerHTML='<div style="padding:14px 16px;font-size:13px;line-height:1.7">📝 C\'est bien le <b>formulaire de commande du Back Office OlyLife</b>, mais il est arrivé <b>vide</b> : nom, téléphone, adresse, ID… sont tous absents.<br>'
+          +'<b>Pourquoi :</b> quand on sélectionne et copie une page de formulaire, le navigateur copie les libellés mais <u>pas ce qui a été tapé dans les champs</u>.<br><br>'
+          +'<b>Deux façons qui marchent :</b><br>1️⃣ Après avoir validé la commande, ouvrez <b>My Order → la commande</b> (ou le récapitulatif) et copiez cette page-là : les valeurs y sont en texte.<br>'
+          +'2️⃣ Avant de valider, faites une <b>capture d\'écran</b> du formulaire rempli et glissez-la dans la zone 📷 ci-dessus : le CRM lit l\'image.</div>';
+        oT('📝 Formulaire BO copié sans les valeurs saisies — voir l\'explication','e');return;}
       var isOrd=looksOlyOrder(raw)||looksOlyOrderOcr(raw);
       var isReg=!isOrd&&looksOlyReg(raw);
       var isRows=!isOrd&&!isReg&&!looksCSV&&looksOlyRows(raw);
