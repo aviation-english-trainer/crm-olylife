@@ -2407,7 +2407,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.35.1 · 09/11';
+var APP_VERSION='v3.36 · 09/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -4698,7 +4698,7 @@ function oOpenImport(){
 }
 function oCloseImport(){oSheetClose('oimp');}
 
-function normPhone(p){return(p||'').replace(/\(0\)/g,'').replace(/[\s().\u00A0-]/g,'');}
+function normPhone(p){var v=(p||'').replace(/\(0\)/g,'').replace(/[\s().\u00A0-]/g,'');var m=v.match(/^(\+?)(\d{2,3})\2(\d{8,10})$/);if(m)v=m[1]+m[2]+m[3];return v;}
 
 // Carte de visite : un seul contact étalé sur plusieurs lignes (nom, société, adresse, tél, email, sites)
 function looksCard(text){
@@ -4830,10 +4830,12 @@ function parseOlyReg(text){
   var adr=find(/^(address|adresse)$/i),cp=find(/^(code postal|postal code|zip( code)?|zip)$/i),ville=find(/^(city|ville)$/i);
   var full=(text.match(/(?:full address|adresse compl[èe]te)\s*[:：]\s*(.+)/i)||[])[1]||'';
   if(full){var segs=full.split(',').map(function(x){return x.trim();}).filter(Boolean);if(!adr)adr=segs[0]||'';segs.forEach(function(sg,i){if(/^\d{4,5}$/.test(sg)){if(!cp)cp=sg;if(!ville&&segs[i+1])ville=segs[i+1];}});if(!pays&&segs.length)pays=segs[segs.length-1];}
-  var member=(text.match(/(?:id membre correspondant|corresponding member id|member id)[^A-Z0-9]{0,4}(?:est|is)?[^A-Z0-9]{0,8}((?:EA|AF)\d{5,})/i)||[])[1]||'';
+  var member=(text.match(/(?:id membre correspondant|corresponding member id|member id)[^A-Z0-9]{0,4}(?:est|is)?[^A-Z0-9]{0,8}((?:EA|AF)\d{5,})/i)||[])[1]||'';var boEA=boHeaderEA(text);
   // ── repli OCR : libellés et valeurs séparés par la mise en page ──
   placement=ocrClean(placement);sponsor=ocrClean(sponsor);nomC=ocrClean(nomC);pieceId=ocrClean(pieceId);email=ocrClean(email);tel=ocrClean(tel);adr=ocrClean(adr);cp=ocrClean(cp);ville=ocrClean(ville);pays=ocrClean(pays);rangTxt=ocrClean(rangTxt);position=ocrClean(position);
   if(!/^[A-Z]$/.test(position))position='';
+  adr=adr.replace(/\s*apt,?\s*suite,?\s*unit,?\s*building,?\s*floor\.?/i,'').replace(/[,\s]+$/,'').trim();
+  if(/^(apt|suite|unit|building|floor|other countries)$/i.test(ville))ville='';
   var LBL=/^(num[ée]ro|adresse|address|sexe|gender|nom|name|pays|country|e-?mail|t[ée]l[ée]phone|phone|mot de passe|password|informations?|code postal|city|ville|full|search|apt)/i;
   if(!/@/.test(email))email='';if(!/^[A-Z0-9]{5,}$/i.test(pieceId))pieceId='';if(!/^\d{4,5}$/.test(cp))cp='';if(LBL.test(nomC)||/^other countries$/i.test(nomC))nomC='';if(LBL.test(ville))ville='';if(LBL.test(adr))adr='';if(LBL.test(pays)||/^other countries$/i.test(pays))pays='';
   if(!email)email=(text.match(/[\w.+-]+@[\w-]+\.[\w.-]+/)||[])[0]||'';
@@ -4846,6 +4848,7 @@ function parseOlyReg(text){
   if(!pays){var mp=text.match(/\b(France|Belgique|Suisse|Luxembourg|Maroc|C[oô]te d'Ivoire|S[ée]n[ée]gal|Cameroun|B[ée]nin|Togo|Gabon|Congo|Mali|Burkina Faso|Guin[ée]e|Madagascar|Maurice|R[ée]union|Guadeloupe|Martinique|Canada|Espagne|Italie|Portugal|Allemagne|Royaume-Uni|Monaco|Tunisie|Alg[ée]rie)\b/i);if(mp)pays=mp[1];}
   if(!rangTxt){var mr2=text.match(/\bP([1-5])\b\s*[-–]?\s*(Starter|Builder|Leader|Supervisor|Pioneer)?/i);if(mr2)rangTxt=mr2[0];}
   if(!placement||!sponsor){var allIds=(text.match(/\b(?:EA|AF)\d{5,}\b/g)||[]).filter(function(id){return id!==member;});if(!placement&&allIds[0])placement=allIds[0];if(!sponsor&&allIds[1])sponsor=allIds[1];}
+  if(member&&(member.toUpperCase()===(sponsor||'').toUpperCase()||member.toUpperCase()===(placement||'').toUpperCase()||member.toUpperCase()===boEA))member='';
   var statusTxt=find(/^(statut de la commande|order status)$/i);
   var paid=/settled|pay[ée]e?|paid|r[ée]gl[ée]e?/i.test(statusTxt);
   var rang='';var mr=rangTxt.match(/\b(P[1-5])\b/i)||rangTxt.match(/\b(Starter|Builder|Leader|Supervisor|Pioneer)\b/i);if(mr)rang=RANG_OLY[mr[1].toLowerCase()]||'';
@@ -4854,7 +4857,7 @@ function parseOlyReg(text){
   if(!nom&&!tel&&!email)return[];
   var today=new Date().toISOString().split('T')[0];
   var notes=['Inscription OlyLife (formulaire BO)'+(member?' — ID membre '+member:'')+' · saisie le '+fD(today),rang?'Rang d\'adhésion : '+rang:'',sponsor?'Parrain : '+sponsor:'',placement?'Placement : '+placement+(position?' · position '+position:''):'',adr?'Adresse : '+[adr,cp,ville,pays].filter(Boolean).join(', '):'',paid?'Commande réglée':'Paiement à confirmer (commande créée)'].filter(Boolean).join('\n');
-  var out={nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',adresse:adr,cp:cp,ville:ville,pieceId:pieceId,memberIdOlyLife:member.toUpperCase(),sponsor:sponsor,placement:placement,cote:position,rangOly:rang,qualification:'Chaud',canal:'WhatsApp',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olyreg'};
+  var out={boCompte:boEA||'',nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',adresse:adr,cp:cp,ville:ville,pieceId:pieceId,memberIdOlyLife:member.toUpperCase(),sponsor:sponsor,placement:placement,cote:position,rangOly:rang,qualification:'Chaud',canal:'WhatsApp',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olyreg'};
   if(paid){out.etape='Client';out.statut='reseau';}else{out.etape='Achat en cours';out.statut='close';}
   return[out];
 }
@@ -4964,7 +4967,7 @@ function parseOlyOrderOcr(text){
   lines.forEach(function(l){var mc=l.match(CARRIERS);if(mc&&!transporteur)transporteur=mc[1].toUpperCase()==='LA POSTE'?'Colissimo / La Poste':mc[1];});
   // Tracking : format postal international XX000000000XX, ou alphanumérique 8+ chars près de "tracking"
   (flat.match(TRK_RX)||[]).forEach(function(t){if(trackingNums.indexOf(t)<0)trackingNums.push(t);});
-  if(!trackingNums.length){var mt=flat.match(/(?:tracking|suivi|n[°o]\s*(?:de\s*)?suivi)\s*(?:number)?\s*[:：]?\s*([A-Z0-9]{8,20})/i);if(mt)trackingNums.push(mt[1]);}
+  if(!trackingNums.length){var mt=flat.match(/(?:tracking|suivi|n[°o]\s*(?:de\s*)?suivi)\s*(?:number)?\s*[:：]?\s*((?=[A-Z0-9]*\d)[A-Z0-9]{8,20})/i);if(mt)trackingNums.push(mt[1]);}
   // Date de livraison : YYYY-MM-DD
   lines.forEach(function(l){var md=l.match(/\b(20\d{2}-\d{2}-\d{2})\b/g);if(md)dLivr=md[md.length-1];});
   var LR=delivRows(flat);delivApply(LR,trackingNums,prods,function(t){transporteur=t;},function(d){dLivr=d;});
@@ -4993,6 +4996,7 @@ function parseOlyOrderAny(text){
     // v3.22.4 — texte OCR : la lecture « propre » garde ses valeurs, la lecture OCR complète les champs vides (montant, adresse, pièce d'identité…)
     if(its.length===1&&o.length===1){var keep=its[0]._src;['montantUSD','achatsUSD','rangOly'].forEach(function(k){if(!its[0][k])delete its[0][k];});impFold(its[0],o[0]);its[0]._src=keep;}
     if(its.length===1&&its[0].adresse)its[0].adresse=String(its[0].adresse).replace(/^(detailed|d[ée]taill[ée]e)\s*[:：]?\s*/i,'').trim();
+    if(its.length===1&&its[0].livNom&&its[0].livAdresse&&its[0].adresse===its[0].livAdresse){its[0].adresse='';its[0].cp='';its[0].ville='';}
   }
   return its;
 }
@@ -5010,8 +5014,10 @@ function deEnt(x){return String(x||'').replace(/&ccedil;/gi,'ç').replace(/&eacu
 function rangFromUSD(u){u=+u||0;var R=RANG_SEUILS;if(u>=R.p5)return'P5 - Pioneer';if(u>=R.p4)return'P4 - Supervisor';if(u>=R.p3)return'P3 - Leader';if(u>=R.p2)return'P2 - Builder';if(u>0)return'P1 - Starter';return'';}
 function rangNum(r){var m=String(r||'').match(/P([1-5])/i);return m?+m[1]:0;}
 var RANG_OLY={p1:'P1 - Starter',p2:'P2 - Builder',p3:'P3 - Leader',p4:'P4 - Supervisor',p5:'P5 - Pioneer',starter:'P1 - Starter',builder:'P2 - Builder',leader:'P3 - Leader',supervisor:'P4 - Supervisor',pioneer:'P5 - Pioneer'};
+// v3.36 — compte BO connecté : l'ID affiché en en-tête, avant le menu ou le titre de la page
+function boHeaderEA(text){var head=String(text||'').split(/order information|member report submission|informations? de (la )?commande|basic information/i)[0]||'';var m=head.match(/\b(EA|AF)\d{5,}\b/i);return m?m[0].toUpperCase():'';}
 function parseOlyOrders(text){
-  text=deEnt(text);
+  text=deEnt(text);var boEA=boHeaderEA(text);
   var lines=text.split(/\r?\n/).map(function(l){return l.replace(/ /g,' ').trim();});
   var SPLIT=/^(num[ée]ro de commande|order number)\s*[:：]/i;
   var blocks=[],cur=null;
@@ -5081,7 +5087,8 @@ function parseOlyOrders(text){
     if(!ville&&segs.length>=3)ville=segs[segs.length-2];
     if(!cp){var mcp=adr.match(/\b(\d{5})\b/);if(mcp)cp=mcp[1];}
     if(!num){var mnum=bl.join(' ').match(/\b(20\d{14,})\b/);if(mnum)num=mnum[1];}
-    if(!member){var mea=bl.join(' ').match(/\b((?:EA|AF)\d{5,})\b/i);if(mea)member=mea[1];}
+    if(!member){var meas=bl.join(' ').match(/\b((?:EA|AF)\d{5,})\b/gi)||[];meas=meas.filter(function(x){return x.toUpperCase()!==boEA;});if(meas.length)member=meas[0];}
+    if(member&&member.toUpperCase()===boEA)member='';
     if(!nomC&&destinataire)nomC=destinataire;
     var dateCmd=/^\d{8}/.test(num)?num.slice(0,4)+'-'+num.slice(4,6)+'-'+num.slice(6,8):'';
     var montantUSD=parseFloat(String(montant||'').replace(/[^\d.,]/g,'').replace(',','.'))||0;
@@ -5090,7 +5097,9 @@ function parseOlyOrders(text){
     var notes=['Commande OlyLife n°'+num+(dateCmd?' du '+fD(dateCmd):''),montant?'Montant : '+montant+' USD':'',type?'Type : '+type:'',stCmd?'Statut commande : '+stCmd:'',prodTxt.length?'Produits : '+prodTxt.join(', '):'',adr?'Livraison : '+adr:'',destinataire&&destinataire!==nomC?'Destinataire : '+destinataire:'',rem?'Remarque : '+rem:''].filter(Boolean).join('\n');
     var livNom=(destinataire&&destinataire.replace(/\s+/g,' ').toLowerCase()!==nomC.replace(/\s+/g,' ').toLowerCase())?destinataire:'';
     var livTel=(recipTel&&normPhone(recipTel)!==normPhone(tel))?normPhone(recipTel):'';
-    return{nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,livNom:livNom,livTel:livTel,numCommande:num,memberIdOlyLife:(member||'').toUpperCase(),pieceId:idcard,dateCommande:dateCmd,transporteur:transporteur,tracking:tracking.join(' / '),dateLivraison:dLivr,livraisons:LR.length>1?LR:undefined,rangOly:rang,montantUSD:montantUSD,achatsUSD:montantUSD,produits:prods,etape:'Client',qualification:'Chaud',statut:'reseau',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olylife'};
+    // v3.36 — la « Mailing information » du BO est l'adresse de livraison : si le colis part chez quelqu'un d'autre, elle ne doit pas devenir l'adresse du client
+    var liv={};if(livNom){liv={livAdresse:adr,livCp:cp,livVille:ville,livPays:pays||'France'};adr='';cp='';ville='';}
+    return Object.assign({boCompte:boEA&&boEA!==(member||'').toUpperCase()?boEA:''},liv,{nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,livNom:livNom,livTel:livTel,numCommande:num,memberIdOlyLife:(member||'').toUpperCase(),pieceId:idcard,dateCommande:dateCmd,transporteur:transporteur,tracking:tracking.join(' / '),dateLivraison:dLivr,livraisons:LR.length>1?LR:undefined,rangOly:rang,montantUSD:montantUSD,achatsUSD:montantUSD,produits:prods,etape:'Client',qualification:'Chaud',statut:'reseau',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olylife'});
   }).filter(function(x){return x.nom||x.tel||x.numCommande;});
 }
 function parseCSV(text){
@@ -5165,8 +5174,8 @@ function impBoOwner(it){
   if(!(it.memberIdOlyLife||it.numCommande))return null;
   return OC.find(function(c){return impSameKeyBo(it,c)&&!impSamePerson(it,c);})||null;
 }
-var IMP_FLBL={livraisons:'colis (plusieurs)',tel:'téléphone',email:'e-mail',pays:'pays',ville:'ville',adresse:'adresse livraison',cp:'code postal',livNom:'destinataire livraison',livTel:'tél. livraison',factAdresse:'adresse facturation',numCommande:'n° commande',memberIdOlyLife:'ID membre',pieceId:'pièce d\'identité',tracking:'n° de tracking',transporteur:'transporteur',dateLivraison:'date de livraison',dateCommande:'date de commande',rangOly:'rang OlyLife',refere:'référent',suiviPar:'suivi par',produits:'produits',notes:'notes de commande',statut:'statut',etape:'étape'};
-var IMP_SKIP={id:1,createdAt:1,createdBy:1,journal:1,actions:1,rdvs:1,avances:1,suivis:1,geo:1,qualification:1,canal:1,registre:1,referentId:1,referentNom:1,_src:1,_state:1,_exid:1,_bo:1,_boId:1,_idMode:1};
+var IMP_FLBL={livraisons:'colis (plusieurs)',tel:'téléphone',email:'e-mail',pays:'pays',ville:'ville',adresse:'adresse livraison',cp:'code postal',livNom:'destinataire livraison',livTel:'tél. livraison',livAdresse:'adresse de livraison',livCp:'CP livraison',livVille:'ville livraison',livPays:'pays livraison',boCompte:'compte BO utilisé',sponsor:'parrain',placement:'placement',cote:'côté',factAdresse:'adresse facturation',numCommande:'n° commande',memberIdOlyLife:'ID membre',pieceId:'pièce d\'identité',tracking:'n° de tracking',transporteur:'transporteur',dateLivraison:'date de livraison',dateCommande:'date de commande',rangOly:'rang OlyLife',refere:'référent',suiviPar:'suivi par',produits:'produits',notes:'notes de commande',statut:'statut',etape:'étape'};
+var IMP_SKIP={_idFix:1,id:1,createdAt:1,createdBy:1,journal:1,actions:1,rdvs:1,avances:1,suivis:1,geo:1,qualification:1,canal:1,registre:1,referentId:1,referentNom:1,_src:1,_state:1,_exid:1,_bo:1,_boId:1,_idMode:1};
 var IMP_FORCE={tracking:1,transporteur:1,dateLivraison:1,numCommande:1,dateCommande:1,memberIdOlyLife:1,montantUSD:1};
 function impDiff(it,ex){
   var news=[],known=[];
@@ -5280,7 +5289,7 @@ function oImpAnalyse(){
         detail='<div class="oimp-diff">'+(normStr(ex.nom)!==normStr(it.nom||ex.nom)?'<span class="kn">→ met à jour la fiche de <b>'+esc(ex.nom+' '+(ex.prenom||''))+'</b></span><br>':'')+'<span class="nw">➕ Nouveau : '+esc(d.news.join(', '))+'</span>'+(d.known.length?'<br><span class="kn">Déjà enregistré : '+esc(d.known.join(', '))+'</span>':'')+'</div>';
       }else{badge='<span class="obdg bgy">⛔ doublon — ignoré</span>';it._state='dup';
         detail='<div class="oimp-diff"><span class="kn">Fiche identique déjà présente : '+esc(ex.nom+' '+(ex.prenom||''))+'</span></div>';}
-      if(IMP_IDMODE[eaI]==='replace')detail+='<div class="oimp-diff"><span class="kn">↔ L\'ID principal sera remplacé par '+esc(eaI)+'</span> <button type="button" class="ob bgh bsm" onclick="impIdMode(\''+eaI+'\',\'\')">Annuler</button></div>';
+      if(IMP_IDMODE[eaI]==='replace')detail+='<div class="oimp-diff"><span class="kn">↔ L\'ID principal '+(it._idFix?esc(it._idFix)+' (c\'est le parrain / le compte BO, pas le client) ':'')+'sera remplacé par '+esc(eaI)+'</span> <button type="button" class="ob bgh bsm" onclick="impIdMode(\''+eaI+'\',\'\')">Annuler</button></div>';
       }
     }
     return'<div class="oimp-row'+(warn?' warn':'')+'">'
@@ -7413,7 +7422,7 @@ function oCompteRender(){
   var box=document.getElementById('fo-comptes');if(!box)return;
   var pl=document.getElementById('prod-list');if(pl)pl.innerHTML=PRODUCTS.map(function(P){return'<option value="'+esc(P)+'">';}).join('');
   box.innerHTML=FORM_COMPTES.map(function(k,i){
-    return'<div class="cpt-box" data-i="'+i+'"><div class="cpt-hd"><b>'+(i+2)+'ᵉ compte</b>'+(k.memberIdOlyLife?' <span style="color:var(--t3)">· '+esc(k.memberIdOlyLife)+'</span>':'')+'<button type="button" class="ob bgh bsm" onclick="oCompteDel('+i+')">🗑 Retirer</button></div><div class="ofg">'
+    return'<div class="cpt-box" data-i="'+i+'"><div class="cpt-hd"><b>'+(i+2)+'ᵉ compte</b>'+(k.memberIdOlyLife?' <span style="color:var(--t3)">· '+esc(k.memberIdOlyLife)+'</span>':'')+'<button type="button" class="ob bgh bsm" onclick="oCompteSwap('+i+')" title="Ce compte devient le principal ; l\'actuel principal prend sa place ici">↔ Principal</button> <button type="button" class="ob bgh bsm" onclick="oCompteDel('+i+')">🗑 Retirer</button></div><div class="ofg">'
       +CPT_FIELDS.map(function(f){
         var v=f[0]==='produit'?((k.produits||[])[0]||''):f[0]==='installConfirm'?(k.installConfirm?'Oui':''):(k[f[0]]||''),inp;
         if(f[2]==='select'){var o=f[0]==='cote'?['','Gauche','Droite']:f[0]==='installConfirm'?['','Oui']:['','P1 - Starter','P2 - Builder','P3 - Leader','P4 - Supervisor','P5 - Pioneer'];
@@ -7432,6 +7441,15 @@ function oCompteCollect(){
   return FORM_COMPTES.filter(function(k){return k.memberIdOlyLife||k.numCommande||k.tracking||(k.produits&&k.produits.length);});
 }
 function oCompteAdd(){oCompteCollect();FORM_COMPTES.push({id:'k_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),produits:[]});oCompteRender();}
+function oCompteSwap(i){
+  oCompteCollect();var k=FORM_COMPTES[i];if(!k)return;
+  if(!confirm('Faire de '+(k.memberIdOlyLife||'ce compte')+' le compte principal de la fiche ? Les données actuelles du principal passent dans ce bloc (vous pourrez ensuite le retirer).'))return;
+  var ids={memberIdOlyLife:'fl-memberid',numCommande:'fl-numcmd',dateCommande:'fl-datecmd',transporteur:'fl-transp',tracking:'fl-tracking',dateLivraison:'fl-datelivr',rangOly:'fo-rang',sponsor:'fe-sponsor',placement:'fe-placement',cote:'fe-cote'};
+  Object.keys(ids).forEach(function(f){var el=document.getElementById(ids[f]);if(!el)return;var mv=el.value,kv=k[f]||'';el.value=kv;k[f]=mv;});
+  var kp=(k.produits||[])[0]||'',mp=[];document.querySelectorAll('#opg .oprd').forEach(function(p){var cb=p.querySelector('input');if(cb.checked)mp.push(cb.value);cb.checked=cb.value===kp;p.classList.toggle('on',cb.checked);});
+  k.produits=mp.slice(0,1);
+  oCompteRender();oT('↔ Comptes échangés — vérifiez puis enregistrez','s');
+}
 function oCompteDel(i){oCompteCollect();var k=FORM_COMPTES[i];if(k&&(k.memberIdOlyLife||k.numCommande)&&!confirm('Retirer le compte '+(k.memberIdOlyLife||k.numCommande)+' de cette fiche ?'))return;FORM_COMPTES.splice(i,1);oCompteRender();}
 
 // ── Import : un autre n° de distributeur de la même personne devient un compte de plus (pas un écrasement) ──
@@ -7441,6 +7459,8 @@ function impCompteRoute(it,ex){
   if(!ex||!it.memberIdOlyLife)return null;
   var ea=String(it.memberIdOlyLife).toUpperCase(),main=String(ex.memberIdOlyLife||'').toUpperCase();
   if(IMP_IDMODE[ea]==='replace'||!main||main===ea)return null;
+  // v3.36 — l'ID principal actuel est le parrain, le placement ou le compte BO de cette commande : ce n'est pas un 2e compte, c'est une erreur à corriger
+  if([it.sponsor,it.placement,it.boCompte].some(function(x){return eaOf(x)===main;})){IMP_IDMODE[ea]='replace';it._idFix=main;return null;}
   var k=(ex.comptes||[]).find(function(x){return String(x.memberIdOlyLife||'').toUpperCase()===ea;});
   return k?{k:k,isNew:false}:{k:null,isNew:true};
 }
