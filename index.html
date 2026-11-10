@@ -1853,6 +1853,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
               <div class="adm-f"><label>App Tunnels — Un lien, un client</label><input type="url" id="adm-l-tunnels"></div>
               <div class="adm-f"><label>Chaîne YouTube WaterLifeHighTech (témoignages vidéo)</label><input type="url" id="adm-l-youtube" placeholder="https://www.youtube.com/@…"></div>
               <div class="adm-f"><label>📘 Tunnel « plan de rémunération OlyLife » (envoyé avec le message « première commission »)</label><input type="url" id="adm-l-plan" placeholder="https://www.waterlifehightech.com/…"></div>
+              <div class="adm-f"><label>🌿 Tunnel d'adhésion à l'association WLHT (bouton « Découvrir l'adhésion » des propositions)</label><input type="url" id="adm-l-adhesion" placeholder="https://www.waterlifehightech.com/inscription_membre_wlht"></div>
               <div class="adm-f"><label>🎥 Zoom de l'association (repli si le membre n'a pas renseigné son propre lien)</label><input type="url" id="adm-l-zoom" placeholder="https://us05web.zoom.us/j/…?pwd=…"></div>
               <div class="adm-grid"><div class="adm-f"><label>Assistance WhatsApp du formulaire d'inscription — numéro (international, sans +)</label><input type="tel" id="adm-l-watel" placeholder="33651001085"></div><div class="adm-f"><label>Prénom affiché dans la bulle « Écrivez à … »</label><input type="text" id="adm-l-wanom" placeholder="Jean-Charles"></div></div>
               <div class="adm-f" style="margin-top:10px"><label>🔔 Notifications push — OneSignal <b>App ID</b> (gratuit · onesignal.com → votre app → Settings → Keys &amp; IDs)</label><input type="text" id="adm-l-onesignal" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"><div class="hint" style="margin-top:4px">La <b>clé REST API</b> ne se colle jamais ici : propriété de script <code>ONESIGNAL_KEY</code> dans Apps Script (Paramètres du projet → Propriétés du script). Chaque membre active ensuite les notifications depuis <b>Mon profil</b>. Sur iPhone, l'app doit être installée sur l'écran d'accueil.</div></div>
@@ -2422,7 +2423,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.38 · 10/11';
+var APP_VERSION='v3.38.1 · 10/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -7733,6 +7734,7 @@ var OFFRE_PIED_DEF='Proposition établie par {moi}, distributeur indépendant Ol
 function catList(){var P=CFG&&CFG.params||{};var l=(P.offreCat&&P.offreCat.length)?P.offreCat:CAT_DEF;return l.map(function(x){return Object.assign({},x);});}
 function catById(id){return catList().find(function(x){return x.id===id;})||null;}
 function offreParams(){var P=CFG&&CFG.params||{};return Object.assign({fraisPct:10,eur:0.90,validite:15,pied:OFFRE_PIED_DEF},P.offre||{});}
+function adhesionUrl(c){var base=((CFG.params&&CFG.params.liens&&CFG.params.liens.adhesion)||'').trim()||(TUNNEL_BASE+'inscription_membre_wlht');var q=[];if(c&&c.prenom)q.push('p='+encodeURIComponent(c.prenom));if(c&&c.nom)q.push('n='+encodeURIComponent(c.nom));if(USER&&USER.nom)q.push('d='+encodeURIComponent(USER.nom));var w=USER&&USER.tel?String(USER.tel).replace(/\D/g,''):'';if(w&&w.charAt(0)!=='0')q.push('w='+w);if(USER&&USER.email)q.push('e='+encodeURIComponent(USER.email));return base+(q.length?(base.indexOf('?')>=0?'&':'?')+q.join('&'):'');}
 function offreUrl(o){return SITE_URL+'offre.html?t='+encodeURIComponent(o.tok);}
 function offreTot(o){var p=0;(o.lignes||[]).forEach(function(l){p+=(+l.usd||0)*(+l.qte||1);});var f=Math.round(p*(+o.frais||0))/100;return{produits:p,frais:f,total:p+f,eur:Math.round((p+f)*(+o.eur||0)*100)/100};}
 function fUSD(n){return(Math.round(n*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2})+' USD';}
@@ -7790,7 +7792,7 @@ function oOffreCollect(c){
 function oOffreCreate(cid,send){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;var o=oOffreCollect(c);if(!o)return;
   if(!o.lignes.length){oT('Cochez au moins un appareil','w');return;}
-  o.pied=String(offreParams().pied||OFFRE_PIED_DEF).replace(/\{moi\}/g,PARTNER_NOM());o.lienAdhesion=(USER&&USER.pubToken)?SITE_URL+'inscription.html?r='+encodeURIComponent(USER.pubToken):'';
+  o.pied=String(offreParams().pied||OFFRE_PIED_DEF).replace(/\{moi\}/g,PARTNER_NOM());o.lienAdhesion=adhesionUrl(c);
   o.id='of_'+Date.now().toString(36);o.tok=(function(){var a='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',t='';for(var i=0;i<20;i++)t+=a.charAt(Math.floor(Math.random()*a.length));return t;})();
   o.le=new Date().toISOString();var dn=new Date(),seq=OC.reduce(function(a,x){return a+((x.offres||[]).length);},0)+1;o.num='OF'+String(dn.getFullYear()).slice(2)+('0'+(dn.getMonth()+1)).slice(-2)+'-'+('000'+seq).slice(-4);o.par=PARTNER_NOM();o.parId=USER?USER.id:'';o.memberId=(USER&&USER.memberId)||'';o.rang=(USER&&USER.rang)||'';o.statut='brouillon';o.envois=[];
   c.offres=c.offres||[];c.offres.push(o);
@@ -7807,6 +7809,16 @@ function oOffreSend(cid,oid){
   sendVia(canal,num,text,c.email);
   o.envois=o.envois||[];o.envois.push({ts:new Date().toISOString(),canal:canal,par:PARTNER_NOM()});if(o.statut==='brouillon')o.statut='envoyee';
   jrnAdd(c,'fait','📨 Offre de commande envoyée par '+(CANAL_LBL[canal]||canal)+' ('+fUSD(t.total)+')');oPush([c]);oOpenF(cid);
+  oOffreMail(cid,o.id,canal==='mail');
+}
+function oOffreMail(cid,oid,dejaMail){
+  // v3.38.1 — e-mail automatique : la personne reçoit l'offre (si e-mail), l'émetteur reçoit toujours une copie
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  fetch(GAS_URL,{method:'POST',body:JSON.stringify({op:'offreMail',token:TOKEN,cid:cid,oid:oid,auClient:!dejaMail})}).then(function(r){return r.json();}).then(function(d){
+    if(!d||!d.ok){oT('✉️ E-mail de l\'offre non envoyé ('+(d&&d.error||'réseau')+')','w');return;}
+    oT(d.client?'✉️ Offre envoyée par e-mail à '+(c.email||'')+' · copie dans votre boîte':'✉️ Copie de l\'offre dans votre boîte'+(c.email?'':' (pas d\'e-mail sur la fiche)'),'s');
+    var o=(c.offres||[]).find(function(x){return x.id===oid;});if(o){o.envois=o.envois||[];o.envois.push({ts:new Date().toISOString(),canal:'mail',par:PARTNER_NOM(),auto:true});}
+  }).catch(function(){oT('✉️ E-mail de l\'offre non envoyé (hors ligne ?)','w');});
 }
 function oOffreSet(cid,oid,st){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;var o=(c.offres||[]).find(function(x){return x.id===oid;});if(!o)return;
@@ -8477,7 +8489,7 @@ function admRenderTab(t){
   if(t==='messages'){admMsgFill();}
   if(t==='liens'){
     admLpRender(LIENS_PERSO);
-    document.getElementById('adm-l-boffice').value=BOFFICE_URL;var _pl=(CFG.params&&CFG.params.liens)||{};document.getElementById('adm-l-watel').value=_pl.waSupportTel||'33651001085';document.getElementById('adm-l-wanom').value=_pl.waSupportNom||'Jean-Charles';var _os=document.getElementById('adm-l-onesignal');if(_os)_os.value=_pl.onesignalAppId||'';document.getElementById('adm-l-boly').value=BOLY_URL;document.getElementById('adm-l-olynation').value=OLYNATION_URL;document.getElementById('adm-l-tunnels').value=TUNNELS_URL;document.getElementById('adm-l-youtube').value=YOUTUBE_URL;var _zz=document.getElementById('adm-l-zoom');if(_zz)_zz.value=_pl.zoom||'';var _pp=document.getElementById('adm-l-plan');if(_pp)_pp.value=_pl.planRemu||'';
+    document.getElementById('adm-l-boffice').value=BOFFICE_URL;var _pl=(CFG.params&&CFG.params.liens)||{};document.getElementById('adm-l-watel').value=_pl.waSupportTel||'33651001085';document.getElementById('adm-l-wanom').value=_pl.waSupportNom||'Jean-Charles';var _os=document.getElementById('adm-l-onesignal');if(_os)_os.value=_pl.onesignalAppId||'';document.getElementById('adm-l-boly').value=BOLY_URL;document.getElementById('adm-l-olynation').value=OLYNATION_URL;document.getElementById('adm-l-tunnels').value=TUNNELS_URL;document.getElementById('adm-l-youtube').value=YOUTUBE_URL;var _zz=document.getElementById('adm-l-zoom');if(_zz)_zz.value=_pl.zoom||'';var _ad=document.getElementById('adm-l-adhesion');if(_ad)_ad.value=_pl.adhesion||'';var _pp=document.getElementById('adm-l-plan');if(_pp)_pp.value=_pl.planRemu||'';
     var cal=USERS.filter(function(u){return u.calendlyUrl;}).length;
     document.getElementById('adm-integ').innerHTML='📅 <b>Calendly</b> : '+cal+' membre(s) avec un lien de prise de RDV (chacun le renseigne dans Réglages ; la synchronisation des RDV se fait côté script toutes les heures).<br>🗺️ <b>Carte</b> : géolocalisation des adresses via OpenStreetMap (gratuit, sans clé).<br>📧 <b>Résumé quotidien</b> : envoyé par le script Google avec l\'adresse e-mail du profil de chaque membre.<br>🔐 <b>Serveur</b> : <span style="word-break:break-all">'+esc(GAS_URL)+'</span>';
   }
@@ -8578,7 +8590,7 @@ function admSaveParams(){
   var lines=function(id){return document.getElementById(id).value.split('\n').map(function(x){return x.trim();}).filter(Boolean);};
   if(ADM_TAB==='catalogue'){var pr=lines('adm-produits'),th=lines('adm-themes');if(!pr.length){oT('Il faut au moins un produit','w');return;}P.produits=pr;P.themes=th.length?th:THEMES;P.offreCat=admCatCollect();P.offre={fraisPct:+val('adm-of-frais')||0,eur:+val('adm-of-eur')||0,validite:parseInt(val('adm-of-val'),10)||15,pied:(val('adm-of-pied')||'').trim()||OFFRE_PIED_DEF};P.rangs={p2:n('adm-r-p2'),p3:n('adm-r-p3'),p4:n('adm-r-p4'),p5:n('adm-r-p5')};if(!(P.rangs.p2<P.rangs.p3&&P.rangs.p3<P.rangs.p4&&P.rangs.p4<P.rangs.p5)){oT('Les seuils de rang doivent être croissants','w');return;}}
   if(ADM_TAB==='relances'){P.relances={j1:n('adm-j1'),j2:n('adm-j2'),j3:n('adm-j3')};if(!(P.relances.j1<P.relances.j2&&P.relances.j2<P.relances.j3)){oT('Les rappels doivent être croissants (ex. 2, 5, 12)','w');return;}P.logistique=n('adm-logi');P.install=n('adm-inst');P.temoignage=n('adm-tem');P.protoPoints=[n('adm-pp1'),n('adm-pp2')];P.signature=document.getElementById('adm-sign').value.trim()||'OlyLife / WLHT';}
-  if(ADM_TAB==='liens'){P.liens={boffice:document.getElementById('adm-l-boffice').value.trim(),boly:document.getElementById('adm-l-boly').value.trim(),olynation:document.getElementById('adm-l-olynation').value.trim(),tunnels:document.getElementById('adm-l-tunnels').value.trim(),youtube:document.getElementById('adm-l-youtube').value.trim(),zoom:(document.getElementById('adm-l-zoom').value||'').trim(),planRemu:(document.getElementById('adm-l-plan').value||'').trim(),waSupportTel:document.getElementById('adm-l-watel').value.replace(/\D/g,''),waSupportNom:document.getElementById('adm-l-wanom').value.trim(),onesignalAppId:(document.getElementById('adm-l-onesignal').value||'').trim()};
+  if(ADM_TAB==='liens'){P.liens={boffice:document.getElementById('adm-l-boffice').value.trim(),boly:document.getElementById('adm-l-boly').value.trim(),olynation:document.getElementById('adm-l-olynation').value.trim(),tunnels:document.getElementById('adm-l-tunnels').value.trim(),youtube:document.getElementById('adm-l-youtube').value.trim(),zoom:(document.getElementById('adm-l-zoom').value||'').trim(),adhesion:(document.getElementById('adm-l-adhesion').value||'').trim(),planRemu:(document.getElementById('adm-l-plan').value||'').trim(),waSupportTel:document.getElementById('adm-l-watel').value.replace(/\D/g,''),waSupportNom:document.getElementById('adm-l-wanom').value.trim(),onesignalAppId:(document.getElementById('adm-l-onesignal').value||'').trim()};
     var lp=admLpCollect().filter(function(l){return l.label||l.url;});for(var i=0;i<lp.length;i++){if(!lp[i].label||!/^https?:\/\//.test(lp[i].url)){oT('Lien '+(i+1)+' : libellé et adresse https:// obligatoires','w');return;}}P.liensPerso=lp;}
   CFG.params=P;applyParams();oSaveCache();
   oPost_({op:'saveConfig',config:{params:P}});

@@ -59,6 +59,7 @@
 // v3.9 — QR CODE D'INSCRIPTION (formulaire public → « Demandes reçues ») · OCR des captures d'écran (Drive API)
 //        ▶ Pour l'OCR : éditeur Apps Script → Services (+) → « Drive API » (v3) → Ajouter, puis Nouvelle version
 // v3.8 — ADMINISTRATION : paramètres (relances, catalogue, seuils de rang, liens, signature) dans config.params
+// v3.31 — offres : envoi e-mail au destinataire + copie à l'émetteur (op offreMail)
 // v3.30 — offres : signature électronique en ligne (action « signer », PNG + nom + horodatage), image produit, adresses client
 // v3.29 — OFFRES DE COMMANDE : page publique offre.html (ops offreInfo / offreAct), notification à l'émetteur ; Member ID + rang dans le profil (saveMyProfile)
 // v3.28 — référents : choix du gestionnaire parmi tous les gestionnaires (suiveursFor_)
@@ -266,7 +267,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.30';
+var SRV_VERSION = '3.31';
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
@@ -965,6 +966,38 @@ function doPost(e) {
           if (db.users[ui].id === user.id) { db.users[ui].digestEmail = req.digestEmail || ''; db.users[ui].digestHeure = req.digestHeure || ''; db.users[ui].calendlyUrl = req.calendlyUrl || ''; }
         }
       }
+    }
+    else if (op === 'offreMail') {
+      // v3.31 — e-mail de l'offre au destinataire (lien personnel) + copie à l'émetteur, réponse adressée à l'émetteur
+      var oc = contactById_(db, String(req.cid || '')); if (!oc) return out_({ ok: false, error: 'fiche' });
+      if (user.role !== 'admin' && !isVisible_(oc, user)) return out_({ ok: false, error: 'droit' });
+      var oo = (oc.offres || []).filter(function (x) { return x.id === req.oid; })[0]; if (!oo) return out_({ ok: false, error: 'offre' });
+      var lien = APP_PUBLIC_URL + 'offre.html?t=' + encodeURIComponent(oo.tok);
+      var tot = 0; (oo.lignes || []).forEach(function (l) { tot += (+l.usd || 0) * (+l.qte || 1); }); tot = tot + Math.round(tot * (+oo.frais || 0)) / 100;
+      var lignesHtml = (oo.lignes || []).map(function (l) { return '<tr><td style="padding:6px 8px;border-bottom:1px solid #E1ECE4">' + (l.ic ? l.ic + ' ' : '') + String(l.nom).replace(/</g, '&lt;') + (l.qte > 1 ? ' × ' + l.qte : '') + '</td><td style="padding:6px 8px;border-bottom:1px solid #E1ECE4;text-align:right;white-space:nowrap">' + Math.round((+l.usd || 0) * (+l.qte || 1)) + ' USD</td></tr>'; }).join('');
+      var moi = user.nom, monMail = user.email || user.digestEmail || emailDe_(db, user.nom) || MON_EMAIL;
+      var corpsC = '<p>Bonjour ' + String(oc.prenom || '').replace(/</g, '&lt;') + ',</p><p>Voici votre proposition OlyLife n° <b>' + String(oo.num || '').replace(/</g, '&lt;') + '</b>, préparée par ' + moi.replace(/</g, '&lt;') + '.</p>'
+        + '<table style="width:100%;border-collapse:collapse;font-size:14px">' + lignesHtml + '<tr><td style="padding:8px;font-weight:700">Total estimé, frais OlyLife compris</td><td style="padding:8px;text-align:right;font-weight:700">' + Math.round(tot) + ' USD</td></tr></table>'
+        + (oo.note ? '<p style="border-left:3px solid #C9A84C;padding:6px 12px;color:#5A4E2A">' + String(oo.note).replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</p>' : '')
+        + '<p style="text-align:center;margin:22px 0"><a href="' + lien + '" style="background:#C9A84C;color:#1E2B10;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:12px;display:inline-block">Voir ma proposition, le détail des appareils et signer en ligne</a></p>'
+        + '<p style="font-size:13px;color:#5A6E61">Sur cette page : un bouton « En savoir plus » pour chaque appareil, la version imprimable, et le bon pour accord à signer en ligne. Valable ' + (+oo.validite || 15) + ' jours. Pour toute question, répondez simplement à cet e-mail : il arrive directement chez ' + moi.replace(/</g, '&lt;') + '.</p>'
+        + '<p style="font-size:12px;color:#7F9186">Vendeur : OlyLife — commande et règlement exclusivement sur le back-office OlyLife, en dollars US. Les produits OlyLife sont des appareils de bien-être, pas des dispositifs médicaux. Supports Team WLHT, distincts des communications officielles OlyLife.</p>';
+      var sent = { client: false, copie: false };
+      if (oc.email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(oc.email) && req.auClient !== false) {
+        MailApp.sendEmail({ to: oc.email, subject: '💶 Votre proposition OlyLife n° ' + (oo.num || '') + ' — ' + moi, htmlBody: avMailShell_('Votre proposition OlyLife', 'De la part de ' + moi.replace(/</g, '&lt;') + ' · Water Life High Tech', '#126A3C', corpsC), name: moi + ' · Water Life High Tech', replyTo: monMail }); sent.client = true;
+      }
+      if (monMail) {
+        var corpsM = '<p>Copie de la proposition n° <b>' + (oo.num || '') + '</b> ' + (sent.client ? 'envoyée par e-mail à' : 'préparée pour') + ' <b>' + ((oc.prenom || '') + ' ' + (oc.nom || '')).replace(/</g, '&lt;') + '</b>' + (oc.email ? ' (' + oc.email + ')' : ' — <i>pas d\'adresse e-mail sur la fiche : elle n\'a pas reçu l\'e-mail, seulement le lien par son canal</i>') + '.</p>'
+          + '<table style="width:100%;border-collapse:collapse;font-size:14px">' + lignesHtml + '<tr><td style="padding:8px;font-weight:700">Total estimé</td><td style="padding:8px;text-align:right;font-weight:700">' + Math.round(tot) + ' USD</td></tr></table>'
+          + '<p style="text-align:center;margin:18px 0"><a href="' + lien + '" style="background:#126A3C;color:#fff;text-decoration:none;font-weight:700;padding:12px 20px;border-radius:12px;display:inline-block">Ouvrir la proposition</a> &nbsp; <a href="' + lien + '&v=doc" style="background:#fff;color:#126A3C;border:1.5px solid #126A3C;text-decoration:none;font-weight:700;padding:12px 20px;border-radius:12px;display:inline-block">Version document / PDF</a></p>'
+          + '<p style="font-size:12px;color:#7F9186">Vous serez prévenu(e) par notification et par e-mail dès qu\'elle sera ouverte, acceptée ou signée.</p>';
+        MailApp.sendEmail({ to: monMail, subject: '📋 Copie — proposition OlyLife n° ' + (oo.num || '') + ' pour ' + ((oc.prenom || '') + ' ' + (oc.nom || '')).trim(), htmlBody: avMailShell_('Copie de votre proposition', 'CRM OlyLife — Water Life High Tech', '#0F3B22', corpsM), name: 'CRM OlyLife WLHT' }); sent.copie = true;
+      }
+      oo.envois = oo.envois || []; oo.envois.push({ ts: now_(), canal: 'mail', par: user.nom, client: sent.client, copie: sent.copie }); if (oo.statut === 'brouillon') oo.statut = 'envoyee';
+      oc.journal = oc.journal || []; oc.journal.push({ id: 'j_' + Date.now() + '_om', ts: now_(), auteur: user.nom, role: user.role, type: 'fait', texte: '✉️ Proposition n° ' + (oo.num || '') + (sent.client ? ' envoyée par e-mail à ' + oc.email : ' — pas d\'e-mail sur la fiche') + (sent.copie ? ' · copie à ' + monMail : '') });
+      oc.lastActivity = now_();
+      saveDB_(db);
+      return out_({ ok: true, client: sent.client, copie: sent.copie });
     }
     else if (op === 'saveMyProfile') {
       // v3.5 — chaque utilisateur met à jour sa photo, son téléphone et son email
