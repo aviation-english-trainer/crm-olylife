@@ -59,6 +59,7 @@
 // v3.9 — QR CODE D'INSCRIPTION (formulaire public → « Demandes reçues ») · OCR des captures d'écran (Drive API)
 //        ▶ Pour l'OCR : éditeur Apps Script → Services (+) → « Drive API » (v3) → Ajouter, puis Nouvelle version
 // v3.8 — ADMINISTRATION : paramètres (relances, catalogue, seuils de rang, liens, signature) dans config.params
+// v3.30 — offres : signature électronique en ligne (action « signer », PNG + nom + horodatage), image produit, adresses client
 // v3.29 — OFFRES DE COMMANDE : page publique offre.html (ops offreInfo / offreAct), notification à l'émetteur ; Member ID + rang dans le profil (saveMyProfile)
 // v3.28 — référents : choix du gestionnaire parmi tous les gestionnaires (suiveursFor_)
 // v3.7 — SÉCURITÉ : sessions par appareil (jeton, expiration, révocation), frein anti-force brute,
@@ -265,7 +266,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.29';
+var SRV_VERSION = '3.30';
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
@@ -551,30 +552,35 @@ function handleOffre_(db, req, op) {
       client: { prenom: c.prenom || '', nom: c.nom || '', adresse: c.adresse || '', cp: c.cp || '', ville: c.ville || '', pays: c.pays || '', liv: { nom: ((c.livPrenom || '') + ' ' + (c.livNom || '')).trim(), adresse: c.livAdresse || '', cp: c.livCp || '', ville: c.livVille || '', pays: c.livPays || '' } },
       ref: { nom: u.nom || o.par || '', photo: u.photo || '', tel: u.tel || '', email: u.email || '', rdv: rdv, memberId: u.memberId || o.memberId || '', rang: u.rang || o.rang || '' },
       lienAdhesion: o.lienAdhesion || '',
-      offre: { num: o.num || ('OF-' + String(o.id || '').slice(-6).toUpperCase()), le: o.le, fin: fin.toISOString(), lignes: (o.lignes || []).map(function (l) { return { nom: l.nom, usd: +l.usd || 0, qte: +l.qte || 1, ic: l.ic || '', pitch: l.pitch || '', tunnel: l.tunnel || '' }; }), produits: prod, frais: frais, fraisPct: +o.frais || 0, total: total, eur: +o.eur || 0, eurTotal: Math.round(total * (+o.eur || 0) * 100) / 100, note: o.note || '', pied: o.pied || '', cot: !!o.cot, acceptLe: o.acceptLe || '' } });
+      offre: { num: o.num || ('OF-' + String(o.id || '').slice(-6).toUpperCase()), le: o.le, fin: fin.toISOString(), lignes: (o.lignes || []).map(function (l) { return { nom: l.nom, usd: +l.usd || 0, qte: +l.qte || 1, ic: l.ic || '', pitch: l.pitch || '', tunnel: l.tunnel || '', img: l.img || '' }; }), signature: o.signature ? { png: o.signature.png || '', nom: o.signature.nom || '', le: o.signature.le || '' } : null, produits: prod, frais: frais, fraisPct: +o.frais || 0, total: total, eur: +o.eur || 0, eurTotal: Math.round(total * (+o.eur || 0) * 100) / 100, note: o.note || '', pied: o.pied || '', cot: !!o.cot, acceptLe: o.acceptLe || '' } });
   }
   // offreAct : accepter
   var cache = CacheService.getScriptCache(), ck = 'off_' + String(req.t).slice(0, 20), n = parseInt(cache.get(ck) || '0', 10) + 1; cache.put(ck, String(n), 3600);
   if (n > 20) return out_({ ok: false, error: 'trop' });
-  if (req.action !== 'accepter') return out_({ ok: false, error: 'action' });
+  if (req.action !== 'accepter' && req.action !== 'signer') return out_({ ok: false, error: 'action' });
   if (statut === 'expiree') return out_({ ok: false, error: 'expiree' });
   var msg = String(req.msg || '').slice(0, 400);
   o.statut = 'acceptee'; o.acceptLe = now_(); if (msg) o.acceptMsg = msg;
+  var signed = false;
+  if (req.action === 'signer') {
+    var png = String(req.png || ''); if (!/^data:image\/png;base64,[A-Za-z0-9+\/=]+$/.test(png) || png.length > 120000) return out_({ ok: false, error: 'signature' });
+    o.signature = { png: png, nom: String(req.nom || '').slice(0, 80), le: o.acceptLe, ua: String((req.ua || '')).slice(0, 160) }; signed = true;
+  }
   c.journal = c.journal || [];
-  c.journal.push({ id: 'j_' + Date.now() + '_oa', ts: now_(), auteur: (c.prenom || '') + ' ' + (c.nom || ''), role: '', type: 'systeme', texte: '✅ Offre de commande acceptée par la personne (' + Math.round(total) + ' USD)' + (msg ? ' — « ' + msg + ' »' : '') });
+  c.journal.push({ id: 'j_' + Date.now() + '_oa', ts: now_(), auteur: (c.prenom || '') + ' ' + (c.nom || ''), role: '', type: 'systeme', texte: (signed ? '✍️ Offre de commande signée électroniquement par ' + (o.signature.nom || 'la personne') : '✅ Offre de commande acceptée par la personne') + ' (' + Math.round(total) + ' USD)' + (msg ? ' — « ' + msg + ' »' : '') });
   c.lastActivity = now_();
   if (c.statut !== 'reseau' && c.etape !== 'Client') { c.statut = 'pret'; }
   saveDB_(db);
   var qui = (c.prenom || '') + ' ' + (c.nom || '');
-  try { pushSend_(db, [u, { id: 'root' }], '✅ Offre acceptée', qui.trim() + ' souhaite commander (' + Math.round(total) + ' USD)', ''); } catch (e) {}
+  try { pushSend_(db, [u, { id: 'root' }], (signed ? '✍️ Offre signée' : '✅ Offre acceptée'), qui.trim() + (signed ? ' a signé le bon pour accord (' : ' souhaite commander (') + Math.round(total) + ' USD)', ''); } catch (e) {}
   try {
     var em = u.email || u.digestEmail || emailDe_(db, u.nom || o.par);
     if (em) {
-      var corps = '<p>Bonne nouvelle : <b>' + qui + '</b> vient d\'accepter votre proposition OlyLife de <b>' + Math.round(total) + ' USD</b>' + (msg ? ' avec ce message :</p><blockquote style="border-left:3px solid #C9A84C;margin:8px 0;padding:6px 12px;color:#5A4E2A">' + msg.replace(/</g, '&lt;') + '</blockquote><p>' : '.</p><p>') + 'Prochaine étape : convenir ensemble du moment pour passer la commande sur le back-office OlyLife' + (c.tel ? ' — WhatsApp : <a href="https://wa.me/' + String(c.tel).replace(/\D/g, '') + '">+' + String(c.tel).replace(/\D/g, '') + '</a>' : '') + '.</p><p>Fiche dans le CRM : <a href="https://crm.team-waterlifehightech.com/">crm.team-waterlifehightech.com</a></p>';
+      var corps = '<p>Bonne nouvelle : <b>' + qui + '</b> vient ' + (signed ? 'de <b>signer électroniquement</b>' : 'd\'accepter') + ' votre proposition OlyLife de <b>' + Math.round(total) + ' USD</b>' + (msg ? ' avec ce message :</p><blockquote style="border-left:3px solid #C9A84C;margin:8px 0;padding:6px 12px;color:#5A4E2A">' + msg.replace(/</g, '&lt;') + '</blockquote><p>' : '.</p><p>') + 'Prochaine étape : convenir ensemble du moment pour passer la commande sur le back-office OlyLife' + (c.tel ? ' — WhatsApp : <a href="https://wa.me/' + String(c.tel).replace(/\D/g, '') + '">+' + String(c.tel).replace(/\D/g, '') + '</a>' : '') + '.</p><p>Fiche dans le CRM : <a href="https://crm.team-waterlifehightech.com/">crm.team-waterlifehightech.com</a></p>';
       MailApp.sendEmail({ to: em, subject: '✅ ' + qui.trim() + ' accepte votre proposition OlyLife (' + Math.round(total) + ' USD)', htmlBody: avMailShell_('✅ Offre acceptée', 'CRM OlyLife — Water Life High Tech', '#126A3C', corps), name: 'CRM OlyLife WLHT' });
     }
   } catch (me) { try { adminLog_(db, 'système', 'échec e-mail « offre acceptée »', String(me && me.message ? me.message : me)); saveDB_(db); } catch (le) {} }
-  return out_({ ok: true, prenom: c.prenom || '' });
+  return out_({ ok: true, prenom: c.prenom || '', le: o.acceptLe });
 }
 // ═══ v3.20 — Notifications push (OneSignal) ═══════════════════════
 // Script Properties : ONESIGNAL_KEY (clé REST). App ID : db.config.params.liens.onesignalAppId (Administration → Liens).

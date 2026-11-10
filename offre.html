@@ -49,7 +49,21 @@ textarea{width:100%;border:1.5px solid var(--bd);border-radius:12px;padding:12px
 .bdg.r{background:#FBEBEC;color:#8E2A31}
 #bad{display:none;text-align:center}
 /* ── Version document (devis) ── */
-#doc{display:none;max-width:820px;margin:0 auto;background:#fff;color:#1d2b22;padding:34px 38px 28px;font-size:13px;line-height:1.45}
+#doc{display:none;max-width:820px;margin:0 auto;background:#fff;color:#1d2b22;padding:0 0 26px;font-size:13px;line-height:1.45;overflow:hidden}
+#doc .band{background:linear-gradient(120deg,#0F3B22 0%,#1E6B3A 55%,#C9A84C 100%);color:#fff;padding:22px 34px 20px;display:flex;justify-content:space-between;align-items:center;gap:18px}
+#doc .band .brand{font-family:'Cormorant Garamond',serif;font-size:15px;letter-spacing:.06em;text-transform:uppercase;opacity:.9}
+#doc .band h1{font-family:Outfit,sans-serif;font-weight:700;font-size:34px;letter-spacing:.04em;margin:2px 0 0;line-height:1}
+#doc .band .num{font-size:12.5px;opacity:.95;margin-top:6px}
+#doc .band img{width:86px;height:86px;border-radius:50%;background:#fff;flex:0 0 auto;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+#doc .inner{padding:18px 34px 0}
+#doc .meta{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;flex-wrap:wrap}
+#doc .meta .who{display:flex;gap:12px;align-items:center}
+#doc .meta .who img,#doc .meta .who .ini{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#EAF4EC;color:var(--g);display:flex;align-items:center;justify-content:center;font-weight:700;flex:0 0 auto}
+#doc .meta .k{font-size:12px;color:#4a5e51;line-height:1.55}
+#doc .meta .k b{color:var(--g2);font-size:14px}
+#doc .meta .cli{text-align:right;font-size:12.5px;line-height:1.55}
+#doc .meta .cli b{font-size:14px;color:var(--g2)}
+#doc .tag{display:inline-block;background:#EAF4EC;color:var(--g);border-radius:999px;padding:3px 10px;font-size:11px;font-weight:600;margin-top:4px}
 body.docmode .hd,body.docmode .wrap{display:none}
 body.docmode #doc{display:block}
 body.docmode{background:#e9eeea}
@@ -64,27 +78,35 @@ body.docmode{background:#e9eeea}
 #doc .adr{display:flex;gap:14px;margin:26px 0 16px}
 #doc .adr>div{flex:1}
 #doc .adr .lb{font-size:12px;margin-bottom:4px}
-#doc .adr .bx{border:1px solid #1d2b22;background:#DDEBF7;min-height:64px;padding:8px 10px;font-size:12.5px;line-height:1.45}
+#doc .adr .bx{border:1px solid #BFD8C8;border-radius:8px;background:#F3F8F4;min-height:64px;padding:8px 10px;font-size:12.5px;line-height:1.45}
 #doc table{width:100%;border-collapse:collapse}
-#doc th{background:#D9D9D9;text-align:left;padding:6px 8px;font-size:12.5px;border:1px solid #1d2b22}
-#doc td{padding:6px 8px;border-left:1px solid #1d2b22;border-right:1px solid #1d2b22;vertical-align:top;font-size:12.5px}
-#doc tr.last td{border-bottom:1px solid #1d2b22}
+#doc th{background:var(--g2);color:#fff;text-align:left;padding:8px 10px;font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+#doc th:first-child{border-radius:8px 0 0 0}#doc th:last-child{border-radius:0 8px 0 0}
+#doc td{padding:9px 10px;border-bottom:1px solid #E1ECE4;vertical-align:top;font-size:12.5px}
+#doc td .ic{font-size:22px;margin-right:8px;vertical-align:middle}
+#doc td img.ph{width:54px;height:54px;object-fit:cover;border-radius:8px;margin-right:10px;vertical-align:middle;float:left}
+#doc tr.fee td{background:#FBFCFB;color:#4a5e51}
 #doc .r{text-align:right;white-space:nowrap}
 #doc .c{text-align:center}
 #doc .pt{color:#4a5e51;font-size:11.5px;line-height:1.4;margin-top:2px}
-#doc .tots{margin-left:auto;width:52%;margin-top:0;border:1px solid #1d2b22;border-top:none}
-#doc .tots div{display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid #cfd8d2}
-#doc .tots .tt{font-weight:700;font-size:16px;background:#1E3A5F;color:#fff;border:none}
+#doc .tots{margin-left:auto;width:52%;margin-top:10px}
+#doc .tots div{display:flex;justify-content:space-between;padding:6px 10px;border-bottom:1px dashed #cfd8d2}
+#doc .tots .tt{font-weight:700;font-size:17px;background:linear-gradient(120deg,#126A3C,#1E6B3A);color:#fff;border:none;border-radius:8px;margin-top:4px}
 #doc .tots .eu{color:#4a5e51;font-size:11.5px;border:none;justify-content:flex-end}
 #doc .nb{margin-top:16px;font-size:12px;line-height:1.5}
 #doc .wl{margin-top:14px;border:1px solid #C9A84C;background:#FFF8E6;padding:10px 12px;font-size:12px;line-height:1.5;border-radius:4px}
 #doc .sig{margin-top:18px;display:flex;justify-content:space-between;gap:16px;align-items:flex-end}
-#doc .sig .box{width:46%;border:1px solid #1d2b22;height:92px;position:relative}
-#doc .sig .box span{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-weight:700;font-size:12px}
-#doc .ft{margin-top:22px;border-top:1px solid #1d2b22;padding-top:8px;font-size:10.5px;color:#4a5e51;line-height:1.5;text-align:center}
+#doc .sig .box{width:48%;border:1.5px solid var(--g);border-radius:10px;min-height:110px;position:relative;background:#fff;padding:8px 10px 26px}
+#doc .sig .box span.lb{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-weight:700;font-size:11.5px;color:var(--g2)}
+#doc .sig .box img{max-height:70px;max-width:100%;display:block;margin:0 auto}
+#doc .sig .box .st{font-size:11px;color:#4a5e51;text-align:center;margin-top:4px}
+#doc .ft{margin:22px 34px 0;border-top:1px solid #BFD8C8;padding-top:8px;font-size:10.5px;color:#4a5e51;line-height:1.5;text-align:center}
+.sigpad{border:1.5px dashed var(--g);border-radius:12px;background:#fff;touch-action:none;width:100%;height:160px;display:block}
+.sigrow{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.sigrow input{flex:1;min-width:160px;border:1.5px solid var(--bd);border-radius:12px;padding:12px;font:inherit;font-size:15px}
 #doc .bar{display:flex;gap:8px;justify-content:flex-end;margin:0 auto 10px;max-width:820px;padding:12px 0 0}
-@media (max-width:640px){#doc{padding:20px 14px}#doc .top{flex-direction:column}#doc .ttl{text-align:left}#doc .ttl h1{font-size:30px}#doc .adr{flex-direction:column}#doc .tots{width:100%}}
-@media print{@page{size:A4;margin:12mm}body{background:#fff!important}.hd,.wrap,.bar,.noprint{display:none!important}#doc{display:block!important;max-width:none;padding:0;font-size:12px}#doc th,#doc .adr .bx,#doc .tots .tt{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@media (max-width:640px){#doc .band{padding:16px 14px}#doc .band h1{font-size:26px}#doc .inner{padding:14px 14px 0}#doc .meta{flex-direction:column}#doc .meta .cli{text-align:left}#doc .adr{flex-direction:column}#doc .tots{width:100%}#doc .sig{flex-direction:column;align-items:stretch}#doc .sig .box{width:100%}#doc .ft{margin:18px 14px 0}}
+@media print{@page{size:A4;margin:0}html,body{background:#fff!important}.hd,.wrap,.bar,.noprint{display:none!important}#doc{display:block!important;max-width:none;padding:0 0 14mm;font-size:12px}#doc .band{padding:16mm 14mm 8mm}#doc .inner{padding:8mm 14mm 0}#doc .ft{margin:8mm 14mm 0}#doc *{-webkit-print-color-adjust:exact;print-color-adjust:exact}tr,.sig,.wl{break-inside:avoid}}
 </style>
 </head>
 <body>
@@ -121,9 +143,9 @@ function render(){
   var note=o.note?'<div class="card"><h2>Un mot de '+esc((r.nom||'').split(' ')[0])+'</h2><div class="note">'+esc(o.note)+'</div></div>':'';
   var wl=o.cot?'<div class="card wl"><h2>🌿 L\'association Water Life High Tech</h2><p class="legal" style="font-size:13.5px">Facultative, mais chaudement recommandée à celles et ceux qui veulent développer : l\'adhésion à l\'association (180 € la première année) donne accès aux formations, aux outils, aux fiches conseils et à l\'accompagnement du réseau. L\'association ne vend aucun appareil : elle accompagne ses adhérents.</p>'+(d.lienAdhesion?'<a class="btn o noprint" href="'+esc(d.lienAdhesion)+'" target="_blank" rel="noopener">Découvrir l\'adhésion →</a>':'')+'</div>':'';
   var act='';
-  if(d.statut==='acceptee'||d.statut==='commandee')act='<div class="card ok"><div class="big">🌿</div><h2>Merci, '+esc(c.prenom||'')+' !</h2><p class="legal" style="font-size:14px">Votre accord est bien enregistré'+(o.acceptLe?' le '+fd(o.acceptLe):'')+'. '+esc(r.nom)+' vous recontacte pour la suite : la commande se passe ensemble, sur le back-office OlyLife.</p></div>';
+  if(d.statut==='acceptee'||d.statut==='commandee')act='<div class="card ok"><div class="big">🌿</div><h2>Merci, '+esc(c.prenom||'')+' !</h2><p class="legal" style="font-size:14px">Votre accord est bien enregistré'+(o.acceptLe?' le '+fd(o.acceptLe):'')+(o.signature&&o.signature.png?' — signé électroniquement':'')+'. '+esc(r.nom)+' vous recontacte pour la suite : la commande se passe ensemble, sur le back-office OlyLife.</p></div>';
   else if(d.statut==='expiree')act='<div class="card"><span class="bdg r">Proposition expirée</span><p class="legal">Les prix peuvent avoir changé. Demandez une proposition à jour à '+esc(r.nom)+'.</p></div>';
-  else act='<div class="card noprint" id="actc"><h2>Et maintenant ?</h2><p class="legal" style="font-size:13.5px">Un clic pour dire « je suis intéressé(e) » : '+esc(r.nom)+' est prévenu(e) immédiatement et vous accompagne pour passer la commande sur le back-office OlyLife (le paiement se fait là-bas, jamais ici).</p><textarea id="msg" placeholder="Un message, une question ? (facultatif)"></textarea><button class="btn" id="go" onclick="accept()">✅ Je souhaite commander</button>'+(tel?'<a class="btn g" href="https://wa.me/'+tel+'?text='+encodeURIComponent('Bonjour '+(r.nom||'').split(' ')[0]+', j\'ai bien reçu votre proposition OlyLife. ')+'" target="_blank" rel="noopener">💬 Poser une question sur WhatsApp</a>':'')+'<div id="err" class="legal" style="color:#8E2A31;display:none;margin-top:8px"></div></div>';
+  else act='<div class="card noprint" id="actc"><h2>Et maintenant ?</h2><p class="legal" style="font-size:13.5px">Un clic pour dire « je suis intéressé(e) » : '+esc(r.nom)+' est prévenu(e) immédiatement et vous accompagne pour passer la commande sur le back-office OlyLife (le paiement se fait là-bas, jamais ici).</p><textarea id="msg" placeholder="Un message, une question ? (facultatif)"></textarea><button class="btn" onclick="sigOpen()">✍️ Signer le bon pour accord en ligne</button><button class="btn o" id="go" onclick="accept()">✅ Je souhaite commander (sans signature)</button>'+(tel?'<a class="btn g" href="https://wa.me/'+tel+'?text='+encodeURIComponent('Bonjour '+(r.nom||'').split(' ')[0]+', j\'ai bien reçu votre proposition OlyLife. ')+'" target="_blank" rel="noopener">💬 Poser une question sur WhatsApp</a>':'')+'<div id="err" class="legal" style="color:#8E2A31;display:none;margin-top:8px"></div></div>';
   var pied='<div class="card"><p class="legal">'+esc(o.pied)+'</p><button class="btn o noprint" onclick="window.print()">📄 Imprimer / enregistrer en PDF</button></div>';
   document.getElementById('app').innerHTML=who+'<div class="card"><h2>Ce que je vous propose</h2>'+lignes+tot+'</div>'+note+wl+act+pied
     +'<p class="foot">Association Water Life High Tech — Loi 1901 · 60 rue François 1er, 75008 Paris. Supports Team WLHT, distincts des communications officielles OlyLife. Les produits OlyLife sont des appareils de bien-être, pas des dispositifs médicaux.</p>';
@@ -133,21 +155,60 @@ function adrTxt(a){if(!a)return'';return[a.adresse,[a.cp,a.ville].filter(Boolean
 function renderDoc(){
   var d=D;if(!d)return;var o=d.offre,r=d.ref,c=d.client;
   var tel=String(r.tel||'').replace(/\D/g,'');
-  var fact=adrTxt(c)||'<span style="color:#7F9186">Adresse à confirmer</span>';
-  var liv=c.liv&&(c.liv.adresse||c.liv.nom)?((c.liv.nom?'<b>'+esc(c.liv.nom)+'</b><br>':'')+adrTxt(c.liv)):'Idem';
-  var rows=o.lignes.map(function(l){return'<tr><td><b>'+esc(l.nom)+'</b>'+(l.pitch?'<div class="pt">'+esc(l.pitch)+'</div>':'')+'</td><td class="c">'+l.qte+'</td><td class="r">'+n2(l.usd)+'</td><td class="r">'+n2(l.usd*l.qte)+'</td></tr>';}).join('');
-  rows+='<tr class="last"><td>Frais OlyLife (logistique / transaction)<div class="pt">Estimés à '+n2(o.fraisPct)+' % — le montant exact est celui affiché par le back-office OlyLife lors de la commande.</div></td><td class="c">1</td><td class="r">'+n2(o.frais)+'</td><td class="r">'+n2(o.frais)+'</td></tr>';
+  var fact=adrTxt(c)||'<span style="color:#7F9186">Adresse à confirmer avec votre conseiller</span>';
+  var liv=c.liv&&(c.liv.adresse||c.liv.nom)?((c.liv.nom?'<b>'+esc(c.liv.nom)+'</b><br>':'')+adrTxt(c.liv)):'Identique à l\'adresse de facturation';
+  var rows=o.lignes.map(function(l){return'<tr><td>'+(l.img?'<img class="ph" src="'+esc(l.img)+'" alt="" onerror="this.remove()">':'<span class="ic">'+esc(l.ic||'🧩')+'</span>')+'<b>'+esc(l.nom)+'</b>'+(l.pitch?'<div class="pt">'+esc(l.pitch)+'</div>':'')+'</td><td class="c">'+l.qte+'</td><td class="r">'+n2(l.usd)+'</td><td class="r"><b>'+n2(l.usd*l.qte)+'</b></td></tr>';}).join('');
+  rows+='<tr class="fee"><td>Frais OlyLife (logistique / transaction)<div class="pt">Estimés à '+n2(o.fraisPct)+' % — le montant exact est celui affiché par le back-office OlyLife lors de la commande.</div></td><td class="c">1</td><td class="r">'+n2(o.frais)+'</td><td class="r">'+n2(o.frais)+'</td></tr>';
+  var sg=o.signature;
+  var sigBox=sg&&sg.png?'<div class="box"><img src="'+sg.png+'" alt="Signature"><div class="st">Signé électroniquement le '+fd(sg.le)+(sg.nom?' par '+esc(sg.nom):'')+'</div><span class="lb">Bon pour accord</span></div>'
+    :'<div class="box">'+(d.statut==='expiree'?'':'<div class="noprint" style="text-align:center;padding-top:6px"><button class="btn" style="margin:0;padding:12px;font-size:14px;width:auto" onclick="docMode(false);setTimeout(function(){sigOpen();},80)">✍️ Signer en ligne</button></div>')+'<span class="lb">Bon pour accord — date et signature</span></div>';
   document.getElementById('doc').innerHTML=
-    '<div class="top"><div class="em"><img src="logo-wlht.png" alt="" onerror="this.src=\'icon-192.png\'"><div><div class="n">'+esc(r.nom)+'</div><small>Conseiller Water Life High Tech<br>Distributeur indépendant OlyLife'+(r.memberId?' · Member ID '+esc(r.memberId):'')+(r.rang?' · '+esc(r.rang):'')+'</small><small>'+(tel?'Tél. / WhatsApp : +'+tel+'<br>':'')+(r.email?'Mail : '+esc(r.email):'')+'</small></div></div>'
-    +'<div class="ttl"><h1>PROPOSITION</h1><div>Numéro '+esc(o.num||'')+'</div><div>Date : '+fd(o.le)+'</div><div>Valable jusqu\'au '+fd(o.fin)+'</div><div>Établie en USD (dollars US)</div><div><b>Client : '+esc((c.prenom||'')+' '+(c.nom||''))+'</b></div></div></div>'
+    '<div class="band"><div><div class="brand">OlyLife · Énergie de vie augmentée</div><h1>PROPOSITION</h1><div class="num">N° '+esc(o.num||'')+' · '+fd(o.le)+' · valable jusqu\'au '+fd(o.fin)+'</div></div><img src="logo-wlht.png" alt="Water Life High Tech" onerror="this.style.display=\'none\'"></div>'
+    +'<div class="inner">'
+    +'<div class="meta"><div class="who">'+(r.photo?'<img src="'+esc(r.photo)+'" alt="">':'<div class="ini">'+esc((r.nom||'?').trim().split(/\s+/).map(function(x){return x.charAt(0);}).join('').slice(0,2).toUpperCase())+'</div>')+'<div class="k"><b>'+esc(r.nom)+'</b><br>Conseiller Water Life High Tech · distributeur indépendant OlyLife'+(r.memberId?'<br>Member ID '+esc(r.memberId):'')+(r.rang?' · '+esc(r.rang):'')+'<br>'+(tel?'+'+tel+' · ':'')+esc(r.email||'')+'</div></div>'
+    +'<div class="cli">Proposition établie pour<br><b>'+esc((c.prenom||'')+' '+(c.nom||''))+'</b><br>Montants en USD (dollars US)<br><span class="tag">'+(d.statut==='acceptee'||d.statut==='commandee'?'✅ Acceptée':d.statut==='expiree'?'⌛ Expirée':'En attente de votre accord')+'</span></div></div>'
     +'<div class="adr"><div><div class="lb">Adresse de facturation</div><div class="bx">'+fact+'</div></div><div><div class="lb">Adresse de livraison</div><div class="bx">'+liv+'</div></div></div>'
-    +'<table><thead><tr><th>Désignation</th><th class="c" style="width:52px">Qté</th><th class="r" style="width:120px">Prix unitaire</th><th class="r" style="width:120px">TOTAL</th></tr></thead><tbody>'+rows+'</tbody></table>'
+    +'<table><thead><tr><th>Désignation</th><th class="c" style="width:52px">Qté</th><th class="r" style="width:110px">P.U. USD</th><th class="r" style="width:110px">Total USD</th></tr></thead><tbody>'+rows+'</tbody></table>'
     +'<div class="tots"><div><span>Appareils</span><span>'+n2(o.produits)+' USD</span></div><div><span>Frais OlyLife estimés</span><span>'+n2(o.frais)+' USD</span></div><div class="tt"><span>Total</span><span>'+n2(o.total)+' USD</span></div>'+(o.eur?'<div class="eu">≈ '+n2(o.eurTotal)+' € au taux indicatif de '+o.eur+' €/USD</div>':'')+'</div>'
     +(o.note?'<div class="nb"><b>Mot de '+esc((r.nom||'').split(' ')[0])+' :</b> '+esc(o.note)+'</div>':'')
-    +'<div class="nb">*Vendeur : OlyLife. La commande est passée ensemble sur le back-office OlyLife ; le règlement s\'y effectue exclusivement, en dollars US (carte ou e-wallet). Facture OlyLife transmise après la commande. Livraison assurée par OlyLife ; délai communiqué à la commande.</div>'
+    +'<div class="nb">Vendeur : OlyLife. La commande est passée ensemble sur le back-office OlyLife ; le règlement s\'y effectue exclusivement, en dollars US (carte ou e-wallet). Facture OlyLife transmise après la commande. Livraison assurée par OlyLife ; délai communiqué à la commande.</div>'
     +(o.cot?'<div class="wl"><b>Adhésion à l\'association Water Life High Tech — facultative, recommandée pour développer : 180 € la première année.</b> Réglée séparément à l\'association, qui délivre son reçu. Accès aux formations, outils, fiches conseils et à l\'accompagnement du réseau. L\'association ne vend aucun appareil.</div>':'')
-    +'<div class="sig"><div style="font-size:11.5px;color:#4a5e51;max-width:46%">Pour toute question : '+esc(r.nom)+(tel?' · +'+tel:'')+(r.rdv?'<br>Rendez-vous : '+esc(r.rdv):'')+'</div><div class="box"><span>Bon pour accord — date et signature</span></div></div>'
+    +'<div class="sig"><div style="font-size:11.5px;color:#4a5e51;max-width:46%">Pour toute question : '+esc(r.nom)+(tel?' · +'+tel:'')+(r.rdv?'<br>Rendez-vous : '+esc(r.rdv):'')+'</div>'+sigBox+'</div>'
+    +'</div>'
     +'<div class="ft">'+esc(o.pied)+'<br>Association Water Life High Tech — Loi 1901 · 60 rue François 1er, 75008 Paris · Supports Team WLHT, distincts des communications officielles OlyLife.</div>';
+}
+// ── Signature électronique (simple) : tracé au doigt / à la souris, nom, date automatique
+var SIG={on:false,drawn:false};
+function sigOpen(){
+  var c=document.getElementById('actc');if(!c)return;var z=document.getElementById('sigz');if(z){z.style.display='block';z.scrollIntoView({behavior:'smooth',block:'center'});return;}
+  z=document.createElement('div');z.id='sigz';z.style.marginTop='12px';
+  z.innerHTML='<div class="legal" style="font-size:13px;margin-bottom:6px">Signez dans le cadre (doigt ou souris). La date est ajoutée automatiquement : <b>'+new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})+'</b>.</div><canvas class="sigpad" id="sigc"></canvas><div class="sigrow"><input id="signom" placeholder="Votre nom et prénom" autocomplete="name" value="'+esc(((D.client.prenom||'')+' '+(D.client.nom||'')).trim())+'"><button class="btn o" style="margin:0;width:auto;padding:10px 14px;font-size:14px" onclick="sigClear()">Effacer</button></div><label style="display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;margin-top:10px"><input type="checkbox" id="sigok" style="width:22px;height:22px;flex:0 0 auto"><span>J\'ai pris connaissance de la proposition n° '+esc(D.offre.num||'')+' ('+n2(D.offre.total)+' USD) et je donne mon accord pour passer commande sur le back-office OlyLife avec mon conseiller.</span></label><button class="btn" id="siggo" onclick="sigSend()">✍️ Signer et valider</button>';
+  c.appendChild(z);sigInit();z.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function sigInit(){
+  var cv=document.getElementById('sigc');if(!cv)return;var ctx=cv.getContext('2d');
+  function size(){var w=cv.clientWidth,h=cv.clientHeight,dpr=window.devicePixelRatio||1;cv.width=w*dpr;cv.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.lineWidth=2.4;ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle='#1d2b22';}
+  size();var last=null;
+  function pos(e){var r=cv.getBoundingClientRect(),t=e.touches?e.touches[0]:e;return{x:t.clientX-r.left,y:t.clientY-r.top};}
+  function down(e){e.preventDefault();SIG.on=true;last=pos(e);}
+  function move(e){if(!SIG.on)return;e.preventDefault();var p=pos(e);ctx.beginPath();ctx.moveTo(last.x,last.y);ctx.lineTo(p.x,p.y);ctx.stroke();last=p;SIG.drawn=true;}
+  function up(){SIG.on=false;}
+  cv.addEventListener('pointerdown',down);cv.addEventListener('pointermove',move);window.addEventListener('pointerup',up);
+}
+function sigClear(){var cv=document.getElementById('sigc');if(!cv)return;cv.getContext('2d').clearRect(0,0,cv.width,cv.height);SIG.drawn=false;}
+function sigSend(){
+  var b=document.getElementById('siggo'),e=document.getElementById('err');e.style.display='none';
+  var nom=(document.getElementById('signom').value||'').trim();
+  if(!SIG.drawn){e.textContent='Merci de signer dans le cadre.';e.style.display='block';return;}
+  if(!nom){e.textContent='Merci d\'indiquer votre nom.';e.style.display='block';return;}
+  if(!document.getElementById('sigok').checked){e.textContent='Merci de cocher la case d\'accord.';e.style.display='block';return;}
+  var cv=document.getElementById('sigc'),out=document.createElement('canvas');out.width=600;out.height=200;var oc=out.getContext('2d');oc.drawImage(cv,0,0,600,200);var png=out.toDataURL('image/png');
+  if(png.length>120000){e.textContent='Signature trop lourde — effacez et signez plus simplement.';e.style.display='block';return;}
+  b.disabled=true;b.textContent='Enregistrement…';
+  post({op:'offreAct',action:'signer',nom:nom.slice(0,80),png:png,ua:navigator.userAgent,msg:(document.getElementById('msg')||{}).value||''}).then(function(d){
+    if(!d.ok){b.disabled=false;b.textContent='✍️ Signer et valider';e.textContent=d.error==='trop'?'Trop de tentatives — réessayez dans une heure.':'Impossible d\'enregistrer pour le moment. Réessayez dans un instant.';e.style.display='block';return;}
+    D.statut='acceptee';D.offre.acceptLe=d.le||new Date().toISOString();D.offre.signature={png:png,nom:nom,le:D.offre.acceptLe};render();renderDoc();docMode(true);
+  }).catch(function(){b.disabled=false;b.textContent='✍️ Signer et valider';e.textContent='Réseau indisponible — réessayez.';e.style.display='block';});
 }
 function accept(){
   var b=document.getElementById('go'),e=document.getElementById('err');b.disabled=true;b.textContent='Envoi…';e.style.display='none';
