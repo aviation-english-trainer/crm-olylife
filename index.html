@@ -2423,7 +2423,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.38.1 · 10/11';
+var APP_VERSION='v3.39 · 10/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -7645,10 +7645,10 @@ var KITS={
 // ── PARCOURS DÉCOUVERTE (v3.20) ─────────────────────────────────────
 var TUNNEL_BASE='https://www.waterlifehightech.com/';
 var RDV_DEFAULT='https://calendly.com/waterlifehightech/appel_decouverte_olylife';
-var DECOUV={parcours:{l:'Parcours découverte OlyLife (6 vidéos)',slug:'olylife_waterlifehightech'},'Tera-P90+':{l:'Tera-P90+ (la pédale)',slug:'pedale_p90plus'},'Galaxy G1-MAX':{l:'Galaxy G1-MAX (masque yeux & sommeil — disponible début 2027)',slug:'galaxy_g1_max'},'Galaxy G-One':{l:'Galaxy G-One (masque oculaire)',slug:'galaxy_g1_max'},'Vitality Wand':{l:'Vitality Wand (baguette)',slug:'vitality'},'Shaken Massager':{l:'Shaken Massager',slug:'olylife_shaken'},certifs:{l:'Certificats et rapports de test',slug:'olylife_certificats'}};
+var DECOUV={parcours:{l:'Parcours découverte OlyLife (6 vidéos)',slug:'olylife_waterlifehightech'},'Tera-P90+':{l:'Tera-P90+ (la pédale)',slug:'pedale_p90plus'},'Galaxy G1-MAX':{l:'Galaxy G1-MAX (masque yeux & sommeil — disponible début 2027)',slug:'galaxy_g1_max'},'Financement':{l:'💳 Payer en plusieurs fois (simulateur Klarna / PayPal)',slug:SITE_URL+'financement.html'},'Galaxy G-One':{l:'Galaxy G-One (masque oculaire)',slug:'galaxy_g1_max'},'Vitality Wand':{l:'Vitality Wand (baguette)',slug:'vitality'},'Shaken Massager':{l:'Shaken Massager',slug:'olylife_shaken'},certifs:{l:'Certificats et rapports de test',slug:'olylife_certificats'}};
 var INTERETS=['Tera-P90+','Galaxy G1-MAX','Vitality Wand','Shaken Massager','La technologie','L\'association / l\'opportunité','Je ne sais pas encore'];
 // Lien tunnel personnalisé — même convention que l'App Tunnels : p prénom client, n nom, d nom du référent, w WhatsApp (chiffres, indicatif), e e-mail
-function tunnelUrl(slug,c){var q=[];if(c&&c.prenom)q.push('p='+encodeURIComponent(c.prenom));if(c&&c.nom)q.push('n='+encodeURIComponent(c.nom));if(USER&&USER.nom)q.push('d='+encodeURIComponent(USER.nom));var w=USER&&USER.tel?String(USER.tel).replace(/\D/g,''):'';if(w&&w.charAt(0)==='0')w='';if(w)q.push('w='+w);if(USER&&USER.email)q.push('e='+encodeURIComponent(USER.email));return TUNNEL_BASE+slug+(q.length?'?'+q.join('&'):'');}
+function tunnelUrl(slug,c){var q=[];if(c&&c.prenom)q.push('p='+encodeURIComponent(c.prenom));if(c&&c.nom)q.push('n='+encodeURIComponent(c.nom));if(USER&&USER.nom)q.push('d='+encodeURIComponent(USER.nom));var w=USER&&USER.tel?String(USER.tel).replace(/\D/g,''):'';if(w&&w.charAt(0)==='0')w='';if(w)q.push('w='+w);if(USER&&USER.email)q.push('e='+encodeURIComponent(USER.email));var base=/^https?:/.test(slug)?slug:TUNNEL_BASE+slug;return base+(q.length?(base.indexOf('?')>=0?'&':'?')+q.join('&'):'');}
 function decouverteUrl(c){var tok=(USER&&USER.pubToken)||'';if(!tok)return'';return SITE_URL+'decouverte.html?r='+encodeURIComponent(tok)+(c&&c.prenom?'&p='+encodeURIComponent(c.prenom):'');}
 // ── v3.33 — Première commission OlyLife : lecture du « Bonus Statement » collé, message sur le canal préféré ──
 function commParse(txt){

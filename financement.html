@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Payer son appareil OlyLife en plusieurs fois — simulateur</title>
+<meta name="description" content="Simulez le paiement en plusieurs fois de vos appareils OlyLife (Klarna via OlyPay) : mensualités sur 3 à 24 mois, 4 fois sans frais, PayPal. Estimation indicative.">
+<meta property="og:title" content="Payer son appareil OlyLife en plusieurs fois">
+<meta property="og:description" content="Simulateur de mensualités : Tera-P90+, Vitality Wand, Shaken Massager, Galaxy G1-MAX… en 3 à 24 mois ou 4 fois sans frais.">
+<meta property="og:image" content="https://crm.team-waterlifehightech.com/img/p90plus-hero.jpg">
+<link rel="icon" href="logo-wlht.png">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--g:#126A3C;--g2:#0F3B22;--gold:#C9A84C;--bg:#F3F8F4;--bd:#D7E6DB;--tx:#20362A;--t2:#5A6E61;--t3:#7F9186;--blue:#00B4FF;}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:Outfit,system-ui,sans-serif;-webkit-text-size-adjust:100%}
+.hd{background:linear-gradient(120deg,#0F3B22 0%,#1E6B3A 55%,#C9A84C 100%);color:#fff;padding:26px 18px 34px;text-align:center}
+.hd img{width:72px;height:72px;border-radius:50%;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.hd .k{font-family:'Cormorant Garamond',serif;letter-spacing:.08em;text-transform:uppercase;font-size:13px;opacity:.9;margin-top:10px}
+.hd h1{font-family:'Cormorant Garamond',serif;font-size:30px;margin:4px 0 6px;font-weight:700;line-height:1.15}
+.hd p{margin:0 auto;font-size:14px;opacity:.92;max-width:560px;line-height:1.5}
+.wrap{max-width:680px;margin:-18px auto 40px;padding:0 14px}
+.card{background:#fff;border:1px solid var(--bd);border-radius:18px;padding:18px;margin-bottom:12px;box-shadow:0 6px 20px rgba(18,106,60,.06)}
+h2{font-family:'Cormorant Garamond',serif;font-size:22px;margin:0 0 10px;color:var(--g2)}
+.it{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.it:last-child{border-bottom:none}
+.it .ic{font-size:26px;width:36px;text-align:center}
+.it img{width:48px;height:48px;object-fit:cover;border-radius:10px}
+.it .nm{font-weight:600;font-size:14.5px}
+.it .sub{font-size:12px;color:var(--t2)}
+.q{display:flex;align-items:center;gap:6px;margin-left:auto}
+.q button{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--g);background:#fff;color:var(--g);font-size:18px;font-weight:700;cursor:pointer}
+.q b{min-width:22px;text-align:center;font-size:16px}
+.tot{display:flex;justify-content:space-between;padding:6px 0;font-size:14px;border-bottom:1px dashed var(--bd)}
+.tot.big{font-size:18px;font-weight:700;border:none;padding-top:10px}
+.opt{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid var(--bd);border-radius:14px;margin-top:8px;background:#fff}
+.opt.best{border-color:var(--gold);background:#FFFCF2}
+.opt .l b{font-size:16px}
+.opt .l small{display:block;color:var(--t2);font-size:12px;margin-top:2px}
+.opt .r{text-align:right;white-space:nowrap}
+.opt .r b{font-size:18px;color:var(--g)}
+.opt .r small{display:block;color:var(--t3);font-size:11.5px}
+.tag{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;font-weight:700;background:#FFE5F0;color:#B3105A;vertical-align:middle}
+.tag.pp{background:#E6F0FF;color:#1D4ED8}.tag.ok{background:#EAF4EC;color:var(--g)}
+.btn{display:block;width:100%;border:none;border-radius:14px;background:linear-gradient(120deg,#C9A84C,#B38F35);color:#1E2B10;font:inherit;font-weight:700;font-size:16px;padding:15px;cursor:pointer;margin-top:10px;text-align:center;text-decoration:none}
+.btn.g{background:var(--g);color:#fff}.btn.o{background:#fff;color:var(--g);border:1.5px solid var(--g)}
+.legal{font-size:12.5px;color:var(--t2);line-height:1.6}
+.steps{counter-reset:s;padding:0;margin:0;list-style:none}
+.steps li{position:relative;padding:8px 0 8px 40px;font-size:14px;line-height:1.5;border-bottom:1px solid var(--bd)}
+.steps li:last-child{border-bottom:none}
+.steps li:before{counter-increment:s;content:counter(s);position:absolute;left:0;top:9px;width:28px;height:28px;border-radius:50%;background:var(--g);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+details{border:1px solid var(--bd);border-radius:12px;padding:10px 14px;margin-top:8px;background:#fff}
+summary{cursor:pointer;font-weight:600;font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+th,td{padding:6px 6px;border-bottom:1px solid #E1ECE4;text-align:right}
+th:first-child,td:first-child{text-align:left}
+th{background:#EAF4EC;color:var(--g2)}
+.ref{display:flex;gap:12px;align-items:center}
+.ref .ini{width:48px;height:48px;border-radius:50%;background:#EAF4EC;color:var(--g);display:flex;align-items:center;justify-content:center;font-weight:700}
+.foot{font-size:11px;color:var(--t3);line-height:1.6;text-align:center;margin-top:14px}
+.rate{display:flex;align-items:center;gap:10px;font-size:13px;margin-top:10px}
+.rate input{flex:1}
+@media print{.noprint{display:none!important}body{background:#fff}.card{box-shadow:none;break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="hd">
+  <img src="logo-wlht.png" alt="Water Life High Tech">
+  <div class="k">OlyLife · Énergie de vie augmentée</div>
+  <h1>Payer son appareil<br>en plusieurs fois</h1>
+  <p>Choisissez vos appareils : le simulateur vous montre, à titre indicatif, les mensualités proposées par Klarna au moment du paiement sur le back-office OlyLife (OlyPay).</p>
+</div>
+<div class="wrap">
+  <div class="card" id="refc" style="display:none"><div class="ref"><div class="ini" id="ref-ini"></div><div><b id="ref-nom"></b><div class="legal" style="margin:0">Conseiller Water Life High Tech · distributeur indépendant OlyLife</div><div id="ref-links" class="legal" style="margin:0"></div></div></div></div>
+
+  <div class="card">
+    <h2>1 · Vos appareils</h2>
+    <div id="items"></div>
+    <div style="margin-top:12px">
+      <div class="tot"><span>Appareils</span><span id="t-prod">0 USD</span></div>
+      <div class="tot"><span>Frais OlyLife estimés (10 %) <span class="legal">— montant exact affiché par le back-office</span></span><span id="t-fee">0 USD</span></div>
+      <div class="tot big"><span>Total à financer</span><span id="t-tot">0 USD</span></div>
+      <div class="legal" style="text-align:right" id="t-eur"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2 · Les façons de payer</h2>
+    <div id="opts"><div class="legal">Ajoutez au moins un appareil.</div></div>
+    <div class="rate noprint"><span>Taux estimé</span><input type="range" id="apr" min="0" max="35.99" step="0.01" value="13.99"><b id="apr-v">13,99 %</b></div>
+    <div class="legal" style="margin-top:8px">Le taux affiché par Klarna au moment du paiement était de <b>13,99 % (APR)</b> lors de nos essais ; Klarna annonce une fourchette de <b>0 % à 35,99 %</b> selon le profil. « 4 fois » : sans frais, un prélèvement toutes les deux semaines. Les mensualités ci-dessus sont une <b>estimation</b> : seule la proposition affichée par Klarna au moment du paiement fait foi.</div>
+  </div>
+
+  <div class="card" id="amortc" style="display:none">
+    <h2>3 · Comment se calcule une mensualité</h2>
+    <div class="legal" id="amort-txt"></div>
+    <details><summary>Voir le tableau d'amortissement</summary><div id="amort"></div></details>
+  </div>
+
+  <div class="card">
+    <h2>Ce que Klarna vous demandera</h2>
+    <ol class="steps">
+      <li><b>Au moment de payer</b> sur le back-office OlyLife, choisissez « Paiement échelonné » : la page OlyPay (Stripe) s'ouvre et propose Klarna.</li>
+      <li><b>Votre numéro de téléphone mobile</b> — Klarna envoie un code par SMS pour le vérifier.</li>
+      <li><b>Votre adresse e-mail</b> — une vérification complémentaire vous est envoyée.</li>
+      <li><b>Une carte bancaire</b> (débit ou crédit — pas de carte prépayée) sur laquelle les échéances seront prélevées, et votre adresse de facturation.</li>
+      <li><b>La vérification d'éligibilité</b> : annoncée « sans impact sur votre score de crédit » pour l'étape de choix. Pour un financement sur plusieurs mois, Klarna et ses banques partenaires peuvent demander des informations complémentaires (date de naissance, pièce d'identité) et procéder à une étude plus poussée. La décision appartient à Klarna, pas à OlyLife ni à votre conseiller.</li>
+      <li><b>Le choix de la formule</b> (4 fois sans frais, ou 3 à 24 mois) et la signature électronique du contrat Klarna. Les échéances sont ensuite prélevées automatiquement ; un retard entraîne des frais fixés par Klarna.</li>
+    </ol>
+    <div class="legal" style="margin-top:10px">💡 Le paiement se fait en <b>dollars US</b> : votre banque applique son taux de change et, le cas échéant, ses frais. Le <b>paiement PayPal</b> est également proposé par OlyLife (règlement en une fois ; PayPal peut proposer ses propres facilités selon votre pays).</div>
+  </div>
+
+  <div class="card noprint">
+    <h2>Et maintenant ?</h2>
+    <p class="legal">Parlez-en à votre conseiller : il vous accompagne pas à pas jusqu'au paiement sur le back-office OlyLife — c'est là, et seulement là, que la proposition Klarna définitive s'affiche.</p>
+    <a class="btn g" id="wa" href="#" target="_blank" rel="noopener">💬 Envoyer ma simulation à mon conseiller</a>
+    <button class="btn o" onclick="shareSim()">🔗 Partager cette simulation</button>
+    <button class="btn o" onclick="window.print()">🖨️ Imprimer / PDF</button>
+  </div>
+
+  <p class="foot">Simulation indicative, sans valeur contractuelle : les offres de paiement en plusieurs fois sont proposées et décidées par Klarna (ou PayPal) au moment du paiement sur le back-office OlyLife. Ni l'association Water Life High Tech ni votre conseiller ne sont prêteurs ou intermédiaires de crédit ; ils ne perçoivent rien sur le financement. Un crédit vous engage et doit être remboursé : vérifiez vos capacités de remboursement avant de vous engager. Les produits OlyLife sont des appareils de bien-être, pas des dispositifs médicaux. Association Water Life High Tech — Loi 1901 · 60 rue François 1er, 75008 Paris. Supports Team WLHT, distincts des communications officielles OlyLife.</p>
+</div>
+<script>
+var CAT=[
+ {id:'p90p',nom:'Tera-P90+',sub:'Plaque PEMF + térahertz, Revitaluxe et FrostAge inclus',usd:1500,ic:'🦶',img:'img/p90plus-hero.jpg'},
+ {id:'p90',nom:'Tera-P90',sub:'La plaque, version essentielle',usd:1000,ic:'🦶'},
+ {id:'wand',nom:'Vitality Wand',sub:'Chaleur douce et flux d\'air, mains libres',usd:600,ic:'✨'},
+ {id:'shaken',nom:'Shaken Massager',sub:'La ceinture multi-technologies',usd:1000,ic:'🌀'},
+ {id:'g1max',nom:'Galaxy G1-MAX',sub:'Masque yeux & sommeil — disponible début 2027',usd:500,ic:'😌'}
+];
+var FEE=0.10,EUR=0.90,Q={},APR=13.99,SEL=null;
+var P=new URLSearchParams(location.search);
+(P.get('q')||'').split(',').forEach(function(x){var m=x.split(':');if(m[0]&&CAT.some(function(c){return c.id===m[0];}))Q[m[0]]=Math.max(0,Math.min(9,parseInt(m[1],10)||1));});
+if(P.get('apr'))APR=Math.max(0,Math.min(35.99,parseFloat(P.get('apr'))||13.99));
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
+function n2(n){return(Math.round(n*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function n0(n){return Math.round(n).toLocaleString('fr-FR');}
+function pm(Pr,n,apr){var r=apr/100/12;if(r<=0)return Pr/n;return Pr*r/(1-Math.pow(1+r,-n));}
+function tot(){var p=0;CAT.forEach(function(c){p+=(Q[c.id]||0)*c.usd;});var f=Math.round(p*FEE*100)/100;return{p:p,f:f,t:p+f};}
+function renderItems(){
+  document.getElementById('items').innerHTML=CAT.map(function(c){return'<div class="it">'+(c.img?'<img src="'+c.img+'" alt="">':'<div class="ic">'+c.ic+'</div>')+'<div><div class="nm">OlyLife '+esc(c.nom)+'</div><div class="sub">'+esc(c.sub)+' · '+n0(c.usd)+' USD</div></div><div class="q"><button onclick="qty(\''+c.id+'\',-1)" aria-label="moins">−</button><b>'+(Q[c.id]||0)+'</b><button onclick="qty(\''+c.id+'\',1)" aria-label="plus">+</button></div></div>';}).join('');
+}
+function qty(id,d){Q[id]=Math.max(0,Math.min(9,(Q[id]||0)+d));renderItems();renderOpts();}
+function renderOpts(){
+  var T=tot();document.getElementById('t-prod').textContent=n0(T.p)+' USD';document.getElementById('t-fee').textContent=n0(T.f)+' USD';document.getElementById('t-tot').textContent=n0(T.t)+' USD';document.getElementById('t-eur').textContent=T.t?'≈ '+n0(T.t*EUR)+' € au taux indicatif de '+EUR+' €/USD':'';
+  var o=document.getElementById('opts');if(!T.t){o.innerHTML='<div class="legal">Ajoutez au moins un appareil.</div>';document.getElementById('amortc').style.display='none';return;}
+  var durs=[24,18,12,6,3].filter(function(n){return n!==24||T.t>=1000;});
+  var html='<div class="opt"><div class="l"><b>Paiement en une fois</b><small>Carte bancaire, PayPal <span class="tag pp">PayPal</span> ou Klarna « Pay now »</small></div><div class="r"><b>'+n0(T.t)+' USD</b><small>aucun frais</small></div></div>';
+  html+='<div class="opt best"><div class="l"><b>4 fois sans frais</b> <span class="tag">Klarna</span><small>Un prélèvement toutes les deux semaines, 0 % d\'intérêt</small></div><div class="r"><b>'+n2(T.t/4)+' USD</b><small>× 4 · total '+n0(T.t)+' USD</small></div></div>';
+  durs.forEach(function(n){var m=pm(T.t,n,APR),tt=m*n;html+='<div class="opt" onclick="pick('+n+')" style="cursor:pointer"><div class="l"><b>'+n+' mensualités</b> <span class="tag">Klarna</span><small>'+(APR?APR.toLocaleString('fr-FR')+' % APR estimé · coût du crédit ≈ '+n0(tt-T.t)+' USD':'sans intérêt')+'</small></div><div class="r"><b>'+n2(m)+' USD</b><small>/ mois · total '+n0(tt)+' USD</small></div></div>';});
+  o.innerHTML=html;
+  if(SEL&&durs.indexOf(SEL)<0)SEL=null;if(SEL)pick(SEL);else document.getElementById('amortc').style.display='none';
+  var ref=P.get('d')||'',w=(P.get('w')||'').replace(/\D/g,'');var lst=CAT.filter(function(c){return Q[c.id];}).map(function(c){return(Q[c.id]>1?Q[c.id]+' × ':'')+c.nom;}).join(', ');
+  var msg='Bonjour'+(ref?' '+ref.split(' ')[0]:'')+', j\'ai fait une simulation de paiement en plusieurs fois pour : '+lst+' (total estimé '+n0(T.t)+' USD'+(SEL?', '+SEL+' mensualités de '+n2(pm(T.t,SEL,APR))+' USD':'')+'). Pouvez-vous m\'accompagner ? '+simUrl();
+  document.getElementById('wa').href='https://wa.me/'+(w||'33651001085')+'?text='+encodeURIComponent(msg);
+}
+function pick(n){
+  SEL=n;var T=tot(),r=APR/100/12,m=pm(T.t,n,APR),bal=T.t,rows='',ti=0;
+  for(var i=1;i<=n;i++){var it=bal*r,cap=m-it;if(i===n){cap=bal;m=cap+it;}bal=Math.max(0,bal-cap);ti+=it;rows+='<tr><td>'+i+'</td><td>'+n2(m)+'</td><td>'+n2(it)+'</td><td>'+n2(cap)+'</td><td>'+n2(bal)+'</td></tr>';}
+  document.getElementById('amortc').style.display='block';
+  document.getElementById('amort-txt').innerHTML='Sur <b>'+n+' mois</b> à '+APR.toLocaleString('fr-FR')+' % APR : le taux annuel est divisé par 12 → <b>'+(APR/12).toFixed(4).replace('.',',')+' % par mois</b>, appliqué chaque mois au <b>capital restant dû</b>. La mensualité est constante ('+n2(pm(T.t,n,APR))+' USD) : au début elle contient surtout des intérêts, à la fin surtout du capital. Intérêts totaux ≈ <b>'+n0(ti)+' USD</b> sur '+n0(T.t)+' USD empruntés. Formule : mensualité = capital × r ÷ (1 − (1 + r)<sup>−n</sup>).';
+  document.getElementById('amort').innerHTML='<table><thead><tr><th>Mois</th><th>Mensualité</th><th>Intérêts</th><th>Capital</th><th>Reste dû</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  renderOptsLight();
+}
+function renderOptsLight(){var T=tot();var ref=P.get('d')||'',w=(P.get('w')||'').replace(/\D/g,'');var lst=CAT.filter(function(c){return Q[c.id];}).map(function(c){return(Q[c.id]>1?Q[c.id]+' × ':'')+c.nom;}).join(', ');var msg='Bonjour'+(ref?' '+ref.split(' ')[0]:'')+', j\'ai fait une simulation de paiement en plusieurs fois pour : '+lst+' (total estimé '+n0(T.t)+' USD'+(SEL?', '+SEL+' mensualités de '+n2(pm(T.t,SEL,APR))+' USD':'')+'). Pouvez-vous m\'accompagner ? '+simUrl();document.getElementById('wa').href='https://wa.me/'+(w||'33651001085')+'?text='+encodeURIComponent(msg);}
+function simUrl(){var q=CAT.filter(function(c){return Q[c.id];}).map(function(c){return c.id+':'+Q[c.id];}).join(',');var u=new URL(location.href);u.searchParams.set('q',q);if(APR!==13.99)u.searchParams.set('apr',String(APR));else u.searchParams.delete('apr');return u.toString();}
+function shareSim(){var u=simUrl();if(navigator.share){navigator.share({title:'Payer son appareil OlyLife en plusieurs fois',url:u}).catch(function(){});}else{navigator.clipboard&&navigator.clipboard.writeText(u);alert('Lien copié :\n'+u);}}
+document.getElementById('apr').value=APR;document.getElementById('apr-v').textContent=APR.toLocaleString('fr-FR')+' %';
+document.getElementById('apr').addEventListener('input',function(){APR=parseFloat(this.value)||0;document.getElementById('apr-v').textContent=APR.toLocaleString('fr-FR')+' %';renderOpts();});
+(function(){var d=P.get('d');if(d){document.getElementById('refc').style.display='block';document.getElementById('ref-nom').textContent=d;document.getElementById('ref-ini').textContent=d.trim().split(/\s+/).map(function(x){return x.charAt(0);}).join('').slice(0,2).toUpperCase();var w=(P.get('w')||'').replace(/\D/g,''),e=P.get('e')||'';document.getElementById('ref-links').innerHTML=(w?'<a href="https://wa.me/'+w+'" style="color:var(--g)">WhatsApp</a>':'')+(w&&e?' · ':'')+(e?'<a href="mailto:'+esc(e)+'" style="color:var(--g)">'+esc(e)+'</a>':'');}
+  var p=P.get('p');if(p){document.querySelector('.hd p').textContent='Bonjour '+p+' — choisissez vos appareils : le simulateur vous montre, à titre indicatif, les mensualités proposées par Klarna au moment du paiement sur le back-office OlyLife.';}})();
+renderItems();renderOpts();
+</script>
+</body>
+</html>
