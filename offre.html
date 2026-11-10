@@ -48,7 +48,43 @@ textarea{width:100%;border:1.5px solid var(--bd);border-radius:12px;padding:12px
 .bdg{display:inline-block;border-radius:999px;padding:4px 10px;font-size:11.5px;font-weight:600;background:#EAF4EC;color:var(--g)}
 .bdg.r{background:#FBEBEC;color:#8E2A31}
 #bad{display:none;text-align:center}
-@media print{.hd{background:#0F3B22!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.noprint{display:none!important}.card{box-shadow:none;break-inside:avoid}body{background:#fff}}
+/* ── Version document (devis) ── */
+#doc{display:none;max-width:820px;margin:0 auto;background:#fff;color:#1d2b22;padding:34px 38px 28px;font-size:13px;line-height:1.45}
+body.docmode .hd,body.docmode .wrap{display:none}
+body.docmode #doc{display:block}
+body.docmode{background:#e9eeea}
+#doc .top{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
+#doc .em{display:flex;gap:14px;align-items:flex-start}
+#doc .em img{width:84px;height:84px;object-fit:contain}
+#doc .em .n{font-weight:700;font-size:15px;color:var(--g2)}
+#doc .em small{display:block;color:#4a5e51;font-size:12px;line-height:1.5}
+#doc .ttl{text-align:right}
+#doc .ttl h1{font-family:Outfit,sans-serif;font-weight:500;font-size:38px;letter-spacing:.5px;margin:0 0 6px;color:#1E3A5F}
+#doc .ttl div{font-size:12.5px;color:#2b3b31}
+#doc .adr{display:flex;gap:14px;margin:26px 0 16px}
+#doc .adr>div{flex:1}
+#doc .adr .lb{font-size:12px;margin-bottom:4px}
+#doc .adr .bx{border:1px solid #1d2b22;background:#DDEBF7;min-height:64px;padding:8px 10px;font-size:12.5px;line-height:1.45}
+#doc table{width:100%;border-collapse:collapse}
+#doc th{background:#D9D9D9;text-align:left;padding:6px 8px;font-size:12.5px;border:1px solid #1d2b22}
+#doc td{padding:6px 8px;border-left:1px solid #1d2b22;border-right:1px solid #1d2b22;vertical-align:top;font-size:12.5px}
+#doc tr.last td{border-bottom:1px solid #1d2b22}
+#doc .r{text-align:right;white-space:nowrap}
+#doc .c{text-align:center}
+#doc .pt{color:#4a5e51;font-size:11.5px;line-height:1.4;margin-top:2px}
+#doc .tots{margin-left:auto;width:52%;margin-top:0;border:1px solid #1d2b22;border-top:none}
+#doc .tots div{display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px solid #cfd8d2}
+#doc .tots .tt{font-weight:700;font-size:16px;background:#1E3A5F;color:#fff;border:none}
+#doc .tots .eu{color:#4a5e51;font-size:11.5px;border:none;justify-content:flex-end}
+#doc .nb{margin-top:16px;font-size:12px;line-height:1.5}
+#doc .wl{margin-top:14px;border:1px solid #C9A84C;background:#FFF8E6;padding:10px 12px;font-size:12px;line-height:1.5;border-radius:4px}
+#doc .sig{margin-top:18px;display:flex;justify-content:space-between;gap:16px;align-items:flex-end}
+#doc .sig .box{width:46%;border:1px solid #1d2b22;height:92px;position:relative}
+#doc .sig .box span{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-weight:700;font-size:12px}
+#doc .ft{margin-top:22px;border-top:1px solid #1d2b22;padding-top:8px;font-size:10.5px;color:#4a5e51;line-height:1.5;text-align:center}
+#doc .bar{display:flex;gap:8px;justify-content:flex-end;margin:0 auto 10px;max-width:820px;padding:12px 0 0}
+@media (max-width:640px){#doc{padding:20px 14px}#doc .top{flex-direction:column}#doc .ttl{text-align:left}#doc .ttl h1{font-size:30px}#doc .adr{flex-direction:column}#doc .tots{width:100%}}
+@media print{@page{size:A4;margin:12mm}body{background:#fff!important}.hd,.wrap,.bar,.noprint{display:none!important}#doc{display:block!important;max-width:none;padding:0;font-size:12px}#doc th,#doc .adr .bx,#doc .tots .tt{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 </head>
 <body>
@@ -57,8 +93,11 @@ textarea{width:100%;border:1.5px solid var(--bd);border-radius:12px;padding:12px
   <h1>Votre proposition OlyLife</h1>
   <p id="sub">Chargement…</p>
 </div>
+<div class="bar noprint" id="docbar" style="display:none"><button class="btn o" style="width:auto;margin:0;padding:10px 16px;font-size:14px" onclick="docMode(false)">📱 Version web</button><button class="btn" style="width:auto;margin:0;padding:10px 16px;font-size:14px" onclick="window.print()">🖨️ Imprimer / PDF</button></div>
+<div id="doc"></div>
 <div class="wrap">
   <div id="app"></div>
+  <div class="card noprint" style="text-align:center;padding:12px"><button class="btn o" style="margin:0" onclick="docMode(true)">📄 Voir la version document (devis)</button></div>
   <div class="card" id="bad"><div style="font-size:40px">🔗</div><p class="legal">Ce lien n'est pas valide ou n'est plus actif. Demandez une nouvelle proposition à la personne qui vous l'a transmise.</p></div>
 </div>
 <script>
@@ -70,7 +109,7 @@ function n2(n){return(Math.round((+n||0)*100)/100).toLocaleString('fr-FR',{minim
 function fd(s){if(!s)return'';var d=new Date(s);return isNaN(d)?'':d.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});}
 function bad(){document.getElementById('bad').style.display='block';document.getElementById('sub').textContent='Lien invalide';}
 if(!T)bad();
-else post({op:'offreInfo'}).then(function(d){if(!d.ok){bad();return;}D=d;render();}).catch(bad);
+else post({op:'offreInfo'}).then(function(d){if(!d.ok){bad();return;}D=d;render();renderDoc();if(Q.get('v')==='doc')docMode(true);}).catch(bad);
 function render(){
   var d=D,o=d.offre,r=d.ref,c=d.client;
   document.getElementById('sub').textContent='Préparée pour '+(c.prenom||'')+' '+(c.nom||'')+' · le '+fd(o.le)+(d.statut==='expiree'?' · expirée':' · valable jusqu\'au '+fd(o.fin));
@@ -88,6 +127,27 @@ function render(){
   var pied='<div class="card"><p class="legal">'+esc(o.pied)+'</p><button class="btn o noprint" onclick="window.print()">📄 Imprimer / enregistrer en PDF</button></div>';
   document.getElementById('app').innerHTML=who+'<div class="card"><h2>Ce que je vous propose</h2>'+lignes+tot+'</div>'+note+wl+act+pied
     +'<p class="foot">Association Water Life High Tech — Loi 1901 · 60 rue François 1er, 75008 Paris. Supports Team WLHT, distincts des communications officielles OlyLife. Les produits OlyLife sont des appareils de bien-être, pas des dispositifs médicaux.</p>';
+}
+function docMode(on){document.body.classList.toggle('docmode',!!on);document.getElementById('docbar').style.display=on?'flex':'none';if(on)renderDoc();window.scrollTo(0,0);}
+function adrTxt(a){if(!a)return'';return[a.adresse,[a.cp,a.ville].filter(Boolean).join(' '),a.pays].filter(Boolean).join('<br>');}
+function renderDoc(){
+  var d=D;if(!d)return;var o=d.offre,r=d.ref,c=d.client;
+  var tel=String(r.tel||'').replace(/\D/g,'');
+  var fact=adrTxt(c)||'<span style="color:#7F9186">Adresse à confirmer</span>';
+  var liv=c.liv&&(c.liv.adresse||c.liv.nom)?((c.liv.nom?'<b>'+esc(c.liv.nom)+'</b><br>':'')+adrTxt(c.liv)):'Idem';
+  var rows=o.lignes.map(function(l){return'<tr><td><b>'+esc(l.nom)+'</b>'+(l.pitch?'<div class="pt">'+esc(l.pitch)+'</div>':'')+'</td><td class="c">'+l.qte+'</td><td class="r">'+n2(l.usd)+'</td><td class="r">'+n2(l.usd*l.qte)+'</td></tr>';}).join('');
+  rows+='<tr class="last"><td>Frais OlyLife (logistique / transaction)<div class="pt">Estimés à '+n2(o.fraisPct)+' % — le montant exact est celui affiché par le back-office OlyLife lors de la commande.</div></td><td class="c">1</td><td class="r">'+n2(o.frais)+'</td><td class="r">'+n2(o.frais)+'</td></tr>';
+  document.getElementById('doc').innerHTML=
+    '<div class="top"><div class="em"><img src="logo-wlht.png" alt="" onerror="this.src=\'icon-192.png\'"><div><div class="n">'+esc(r.nom)+'</div><small>Conseiller Water Life High Tech<br>Distributeur indépendant OlyLife'+(r.memberId?' · Member ID '+esc(r.memberId):'')+(r.rang?' · '+esc(r.rang):'')+'</small><small>'+(tel?'Tél. / WhatsApp : +'+tel+'<br>':'')+(r.email?'Mail : '+esc(r.email):'')+'</small></div></div>'
+    +'<div class="ttl"><h1>PROPOSITION</h1><div>Numéro '+esc(o.num||'')+'</div><div>Date : '+fd(o.le)+'</div><div>Valable jusqu\'au '+fd(o.fin)+'</div><div>Établie en USD (dollars US)</div><div><b>Client : '+esc((c.prenom||'')+' '+(c.nom||''))+'</b></div></div></div>'
+    +'<div class="adr"><div><div class="lb">Adresse de facturation</div><div class="bx">'+fact+'</div></div><div><div class="lb">Adresse de livraison</div><div class="bx">'+liv+'</div></div></div>'
+    +'<table><thead><tr><th>Désignation</th><th class="c" style="width:52px">Qté</th><th class="r" style="width:120px">Prix unitaire</th><th class="r" style="width:120px">TOTAL</th></tr></thead><tbody>'+rows+'</tbody></table>'
+    +'<div class="tots"><div><span>Appareils</span><span>'+n2(o.produits)+' USD</span></div><div><span>Frais OlyLife estimés</span><span>'+n2(o.frais)+' USD</span></div><div class="tt"><span>Total</span><span>'+n2(o.total)+' USD</span></div>'+(o.eur?'<div class="eu">≈ '+n2(o.eurTotal)+' € au taux indicatif de '+o.eur+' €/USD</div>':'')+'</div>'
+    +(o.note?'<div class="nb"><b>Mot de '+esc((r.nom||'').split(' ')[0])+' :</b> '+esc(o.note)+'</div>':'')
+    +'<div class="nb">*Vendeur : OlyLife. La commande est passée ensemble sur le back-office OlyLife ; le règlement s\'y effectue exclusivement, en dollars US (carte ou e-wallet). Facture OlyLife transmise après la commande. Livraison assurée par OlyLife ; délai communiqué à la commande.</div>'
+    +(o.cot?'<div class="wl"><b>Adhésion à l\'association Water Life High Tech — facultative, recommandée pour développer : 180 € la première année.</b> Réglée séparément à l\'association, qui délivre son reçu. Accès aux formations, outils, fiches conseils et à l\'accompagnement du réseau. L\'association ne vend aucun appareil.</div>':'')
+    +'<div class="sig"><div style="font-size:11.5px;color:#4a5e51;max-width:46%">Pour toute question : '+esc(r.nom)+(tel?' · +'+tel:'')+(r.rdv?'<br>Rendez-vous : '+esc(r.rdv):'')+'</div><div class="box"><span>Bon pour accord — date et signature</span></div></div>'
+    +'<div class="ft">'+esc(o.pied)+'<br>Association Water Life High Tech — Loi 1901 · 60 rue François 1er, 75008 Paris · Supports Team WLHT, distincts des communications officielles OlyLife.</div>';
 }
 function accept(){
   var b=document.getElementById('go'),e=document.getElementById('err');b.disabled=true;b.textContent='Envoi…';e.style.display='none';

@@ -2422,7 +2422,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.37 · 10/11';
+var APP_VERSION='v3.37.1 · 10/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -7751,9 +7751,9 @@ function offresHtml(c){
   var rows=L.slice().sort(function(a,b){return(b.le||'').localeCompare(a.le||'');}).map(function(o){
     var st=offreStatut(c,o),sb=OFFRE_ST[st]||OFFRE_ST.brouillon,t=offreTot(o);
     var noms=(o.lignes||[]).map(function(l){return(l.qte>1?l.qte+' × ':'')+l.nom.replace(/^OlyLife\s+/i,'');}).join(', ');
-    return'<div style="padding:10px 0;border-bottom:1px solid var(--bd)"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="obdg '+sb[1]+'">'+sb[0]+'</span><b style="font-size:13px">'+fUSD(t.total)+'</b><span style="font-size:11.5px;color:var(--t3)">≈ '+fEUR(t.eur)+' · '+fD(o.le.slice(0,10))+' · par '+esc(o.par||'')+'</span></div>'
+    return'<div style="padding:10px 0;border-bottom:1px solid var(--bd)"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="obdg '+sb[1]+'">'+sb[0]+'</span>'+(o.num?'<span style="font-size:11.5px;color:var(--t3)">'+esc(o.num)+'</span>':'')+'<b style="font-size:13px">'+fUSD(t.total)+'</b><span style="font-size:11.5px;color:var(--t3)">≈ '+fEUR(t.eur)+' · '+fD(o.le.slice(0,10))+' · par '+esc(o.par||'')+'</span></div>'
       +'<div style="font-size:12.5px;color:var(--t2);margin:4px 0 6px">'+esc(noms)+(o.cot?' · + adhésion WLHT':'')+(o.vueLe?' · vue le '+fWhen(o.vueLe):'')+(o.acceptLe?' · acceptée le '+fWhen(o.acceptLe)+(o.acceptMsg?' : « '+esc(o.acceptMsg)+' »':''):'')+'</div>'
-      +'<div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="ob bwa bsm" onclick="oOffreSend(\''+c.id+'\',\''+o.id+'\')">📨 Envoyer ('+(CANAL_LBL[canalCode(c)]||'WhatsApp')+')</button><a class="ob bgh bsm" href="'+offreUrl(o)+'" target="_blank" rel="noopener">👁 Voir / PDF</a><button type="button" class="ob bgh bsm" onclick="sendCopy(\''+offreUrl(o)+'\',\'🔗 Lien de l\\\'offre copié\')">🔗 Copier le lien</button>'
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="ob bwa bsm" onclick="oOffreSend(\''+c.id+'\',\''+o.id+'\')">📨 Envoyer ('+(CANAL_LBL[canalCode(c)]||'WhatsApp')+')</button><a class="ob bgh bsm" href="'+offreUrl(o)+'" target="_blank" rel="noopener">👁 Voir</a><a class="ob bgh bsm" href="'+offreUrl(o)+'&v=doc" target="_blank" rel="noopener">📄 Devis / PDF</a><button type="button" class="ob bgh bsm" onclick="sendCopy(\''+offreUrl(o)+'\',\'🔗 Lien de l\\\'offre copié\')">🔗 Copier le lien</button>'
       +(st!=='commandee'&&st!=='refusee'?'<button type="button" class="ob bgh bsm" onclick="oOffreSet(\''+c.id+'\',\''+o.id+'\',\'commandee\')">🛒 Commandée</button><button type="button" class="ob bgh bsm" onclick="oOffreSet(\''+c.id+'\',\''+o.id+'\',\'refusee\')">❌ Refusée</button>':'')
       +'<button type="button" class="ob bgh bsm" onclick="oOffreOpen(\''+c.id+'\',\''+o.id+'\')">📋 Dupliquer</button></div></div>';
   }).join('');
@@ -7792,7 +7792,7 @@ function oOffreCreate(cid,send){
   if(!o.lignes.length){oT('Cochez au moins un appareil','w');return;}
   o.pied=String(offreParams().pied||OFFRE_PIED_DEF).replace(/\{moi\}/g,PARTNER_NOM());o.lienAdhesion=(USER&&USER.pubToken)?SITE_URL+'inscription.html?r='+encodeURIComponent(USER.pubToken):'';
   o.id='of_'+Date.now().toString(36);o.tok=(function(){var a='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',t='';for(var i=0;i<20;i++)t+=a.charAt(Math.floor(Math.random()*a.length));return t;})();
-  o.le=new Date().toISOString();o.par=PARTNER_NOM();o.parId=USER?USER.id:'';o.memberId=(USER&&USER.memberId)||'';o.rang=(USER&&USER.rang)||'';o.statut='brouillon';o.envois=[];
+  o.le=new Date().toISOString();var dn=new Date(),seq=OC.reduce(function(a,x){return a+((x.offres||[]).length);},0)+1;o.num='OF'+String(dn.getFullYear()).slice(2)+('0'+(dn.getMonth()+1)).slice(-2)+'-'+('000'+seq).slice(-4);o.par=PARTNER_NOM();o.parId=USER?USER.id:'';o.memberId=(USER&&USER.memberId)||'';o.rang=(USER&&USER.rang)||'';o.statut='brouillon';o.envois=[];
   c.offres=c.offres||[];c.offres.push(o);
   var t=offreTot(o);jrnAdd(c,'fait','💶 Offre de commande créée : '+o.lignes.map(function(l){return(l.qte>1?l.qte+' × ':'')+l.nom.replace(/^OlyLife\s+/i,'');}).join(', ')+' — '+fUSD(t.total)+(o.cot?' + adhésion WLHT':''));
   oPush([c]);var m=document.getElementById('ooffre');if(m)m.remove();emojiBurst(['💶','✨','🌿']);

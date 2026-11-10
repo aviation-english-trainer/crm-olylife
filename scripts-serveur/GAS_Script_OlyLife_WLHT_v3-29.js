@@ -548,10 +548,10 @@ function handleOffre_(db, req, op) {
     if (!o.vueLe) { o.vueLe = now_(); c.journal = c.journal || []; c.journal.push({ id: 'j_' + Date.now() + '_ov', ts: now_(), auteur: (c.prenom || '') + ' ' + (c.nom || ''), role: '', type: 'systeme', texte: '👀 Offre de commande ouverte par la personne (' + Math.round(total) + ' USD)' }); c.lastActivity = now_(); saveDB_(db); try { pushSend_(db, [u], '👀 Offre ouverte', (c.prenom || '') + ' ' + (c.nom || '') + ' vient d\'ouvrir votre proposition (' + Math.round(total) + ' USD)', ''); } catch (e) {} }
     var rdv = u.calendlyUrl || ((db.config.params || {}).liens || {}).rdvDecouverte || '';
     return out_({ ok: true, statut: statut,
-      client: { prenom: c.prenom || '', nom: c.nom || '' },
+      client: { prenom: c.prenom || '', nom: c.nom || '', adresse: c.adresse || '', cp: c.cp || '', ville: c.ville || '', pays: c.pays || '', liv: { nom: ((c.livPrenom || '') + ' ' + (c.livNom || '')).trim(), adresse: c.livAdresse || '', cp: c.livCp || '', ville: c.livVille || '', pays: c.livPays || '' } },
       ref: { nom: u.nom || o.par || '', photo: u.photo || '', tel: u.tel || '', email: u.email || '', rdv: rdv, memberId: u.memberId || o.memberId || '', rang: u.rang || o.rang || '' },
       lienAdhesion: o.lienAdhesion || '',
-      offre: { le: o.le, fin: fin.toISOString(), lignes: (o.lignes || []).map(function (l) { return { nom: l.nom, usd: +l.usd || 0, qte: +l.qte || 1, ic: l.ic || '', pitch: l.pitch || '', tunnel: l.tunnel || '' }; }), produits: prod, frais: frais, fraisPct: +o.frais || 0, total: total, eur: +o.eur || 0, eurTotal: Math.round(total * (+o.eur || 0) * 100) / 100, note: o.note || '', pied: o.pied || '', cot: !!o.cot, acceptLe: o.acceptLe || '' } });
+      offre: { num: o.num || ('OF-' + String(o.id || '').slice(-6).toUpperCase()), le: o.le, fin: fin.toISOString(), lignes: (o.lignes || []).map(function (l) { return { nom: l.nom, usd: +l.usd || 0, qte: +l.qte || 1, ic: l.ic || '', pitch: l.pitch || '', tunnel: l.tunnel || '' }; }), produits: prod, frais: frais, fraisPct: +o.frais || 0, total: total, eur: +o.eur || 0, eurTotal: Math.round(total * (+o.eur || 0) * 100) / 100, note: o.note || '', pied: o.pied || '', cot: !!o.cot, acceptLe: o.acceptLe || '' } });
   }
   // offreAct : accepter
   var cache = CacheService.getScriptCache(), ck = 'off_' + String(req.t).slice(0, 20), n = parseInt(cache.get(ck) || '0', 10) + 1; cache.put(ck, String(n), 3600);
