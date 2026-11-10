@@ -101,6 +101,23 @@ body.docmode{background:#e9eeea}
 #doc .sig .box img{max-height:70px;max-width:100%;display:block;margin:0 auto}
 #doc .sig .box .st{font-size:11px;color:#4a5e51;text-align:center;margin-top:4px}
 #doc .ft{margin:22px 34px 0;border-top:1px solid #BFD8C8;padding-top:8px;font-size:10.5px;color:#4a5e51;line-height:1.5;text-align:center}
+.ovl{position:fixed;inset:0;background:rgba(15,59,34,.72);backdrop-filter:blur(3px);z-index:900;display:flex;align-items:center;justify-content:center;padding:18px}
+.ovl .bx{background:#fff;border-radius:22px;padding:26px 22px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35);animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.spin{width:54px;height:54px;border-radius:50%;border:5px solid #EAF4EC;border-top-color:var(--gold);margin:0 auto 14px;animation:rot 1s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.ovl h3{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--g2);margin:8px 0 6px}
+.ovl p{font-size:14px;color:var(--t2);line-height:1.6;margin:0 0 8px}
+.ovl .lg{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
+.ovl .lg img{width:64px;height:64px;border-radius:50%;box-shadow:0 6px 18px rgba(18,106,60,.25);animation:float 2.4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.ovl .lg b{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--g);letter-spacing:.04em}
+.chk{width:86px;height:86px;border-radius:50%;background:linear-gradient(135deg,#126A3C,#1E6B3A);margin:0 auto 10px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 30px rgba(18,106,60,.35);animation:pop .6s .15s both cubic-bezier(.2,1.4,.4,1)}
+.chk svg{width:48px;height:48px}
+.chk path{stroke:#fff;stroke-width:6;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:draw .5s .5s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.cf{position:fixed;top:-12px;width:10px;height:16px;border-radius:2px;z-index:950;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.9}}
 .sigpad{border:1.5px dashed var(--g);border-radius:12px;background:#fff;touch-action:none;width:100%;height:160px;display:block}
 .sigrow{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 .sigrow input{flex:1;min-width:160px;border:1.5px solid var(--bd);border-radius:12px;padding:12px;font:inherit;font-size:15px}
@@ -196,6 +213,15 @@ function sigInit(){
   cv.addEventListener('pointerdown',down);cv.addEventListener('pointermove',move);window.addEventListener('pointerup',up);
 }
 function sigClear(){var cv=document.getElementById('sigc');if(!cv)return;cv.getContext('2d').clearRect(0,0,cv.width,cv.height);SIG.drawn=false;}
+function ovl(html){var o=document.getElementById('ovl');if(!o){o=document.createElement('div');o.id='ovl';o.className='ovl';document.body.appendChild(o);}o.innerHTML='<div class="bx">'+html+'</div>';o.style.display='flex';return o;}
+function ovlOff(){var o=document.getElementById('ovl');if(o)o.style.display='none';}
+function confetti(){var cols=['#126A3C','#C9A84C','#1E6B3A','#00B4FF','#6FE3F3','#E8C25A'];for(var i=0;i<90;i++){var e=document.createElement('span');e.className='cf';e.style.left=Math.random()*100+'vw';e.style.background=cols[i%cols.length];e.style.animationDuration=(2.2+Math.random()*2.2)+'s';e.style.animationDelay=(Math.random()*.8)+'s';e.style.transform='rotate('+Math.random()*360+'deg)';e.style.width=(6+Math.random()*8)+'px';e.style.height=(10+Math.random()*10)+'px';document.body.appendChild(e);setTimeout(function(x){return function(){x.remove();};}(e),5500);}}
+function sigWait(){ovl('<div class="spin"></div><h3>Enregistrement en cours…</h3><p>Nous mettons votre signature à l\'abri. <b>Merci de ne pas rafraîchir ni fermer cette page</b> — cela ne prend que quelques secondes.</p>');}
+function sigBravo(nom){
+  var r=D.ref,o=D.offre,tel=String(r.tel||'').replace(/\D/g,'');
+  ovl('<div class="lg"><img src="logo-wlht.png" alt="" onerror="this.style.display=\'none\'"><b>OlyLife · Water Life High Tech</b></div><div class="chk"><svg viewBox="0 0 52 52"><path d="M14 27 l9 9 l16 -18"/></svg></div><h3>Félicitations, '+esc((D.client.prenom||nom||'').split(' ')[0])+' !</h3><p>Votre bon pour accord est <b>signé et enregistré</b>'+(o.acceptLe?' le '+fd(o.acceptLe):'')+'. '+esc(r.nom)+' vient d\'être prévenu(e) et vous recontacte très vite pour passer la commande ensemble sur le back-office OlyLife.</p><p style="font-size:13px">Bienvenue dans l\'énergie de vie augmentée 🌿</p><button class="btn" style="margin-top:6px" onclick="ovlOff();docMode(true)">📄 Voir ma proposition signée</button>'+(tel?'<a class="btn g" href="https://wa.me/'+tel+'?text='+encodeURIComponent('Bonjour '+(r.nom||'').split(' ')[0]+', je viens de signer la proposition n° '+(o.num||'')+' 🙂')+'" target="_blank" rel="noopener">💬 Prévenir '+esc((r.nom||'').split(' ')[0])+' sur WhatsApp</a>':'')+'<button class="btn o" onclick="ovlOff()">Fermer</button>');
+  confetti();
+}
 function sigSend(){
   var b=document.getElementById('siggo'),e=document.getElementById('err');e.style.display='none';
   var nom=(document.getElementById('signom').value||'').trim();
@@ -204,18 +230,26 @@ function sigSend(){
   if(!document.getElementById('sigok').checked){e.textContent='Merci de cocher la case d\'accord.';e.style.display='block';return;}
   var cv=document.getElementById('sigc'),out=document.createElement('canvas');out.width=600;out.height=200;var oc=out.getContext('2d');oc.drawImage(cv,0,0,600,200);var png=out.toDataURL('image/png');
   if(png.length>120000){e.textContent='Signature trop lourde — effacez et signez plus simplement.';e.style.display='block';return;}
-  b.disabled=true;b.textContent='Enregistrement…';
-  post({op:'offreAct',action:'signer',nom:nom.slice(0,80),png:png,ua:navigator.userAgent,msg:(document.getElementById('msg')||{}).value||''}).then(function(d){
-    if(!d.ok){b.disabled=false;b.textContent='✍️ Signer et valider';e.textContent=d.error==='trop'?'Trop de tentatives — réessayez dans une heure.':'Impossible d\'enregistrer pour le moment. Réessayez dans un instant.';e.style.display='block';return;}
-    D.statut='acceptee';D.offre.acceptLe=d.le||new Date().toISOString();D.offre.signature={png:png,nom:nom,le:D.offre.acceptLe};render();renderDoc();docMode(true);
-  }).catch(function(){b.disabled=false;b.textContent='✍️ Signer et valider';e.textContent='Réseau indisponible — réessayez.';e.style.display='block';});
+  b.disabled=true;b.textContent='Enregistrement…';sigWait();
+  var payload={op:'offreAct',action:'signer',nom:nom.slice(0,80),png:png,ua:navigator.userAgent,msg:(document.getElementById('msg')||{}).value||''};
+  var fail=function(txt){ovlOff();b.disabled=false;b.textContent='✍️ Signer et valider';e.textContent=txt;e.style.display='block';e.scrollIntoView({behavior:'smooth',block:'center'});};
+  var go=function(essai){post(payload).then(function(d){
+    if(!d.ok){
+      if(essai<2&&d.error!=='trop'&&d.error!=='expiree'){setTimeout(function(){go(essai+1);},1500);return;}   // 2e tentative automatique (verrou serveur, déploiement en cours)
+      fail(d.error==='trop'?'Trop de tentatives — réessayez dans une heure.':d.error==='expiree'?'Cette proposition a expiré : demandez-en une nouvelle à votre conseiller.':d.error==='action'?'Le serveur n\'est pas encore à jour pour la signature (code action). Réessayez dans une minute.':'Impossible d\'enregistrer pour le moment ('+(d.error||'?')+'). Réessayez dans un instant.');return;}
+    D.statut='acceptee';D.offre.acceptLe=d.le||new Date().toISOString();D.offre.signature={png:png,nom:nom,le:D.offre.acceptLe};render();renderDoc();sigBravo(nom);
+  }).catch(function(){if(essai<2){setTimeout(function(){go(essai+1);},1500);return;}fail('Réseau indisponible — vérifiez votre connexion et réessayez.');});};
+  go(1);
 }
 function accept(){
-  var b=document.getElementById('go'),e=document.getElementById('err');b.disabled=true;b.textContent='Envoi…';e.style.display='none';
-  post({op:'offreAct',action:'accepter',msg:(document.getElementById('msg').value||'').trim().slice(0,400)}).then(function(d){
-    if(!d.ok){b.disabled=false;b.textContent='✅ Je souhaite commander';e.textContent=d.error==='trop'?'Trop de tentatives — réessayez dans une heure.':'Impossible d\'enregistrer pour le moment. Réessayez dans un instant.';e.style.display='block';return;}
-    D.statut='acceptee';D.offre.acceptLe=new Date().toISOString();render();window.scrollTo(0,0);
-  }).catch(function(){b.disabled=false;b.textContent='✅ Je souhaite commander';e.textContent='Réseau indisponible — réessayez.';e.style.display='block';});
+  var b=document.getElementById('go'),e=document.getElementById('err');b.disabled=true;b.textContent='Envoi…';e.style.display='none';sigWait();
+  var payload={op:'offreAct',action:'accepter',msg:(document.getElementById('msg').value||'').trim().slice(0,400)};
+  var fail=function(txt){ovlOff();b.disabled=false;b.textContent='✅ Je souhaite commander (sans signature)';e.textContent=txt;e.style.display='block';};
+  var go=function(essai){post(payload).then(function(d){
+    if(!d.ok){if(essai<2&&d.error!=='trop'&&d.error!=='expiree'){setTimeout(function(){go(essai+1);},1500);return;}fail(d.error==='trop'?'Trop de tentatives — réessayez dans une heure.':d.error==='expiree'?'Cette proposition a expiré : demandez-en une nouvelle à votre conseiller.':'Impossible d\'enregistrer pour le moment ('+(d.error||'?')+'). Réessayez dans un instant.');return;}
+    D.statut='acceptee';D.offre.acceptLe=d.le||new Date().toISOString();render();sigBravo('');
+  }).catch(function(){if(essai<2){setTimeout(function(){go(essai+1);},1500);return;}fail('Réseau indisponible — vérifiez votre connexion et réessayez.');});};
+  go(1);
 }
 </script>
 </body>
