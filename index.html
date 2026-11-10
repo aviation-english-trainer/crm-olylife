@@ -1775,6 +1775,17 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
           <div class="adm-sec"><h4>Stock de machines</h4><div class="hint">Le stock (qui détient quoi) se gère dans l'onglet Équipe, visible aussi par les gestionnaires.</div>
             <button class="ob bgh" style="min-height:42px" onclick="oSw('equipe');setTimeout(function(){var k=document.getElementById('eq-stock-card');if(k)k.scrollIntoView({behavior:'smooth'});},150)">📦 Ouvrir le stock</button></div>
         </div>
+        <div class="ocard" style="margin-bottom:14px">
+          <div class="adm-sec"><h4>💶 Grille OlyNation — offres de commande</h4><div class="hint">Articles proposés dans « Proposer une offre » (fiche contact). Prix en USD de la grille officielle ; les frais OlyLife (logistique / transaction) sont estimés en pourcentage, le montant exact est celui du back-office. L'accroche reprend le registre des tunnels : envie, sans allégation de santé, sans les quatre verbes.</div>
+            <div id="adm-cat-grid" style="overflow-x:auto;margin-top:8px"></div>
+            <button type="button" class="ob bgh bsm" style="margin-top:8px" onclick="admCatAdd()">➕ Ajouter un article</button>
+            <div class="adm-grid" style="margin-top:12px">
+              <div class="adm-f"><label>Frais OlyLife estimés (%)</label><input type="number" id="adm-of-frais" min="0" step="0.5"></div>
+              <div class="adm-f"><label>Taux indicatif : 1 USD = … €</label><input type="number" id="adm-of-eur" min="0" step="0.001"></div>
+              <div class="adm-f"><label>Validité d'une offre (jours)</label><input type="number" id="adm-of-val" min="1"></div>
+            </div>
+            <div class="adm-f" style="margin-top:8px"><label>Mention de responsabilité (pied de l'offre) — {moi} = la personne qui propose</label><textarea id="adm-of-pied" style="min-height:90px"></textarea></div></div>
+        </div>
         <div class="adm-save"><button class="ob bgold" style="min-height:46px" onclick="admSaveParams()">💾 Enregistrer le catalogue</button></div>
       </div>
 
@@ -2149,6 +2160,10 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <div style="margin-top:12px;padding:12px;background:rgba(18,106,60,.07);border-radius:12px;border:1px solid rgba(18,106,60,.18)">
       <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">🎥 Mon lien Zoom (salle de réunion personnelle)</div>
       <input type="url" class="ofc" id="oprof-zoom" placeholder="https://us05web.zoom.us/j/1234567890?pwd=…">
+    </div>
+    <div style="margin-top:12px;padding:12px;background:rgba(201,168,76,.10);border-radius:12px;border:1px solid rgba(201,168,76,.35)">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">🧬 Mon compte OlyLife (figure sur mes offres de commande)</div>
+      <div class="ofg2" style="gap:8px"><div><label class="ofl">Member ID</label><input class="ofc" id="oprof-ea" placeholder="EA…" style="text-transform:uppercase"></div><div><label class="ofl">Rang</label><select class="ofc" id="oprof-rang"><option value="">—</option><option>P1 - Starter</option><option>P2 - Builder</option><option>P3 - Leader</option><option>P4 - Supervisor</option><option>P5 - Pioneer</option></select></div></div>
       <div style="font-size:11.5px;line-height:1.5;margin-top:6px;color:var(--t2)">Sur la fiche d'un contact, le bouton <b>🎥 Zoom</b> envoie une invitation déjà rédigée avec ce lien, par son canal préféré, et ouvre votre salle. Dans Zoom : Profil → « ID de réunion personnelle » → copier le lien d'invitation (compte gratuit : 40 min par réunion).</div>
     </div>
     <div class="oinst-note" id="oprof-note" style="margin-top:10px"></div>
@@ -2407,7 +2422,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.36 · 09/11';
+var APP_VERSION='v3.37 · 10/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -2422,6 +2437,7 @@ var DROITS_DEF=[
   {k:'statut',l:'Modifier le statut / l\'étape des fiches (pipeline, glisser-déposer)',d:{admin:1,gestionnaire:1,referent:0,comite:0}},
   {k:'rappels',l:'Marquer les rappels comme faits',d:{admin:1,gestionnaire:1,referent:0,comite:0}},
   {k:'journal',l:'Modifier / supprimer des observations du journal',d:{admin:1,gestionnaire:1,referent:0,comite:1}},
+  {k:'offres',l:'Proposer des offres de commande OlyLife (en son nom, prix de la grille OlyNation)',d:{admin:1,gestionnaire:1,referent:1,comite:0}},
   {k:'attribuer',l:'Attribuer une fiche ou une demande à un gestionnaire',d:{admin:1,gestionnaire:1,referent:0,comite:0}},
   {k:'avances',l:'Avances & dons : enregistrer, rembourser, supprimer',d:{admin:1,gestionnaire:1,referent:0,comite:0}},
   {k:'factures',l:'Factures, mot de passe client, suivi de commande',d:{admin:1,gestionnaire:1,referent:0,comite:0}},
@@ -3283,6 +3299,10 @@ var MSG_DEFAULTS={};
   // v3.33 — première commission OlyLife : explication du relevé « Bonus Statement » + plan de rémunération
   MSG_DEFAULTS.premiere_commission={g:'Membre du réseau',l:'Première commission OlyLife — explication du relevé',vars:['prenom','dateBonus','perf','tier','autres','retenue','bonus','income','voucher','lienPlan','lienRdv','moi'],
     t:'Bonjour {prenom} 🎉\n\nBonne nouvelle : votre première commission OlyLife est tombée{?dateBonus: (relevé du {dateBonus})} ! Petit décodage de votre « Bonus Statement » (Financial Management → Bonus Statement) :\n\n{?perf:• Performance Bonus : {perf} — lié aux commandes passées directement grâce à vous\n}{?tier:• Tier Bonus : {tier} — bonus de niveau, lié à l\'organisation de votre équipe\n}{?autres:• Autres bonus (groupe, coaching, rang, équipe) : {autres}\n}{?bonus:• Bonus total (brut) : {bonus}\n}{?retenue:• Repurchase : {retenue} — la retenue de 20 % qui alimente votre portefeuille de rachat (pour vos prochaines commandes)\n}{?income:• Income : {income} — ce qui est réellement crédité sur votre compte\n}{?voucher:• Shopping Voucher : {voucher} — bons d\'achat cumulés, utilisables sur la boutique OlyLife\n}\nLes montants sont en dollars US et indiqués avant la retenue de 20 %. Rien à faire de votre côté : les retraits se font depuis Financial Management.\n{?lienPlan:\n📘 Pour comprendre tout le plan de rémunération (les bonus, comment ils se déclenchent, et ce qui se passe quand vous parrainez 2 personnes) :\n{lienPlan}\n}{?lienRdv:\n📅 Et si vous voulez qu\'on le parcoure ensemble en 20 minutes : {lienRdv}\n}\nBravo pour ce premier pas 🌿\n{moi} — Water Life High Tech'};
+  MSG_DEFAULTS.offre={g:'Prospect',l:'Offre de commande OlyLife (lien personnel)',vars:['prenom','appareilsOffre','montantOffre','validiteOffre','lienOffre','lienRdv','moi'],
+    t:'Bonjour {prenom},\n\nComme convenu, voici votre proposition personnalisée : {appareilsOffre}.\n\n👉 {lienOffre}\n\nVous y trouverez le détail, un bouton « En savoir plus » pour chaque appareil, et le montant ({montantOffre}, frais OlyLife compris). Elle reste valable {validiteOffre} jours.\n\nUn doute, une question ? Je suis là.{?lienRdv: Pour en parler de vive voix, choisissez un créneau : {lienRdv}}\n\n{moi}'};
+  MSG_DEFAULTS.offre_relance={g:'Prospect',l:'Relance d\'une offre de commande (J+7)',vars:['prenom','montantOffre','jours','lienOffre','lienRdv','moi'],
+    t:'Bonjour {prenom},\n\nJe reviens vers vous au sujet de la proposition que je vous ai envoyée il y a {jours} jours : {lienOffre}\n\nAvez-vous eu le temps d\'y jeter un œil ? Je suis disponible pour en parler.{?lienRdv: Un créneau ici : {lienRdv}}\n\nBelle journée,\n{moi}'};
   // v3.30 — invitation Zoom (salle personnelle du gestionnaire, tous canaux)
   MSG_DEFAULTS.zoom_invitation={g:'Rendez-vous',l:'Invitation à une visio Zoom (lien personnel)',vars:['prenom','quand','lienZoom','moi','telMoi'],
     t:'Bonjour {prenom} 🌿\n\nComme convenu, voici le lien de notre visio Zoom{?quand: — {quand}} :\n{lienZoom}\n\nUn clic suffit (l\'application Zoom s\'ouvre, ou le navigateur). Pensez à activer micro et caméra 🙂 Si besoin, je reste joignable{?telMoi: au {telMoi}}.\n\nÀ tout de suite !\n{moi} — Water Life High Tech'};
@@ -3321,7 +3341,7 @@ var MSG_DEFAULTS={};
   MSG_DEFAULTS.inscription_infos={g:'Inscription OlyLife',l:'Demande des informations d\'inscription',vars:['nomComplet','prenom','nom','lienInscription','moi','role','telMoi'],
     t:'Bonjour {nomComplet} 👋\n\nPour créer votre compte OlyLife et passer votre commande, j\'ai besoin de quelques informations.{?lienInscription:\n\n✅ *Le plus simple* : remplissez ce formulaire sécurisé (2 minutes, sur votre téléphone) — il m\'arrive directement :\n{lienInscription}\n\n📋 À avoir sous la main : votre passeport (ou carte nationale d\'identité — permis et autres cartes refusés, sauf carte de résident), votre adresse de livraison (et de facturation si différente), votre e-mail, et un mot de passe d\'au moins 8 caractères (lettres et chiffres) que vous pourrez modifier ensuite.\n\n✍️ Vous préférez répondre ici ? Envoyez-moi alors EN UN SEUL MESSAGE :}{?sansLien:\n\nMerci de me renvoyer EN UN SEUL MESSAGE les informations suivantes :}\n\n1️⃣ Votre identité EXACTEMENT comme sur votre PASSEPORT (tous les noms et tous les prénoms) + le numéro du passeport.\n   ➡️ Pas de passeport ? La carte nationale d\'identité est acceptée. (Permis de conduire et autres cartes refusés — sauf carte de résident pour les personnes étrangères.)\n2️⃣ Votre adresse postale complète de livraison — et l\'adresse de facturation si elle est différente.\n3️⃣ Votre adresse e-mail.\n4️⃣ Un mot de passe d\'au moins 8 caractères (lettres et chiffres ; symboles possibles mais non obligatoires) — vous pourrez le modifier ensuite.\n\n💳 *Paiement* : la commande se règle en dollars US auprès d\'OlyLife (plateforme à l\'étranger). Il arrive que la banque émettrice bloque la carte par sécurité. Si c\'est le cas, dites-le-moi simplement : je vous transmets une autre méthode via notre association Water Life High Tech (compte français), par carte bancaire ou virement.\n\n🔒 Ces informations restent strictement confidentielles : elles servent uniquement à votre enregistrement officiel OlyLife.\n\nMerci beaucoup, à très vite !\n{moi} — {role}{?telMoi: · 📞 {telMoi}}\nWater Life High Tech'};
 })();
-var MSG_VAR_HELP={dateBonus:'date de la ligne du relevé',perf:'Performance Bonus (avec $)',tier:'Tier Bonus',autres:'somme des autres bonus (groupe, coaching, rang, équipe)',retenue:'Repurchase (retenue 20 %)',bonus:'Bonus total brut',income:'Income (net crédité)',voucher:'Shopping Voucher cumulé',lienPlan:'tunnel « plan de rémunération » (Administration → Liens)',lienZoom:'votre lien Zoom personnel (Mon profil), sinon le Zoom de l\'association',quand:'date et heure choisies pour la visio (vide = maintenant)',lienConsent:'lien personnel de consentement e-mail (page consentement.html, 20 secondes)',lienFacture:'lien de la facture PDF (Drive, lecture seule)',numFacture:'n° de document de la facture',produitFacture:'appareil facturé',montantFacture:'montant total de la facture',demandeMdp:'(case) phrase « vous pouvez conserver ou modifier votre mot de passe »',compte:'ID membre du compte facturé',prenom:'forme d\'adresse selon le registre : premier prénom (tutoiement / équipe) ou titre + premier prénom + NOM (professionnel)',prenomSeul:'premier prénom seulement',civilite:'titre de la fiche (Dr, Pr, Maître…)',gest:'nom du gestionnaire qui suit la fiche (sinon vous)',telGest:'téléphone du gestionnaire',emailGest:'e-mail du gestionnaire',appareil:'nom de l\'appareil reçu',lienKit:'page de bienvenue (vidéo, premiers pas, règles d\'or)',lienNotice:'notice en français (PDF)',lienVideo:'vidéo de prise en main (YouTube)',reglesOr:'règles d\'or de l\'appareil (texte)',nomComplet:'prénom + nom (ou seulement ce qui est rempli)',lienInscription:'votre lien personnel du formulaire d\'inscription (celui de votre QR code)',lienDecouverte:'votre lien personnel du formulaire découverte (1 minute : prénom, WhatsApp, intérêts)',lienParcours:'parcours découverte OlyLife (6 vidéos), personnalisé à votre nom',liensAppareils:'pages des appareils cochés (une ligne par appareil)',lienCertificats:'certificats et rapports de test',lienRdv:'votre lien de rendez-vous (Calendly de Mon profil, sinon l\'appel découverte WLHT)',interets:'centres d\'intérêt cochés',sansLien:'vrai seulement si le lien n\'est pas disponible (bloc de repli)',role:'votre rôle (admin, gestionnaire, référent…)',telMoi:'votre téléphone (Mon profil)',prenom:'prénom du contact',nom:'nom',numCommande:'n° de commande',logistique:'Service Logistique OlyLife',transporteur:'transporteur',tracking:'n° de suivi',lienSuivi:'lien de suivi du colis',tipLivraison:'numéros utiles DHL / Colissimo (France)',sav:'Service Après-Vente OlyLife',savEmail:'e-mail du SAV',montant:'montant',devise:'devise',date:'date de l\'avance',motif:'motif',rendu:'déjà remboursé',reste:'reste à rembourser',echeance:'date d\'échéance',payeur:'prénom de la personne qui a avancé',client:'nom du client',moi:'votre nom (expéditeur)',jours:'nombre de jours',programme:'titre de la fiche conseils',rythme:'durée, fréquence',appareil:'nom de l\'appareil',interdits:'contre-indications (manuel)',duree:'durée & fréquence (manuel)',precautions:'précautions (manuel)',lienApp:'lien de l\'application',code:'code d\'accès',role:'rôle'};
+var MSG_VAR_HELP={lienOffre:'lien personnel de l\'offre de commande (page offre.html)',appareilsOffre:'appareils de l\'offre (liste)',montantOffre:'total de l\'offre, frais OlyLife compris (USD)',validiteOffre:'validité de l\'offre en jours',dateBonus:'date de la ligne du relevé',perf:'Performance Bonus (avec $)',tier:'Tier Bonus',autres:'somme des autres bonus (groupe, coaching, rang, équipe)',retenue:'Repurchase (retenue 20 %)',bonus:'Bonus total brut',income:'Income (net crédité)',voucher:'Shopping Voucher cumulé',lienPlan:'tunnel « plan de rémunération » (Administration → Liens)',lienZoom:'votre lien Zoom personnel (Mon profil), sinon le Zoom de l\'association',quand:'date et heure choisies pour la visio (vide = maintenant)',lienConsent:'lien personnel de consentement e-mail (page consentement.html, 20 secondes)',lienFacture:'lien de la facture PDF (Drive, lecture seule)',numFacture:'n° de document de la facture',produitFacture:'appareil facturé',montantFacture:'montant total de la facture',demandeMdp:'(case) phrase « vous pouvez conserver ou modifier votre mot de passe »',compte:'ID membre du compte facturé',prenom:'forme d\'adresse selon le registre : premier prénom (tutoiement / équipe) ou titre + premier prénom + NOM (professionnel)',prenomSeul:'premier prénom seulement',civilite:'titre de la fiche (Dr, Pr, Maître…)',gest:'nom du gestionnaire qui suit la fiche (sinon vous)',telGest:'téléphone du gestionnaire',emailGest:'e-mail du gestionnaire',appareil:'nom de l\'appareil reçu',lienKit:'page de bienvenue (vidéo, premiers pas, règles d\'or)',lienNotice:'notice en français (PDF)',lienVideo:'vidéo de prise en main (YouTube)',reglesOr:'règles d\'or de l\'appareil (texte)',nomComplet:'prénom + nom (ou seulement ce qui est rempli)',lienInscription:'votre lien personnel du formulaire d\'inscription (celui de votre QR code)',lienDecouverte:'votre lien personnel du formulaire découverte (1 minute : prénom, WhatsApp, intérêts)',lienParcours:'parcours découverte OlyLife (6 vidéos), personnalisé à votre nom',liensAppareils:'pages des appareils cochés (une ligne par appareil)',lienCertificats:'certificats et rapports de test',lienRdv:'votre lien de rendez-vous (Calendly de Mon profil, sinon l\'appel découverte WLHT)',interets:'centres d\'intérêt cochés',sansLien:'vrai seulement si le lien n\'est pas disponible (bloc de repli)',role:'votre rôle (admin, gestionnaire, référent…)',telMoi:'votre téléphone (Mon profil)',prenom:'prénom du contact',nom:'nom',numCommande:'n° de commande',logistique:'Service Logistique OlyLife',transporteur:'transporteur',tracking:'n° de suivi',lienSuivi:'lien de suivi du colis',tipLivraison:'numéros utiles DHL / Colissimo (France)',sav:'Service Après-Vente OlyLife',savEmail:'e-mail du SAV',montant:'montant',devise:'devise',date:'date de l\'avance',motif:'motif',rendu:'déjà remboursé',reste:'reste à rembourser',echeance:'date d\'échéance',payeur:'prénom de la personne qui a avancé',client:'nom du client',moi:'votre nom (expéditeur)',jours:'nombre de jours',programme:'titre de la fiche conseils',rythme:'durée, fréquence',appareil:'nom de l\'appareil',interdits:'contre-indications (manuel)',duree:'durée & fréquence (manuel)',precautions:'précautions (manuel)',lienApp:'lien de l\'application',code:'code d\'accès',role:'rôle'};
 function renderTpl(t,v){
   v=v||{};
   return String(t||'').replace(/\{\?(\w+):((?:[^{}]|\{\w+\})*)\}/g,function(m,k,inner){return v[k]?inner.replace(/\{(\w+)\}/g,function(_,n){return v[n]!=null?v[n]:'';}):'';})
@@ -3370,7 +3390,7 @@ function buildMsgFor(item,lang,tone){
 function computeActions(){
   var items=[];
   OC.forEach(function(c0){[c0].concat(ordViews(c0)).forEach(function(c){
-    var concerne=ROLE()==='admin'||contactMeConcerne(c);
+    var concerne=ROLE()==='admin'||contactMeConcerne(c)||(c.offres||[]).some(function(o){return USER&&o.parId===USER.id;});
     if(!c._ck&&concerne&&(c.etape==='Prospect'||c.etape==='Relance en cours'||!c.etape)&&cStatut(c)==='encours'&&!c.rappel){
       // base = date du 1er contact réel (journal), sinon date de création
       var first=(c.journal||[]).filter(function(e){return e.type==='appel'||e.type==='note'||e.type==='rdv';}).map(function(e){return e.ts;}).sort()[0];
@@ -3440,6 +3460,10 @@ function computeActions(){
       });
     });
     if(c._ck)return;
+    (c.offres||[]).forEach(function(o){
+      var st=offreStatut(c,o);if(st!=='envoyee'&&st!=='vue')return;var last=(o.envois&&o.envois.length?o.envois[o.envois.length-1].ts:o.le)||o.le;var d=Math.floor((Date.now()-new Date(last).getTime())/864e5);
+      if(d>=7&&!(c.actions&&c.actions['offre_'+o.id]&&c.actions['offre_'+o.id].done))items.push({c:c,key:'offre_'+o.id,type:'Offre',label:'Offre de commande '+fUSD(offreTot(o).total)+' envoyée il y a '+d+' j'+(o.vueLe?' (vue, sans réponse)':' (pas encore ouverte)'),diff:-d,msg:renderTpl(tplText('offre_relance'),Object.assign(tplVars(c,'fr'),{lienOffre:offreUrl(o),montantOffre:fUSD(offreTot(o).total),jours:String(d)}))});
+    });
     (c.avances||[]).forEach(function(a){
       if(a.type==='don'||a.statut==='rembourse'||!a.echeance)return;
       var diff=diffD(a.echeance);
@@ -3517,11 +3541,12 @@ function oAct(){
       var mailBody='Bonjour,\n\nMerci de me communiquer le statut d\'expédition de la commande n°'+(a.c.numCommande||'')+' (Member ID '+(a.c.memberIdOlyLife||'')+').\n\nCordialement,\n'+(PARTNER_NOM()||'');
       extraBtn='<div class="brow"><button type="button" class="ob bgh" onclick="oLogiWA(\''+a.c.id+'\''+ckArg(a.c)+')">📨 WhatsApp Logistique OlyLife + prévenir le client</button><button type="button" class="ob bgh" onclick="oLogiMail(\''+a.c.id+'\''+ckArg(a.c)+')">✉️ Email Logistique (client et gestionnaire en copie)</button></div>';
     }
+    if(a.key.indexOf('offre_')===0){extraBtn='<div class="brow"><button type="button" class="ob bwa" onclick="oOffreSend(\''+a.c.id+'\',\''+a.key.slice(6)+'\')">📨 Renvoyer l\'offre par '+esc(CANAL_LBL[canalCode(a.c)]||'WhatsApp')+'</button><a class="ob bgh" href="'+esc(offreUrl((a.c.offres||[]).find(function(o){return o.id===a.key.slice(6);})||{tok:''}))+'" target="_blank" rel="noopener">👁 Voir l\'offre</a></div>';}
     if(a.key.indexOf('fact_')===0){extraBtn='<div class="brow"><button type="button" class="ob bwa" onclick="oFactSend(\''+a.c.id+'\',\''+a.key.slice(5)+'\')">📤 Envoyer par '+esc(a.c.canal||'WhatsApp')+' (et effacer le mot de passe)</button></div>';}
     if(a.key==='bienvenue'){var KL=kitLinks(a.c);extraBtn='<div class="brow"><button type="button" class="ob" style="background:var(--blp);color:var(--bl);border:none" onclick="oKitMail(\''+a.c.id+'\''+ckArg(a.c)+')">✉️ E-mail de bienvenue'+(a.c.email?'':' (pas d\'adresse)')+'</button>'+(KL.lienKit?'<a class="ob bgh" href="'+esc(KL.lienKit)+'" target="_blank" rel="noopener">🧭 Page du kit</a>':'')+'</div>';}
     return'<div class="oacc '+cls+'">'
       +'<div class="oacc-hd" onclick="oAccTog(\''+uid+'\')">'
-        +'<span class="obdg '+(a.type==='Relance'?'bbl':a.type==='Logistique'?'brd':a.type==='Installation'?'baq':a.type==='Précautions'?'bpu':a.type==='Fiche conseils'?'bgr':a.type==='Bienvenue'?'bor':'bgo')+'">'+a.type+'</span>'
+        +'<span class="obdg '+(a.type==='Relance'?'bbl':a.type==='Logistique'?'brd':a.type==='Installation'?'baq':a.type==='Précautions'?'bpu':a.type==='Fiche conseils'?'bgr':a.type==='Bienvenue'?'bor':a.type==='Offre'?'bgo':'bgo')+'">'+a.type+'</span>'
         +'<div class="oacc-info"><div class="oacc-name">'+a.c.nom+' '+a.c.prenom+(a.c._ck?' <span class="obdg bpu">🧬 '+esc(a.c.memberIdOlyLife||a.c.cpt)+'</span>':'')+' '+jBdg(a.c)+resBdg(a.c,true)+'</div><div class="oacc-sub"><span class="st-chip todo" style="margin:0 6px 0 0">🔴 À faire</span>'+a.label+' — <span style="'+lateCol+';font-weight:700">'+lateTxt+'</span></div></div>'
         +'<span class="oacc-arr" id="aca-'+uid+'">▼</span>'
       +'</div>'
@@ -4525,6 +4550,7 @@ function oOpenF(id){
     +merciHtml(c)
     +kitHtml(c)
     +logiHtml(c)
+    +offresHtml(c)
     +comptesHtml(c)
     +ordViews(c).map(function(v){return merciHtml(v)+kitHtml(v)+logiHtml(v);}).join('')
     +factHtml(c)
@@ -7691,6 +7717,112 @@ function oCommSend(cid){
 }
 // ── v3.30 — Zoom : invitation pré-rédigée depuis la fiche, lien personnel du gestionnaire ──
 function zoomUrl(){return(USER&&USER.zoomUrl)||((CFG.params&&CFG.params.liens&&CFG.params.liens.zoom)||'');}
+// ═══ v3.37 — Offres de commande OlyLife (proposition personnelle, vendeur = OlyLife) ═══
+var CAT_DEF=[
+ {id:'p90p',ref:'OLY-HCA002A',nom:'OlyLife THZ Tera-P90+',usd:1500,pv:1125,decouv:'Tera-P90+',ic:'🦶',pitch:'La plaque PEMF + térahertz pour les pieds, livrée avec ses deux appareils de poche Revitaluxe et FrostAge : un rituel de détente complet à la maison.',actif:true},
+ {id:'p90',ref:'OLY-HCA002',nom:'OlyLife Tera-P90',usd:1000,pv:750,decouv:'Tera-P90+',ic:'🦶',pitch:'La plaque PEMF + térahertz, version essentielle, sans les appareils de poche.',actif:true},
+ {id:'g1max',ref:'',nom:'OlyLife Galaxy G1-MAX',usd:500,pv:375,decouv:'Galaxy G1-MAX',ic:'😌',pitch:'Le masque yeux & sommeil : chaleur douce, pression d\'air, son, fraîcheur et quatre rituels (nuit, méditation, yeux, réveil). Disponible début 2027.',actif:true},
+ {id:'gone',ref:'OLY-PKG004',nom:'OlyLife Galaxy G-One',usd:500,pv:375,decouv:'Galaxy G-One',ic:'😌',pitch:'Le masque oculaire pliable : chaleur à 42 °C, pression d\'air, vibrations, sept modes.',actif:false},
+ {id:'wand',ref:'OLY-TPC003',nom:'OlyLife Vitality Wand',usd:600,pv:375,decouv:'Vitality Wand',ic:'✨',pitch:'La baguette de chaleur douce et de flux d\'air, à diriger soi-même sur les zones à détendre, avec son support mains libres.',actif:true},
+ {id:'shaken',ref:'OLY-SK-M3',nom:'OlyLife Shaken Massager',usd:1000,pv:750,decouv:'Shaken Massager',ic:'🌀',pitch:'La ceinture multi-technologies pour le ventre et le bas du dos : trois modes, pilotage depuis la montre incluse.',actif:true},
+ {id:'bama',ref:'',nom:'OlyLife A9 Smart Anion BamaAir',usd:500,pv:375,decouv:'',ic:'🌬️',pitch:'Le purificateur d\'air aux ions négatifs inspiré de Bama, avec filtre HEPA, lumières d\'ambiance et musiques apaisantes.',actif:true},
+ {id:'hbar',ref:'',nom:'OlyLife H+ Bar',usd:600,pv:375,decouv:'',ic:'💧',pitch:'La gourde qui produit une eau enrichie en hydrogène, avec la technologie de résonance MRET.',actif:true},
+ {id:'skyline',ref:'OLY-SL-6-P',nom:'OlyLife Skyline Package',usd:500,pv:375,decouv:'',ic:'🌸',pitch:'',actif:false}
+];
+var OFFRE_PIED_DEF='Proposition établie par {moi}, distributeur indépendant OlyLife, sous sa seule responsabilité. Les appareils sont vendus, facturés et expédiés par OlyLife ; le règlement s\'effectue exclusivement sur le back-office OlyLife, en dollars US. Les montants en euros sont indicatifs. Les produits OlyLife sont des appareils de bien-être, pas des dispositifs médicaux. L\'association Water Life High Tech accompagne ses adhérents et ne vend rien.';
+function catList(){var P=CFG&&CFG.params||{};var l=(P.offreCat&&P.offreCat.length)?P.offreCat:CAT_DEF;return l.map(function(x){return Object.assign({},x);});}
+function catById(id){return catList().find(function(x){return x.id===id;})||null;}
+function offreParams(){var P=CFG&&CFG.params||{};return Object.assign({fraisPct:10,eur:0.90,validite:15,pied:OFFRE_PIED_DEF},P.offre||{});}
+function offreUrl(o){return SITE_URL+'offre.html?t='+encodeURIComponent(o.tok);}
+function offreTot(o){var p=0;(o.lignes||[]).forEach(function(l){p+=(+l.usd||0)*(+l.qte||1);});var f=Math.round(p*(+o.frais||0))/100;return{produits:p,frais:f,total:p+f,eur:Math.round((p+f)*(+o.eur||0)*100)/100};}
+function fUSD(n){return(Math.round(n*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2})+' USD';}
+function fEUR(n){return(Math.round(n*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2})+' €';}
+function offreStatut(c,o){
+  if(o.statut==='commandee'||o.statut==='refusee')return o.statut;
+  if(c.numCommande&&c.dateCommande&&o.le&&c.dateCommande>=o.le.slice(0,10))return'commandee';
+  if(o.statut==='acceptee')return'acceptee';
+  var lim=new Date(o.le);lim.setDate(lim.getDate()+(+o.validite||15));
+  if(new Date()>lim&&o.statut!=='acceptee')return'expiree';
+  return o.vueLe?'vue':(o.envois&&o.envois.length?'envoyee':'brouillon');
+}
+var OFFRE_ST={brouillon:['📝 brouillon','bgy'],envoyee:['📨 envoyée','baq'],vue:['👀 vue','bbl'],acceptee:['✅ acceptée','bgr'],commandee:['🛒 commandée','bgr'],refusee:['❌ refusée','bor'],expiree:['⌛ expirée','bgy']};
+function offresHtml(c){
+  var L=c.offres||[];if(!can('offres')&&!L.length)return'';
+  var rows=L.slice().sort(function(a,b){return(b.le||'').localeCompare(a.le||'');}).map(function(o){
+    var st=offreStatut(c,o),sb=OFFRE_ST[st]||OFFRE_ST.brouillon,t=offreTot(o);
+    var noms=(o.lignes||[]).map(function(l){return(l.qte>1?l.qte+' × ':'')+l.nom.replace(/^OlyLife\s+/i,'');}).join(', ');
+    return'<div style="padding:10px 0;border-bottom:1px solid var(--bd)"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="obdg '+sb[1]+'">'+sb[0]+'</span><b style="font-size:13px">'+fUSD(t.total)+'</b><span style="font-size:11.5px;color:var(--t3)">≈ '+fEUR(t.eur)+' · '+fD(o.le.slice(0,10))+' · par '+esc(o.par||'')+'</span></div>'
+      +'<div style="font-size:12.5px;color:var(--t2);margin:4px 0 6px">'+esc(noms)+(o.cot?' · + adhésion WLHT':'')+(o.vueLe?' · vue le '+fWhen(o.vueLe):'')+(o.acceptLe?' · acceptée le '+fWhen(o.acceptLe)+(o.acceptMsg?' : « '+esc(o.acceptMsg)+' »':''):'')+'</div>'
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="ob bwa bsm" onclick="oOffreSend(\''+c.id+'\',\''+o.id+'\')">📨 Envoyer ('+(CANAL_LBL[canalCode(c)]||'WhatsApp')+')</button><a class="ob bgh bsm" href="'+offreUrl(o)+'" target="_blank" rel="noopener">👁 Voir / PDF</a><button type="button" class="ob bgh bsm" onclick="sendCopy(\''+offreUrl(o)+'\',\'🔗 Lien de l\\\'offre copié\')">🔗 Copier le lien</button>'
+      +(st!=='commandee'&&st!=='refusee'?'<button type="button" class="ob bgh bsm" onclick="oOffreSet(\''+c.id+'\',\''+o.id+'\',\'commandee\')">🛒 Commandée</button><button type="button" class="ob bgh bsm" onclick="oOffreSet(\''+c.id+'\',\''+o.id+'\',\'refusee\')">❌ Refusée</button>':'')
+      +'<button type="button" class="ob bgh bsm" onclick="oOffreOpen(\''+c.id+'\',\''+o.id+'\')">📋 Dupliquer</button></div></div>';
+  }).join('');
+  return odSec('💶 Offres de commande OlyLife',(rows||'<div style="font-size:12.5px;color:var(--t3);padding:6px 0">Aucune offre pour l\'instant.</div>')
+    +(can('offres')?'<button type="button" class="ob bgold bsm" style="margin-top:10px" onclick="oOffreOpen(\''+c.id+'\')">➕ Proposer une offre</button>':''),!!L.length);
+}
+function oOffreOpen(cid,dupId){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  if(!can('offres')){oT('Votre rôle ne permet pas de créer une offre','e');return;}
+  var P=offreParams(),dup=dupId?(c.offres||[]).find(function(o){return o.id===dupId;}):null;
+  var old=document.getElementById('ooffre');if(old)old.remove();
+  var m=document.createElement('div');m.id='ooffre';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
+  var cat=catList().filter(function(x){return x.actif!==false||(dup&&dup.lignes.some(function(l){return l.id===x.id;}));});
+  var owned=(c.produits||[]).map(function(p){return p.split('(')[0].trim().toLowerCase();});
+  var rows=cat.map(function(x){var dl=dup?dup.lignes.find(function(l){return l.id===x.id;}):null;var has=owned.some(function(p){return x.nom.toLowerCase().indexOf(p.toLowerCase())>=0;});
+    return'<label class="of-row" style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd)"><input type="checkbox" class="of-ck" data-id="'+x.id+'" '+(dl?'checked':'')+' style="width:20px;height:20px"><span style="flex:1;font-size:13.5px"><b>'+esc(x.nom.replace(/^OlyLife\s+/i,''))+'</b>'+(x.ref?' <span style="color:var(--t3);font-size:11px">'+esc(x.ref)+'</span>':'')+(has?' <span class="obdg bgr" style="font-size:10px">déjà équipé</span>':'')+'<br><span style="color:var(--t2);font-size:12px">'+fUSD(x.usd)+(x.decouv&&DECOUV[x.decouv]?' · tunnel ✔':'')+'</span></span><input type="number" class="ofc of-q" data-id="'+x.id+'" min="1" max="9" value="'+(dl?dl.qte:1)+'" style="width:58px;text-align:center;padding:8px 4px"></label>';}).join('');
+  m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:560px;max-height:92vh;overflow:auto">'
+    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">💶 Offre de commande pour '+esc(((c.prenom||'')+' '+(c.nom||'')).trim())+'</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'ooffre\').remove()">✕</button></div>'
+    +'<div style="font-size:12px;color:var(--t2);margin:6px 0 10px;line-height:1.5">Proposée en votre nom ('+esc(PARTNER_NOM())+(USER&&USER.memberId?' · '+esc(USER.memberId):'')+(USER&&USER.rang?' · '+esc(USER.rang):'')+'), prix de la grille OlyNation en USD, frais OlyLife estimés à '+P.fraisPct+' %, euros indicatifs (1 USD = '+P.eur+' €).'+((USER&&USER.memberId)?'':' <b>Ajoutez votre Member ID et votre rang dans Mon profil</b> pour qu\'ils figurent sur l\'offre.')+'</div>'
+    +rows
+    +'<label style="display:flex;align-items:flex-start;gap:10px;margin:14px 0 6px;padding:10px 12px;border-radius:12px;background:#FFF8E6;border:1px solid #E8C25A;font-size:13px;line-height:1.5"><input type="checkbox" id="of-cot" '+(dup?(dup.cot?'checked':''):'checked')+' style="width:20px;height:20px;margin-top:1px"><span><b>Mentionner l\'adhésion à l\'association WLHT</b> (180 € la première année) — section séparée, facultative, chaudement recommandée à celles et ceux qui veulent développer.</span></label>'
+    +'<label class="ofl" style="margin-top:8px">Mot personnel (facultatif)</label><textarea class="ofc" id="of-note" style="min-height:70px" placeholder="Ce que je vous propose et pourquoi…">'+esc(dup?dup.note||'':'')+'</textarea>'
+    +'<div class="ofg2" style="gap:8px;margin-top:8px"><div><label class="ofl">Validité (jours)</label><input type="number" class="ofc" id="of-val" min="1" value="'+(dup?dup.validite:P.validite)+'"></div><div><label class="ofl">Total estimé</label><div class="ofc" id="of-tot" style="font-weight:700">—</div></div></div>'
+    +'<div style="display:flex;gap:8px;margin-top:14px"><button type="button" class="ob bgold" style="flex:1;min-height:46px" onclick="oOffreCreate(\''+c.id+'\',true)">📨 Créer et envoyer</button><button type="button" class="ob bgh" style="min-height:46px" onclick="oOffreCreate(\''+c.id+'\',false)">💾 Créer seulement</button></div></div>';
+  document.body.appendChild(m);
+  var upd=function(){var o=oOffreCollect();if(!o)return;var t=offreTot(o);document.getElementById('of-tot').textContent=o.lignes.length?fUSD(t.total)+' ≈ '+fEUR(t.eur):'—';};
+  m.querySelectorAll('.of-ck,.of-q').forEach(function(el){el.addEventListener('change',upd);});upd();
+}
+function oOffreCollect(c){
+  var m=document.getElementById('ooffre');if(!m)return null;var P=offreParams(),lignes=[];
+  m.querySelectorAll('.of-ck:checked').forEach(function(ck){var x=catById(ck.getAttribute('data-id'));if(!x)return;var q=m.querySelector('.of-q[data-id="'+x.id+'"]');lignes.push({id:x.id,ref:x.ref||'',nom:x.nom,usd:+x.usd||0,qte:Math.max(1,parseInt(q&&q.value,10)||1),ic:x.ic||'',pitch:x.pitch||'',tunnel:(c&&x.decouv&&DECOUV[x.decouv])?tunnelUrl(DECOUV[x.decouv].slug,c):''});});
+  return{lignes:lignes,frais:+P.fraisPct||0,eur:+P.eur||0,cot:!!(document.getElementById('of-cot')||{}).checked,note:(val('of-note')||'').trim().slice(0,600),validite:Math.max(1,parseInt(val('of-val'),10)||P.validite)};
+}
+function oOffreCreate(cid,send){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;var o=oOffreCollect(c);if(!o)return;
+  if(!o.lignes.length){oT('Cochez au moins un appareil','w');return;}
+  o.pied=String(offreParams().pied||OFFRE_PIED_DEF).replace(/\{moi\}/g,PARTNER_NOM());o.lienAdhesion=(USER&&USER.pubToken)?SITE_URL+'inscription.html?r='+encodeURIComponent(USER.pubToken):'';
+  o.id='of_'+Date.now().toString(36);o.tok=(function(){var a='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',t='';for(var i=0;i<20;i++)t+=a.charAt(Math.floor(Math.random()*a.length));return t;})();
+  o.le=new Date().toISOString();o.par=PARTNER_NOM();o.parId=USER?USER.id:'';o.memberId=(USER&&USER.memberId)||'';o.rang=(USER&&USER.rang)||'';o.statut='brouillon';o.envois=[];
+  c.offres=c.offres||[];c.offres.push(o);
+  var t=offreTot(o);jrnAdd(c,'fait','💶 Offre de commande créée : '+o.lignes.map(function(l){return(l.qte>1?l.qte+' × ':'')+l.nom.replace(/^OlyLife\s+/i,'');}).join(', ')+' — '+fUSD(t.total)+(o.cot?' + adhésion WLHT':''));
+  oPush([c]);var m=document.getElementById('ooffre');if(m)m.remove();emojiBurst(['💶','✨','🌿']);
+  if(send)oOffreSend(cid,o.id);else{oOpenF(cid);oT('Offre créée — envoyez-la quand vous voulez','s');}
+}
+function oOffreSend(cid,oid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;var o=(c.offres||[]).find(function(x){return x.id===oid;});if(!o)return;
+  var v=tplVars(c,'fr');v.lienOffre=offreUrl(o);var t=offreTot(o);v.montantOffre=fUSD(t.total);v.appareilsOffre=o.lignes.map(function(l){return(l.qte>1?l.qte+' × ':'')+l.nom.replace(/^OlyLife\s+/i,'');}).join(', ');v.validiteOffre=String(o.validite||15);
+  var text=renderTpl(tplText('offre'),v),canal=canalCode(c),num=String(c.tel||'').replace(/\D/g,'');
+  if((canal==='wa'||canal==='sms'||canal==='signal'||canal==='tg')&&!num){if(c.email)canal='mail';else{sendCopy(text,'📋 Pas de téléphone ni d\'e-mail : message copié');return;}}
+  if(canal==='mail'&&!c.email){if(num)canal='wa';else{sendCopy(text,'📋 Message copié');return;}}
+  sendVia(canal,num,text,c.email);
+  o.envois=o.envois||[];o.envois.push({ts:new Date().toISOString(),canal:canal,par:PARTNER_NOM()});if(o.statut==='brouillon')o.statut='envoyee';
+  jrnAdd(c,'fait','📨 Offre de commande envoyée par '+(CANAL_LBL[canal]||canal)+' ('+fUSD(t.total)+')');oPush([c]);oOpenF(cid);
+}
+function oOffreSet(cid,oid,st){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;var o=(c.offres||[]).find(function(x){return x.id===oid;});if(!o)return;
+  o.statut=st;o.statutLe=new Date().toISOString();o.statutPar=PARTNER_NOM();
+  jrnAdd(c,'fait',(st==='commandee'?'🛒 Offre marquée commandée':'❌ Offre marquée refusée'));oPush([c]);oOpenF(cid);
+}
+// Administration → Catalogue : grille OlyNation
+function admCatRender(){
+  var g=document.getElementById('adm-cat-grid');if(!g)return;var P=offreParams();
+  var rows=catList().map(function(x,i){return'<tr data-i="'+i+'"><td><input type="checkbox" class="ac-on" '+(x.actif!==false?'checked':'')+'></td><td><input class="ofc ac-ref" value="'+esc(x.ref||'')+'" style="width:120px"></td><td><input class="ofc ac-nom" value="'+esc(x.nom)+'" style="min-width:200px"></td><td><input type="number" class="ofc ac-usd" value="'+(+x.usd||0)+'" style="width:84px"></td><td><input type="number" class="ofc ac-pv" value="'+(+x.pv||0)+'" style="width:74px"></td><td><select class="ofc ac-dec" style="min-width:150px"><option value="">— aucun tunnel —</option>'+Object.keys(DECOUV).map(function(k){return'<option value="'+esc(k)+'"'+(x.decouv===k?' selected':'')+'>'+esc(k)+'</option>';}).join('')+'</select></td><td><input class="ofc ac-ic" value="'+esc(x.ic||'')+'" style="width:44px;text-align:center"></td><td><textarea class="ofc ac-pitch" style="min-width:260px;min-height:54px">'+esc(x.pitch||'')+'</textarea><input type="hidden" class="ac-id" value="'+esc(x.id)+'"></td><td><button type="button" class="ob bgh bsm" onclick="this.closest(\'tr\').remove()">🗑</button></td></tr>';}).join('');
+  g.innerHTML='<table style="font-size:12.5px;border-collapse:collapse;width:100%"><thead><tr><th>Actif</th><th>Réf. BO</th><th>Article</th><th>USD</th><th>PV</th><th>Tunnel « En savoir plus »</th><th>Icône</th><th>Accroche (registre envie, sans allégation)</th><th></th></tr></thead><tbody id="adm-cat-body">'+rows+'</tbody></table>';
+  var s=function(id,v){var el=document.getElementById(id);if(el)el.value=v;};s('adm-of-frais',P.fraisPct);s('adm-of-eur',P.eur);s('adm-of-val',P.validite);s('adm-of-pied',P.pied);
+}
+function admCatAdd(){var b=document.getElementById('adm-cat-body');if(!b)return;var tr=document.createElement('tr');tr.innerHTML='<td><input type="checkbox" class="ac-on" checked></td><td><input class="ofc ac-ref" style="width:120px"></td><td><input class="ofc ac-nom" placeholder="OlyLife …" style="min-width:200px"></td><td><input type="number" class="ofc ac-usd" value="0" style="width:84px"></td><td><input type="number" class="ofc ac-pv" value="0" style="width:74px"></td><td><select class="ofc ac-dec" style="min-width:150px"><option value="">— aucun tunnel —</option>'+Object.keys(DECOUV).map(function(k){return'<option value="'+esc(k)+'">'+esc(k)+'</option>';}).join('')+'</select></td><td><input class="ofc ac-ic" value="🧩" style="width:44px;text-align:center"></td><td><textarea class="ofc ac-pitch" style="min-width:260px;min-height:54px"></textarea><input type="hidden" class="ac-id" value="c_'+Date.now().toString(36)+'"></td><td><button type="button" class="ob bgh bsm" onclick="this.closest(\'tr\').remove()">🗑</button></td>';b.appendChild(tr);}
+function admCatCollect(){var out=[];document.querySelectorAll('#adm-cat-body tr').forEach(function(tr){var q=function(s){return tr.querySelector(s);};var nom=(q('.ac-nom').value||'').trim();if(!nom)return;out.push({id:q('.ac-id').value,ref:(q('.ac-ref').value||'').trim().toUpperCase(),nom:nom,usd:+q('.ac-usd').value||0,pv:+q('.ac-pv').value||0,decouv:q('.ac-dec').value||'',ic:(q('.ac-ic').value||'').trim()||'🧩',pitch:(q('.ac-pitch').value||'').trim(),actif:q('.ac-on').checked});});return out;}
+
 function oZoomOpen(cid){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
   var url=zoomUrl();
@@ -8335,6 +8467,7 @@ function admRenderTab(t){
   if(t==='catalogue'){
     document.getElementById('adm-produits').value=PRODUCTS.join('\n');document.getElementById('adm-themes').value=THEMES.join('\n');
     ['p2','p3','p4','p5'].forEach(function(k){document.getElementById('adm-r-'+k).value=RANG_SEUILS[k];});
+    admCatRender();
   }
   if(t==='relances'){
     document.getElementById('adm-j1').value=RELANCE_STEPS[0].d;document.getElementById('adm-j2').value=RELANCE_STEPS[1].d;document.getElementById('adm-j3').value=RELANCE_STEPS[2].d;
@@ -8443,7 +8576,7 @@ function admSaveParams(){
   var P=CFG.params||{};
   var n=function(id){var v=+document.getElementById(id).value;return v>0?v:0;};
   var lines=function(id){return document.getElementById(id).value.split('\n').map(function(x){return x.trim();}).filter(Boolean);};
-  if(ADM_TAB==='catalogue'){var pr=lines('adm-produits'),th=lines('adm-themes');if(!pr.length){oT('Il faut au moins un produit','w');return;}P.produits=pr;P.themes=th.length?th:THEMES;P.rangs={p2:n('adm-r-p2'),p3:n('adm-r-p3'),p4:n('adm-r-p4'),p5:n('adm-r-p5')};if(!(P.rangs.p2<P.rangs.p3&&P.rangs.p3<P.rangs.p4&&P.rangs.p4<P.rangs.p5)){oT('Les seuils de rang doivent être croissants','w');return;}}
+  if(ADM_TAB==='catalogue'){var pr=lines('adm-produits'),th=lines('adm-themes');if(!pr.length){oT('Il faut au moins un produit','w');return;}P.produits=pr;P.themes=th.length?th:THEMES;P.offreCat=admCatCollect();P.offre={fraisPct:+val('adm-of-frais')||0,eur:+val('adm-of-eur')||0,validite:parseInt(val('adm-of-val'),10)||15,pied:(val('adm-of-pied')||'').trim()||OFFRE_PIED_DEF};P.rangs={p2:n('adm-r-p2'),p3:n('adm-r-p3'),p4:n('adm-r-p4'),p5:n('adm-r-p5')};if(!(P.rangs.p2<P.rangs.p3&&P.rangs.p3<P.rangs.p4&&P.rangs.p4<P.rangs.p5)){oT('Les seuils de rang doivent être croissants','w');return;}}
   if(ADM_TAB==='relances'){P.relances={j1:n('adm-j1'),j2:n('adm-j2'),j3:n('adm-j3')};if(!(P.relances.j1<P.relances.j2&&P.relances.j2<P.relances.j3)){oT('Les rappels doivent être croissants (ex. 2, 5, 12)','w');return;}P.logistique=n('adm-logi');P.install=n('adm-inst');P.temoignage=n('adm-tem');P.protoPoints=[n('adm-pp1'),n('adm-pp2')];P.signature=document.getElementById('adm-sign').value.trim()||'OlyLife / WLHT';}
   if(ADM_TAB==='liens'){P.liens={boffice:document.getElementById('adm-l-boffice').value.trim(),boly:document.getElementById('adm-l-boly').value.trim(),olynation:document.getElementById('adm-l-olynation').value.trim(),tunnels:document.getElementById('adm-l-tunnels').value.trim(),youtube:document.getElementById('adm-l-youtube').value.trim(),zoom:(document.getElementById('adm-l-zoom').value||'').trim(),planRemu:(document.getElementById('adm-l-plan').value||'').trim(),waSupportTel:document.getElementById('adm-l-watel').value.replace(/\D/g,''),waSupportNom:document.getElementById('adm-l-wanom').value.trim(),onesignalAppId:(document.getElementById('adm-l-onesignal').value||'').trim()};
     var lp=admLpCollect().filter(function(l){return l.label||l.url;});for(var i=0;i<lp.length;i++){if(!lp[i].label||!/^https?:\/\//.test(lp[i].url)){oT('Lien '+(i+1)+' : libellé et adresse https:// obligatoires','w');return;}}P.liensPerso=lp;}
@@ -8575,7 +8708,7 @@ function oProfOpen(){
   oSessList('', 'oprof-sess');
   var pc=document.getElementById('oprof-canal');if(pc)pc.value=sendPref();
   var oc=document.getElementById('oprof-cal');if(oc){oc.value=USER.calendlyUrl||'';}oProfCalSt();
-  var oz=document.getElementById('oprof-zoom');if(oz)oz.value=USER.zoomUrl||'';
+  var oz=document.getElementById('oprof-zoom');if(oz)oz.value=USER.zoomUrl||'';var oe=document.getElementById('oprof-ea');if(oe)oe.value=USER.memberId||'';var orr=document.getElementById('oprof-rang');if(orr)orr.value=USER.rang||'';
   pushProfSt();
   oSheetOpen('oprof');
 }
@@ -8590,12 +8723,12 @@ function oProfSave(){
   var calNew=!!calu&&calu!==(USER.calendlyUrl||'');
   var zoomu=(val('oprof-zoom')||'').trim();
   if(zoomu&&!/^https:\/\/([a-z0-9-]+\.)?zoom\.(us|com)\//i.test(zoomu)){oT('Le lien Zoom doit commencer par https://…zoom.us/','e');return;}
-  USER.tel=(val('oprof-tel')||'').trim();USER.email=(val('oprof-email')||'').trim();USER.photo=val('oprof-photo')||'';USER.calendlyUrl=calu;USER.zoomUrl=zoomu;
+  USER.tel=(val('oprof-tel')||'').trim();USER.email=(val('oprof-email')||'').trim();USER.photo=val('oprof-photo')||'';USER.calendlyUrl=calu;USER.zoomUrl=zoomu;USER.memberId=eaOf(val('oprof-ea'))||'';USER.rang=val('oprof-rang')||'';
   if(USER.email&&!USER.digestEmail)USER.digestEmail=USER.email;
   var me=USERS.find(function(u){return u.id===USER.id;});if(me){me.tel=USER.tel;me.email=USER.email;me.photo=USER.photo;me.calendlyUrl=calu;me.zoomUrl=zoomu;if(me.email&&!me.digestEmail)me.digestEmail=me.email;}
   var cu=document.getElementById('my-cal-url');if(cu)cu.value=calu;
   oSaveCache();
-  oPost_({op:'saveMyProfile',tel:USER.tel,email:USER.email,photo:USER.photo,calendlyUrl:calu,zoomUrl:zoomu,push:USER.push!==false});
+  oPost_({op:'saveMyProfile',tel:USER.tel,email:USER.email,photo:USER.photo,calendlyUrl:calu,zoomUrl:zoomu,push:USER.push!==false,memberId:USER.memberId,rang:USER.rang});
   if(calNew){try{localStorage.setItem('owlht2_calnudge','done');}catch(e){}oCalNudge();emojiBurst(['📅','✨','🌿']);}
   applyRole();if(typeof renderUsers==='function')renderUsers();
   oProfClose();emojiBurst();oT('✨ Profil enregistré','s');
