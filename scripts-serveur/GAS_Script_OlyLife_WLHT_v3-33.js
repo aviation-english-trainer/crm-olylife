@@ -268,7 +268,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.32';
+var SRV_VERSION = '3.33';
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
@@ -533,6 +533,32 @@ function offreByTok_(db, tok) {
   for (var i = 0; i < db.contacts.length; i++) { var L = db.contacts[i].offres || []; for (var j = 0; j < L.length; j++) if (L[j].tok === tok) return { c: db.contacts[i], o: L[j] }; }
   return null;
 }
+// ── v3.33 — page publique temoignage.html?t=<id>&r=<pubToken> : ne renvoie que ce qui est publiable ──
+function handleTemInfo_(db, req) {
+  var id = String(req.t || ''), ru = userByPubToken_(db, req.r);
+  var cache = CacheService.getScriptCache(), ck = 'tem_' + id.slice(0, 24), n = parseInt(cache.get(ck) || '0', 10) + 1; cache.put(ck, String(n), 3600);
+  if (n > 60) return out_({ ok: false, error: 'trop' });
+  var refOut = ru ? { nom: ru.nom || '', photo: ru.photo || '', tel: ru.tel || '', email: ru.email || '', rdv: ru.calendlyUrl || ((db.config.params || {}).liens || {}).rdvDecouverte || '' } : null;
+  var photos_ = function (l) { return (l || []).map(function (p) { return { id: p.id || '', url: p.url || '' }; }); };
+  if (/^tx_/.test(id)) {
+    var x = ((db.config.ressources || {}).temExt || []).filter(function (t) { return t.id === id; })[0];
+    if (!x) return out_({ ok: false, error: 'lien' });
+    var ok = {}; (x.avis || []).forEach(function (a) { if (a.avis === 'ok') ok[a.userId || a.par] = 1; });
+    if (x.statut !== 'diffusable' || Object.keys(ok).length < 2) return out_({ ok: false, error: 'nonpublie' });
+    return out_({ ok: true, orig: 'externe', titre: x.titre || '', appareil: x.appareil || '', theme: x.theme || '', besoins: x.besoins || [], texte: x.texte || '', photos: photos_(x.photos), video: x.video || '', audio: x.audio || '', date: x.date || '', source: x.source || '', pays: x.pays || '', langue: x.langue || 'fr', ref: refOut });
+  }
+  for (var i = 0; i < db.contacts.length; i++) {
+    var c = db.contacts[i], t = (c.temoignages || []).filter(function (q) { return q.id === id; })[0];
+    if (!t) continue;
+    if (!(t.statut === 'publie' && t.consent && !(t.type === 'video' && !t.visage))) return out_({ ok: false, error: 'nonpublie' });
+    var m = t.affich || 'prenom', nom = m === 'anonyme' ? 'Membre OlyLife' : m === 'initiales' ? ((c.prenom || '').charAt(0) + '. ' + (c.nom || '').charAt(0) + '.').toUpperCase() : ((c.prenom || c.nom || '') + (c.ville ? ' (' + c.ville + ')' : ''));
+    var o = { ok: true, orig: 'reseau', nom: nom, titre: (t.appareil ? t.appareil.split('(')[0].trim() + ' — ' : '') + nom, appareil: t.appareil || '', theme: t.theme || '', besoins: t.besoins || [], type: t.type || 'ecrit', texte: t.texte || '', url: t.url || '', photos: t.visage || !(t.photos || []).length ? photos_(t.photos) : photos_(t.photos), date: t.date || '', verif: !!t.verif, contactDirect: !!(t.verif && t.contactDirect), ref: refOut };
+    if (o.contactDirect) o.contact = { prenom: c.prenom || '', tel: c.tel || '', email: c.email || '' };
+    if (!t.vuLe) { t.vuLe = now_(); } t.vues = (t.vues || 0) + 1; saveDB_(db);
+    return out_(o);
+  }
+  return out_({ ok: false, error: 'lien' });
+}
 function offreUser_(db, o) {
   if (o.parId === 'root' || !o.parId) { var r = findUser_(db, ADMIN_CODE) || {}; if (!o.parId || r.nom === o.par) return r; }
   for (var i = 0; i < db.users.length; i++) if (db.users[i].id === o.parId) return db.users[i];
@@ -731,6 +757,7 @@ function doPost(e) {
     if (op === 'lead') return handleLead_(db, req);
     if (op === 'consentInfo' || op === 'consent') return handleConsent_(db, req, op);   // v3.20
     if (op === 'offreInfo' || op === 'offreAct') return handleOffre_(db, req, op);   // v3.29
+    if (op === 'temInfo') return handleTemInfo_(db, req);   // v3.33 — page publique d'un témoignage
 
     // ── Connexion (v3.7) : code → session par appareil, jeton renvoyé à l'app ──
     if (op === 'login') {
@@ -1064,6 +1091,45 @@ function doPost(e) {
         try { file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW); } catch (se) {}
         return out_({ ok: true, id: file.getId(), url: 'https://drive.google.com/file/d/' + file.getId() + '/preview' });
       } catch (ue) { return out_({ ok: false, error: String(ue && ue.message ? ue.message : ue) }); }
+    }
+    // ── v3.33 — témoignages extérieurs au réseau (groupes WhatsApp, réseaux) : comité ≥ 2 avis + validation admin ──
+    else if (op === 'temExt') {
+      db.config.ressources = db.config.ressources || {}; var TX = db.config.ressources.temExt = db.config.ressources.temExt || [];
+      var it = req.item || {}, ix = -1; for (var ti = 0; ti < TX.length; ti++) if (TX[ti].id === it.id) ix = ti;
+      var cur = ix >= 0 ? TX[ix] : null, isAdmin = user.role === 'admin', isCom = estComite_(user);
+      var nbOk_ = function (x) { var o = {}; (x.avis || []).forEach(function (a) { if (a.avis === 'ok') o[a.userId || a.par] = 1; }); return Object.keys(o).length; };
+      if (req.action === 'save') {
+        if (!it.id || !/^tx_/.test(it.id)) return out_({ ok: false, error: 'id' });
+        if (cur && !(isAdmin || cur.creeParId === user.id)) return out_({ ok: false, error: 'forbidden' });
+        var nx = JSON.parse(JSON.stringify(it)); nx.titre = String(nx.titre || '').slice(0, 160); nx.texte = String(nx.texte || '').slice(0, 4000);
+        if (cur) { nx.avis = cur.avis || []; nx.envois = cur.envois || 0; nx.creePar = cur.creePar; nx.creeParId = cur.creeParId; nx.creeLe = cur.creeLe; if (!isAdmin) { nx.statut = cur.statut; nx.valideLe = cur.valideLe; nx.validePar = cur.validePar; } }
+        else { nx.avis = []; nx.envois = 0; nx.creePar = user.nom; nx.creeParId = user.id; nx.creeLe = now_(); if (!isAdmin) nx.statut = 'avalider'; }
+        if (nx.statut === 'diffusable' && nbOk_(nx) < 2) nx.statut = 'avalider';
+        if (nx.statut !== 'diffusable' && nx.statut !== 'interne') nx.statut = 'avalider';
+        if (cur) TX[ix] = nx; else TX.push(nx);
+        adminLog_(db, user.nom, cur ? 'témoignage extérieur modifié' : 'témoignage extérieur ajouté', nx.titre);
+      } else if (req.action === 'avis') {
+        if (!cur) return out_({ ok: false, error: 'introuvable' });
+        if (!(isAdmin || isCom)) return out_({ ok: false, error: 'forbidden' });
+        var av = String(req.avis || ((it.avis || []).filter(function (a) { return (a.userId || a.par) === user.id; })[0] || {}).avis || '');
+        if (av !== 'ok' && av !== 'non') return out_({ ok: false, error: 'avis' });
+        cur.avis = (cur.avis || []).filter(function (a) { return (a.userId || a.par) !== user.id; });
+        cur.avis.push({ userId: user.id, par: user.nom, avis: av, note: String(req.note || ((it.avis || []).filter(function (a) { return (a.userId || a.par) === user.id; })[0] || {}).note || '').slice(0, 200), le: now_() });
+        if (av === 'non' && cur.statut === 'diffusable') cur.statut = 'interne';
+        adminLog_(db, user.nom, 'avis comité témoignage', (av === 'ok' ? '👍 ' : '👎 ') + cur.titre);
+      } else if (req.action === 'statut') {
+        if (!cur) return out_({ ok: false, error: 'introuvable' });
+        if (!isAdmin) return out_({ ok: false, error: 'forbidden' });
+        var st = String(req.statut || ''); if (st === 'diffusable' && nbOk_(cur) < 2) return out_({ ok: false, error: 'comite' });
+        if (['avalider', 'diffusable', 'interne'].indexOf(st) < 0) return out_({ ok: false, error: 'statut' });
+        cur.statut = st; cur.valideLe = now_(); cur.validePar = user.nom; adminLog_(db, user.nom, 'statut témoignage extérieur', st + ' — ' + cur.titre);
+      } else if (req.action === 'envoi') {
+        if (!cur) return out_({ ok: false, error: 'introuvable' }); cur.envois = (cur.envois || 0) + 1;
+      } else if (req.action === 'delete') {
+        if (!cur) return out_({ ok: false, error: 'introuvable' });
+        if (!(isAdmin || cur.creeParId === user.id)) return out_({ ok: false, error: 'forbidden' });
+        TX.splice(ix, 1); adminLog_(db, user.nom, 'témoignage extérieur supprimé', cur.titre);
+      } else return out_({ ok: false, error: 'action' });
     }
     // ── v3.13 — mot de passe du compte OlyLife (coffre) ──
     else if (op === 'mdpSet' || op === 'mdpGet' || op === 'mdpPurge') {

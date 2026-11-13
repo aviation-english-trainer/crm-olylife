@@ -2085,6 +2085,18 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
         <button type="button" class="ob bsm" id="tem-audio-del" style="display:none;margin-top:8px;background:var(--rdp);color:var(--rd);border:none;min-height:40px" onclick="oTemAudioDel()">🗑 Supprimer l'audio</button>
       </div>
       <div class="ofg1"><label class="ofl" id="tem-txt-lbl">Texte du témoignage</label><textarea class="ofc" id="tem-txt" rows="6" placeholder="Avec ses mots, tel qu'il l'a dit ou écrit…" oninput="oTemConf()"></textarea><div id="tem-conf"></div></div>
+      <div class="ofg1"><label class="ofl">📷 Photos (avant / après, appareil en situation…)</label><div id="tem-photos" style="display:flex;flex-wrap:wrap;gap:8px"></div></div>
+      <div class="ofg1"><label class="ofl">🎯 Besoins concernés — pour retrouver ce témoignage en un clic</label><div id="tem-besoins-wrap"></div></div>
+    </div>
+    <div style="margin-top:14px;padding:12px;background:var(--navy3);border-radius:12px;border:1px solid var(--bd)">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px">✅ Vérifiabilité (témoignage réseau)</div>
+      <label class="ochk-row"><input type="checkbox" id="tem-verif"><span>Membre vérifiable : il accepte qu'un prospect puisse <b>vérifier son témoignage</b> (par l'intermédiaire de son conseiller)</span></label>
+      <div class="ofg2" style="gap:10px;margin-top:6px">
+        <div><label class="ofl">Accord recueilli</label><select class="ofc" id="tem-verif-mode"><option value="oral">À l'oral (appel / visio)</option><option value="ecrit">Par écrit (message / formulaire)</option></select></div>
+        <div><label class="ofl">Date de l'accord</label><input type="date" class="ofc" id="tem-verif-date"></div>
+      </div>
+      <label class="ochk-row" style="margin-top:6px"><input type="checkbox" id="tem-contact"><span>Mise en relation directe autorisée (le prospect peut lui écrire / l'appeler)</span></label>
+      <div style="font-size:11px;color:var(--t3);margin-top:6px">Sans mise en relation directe, la page du témoignage propose au prospect de <b>demander la vérification à son conseiller</b>, qui organise le contact. Les coordonnées ne sont jamais affichées sans cette case.</div>
     </div>
     <div style="margin-top:14px;padding:12px;background:var(--navy3);border-radius:12px;border:1px solid var(--bd)">
       <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:8px">🔐 Consentement</div>
@@ -2425,7 +2437,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.40.1 · 11/11';
+var APP_VERSION='v3.41 · 13/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -3306,6 +3318,8 @@ var MSG_DEFAULTS={};
     t:'Bonjour {prenom},\n\nComme convenu, voici votre proposition personnalisée : {appareilsOffre}.\n\n👉 {lienOffre}\n\nVous y trouverez le détail, un bouton « En savoir plus » pour chaque appareil, et le montant ({montantOffre}, frais OlyLife compris). Elle reste valable {validiteOffre} jours.\n\n💳 Paiement en plusieurs fois possible au moment de la commande (estimation Klarna) : {financementOffre} — ou PayPal.\n\nUn doute, une question ? Je suis là.{?lienRdv: Pour en parler de vive voix, choisissez un créneau : {lienRdv}}\n\n{moi}'};
   MSG_DEFAULTS.offre_relance={g:'Prospect',l:'Relance d\'une offre de commande (J+7)',vars:['prenom','montantOffre','jours','lienOffre','lienRdv','moi'],
     t:'Bonjour {prenom},\n\nJe reviens vers vous au sujet de la proposition que je vous ai envoyée il y a {jours} jours : {lienOffre}\n\nAvez-vous eu le temps d\'y jeter un œil ? Je suis disponible pour en parler.{?lienRdv: Un créneau ici : {lienRdv}}\n\nBelle journée,\n{moi}'};
+  MSG_DEFAULTS.temoignage_envoi={g:'Prospect',l:'Envoi d\'un témoignage (lien personnel)',vars:['prenom','temTitre','temOrigine','lienTemoignage','lienRdv','moi'],
+    t:'Bonjour {prenom},\n\nComme promis, voici un témoignage qui rejoint ce dont nous avons parlé : {temTitre}.\nIl vient {temOrigine}.\n\n👉 {lienTemoignage}\n\nC\'est une expérience personnelle, elle ne remplace pas un avis médical — mais je trouvais utile de vous la partager. Je reste à votre disposition pour en parler.{?lienRdv: Un créneau ici : {lienRdv}}\n\nBelle journée,\n{moi}'};
   // v3.30 — invitation Zoom (salle personnelle du gestionnaire, tous canaux)
   MSG_DEFAULTS.zoom_invitation={g:'Rendez-vous',l:'Invitation à une visio Zoom (lien personnel)',vars:['prenom','quand','lienZoom','moi','telMoi'],
     t:'Bonjour {prenom} 🌿\n\nComme convenu, voici le lien de notre visio Zoom{?quand: — {quand}} :\n{lienZoom}\n\nUn clic suffit (l\'application Zoom s\'ouvre, ou le navigateur). Pensez à activer micro et caméra 🙂 Si besoin, je reste joignable{?telMoi: au {telMoi}}.\n\nÀ tout de suite !\n{moi} — Water Life High Tech'};
@@ -7008,7 +7022,7 @@ function oProtoGrille(){
 }
 
 // ── Témoignages ───────────────────────────────────────────────────
-var TEM_F={type:'',app:'',theme:'',statut:''},TEM_REC=null,TEM_CHUNKS=[],TEM_TIMER=null;
+var TEM_F={type:'',app:'',theme:'',statut:'',besoin:'',orig:'reseau'},TEM_REC=null,TEM_CHUNKS=[],TEM_TIMER=null;
 function temAll(){var out=[];OC.forEach(function(c){(c.temoignages||[]).forEach(function(t){out.push({c:c,t:t});});});out.sort(function(a,b){return(a.t.date||'')<(b.t.date||'')?1:-1;});return out;}
 function temIcon(t){return t==='audio'?'🎙':t==='video'?'🎬':'✍️';}
 function temNom(c,t){var m=t.affich||'prenom';if(m==='anonyme')return'Membre OlyLife';if(m==='initiales')return((c.prenom||'').charAt(0)+'. '+(c.nom||'').charAt(0)+'.').toUpperCase();return(c.prenom||c.nom||'')+(c.ville?' ('+c.ville+')':'');}
@@ -7025,16 +7039,31 @@ function temEmbed(t){
 }
 function oTemView(){
   var all=temAll(),box=document.getElementById('tem-list');if(!box)return;
+  var ext=temExtList(),orig=TEM_F.orig||'reseau';
+  var seg='<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;width:100%;margin-bottom:4px"><div class="av-seg" style="margin:0"><button type="button" class="'+(orig==='reseau'?'on':'')+'" onclick="TEM_F.orig=\'reseau\';oTemView()">🌿 Réseau ('+all.length+')</button><button type="button" class="'+(orig==='externe'?'on':'')+'" onclick="TEM_F.orig=\'externe\';oTemView()">🌍 Extérieurs ('+ext.length+')</button></div><button type="button" class="ob bgh bsm" style="margin-left:auto" onclick="oTemxOpen()">➕ Témoignage extérieur</button></div>';
+  if(orig==='externe'){
+    var dif=ext.filter(temExtDiffusable).length,att=ext.filter(function(x){return x.statut==='avalider';}).length;
+    document.getElementById('tem-kpi').innerHTML='<div><b>'+ext.length+'</b><small>extérieurs</small></div><div><b>'+dif+'</b><small>diffusables</small></div><div><b>'+att+'</b><small>en attente comité</small></div><div><b>'+ext.filter(function(x){return x.statut==='interne';}).length+'</b><small>internes</small></div>';
+    document.getElementById('tem-filters').innerHTML=seg+'<select class="ofc" style="width:auto;min-height:36px;padding:6px 28px 6px 10px;font-size:12px" onchange="TEM_F.besoin=this.value;oTemView()"><option value="">Tous besoins</option>'+BESOINS.map(function(b){return'<option'+(TEM_F.besoin===b?' selected':'')+'>'+esc(b)+'</option>';}).join('')+'</select><select class="ofc" style="width:auto;min-height:36px;padding:6px 28px 6px 10px;font-size:12px" onchange="TEM_F.app=this.value;oTemView()"><option value="">Tous appareils</option>'+PRODUCTS.map(function(p){return'<option value="'+esc(p)+'"'+(TEM_F.app===p?' selected':'')+'>'+esc(p.split('(')[0].trim())+'</option>';}).join('')+'</select>';
+    var lx=ext.filter(function(x){return(!TEM_F.besoin||(x.besoins||[]).indexOf(TEM_F.besoin)>=0)&&(!TEM_F.app||x.appareil===TEM_F.app);}).sort(function(a,b){return(a.creeLe||'')<(b.creeLe||'')?1:-1;});
+    if(!lx.length){box.innerHTML='<div class="rs-empty" style="grid-column:1/-1">🌍 Aucun témoignage extérieur'+(ext.length?' pour ces filtres':'')+'.<br>Un témoignage vu dans un groupe WhatsApp ou sur les réseaux peut être ajouté ici : il sera soumis au <b>comité scientifique (2 avis favorables)</b> puis validé par l\'administrateur avant tout envoi à un prospect.</div>';return;}
+    box.innerHTML=lx.map(function(x){var nb=temOkComite(x),st=temExtDiffusable(x)?'<span class="obdg bgr">✅ diffusable</span>':x.statut==='interne'?'<span class="obdg bgy">🔒 interne</span>':'<span class="obdg bor">⏳ comité '+nb+'/2</span>';var ph=(x.photos||[])[0];
+      return'<div class="rs-card" onclick="oTemxOpen(\''+x.id+'\')"><div class="rs-hd"><div class="rs-ic">'+(ph?'<img src="'+esc(drivePhotoUrl(ph))+'" alt="">':'🌍')+'</div><div style="min-width:0"><div class="rs-t">'+esc(x.titre||'')+'</div><div class="rs-s">'+esc((x.appareil||'').split('(')[0].trim())+' · '+esc(x.source||'')+(x.pays?' · '+esc(x.pays):'')+' · '+fD(x.date)+'</div></div></div>'
+        +(x.texte?'<div class="rs-x">« '+esc(x.texte)+' »</div>':'<div class="rs-x" style="color:var(--t3)">'+((x.photos||[]).length?(x.photos.length+' photo'+(x.photos.length>1?'s':'')):x.video?'Vidéo':x.audio?'Audio':'')+'</div>')
+        +'<div class="rs-ft">'+st+((x.besoins||[]).length?'<span class="obdg baq">'+esc(x.besoins[0])+(x.besoins.length>1?' +'+(x.besoins.length-1):'')+'</span>':'')+(confCheck(x.texte).length?'<span class="obdg brd">⚠️ vocabulaire</span>':'')+'</div></div>';}).join('');
+    return;
+  }
   var pub=all.filter(function(x){return temPublishable(x.t);}).length,av=all.filter(function(x){return x.t.statut==='avalider';}).length;
   document.getElementById('tem-kpi').innerHTML='<div><b>'+all.length+'</b><small>témoignages</small></div><div><b>'+pub+'</b><small>publiés</small></div><div><b>'+av+'</b><small>à valider</small></div><div><b>'+all.filter(function(x){return x.t.type==='video';}).length+'</b><small>vidéos</small></div>';
   var chips=function(key,opts,lbl){return'<select class="ofc" style="width:auto;min-height:36px;padding:6px 28px 6px 10px;font-size:12px" onchange="TEM_F.'+key+'=this.value;oTemView()"><option value="">'+lbl+'</option>'+opts.map(function(o){return'<option value="'+esc(o[0])+'"'+(TEM_F[key]===o[0]?' selected':'')+'>'+esc(o[1])+'</option>';}).join('')+'</select>';};
-  document.getElementById('tem-filters').innerHTML=chips('type',[['ecrit','✍️ Écrits'],['audio','🎙 Audio'],['video','🎬 Vidéos']],'Tous types')+chips('app',PRODUCTS.map(function(p){return[p,p.split('(')[0].trim()];}),'Tous appareils')+chips('theme',THEMES.map(function(t){return[t,t];}),'Tous thèmes')+chips('statut',[['publie','Publiés'],['avalider','À valider'],['brouillon','Brouillons']],'Tous statuts');
-  var list=all.filter(function(x){var t=x.t;return(!TEM_F.type||t.type===TEM_F.type)&&(!TEM_F.app||t.appareil===TEM_F.app)&&(!TEM_F.theme||t.theme===TEM_F.theme)&&(!TEM_F.statut||t.statut===TEM_F.statut);});
+  document.getElementById('tem-filters').innerHTML=seg+chips('type',[['ecrit','✍️ Écrits'],['audio','🎙 Audio'],['video','🎬 Vidéos']],'Tous types')+chips('besoin',BESOINS.map(function(b){return[b,b];}),'Tous besoins')+chips('app',PRODUCTS.map(function(p){return[p,p.split('(')[0].trim()];}),'Tous appareils')+chips('theme',THEMES.map(function(t){return[t,t];}),'Tous thèmes')+chips('statut',[['publie','Publiés'],['avalider','À valider'],['brouillon','Brouillons']],'Tous statuts');
+  var list=all.filter(function(x){var t=x.t;return(!TEM_F.type||t.type===TEM_F.type)&&(!TEM_F.app||t.appareil===TEM_F.app)&&(!TEM_F.theme||t.theme===TEM_F.theme)&&(!TEM_F.statut||t.statut===TEM_F.statut)&&(!TEM_F.besoin||(t.besoins||[]).indexOf(TEM_F.besoin)>=0);});
   if(!list.length){box.innerHTML='<div class="rs-empty" style="grid-column:1/-1">🎙 Aucun témoignage'+(all.length?' pour ces filtres':' pour l\'instant')+'.<br>Depuis la fiche d\'un client : bloc <b>Accompagnement → ➕ Témoignage</b> (écrit, audio enregistré dans l\'app, ou lien vidéo YouTube).</div>';return;}
   box.innerHTML=list.map(function(x){var c=x.c,t=x.t;var st=t.statut==='publie'?(temPublishable(t)?'<span class="obdg bgr">✅ publié</span>':'<span class="obdg bor">⚠️ publié sans consentement complet</span>'):t.statut==='avalider'?'<span class="obdg bor">⏳ à valider</span>':'<span class="obdg bgy">brouillon</span>';
-    return'<div class="rs-card" onclick="oTemOpen(\''+c.id+'\',\''+t.id+'\')"><div class="rs-hd"><div class="rs-ic">'+(c.photo&&t.visage?'<img src="'+c.photo+'" alt="">':temIcon(t.type))+'</div><div style="min-width:0"><div class="rs-t">'+esc(temNom(c,t))+'</div><div class="rs-s">'+temIcon(t.type)+' '+esc((t.appareil||'').split('(')[0].trim())+(t.theme?' · '+esc(t.theme):'')+' · '+fD(t.date)+'</div></div></div>'
+    var ph0=(t.photos||[])[0];
+    return'<div class="rs-card" onclick="oTemOpen(\''+c.id+'\',\''+t.id+'\')"><div class="rs-hd"><div class="rs-ic">'+(ph0?'<img src="'+esc(drivePhotoUrl(ph0))+'" alt="">':c.photo&&t.visage?'<img src="'+c.photo+'" alt="">':temIcon(t.type))+'</div><div style="min-width:0"><div class="rs-t">'+esc(temNom(c,t))+'</div><div class="rs-s">'+temIcon(t.type)+' '+esc((t.appareil||'').split('(')[0].trim())+(t.theme?' · '+esc(t.theme):'')+' · '+fD(t.date)+'</div></div></div>'
       +(t.texte?'<div class="rs-x">« '+esc(t.texte)+' »</div>':'<div class="rs-x" style="color:var(--t3)">'+(t.type==='video'?'Vidéo':'Audio')+(t.url?' disponible':' — média manquant')+'</div>')
-      +'<div class="rs-ft">'+st+(confCheck(t.texte).length?'<span class="obdg brd">⚠️ vocabulaire à revoir</span>':'')+'</div></div>';}).join('');
+      +'<div class="rs-ft">'+st+(t.verif?'<span class="obdg baq">✅ vérifiable'+(t.contactDirect?' · contact direct':'')+'</span>':'')+((t.photos||[]).length?'<span class="obdg bgy">📷 '+t.photos.length+'</span>':'')+(t.envois?'<span class="obdg bgy">📨 '+t.envois+'</span>':'')+(confCheck(t.texte).length?'<span class="obdg brd">⚠️ vocabulaire à revoir</span>':'')+'</div></div>';}).join('');
 }
 function oTemType(t){document.getElementById('tem-types').querySelectorAll('button').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-t')===t);});document.getElementById('tem-video-wrap').style.display=t==='video'?'':'none';document.getElementById('tem-audio-wrap').style.display=t==='audio'?'':'none';document.getElementById('tem-txt-lbl').textContent=t==='ecrit'?'Texte du témoignage':'Transcription / résumé (facultatif mais recommandé)';}
 function temType(){var b=document.querySelector('#tem-types button.on');return b?b.getAttribute('data-t'):'ecrit';}
@@ -7055,6 +7084,9 @@ function oTemOpen(cid,tid){
   document.getElementById('tem-consent-date').value=t?(t.consentDate||''):'';document.getElementById('tem-visage').checked=!!(t&&t.visage);
   document.getElementById('tem-statut').value=t?(t.statut||'brouillon'):'brouillon';
   document.getElementById('tem-statut').querySelector('[value=publie]').disabled=!can('temoignagesPublier');
+  TEM_PH['tem-photos']=(t&&t.photos?t.photos.slice():[]);temPhotosRender('tem-photos');
+  document.getElementById('tem-besoins-wrap').innerHTML=besoinsChips('tem-besoins',t?t.besoins:[]);
+  document.getElementById('tem-verif').checked=!!(t&&t.verif);document.getElementById('tem-verif-mode').value=t&&t.verifMode?t.verifMode:'oral';document.getElementById('tem-verif-date').value=t?(t.verifLe||''):'';document.getElementById('tem-contact').checked=!!(t&&t.contactDirect);
   document.getElementById('tem-del').style.display=t?'':'none';
   document.getElementById('tem-audio-prev').innerHTML=t&&t.type==='audio'&&t.url?temEmbed(t):'';
   TEM_DEL_URL='';document.getElementById('tem-audio-del').style.display=(t&&t.type==='audio'&&t.url)?'':'none';document.getElementById('tem-rec').textContent=(t&&t.type==='audio'&&t.url)?'🎙 Réenregistrer':'🎙 Démarrer l\'enregistrement';
@@ -7074,7 +7106,7 @@ function oTemAudioDel(){
 function oTemSave(){
   var cid=val('tem-cid'),c=OC.find(function(x){return x.id===cid;});if(!c)return;
   var type=temType(),txt=val('tem-txt').trim(),url=type==='video'?val('tem-video').trim():val('tem-url');
-  if(type==='ecrit'&&!txt){oT('Saisissez le texte du témoignage','e');return;}
+  if(type==='ecrit'&&!txt&&!(TEM_PH['tem-photos']||[]).length){oT('Saisissez le texte du témoignage (ou ajoutez au moins une photo)','e');return;}
   if(type==='video'&&!url){oT('Indiquez le lien de la vidéo','e');return;}
   if(type==='audio'&&!url){oT('Enregistrez l\'audio (ou passez en témoignage écrit)','e');return;}
   var statut=val('tem-statut'),consent=document.getElementById('tem-consent').checked;
@@ -7085,6 +7117,8 @@ function oTemSave(){
   if(!t){t={id:'tm_'+Date.now().toString(36),creePar:PARTNER_NOM()};c.temoignages.push(t);}
   t.type=type;t.appareil=val('tem-app');t.theme=val('tem-theme');t.date=val('tem-date')||todayYMD();t.texte=txt;t.url=url;t.media=type==='audio'?(val('tem-media')||'drive'):(type==='video'?'lien':'');
   t.consent=consent;t.affich=val('tem-affich');t.consentDate=consent?(val('tem-consent-date')||todayYMD()):'';t.visage=document.getElementById('tem-visage').checked;t.statut=statut;t.majLe=todayYMD();t.majPar=PARTNER_NOM();
+  t.photos=(TEM_PH['tem-photos']||[]).slice();t.besoins=besoinsRead('tem-besoins');t.verif=document.getElementById('tem-verif').checked;t.verifMode=val('tem-verif-mode');t.verifLe=t.verif?(val('tem-verif-date')||todayYMD()):'';t.contactDirect=t.verif&&document.getElementById('tem-contact').checked;
+  if(t.photos.length&&!t.visage&&statut==='publie'&&!confirm('Des photos sont jointes sans autorisation d\'image cochée. Publier quand même (photos sans visage identifiable uniquement) ?')){statut='avalider';t.statut=statut;}
   if(type==='ecrit'&&txt&&!c.temoignageTexte){c.temoignageTexte=txt;c.temoignageAutorise=consent;}
   jrnAdd(c,'note',temIcon(type)+' Témoignage '+(isNew?'recueilli':'mis à jour')+(t.appareil?' — '+t.appareil.split('(')[0].trim():'')+' · '+(statut==='publie'?'publié':statut==='avalider'?'à valider':'brouillon')+(consent?' · consentement OK':' · sans consentement'));
   oPush([c]);oTemClose();oOpenF(cid);emojiBurst(['🎙','💚','✨','🌿']);oT('🎙 Témoignage enregistré','s');
@@ -7117,6 +7151,96 @@ function oTemRec(){
 function temShareText(c,t){return'🌿 Témoignage'+(t.appareil?' — '+t.appareil.split('(')[0].trim():'')+'\n'+temNom(c,t)+(t.date?' · '+fD(t.date):'')+'\n\n'+(t.texte?'« '+t.texte+' »':'')+(t.url?'\n▶️ '+t.url:'')+'\n\nExpérience personnelle partagée avec son accord — elle ne remplace pas un avis médical. Les appareils OlyLife ne sont pas des dispositifs médicaux.';}
 function oTemShare(cid,tid){var c=OC.find(function(x){return x.id===cid;});var t=c&&(c.temoignages||[]).find(function(x){return x.id===tid;});if(!t)return;if(!temPublishable(t)){oT('Témoignage non publiable (statut ou consentement)','w');return;}var txt=temShareText(c,t);navigator.clipboard&&navigator.clipboard.writeText(txt);window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');}
 function temSimilaires(c){var apps=(c.produits||[]).map(function(a){return a.split('(')[0].trim().toLowerCase();});return temAll().filter(function(x){return x.c.id!==c.id&&temPublishable(x.t)&&(!apps.length||apps.indexOf((x.t.appareil||'').split('(')[0].trim().toLowerCase())>=0);});}
+// ═══ v3.41 — Témoignages : photos, besoins, vérifiabilité, témoignages extérieurs (validation comité ≥ 2), envoi en un clic ═══
+var BESOINS=['Sommeil & récupération','Énergie au quotidien','Pieds & jambes','Dos & posture','Yeux & écrans','Détente & stress','Confort articulaire & musculaire','Circulation ressentie','Peau & visage','Récupération sportive','Air & respiration','Hydratation'];
+function temExtList(){CFG.ressources=CFG.ressources||{};CFG.ressources.temExt=CFG.ressources.temExt||[];return CFG.ressources.temExt;}
+function temExtById(id){return temExtList().find(function(x){return x.id===id;})||null;}
+function drivePhotoUrl(ph){var id=(ph&&ph.id)||'';if(!id&&ph&&ph.url){var m=String(ph.url).match(/\/d\/([^\/]+)/);if(m)id=m[1];}return id?'https://drive.google.com/thumbnail?id='+id+'&sz=w1600':(ph&&ph.url)||'';}
+function temOkComite(x){var ok={};(x.avis||[]).forEach(function(a){if(a.avis==='ok')ok[a.userId||a.par]=1;});return Object.keys(ok).length;}
+function temExtDiffusable(x){return x.statut==='diffusable'&&temOkComite(x)>=2;}
+function estComiteUser(){return ROLE()==='comite'||!!(USER&&USER.comite);}
+// ── photos : redimension + envoi Drive (réutilisé réseau / extérieur) ──
+var TEM_PH={};   // id de liste → tableau de {id,url,name}
+function temPhotosRender(listId){var box=document.getElementById(listId);if(!box)return;var l=TEM_PH[listId]||[];box.innerHTML=l.map(function(p,i){return'<div style="position:relative;width:86px;height:86px;border-radius:10px;overflow:hidden;border:1px solid var(--bd);background:#F3F8F4"><img src="'+esc(drivePhotoUrl(p))+'" alt="" style="width:100%;height:100%;object-fit:cover"><button type="button" onclick="TEM_PH[\''+listId+'\'].splice('+i+',1);temPhotosRender(\''+listId+'\')" style="position:absolute;top:2px;right:2px;border:none;background:rgba(0,0,0,.55);color:#fff;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:12px">✕</button></div>';}).join('')+(l.length<8?'<label style="width:86px;height:86px;border-radius:10px;border:1.5px dashed var(--g);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--g);font-size:26px;background:#fff" title="Ajouter des photos">＋<input type="file" accept="image/*" multiple capture="environment" style="display:none" onchange="temPhotosAdd(this,\''+listId+'\')"></label>':'')+'<div id="'+listId+'-st" style="font-size:11.5px;color:var(--t3);width:100%"></div>';}
+function temPhotosAdd(input,listId){
+  var files=Array.prototype.slice.call(input.files||[]);if(!files.length)return;TEM_PH[listId]=TEM_PH[listId]||[];var st=function(t){var e=document.getElementById(listId+'-st');if(e)e.textContent=t;};
+  var i=0;(function next(){if(i>=files.length){st('');temPhotosRender(listId);return;}var f=files[i++];st('📤 Envoi de la photo '+i+' / '+files.length+'…');
+    var img=new Image(),rd=new FileReader();rd.onload=function(){img.onload=function(){var max=1400,w=img.width,h=img.height,k=Math.min(1,max/Math.max(w,h));var cv=document.createElement('canvas');cv.width=Math.round(w*k);cv.height=Math.round(h*k);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);var data=cv.toDataURL('image/jpeg',0.82).split(',')[1];
+      oPostAsync_({op:'uploadMedia',data:data,mime:'image/jpeg',name:'temoignage_'+Date.now()+'_'+i+'.jpg'}).then(function(d){if(d&&d.ok){TEM_PH[listId].push({id:d.id,url:d.url,name:f.name});temPhotosRender(listId);}else oT('Photo non envoyée ('+(d&&d.error||'réseau')+')','e');next();}).catch(function(){oT('Photo non envoyée (réseau)','e');next();});};img.src=rd.result;};rd.readAsDataURL(f);})();
+}
+function besoinsChips(id,sel){sel=sel||[];return'<div id="'+id+'" style="display:flex;flex-wrap:wrap;gap:6px">'+BESOINS.map(function(b){return'<button type="button" class="ob bsm '+(sel.indexOf(b)>=0?'bgr':'bgh')+'" data-b="'+esc(b)+'" onclick="this.classList.toggle(\'bgr\');this.classList.toggle(\'bgh\')">'+esc(b)+'</button>';}).join('')+'</div>';}
+function besoinsRead(id){return Array.prototype.slice.call(document.querySelectorAll('#'+id+' button.bgr')).map(function(b){return b.getAttribute('data-b');});}
+// ── Témoignage extérieur : fiche d'édition ──
+function oTemxOpen(id){
+  if(srvNum()<3033){oT('🌍 Témoignages extérieurs : script Google v3.33 requis (Administration → Script serveur)','w');return;}
+  var x=id?temExtById(id):null;var mine=!x||x.creeParId===(USER&&USER.id)||ROLE()==='admin';
+  var old=document.getElementById('otemx');if(old)old.remove();
+  var m=document.createElement('div');m.id='otemx';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center';m.onclick=function(e){if(e.target===m)m.remove();};
+  TEM_PH['tx-photos']=(x&&x.photos?x.photos.slice():[]);
+  var nbOk=x?temOkComite(x):0,avisHtml=x?(x.avis||[]).map(function(a){return'<div style="font-size:12.5px;padding:4px 0;border-bottom:1px solid var(--bd)">'+(a.avis==='ok'?'👍':'👎')+' <b>'+esc(a.par)+'</b> · '+fWhen(a.le)+(a.note?' — '+esc(a.note):'')+'</div>';}).join(''):'';
+  var st=x?x.statut:'avalider';
+  m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:600px;max-height:92vh;overflow:auto">'
+    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">🌍 Témoignage extérieur au réseau</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'otemx\').remove()">✕</button></div>'
+    +'<div style="font-size:12px;color:var(--t2);margin:6px 0 10px;line-height:1.5">Témoignage récupéré hors de notre réseau (groupe WhatsApp, réseaux sociaux). Il ne pourra être envoyé à un prospect qu\'après <b>l\'avis favorable d\'au moins deux membres du comité scientifique</b> et la validation de l\'administrateur ; sinon il reste <b>interne</b> (équipe et comité seulement).</div>'
+    +'<label class="ofl">Titre court *</label><input class="ofc" id="tx-titre" placeholder="Ex. : Confort des pieds après 10 jours — témoignage reçu d\'Italie" value="'+esc(x?x.titre:'')+'">'
+    +'<div class="ofg2" style="gap:8px;margin-top:8px"><div><label class="ofl">Appareil</label><select class="ofc" id="tx-app">'+PRODUCTS.map(function(p){return'<option'+(x&&x.appareil===p?' selected':'')+'>'+esc(p)+'</option>';}).join('')+'</select></div><div><label class="ofl">Thème</label><select class="ofc" id="tx-theme">'+THEMES.map(function(t){return'<option'+(x&&x.theme===t?' selected':'')+'>'+esc(t)+'</option>';}).join('')+'</select></div></div>'
+    +'<label class="ofl" style="margin-top:8px">Besoins concernés (pour retrouver le témoignage)</label>'+besoinsChips('tx-besoins',x?x.besoins:[])
+    +'<label class="ofl" style="margin-top:10px">Photos</label><div id="tx-photos" style="display:flex;flex-wrap:wrap;gap:8px"></div>'
+    +'<div class="ofg2" style="gap:8px;margin-top:8px"><div><label class="ofl">Vidéo (YouTube non répertorié / Drive)</label><input class="ofc" id="tx-video" placeholder="https://…" value="'+esc(x?x.video||'':'')+'"></div><div><label class="ofl">Audio (lien Drive)</label><input class="ofc" id="tx-audio" placeholder="https://drive.google.com/…" value="'+esc(x?x.audio||'':'')+'"></div></div>'
+    +'<label class="ofl" style="margin-top:8px">Texte du témoignage (tel que reçu, ou traduit)</label><textarea class="ofc" id="tx-txt" style="min-height:90px" oninput="document.getElementById(\'tx-conf\').innerHTML=this.value.trim()?confHtml(this.value):\'\'">'+esc(x?x.texte||'':'')+'</textarea><div id="tx-conf"></div>'
+    +'<div style="margin-top:10px;padding:10px 12px;border-radius:12px;background:#F3F8F4;border:1px solid var(--bd)"><b style="font-size:12.5px">Origine</b><div class="ofg2" style="gap:8px;margin-top:6px"><div><label class="ofl">Source (groupe, page…) *</label><input class="ofc" id="tx-src" placeholder="Groupe WhatsApp « … »" value="'+esc(x?x.source||'':'')+'"></div><div><label class="ofl">Auteur tel qu\'il se présente</label><input class="ofc" id="tx-auteur" placeholder="Prénom, pseudo, « ami italien »…" value="'+esc(x?x.auteur||'':'')+'"></div><div><label class="ofl">Pays</label><input class="ofc" id="tx-pays" value="'+esc(x?x.pays||'':'')+'"></div><div><label class="ofl">Date de réception</label><input type="date" class="ofc" id="tx-date" value="'+esc(x?x.date||todayYMD():todayYMD())+'"></div></div><div style="font-size:11.5px;color:var(--t3);margin-top:6px">Le destinataire verra toujours : « témoignage partagé publiquement par un utilisateur extérieur à notre réseau, que nous n\'avons pas pu vérifier ».</div></div>'
+    +(x?'<div style="margin-top:10px;padding:10px 12px;border-radius:12px;background:#FFF8E6;border:1px solid #E8C25A"><b style="font-size:12.5px">🧪 Comité scientifique — '+nbOk+' avis favorable'+(nbOk>1?'s':'')+' / 2 requis</b>'+avisHtml+(estComiteUser()||ROLE()==='admin'?'<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><input class="ofc" id="tx-avis-note" placeholder="Remarque (facultatif)" style="flex:1;min-width:160px"><button type="button" class="ob bgr bsm" onclick="oTemxAvis(\''+x.id+'\',\'ok\')">👍 Diffusable</button><button type="button" class="ob bor bsm" onclick="oTemxAvis(\''+x.id+'\',\'non\')">👎 Interne seulement</button></div>':'')+'</div>':'')
+    +'<div class="ofg2" style="gap:8px;margin-top:10px"><div><label class="ofl">Statut</label><select class="ofc" id="tx-statut"'+(ROLE()==='admin'?'':' disabled')+'><option value="avalider"'+(st==='avalider'?' selected':'')+'>⏳ À valider</option><option value="diffusable"'+(st==='diffusable'?' selected':'')+(nbOk<2?' disabled':'')+'>✅ Diffusable aux prospects'+(nbOk<2?' (2 avis comité requis)':'')+'</option><option value="interne"'+(st==='interne'?' selected':'')+'>🔒 Interne seulement</option></select></div><div><label class="ofl">Langue</label><select class="ofc" id="tx-langue"><option'+(x&&x.langue==='fr'?' selected':'')+' value="fr">Français</option><option value="it"'+(x&&x.langue==='it'?' selected':'')+'>Italien</option><option value="en"'+(x&&x.langue==='en'?' selected':'')+'>Anglais</option><option value="autre"'+(x&&x.langue==='autre'?' selected':'')+'>Autre</option></select></div></div>'
+    +(x?'<div style="font-size:11.5px;color:var(--t3);margin-top:6px">Ajouté par '+esc(x.creePar||'')+' le '+fD((x.creeLe||'').slice(0,10))+(x.validePar?' · statut par '+esc(x.validePar)+' le '+fD((x.valideLe||'').slice(0,10)):'')+' · envoyé '+(x.envois||0)+' fois</div>':'')
+    +'<div style="display:flex;gap:8px;margin-top:14px">'+(mine?'<button type="button" class="ob bgold" style="flex:1;min-height:46px" onclick="oTemxSave(\''+(x?x.id:'')+'\')">💾 Enregistrer</button>':'')+(x&&ROLE()==='admin'?'<button type="button" class="ob bgh" style="min-height:46px" onclick="oTemxDel(\''+x.id+'\')">🗑</button>':'')+'</div></div>';
+  document.body.appendChild(m);temPhotosRender('tx-photos');if(x&&x.texte)document.getElementById('tx-conf').innerHTML=confHtml(x.texte);
+}
+function oTemxSave(id){
+  var titre=(val('tx-titre')||'').trim(),src=(val('tx-src')||'').trim();if(!titre||!src){oT('Titre et source sont obligatoires','e');return;}
+  var x=id?temExtById(id):null,isNew=!x;if(!x){x={id:'tx_'+Date.now().toString(36),creeLe:new Date().toISOString(),creePar:PARTNER_NOM(),creeParId:USER&&USER.id,avis:[],envois:0,statut:'avalider'};temExtList().push(x);}
+  x.titre=titre;x.appareil=val('tx-app');x.theme=val('tx-theme');x.besoins=besoinsRead('tx-besoins');x.photos=(TEM_PH['tx-photos']||[]).slice();x.video=(val('tx-video')||'').trim();x.audio=(val('tx-audio')||'').trim();x.texte=(val('tx-txt')||'').trim();x.source=src;x.auteur=(val('tx-auteur')||'').trim();x.pays=(val('tx-pays')||'').trim();x.date=val('tx-date')||todayYMD();x.langue=val('tx-langue')||'fr';x.majLe=new Date().toISOString();x.majPar=PARTNER_NOM();
+  if(!x.photos.length&&!x.video&&!x.audio&&!x.texte){oT('Ajoutez au moins une photo, une vidéo, un audio ou un texte','e');return;}
+  if(ROLE()==='admin'){var st=val('tx-statut');if(st==='diffusable'&&temOkComite(x)<2){oT('Deux avis favorables du comité sont requis — resté « à valider »','w');st='avalider';}if(st!==x.statut){x.statut=st;x.valideLe=new Date().toISOString();x.validePar=PARTNER_NOM();}}
+  if(x.statut==='diffusable'&&confCheck(x.texte).length){oT('Vocabulaire sensible dans le texte : témoignage passé « interne » — reformulez en ressenti personnel','w');x.statut='interne';}
+  oPost_({op:'temExt',action:'save',item:x});oSaveCache();var m=document.getElementById('otemx');if(m)m.remove();oTemView();oT(isNew?'🌍 Témoignage extérieur ajouté — en attente du comité':'💾 Témoignage mis à jour','s');
+}
+function oTemxAvis(id,avis){var x=temExtById(id);if(!x)return;x.avis=(x.avis||[]).filter(function(a){return(a.userId||a.par)!==(USER&&USER.id);});x.avis.push({userId:USER&&USER.id,par:PARTNER_NOM(),avis:avis,note:(val('tx-avis-note')||'').trim().slice(0,200),le:new Date().toISOString()});if(avis==='non'&&x.statut==='diffusable')x.statut='interne';oPost_({op:'temExt',action:'avis',item:{id:id,avis:x.avis,statut:x.statut}});oSaveCache();oTemxOpen(id);oTemView();oT(avis==='ok'?'👍 Avis favorable enregistré':'👎 Avis enregistré : interne seulement','s');}
+function oTemxDel(id){if(!confirm('Supprimer ce témoignage extérieur ?'))return;CFG.ressources.temExt=temExtList().filter(function(x){return x.id!==id;});oPost_({op:'temExt',action:'delete',item:{id:id}});oSaveCache();var m=document.getElementById('otemx');if(m)m.remove();oTemView();}
+// ── Candidats à l'envoi : réseau publiable + extérieur diffusable ──
+function temCandidats(){
+  var out=[];temAll().forEach(function(x){if(temPublishable(x.t))out.push({key:x.t.id,orig:'reseau',c:x.c,t:x.t,titre:temNom(x.c,x.t)+(x.t.appareil?' — '+x.t.appareil.split('(')[0].trim():''),appareil:x.t.appareil,besoins:x.t.besoins||[],theme:x.t.theme,type:x.t.type,photos:x.t.photos||[],texte:x.t.texte,verif:!!x.t.verif,envois:x.t.envois||0});});
+  temExtList().forEach(function(x){if(temExtDiffusable(x))out.push({key:x.id,orig:'externe',x:x,titre:x.titre,appareil:x.appareil,besoins:x.besoins||[],theme:x.theme,type:x.photos&&x.photos.length?'photo':x.video?'video':x.audio?'audio':'ecrit',photos:x.photos||[],texte:x.texte,verif:false,envois:x.envois||0});});
+  return out;
+}
+function temUrl(key){return SITE_URL+'temoignage.html?t='+encodeURIComponent(key)+(USER&&USER.pubToken?'&r='+encodeURIComponent(USER.pubToken):'');}
+var TEM_SEND_F={besoin:'',app:''};
+function oTemSendOpen(cid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var old=document.getElementById('otemsend');if(old)old.remove();
+  var m=document.createElement('div');m.id='otemsend';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center';m.onclick=function(e){if(e.target===m)m.remove();};
+  var ints=interetsDe(c),devs=(c.produits||[]).map(function(p){return p.split('(')[0].trim().toLowerCase();});
+  var cand=temCandidats(),recus=(c.temRecus||[]).map(function(r){return r.tid;});
+  var list=cand.filter(function(k){return(!TEM_SEND_F.besoin||k.besoins.indexOf(TEM_SEND_F.besoin)>=0)&&(!TEM_SEND_F.app||k.appareil===TEM_SEND_F.app);});
+  list.sort(function(a,b){var sa=(a.orig==='reseau'?2:0)+(a.verif?1:0)+(ints.some(function(i){return(a.appareil||'').toLowerCase().indexOf(String(i).toLowerCase().split(' ')[0])>=0;})?1:0),sb=(b.orig==='reseau'?2:0)+(b.verif?1:0)+(ints.some(function(i){return(b.appareil||'').toLowerCase().indexOf(String(i).toLowerCase().split(' ')[0])>=0;})?1:0);return sb-sa;});
+  var rows=list.map(function(k){var deja=recus.indexOf(k.key)>=0;return'<div style="display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd)">'+(k.photos.length?'<img src="'+esc(drivePhotoUrl(k.photos[0]))+'" alt="" style="width:52px;height:52px;object-fit:cover;border-radius:10px;flex:0 0 auto">':'<div style="width:52px;height:52px;border-radius:10px;background:#F3F8F4;display:flex;align-items:center;justify-content:center;font-size:22px;flex:0 0 auto">'+temIcon(k.type)+'</div>')+'<div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600">'+esc(k.titre)+'</div><div style="font-size:11.5px;color:var(--t3)">'+(k.orig==='reseau'?'🌿 réseau'+(k.verif?' · ✅ vérifiable':''):'🌍 extérieur · non vérifié')+(k.besoins.length?' · '+esc(k.besoins.slice(0,2).join(', ')):'')+' · envoyé '+k.envois+' fois'+(deja?' · <b style="color:var(--rd)">déjà reçu</b>':'')+'</div></div><a class="ob bgh bsm" href="'+temUrl(k.key)+'" target="_blank" rel="noopener">👁</a><button type="button" class="ob bwa bsm" onclick="oTemSend(\''+c.id+'\',\''+k.key+'\')">📨</button></div>';}).join('');
+  m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:600px;max-height:92vh;overflow:auto"><div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">🎙 Envoyer un témoignage à '+esc(((c.prenom||'')+' '+(c.nom||'')).trim())+'</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'otemsend\').remove()">✕</button></div>'
+    +'<div style="font-size:12px;color:var(--t2);margin:6px 0 10px">Par '+esc(CANAL_LBL[canalCode(c)]||'WhatsApp')+', avec un lien personnel vers la page du témoignage. Classés : réseau vérifiable d\'abord'+(ints.length?', puis selon ses centres d\'intérêt ('+esc(ints.join(', '))+')':'')+'.</div>'
+    +'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px"><select class="ofc" style="width:auto;min-height:36px;padding:6px 28px 6px 10px;font-size:12px" onchange="TEM_SEND_F.besoin=this.value;oTemSendOpen(\''+c.id+'\')"><option value="">Tous besoins</option>'+BESOINS.map(function(b){return'<option'+(TEM_SEND_F.besoin===b?' selected':'')+'>'+esc(b)+'</option>';}).join('')+'</select><select class="ofc" style="width:auto;min-height:36px;padding:6px 28px 6px 10px;font-size:12px" onchange="TEM_SEND_F.app=this.value;oTemSendOpen(\''+c.id+'\')"><option value="">Tous appareils</option>'+PRODUCTS.map(function(p){return'<option value="'+esc(p)+'"'+(TEM_SEND_F.app===p?' selected':'')+'>'+esc(p.split('(')[0].trim())+'</option>';}).join('')+'</select></div>'
+    +(rows||'<div style="font-size:12.5px;color:var(--t2);padding:8px 0">Aucun témoignage diffusable'+(TEM_SEND_F.besoin||TEM_SEND_F.app?' pour ces filtres':'')+'. Un témoignage réseau doit être publié avec consentement ; un témoignage extérieur doit avoir deux avis favorables du comité et la validation admin.</div>')+'</div>';
+  document.body.appendChild(m);
+}
+function oTemSend(cid,key){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;var k=temCandidats().find(function(x){return x.key===key;});if(!k)return;
+  var v=tplVars(c,'fr');v.lienTemoignage=temUrl(key);v.temTitre=k.titre;v.temOrigine=k.orig==='reseau'?(k.verif?'d\'un membre de notre réseau, qui accepte que l\'on vérifie son expérience':'d\'un membre de notre réseau'):'d\'une personne extérieure à notre réseau (témoignage public, non vérifié)';
+  var text=renderTpl(tplText('temoignage_envoi'),v),canal=canalCode(c),num=String(c.tel||'').replace(/\D/g,'');
+  if(canal==='mail'&&!c.email)canal='wa';if((canal!=='mail')&&!num){if(c.email)canal='mail';else{sendCopy(text,'📋 Message copié (pas de téléphone ni d\'e-mail)');return;}}
+  sendVia(canal,num,text,c.email);
+  c.temRecus=c.temRecus||[];c.temRecus.push({tid:key,le:new Date().toISOString(),par:PARTNER_NOM(),canal:canal});
+  jrnAdd(c,'fait','🎙 Témoignage envoyé par '+(CANAL_LBL[canal]||canal)+' : '+k.titre+(k.orig==='reseau'?' (réseau'+(k.verif?', vérifiable':'')+')':' (extérieur, non vérifié)'));oPush([c]);
+  if(k.orig==='reseau'){k.t.envois=(k.t.envois||0)+1;oPush([k.c]);}else{k.x.envois=(k.x.envois||0)+1;oPost_({op:'temExt',action:'envoi',item:{id:k.x.id}});}
+  var m=document.getElementById('otemsend');if(m)m.remove();oOpenF(cid);
+}
+
 function oTemConsent(){
   var t='AUTORISATION DE TÉMOIGNAGE — Water Life High Tech / OlyLife\n\nJe soussigné(e) ………………………………, demeurant à ……………………………,\n\nautorise l\'association Water Life High Tech et ses distributeurs partenaires à recueillir et diffuser mon témoignage concernant mon expérience personnelle avec l\'appareil : ……………………………\n\nForme du témoignage : ☐ écrit ☐ audio ☐ vidéo\nAffichage : ☐ prénom + ville ☐ initiales ☐ anonyme\n☐ J\'autorise l\'utilisation de mon image (photo / vidéo où je suis reconnaissable)\nSupports : ☐ messages WhatsApp aux prospects ☐ site et réseaux sociaux WLHT ☐ formations internes\n\nJe comprends que mon témoignage relate un ressenti personnel, qu\'il ne constitue pas une allégation médicale, et que je peux retirer cette autorisation à tout moment par simple message à l\'association.\n\nFait à ……………………… le …… / …… / ……\nSignature :';
   navigator.clipboard&&navigator.clipboard.writeText(t).then(function(){oT('📝 Formulaire de consentement copié — à envoyer ou à faire signer (JotForm à venir)','s');});
@@ -7632,7 +7756,7 @@ function accHtml(c){
   var tems=c.temoignages||[];
   rows+=tems.map(function(t){return'<div class="acc-row"><span class="em">'+temIcon(t.type)+'</span><div class="b">'+(t.texte?'« '+esc(t.texte.length>120?t.texte.slice(0,120)+'…':t.texte)+' »':(t.type==='video'?'Vidéo':'Audio')+(t.url?'':' — média manquant'))+'<small>'+fD(t.date)+' · '+esc((t.appareil||'').split('(')[0].trim())+' · '+(t.statut==='publie'?(temPublishable(t)?'✅ publié':'⚠️ consentement incomplet'):t.statut==='avalider'?'⏳ à valider':'brouillon')+'</small></div><div class="acts"><button class="ob bgh bsm" onclick="oTemOpen(\''+c.id+'\',\''+t.id+'\')">✏️</button>'+(temPublishable(t)?'<button class="ob bwa bsm" onclick="oTemShare(\''+c.id+'\',\''+t.id+'\')">💬 Partager</button>':'')+'</div></div>';}).join('');
   var sim=temSimilaires(c);
-  rows+='<div class="acc-row"><span class="em">🎙</span><div class="b" style="color:var(--t3)">'+(tems.length?'':'Aucun témoignage recueilli pour l\'instant. ')+(sim.length?'<b style="color:var(--tx)">'+sim.length+' témoignage'+(sim.length>1?'s':'')+' publié'+(sim.length>1?'s':'')+'</b> d\'autres membres sur le même appareil — utile pour un prospect.':'')+'</div><div class="acts"><button class="ob bgh bsm" onclick="oTemOpen(\''+c.id+'\')">➕ Témoignage</button>'+(sim.length?'<button class="ob bgh bsm" onclick="TEM_F={type:\'\',app:\''+esc((c.produits||[])[0]||'')+'\',theme:\'\',statut:\'publie\'};oClose();oSw(\'temoignages\')">👀 Voir</button>':'')+'</div></div>';
+  rows+='<div class="acc-row"><span class="em">🎙</span><div class="b" style="color:var(--t3)">'+(tems.length?'':'Aucun témoignage recueilli pour l\'instant. ')+(sim.length?'<b style="color:var(--tx)">'+sim.length+' témoignage'+(sim.length>1?'s':'')+' publié'+(sim.length>1?'s':'')+'</b> d\'autres membres sur le même appareil — utile pour un prospect.':'')+'</div><div class="acts"><button class="ob bgh bsm" onclick="oTemOpen(\''+c.id+'\')">➕ Témoignage</button>'+(temCandidats().length?'<button class="ob bwa bsm" onclick="oTemSendOpen(\''+c.id+'\')">📨 Envoyer un témoignage'+((c.temRecus||[]).length?' ('+c.temRecus.length+')':'')+'</button>':'')+(sim.length?'<button class="ob bgh bsm" onclick="TEM_F={type:\'\',app:\''+esc((c.produits||[])[0]||'')+'\',theme:\'\',statut:\'publie\'};oClose();oSw(\'temoignages\')">👀 Voir</button>':'')+'</div></div>';
   return'<div class="od-section"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">🌿 Accompagnement — précautions · fiche conseils · témoignage</div><div class="od-bd">'+rows+'</div></div>';
 }
 

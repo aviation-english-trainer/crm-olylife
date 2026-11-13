@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Témoignage — OlyLife · Water Life High Tech</title>
+<link rel="icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--g:#126A3C;--g2:#0F3B22;--gold:#C9A84C;--bg:#F3F8F4;--bd:#D7E6DB;--tx:#20362A;--t2:#5A6E61;--t3:#7F9186;--rd:#C63E47;}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font-family:Outfit,system-ui,sans-serif;-webkit-text-size-adjust:100%}
+.hd{background:linear-gradient(160deg,#0F3B22,#1E6B3A);color:#fff;padding:22px 18px 34px;text-align:center}
+.hd img{width:54px;height:54px;border-radius:50%;background:#fff;padding:3px}
+.hd h1{font-family:'Cormorant Garamond',serif;font-size:27px;margin:8px 0 2px;font-weight:700;line-height:1.15}
+.hd p{margin:0;font-size:13px;opacity:.85}
+.wrap{max-width:640px;margin:-18px auto 40px;padding:0 14px}
+.card{background:#fff;border:1px solid var(--bd);border-radius:18px;padding:18px;margin-bottom:12px;box-shadow:0 6px 20px rgba(18,106,60,.06)}
+.tag{display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:4px 10px;margin:0 6px 6px 0;background:#EAF4EC;color:var(--g)}
+.tag.ok{background:#E6F6EC;color:#1B7A3E}.tag.ext{background:#FFF3E0;color:#B5651D}
+h2{font-family:'Cormorant Garamond',serif;font-size:22px;margin:0 0 10px;color:var(--g2)}
+.quote{font-size:16px;line-height:1.65;white-space:pre-wrap;border-left:3px solid var(--gold);padding:4px 0 4px 14px;color:#2B3F32;font-style:italic}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-top:10px}
+.gal img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;border:1px solid var(--bd);cursor:zoom-in;background:#EAF4EC}
+.media{position:relative;padding-top:56.25%;border-radius:12px;overflow:hidden;background:#000;margin-top:10px}
+.media.audio{padding-top:0;height:90px;background:#fff}
+.media iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.who{display:flex;gap:14px;align-items:center}
+.who img,.who .ini{width:56px;height:56px;border-radius:50%;object-fit:cover;flex:0 0 auto;background:#EAF4EC;color:var(--g);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px}
+.who b{font-size:15px}.who small{display:block;color:var(--t2);font-size:12.5px;line-height:1.5}
+.btn{display:block;width:100%;border:none;border-radius:14px;background:linear-gradient(120deg,#C9A84C,#B38F35);color:#1E2B10;font:inherit;font-weight:700;font-size:15px;padding:14px;cursor:pointer;text-align:center;text-decoration:none;margin-top:8px}
+.btn.g{background:var(--g);color:#fff}.btn.o{background:#fff;color:var(--g);border:1.5px solid var(--g)}
+.info{font-size:13px;line-height:1.6;color:var(--t2)}
+.disc{font-size:12px;color:var(--t3);line-height:1.6;text-align:center;margin-top:16px}
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;z-index:50;cursor:zoom-out}
+.lb img{max-width:96vw;max-height:92vh;border-radius:10px}
+.err{text-align:center;padding:40px 16px;color:var(--t2)}
+</style>
+</head>
+<body>
+<div class="hd"><img src="logo-wlht.png" alt=""><h1 id="h1">Témoignage</h1><p id="sub">Expérience personnelle partagée avec son accord · OlyLife × Water Life High Tech</p></div>
+<div class="wrap" id="app"><div class="err">Chargement…</div></div>
+<div class="lb" id="lb" onclick="this.style.display='none'"><img id="lbi" alt=""></div>
+<script>
+var GAS='https://script.google.com/macros/s/AKfycbzHmK4tcWPRr1G-4_f5yTkEPg3uTNTnrloEC8Y3-sZLcOoHTCRGQ9-Gv-FaZ4B4Kxjs/exec';
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(m){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
+function q(k){return new URLSearchParams(location.search).get(k)||'';}
+function fD(d){if(!d)return'';var p=String(d).slice(0,10).split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:d;}
+function photoUrl(p){var id=p.id||'';if(!id&&p.url){var m=String(p.url).match(/\/d\/([^\/]+)/);if(m)id=m[1];}return id?'https://drive.google.com/thumbnail?id='+id+'&sz=w1600':p.url||'';}
+function embed(u,audio){u=String(u||'').trim();if(!u)return'';var yt=u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{6,})/);if(yt)return'<div class="media"><iframe src="https://www.youtube.com/embed/'+yt[1]+'" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>';var vm=u.match(/vimeo\.com\/(\d+)/);if(vm)return'<div class="media"><iframe src="https://player.vimeo.com/video/'+vm[1]+'" allowfullscreen></iframe></div>';var dr=u.match(/drive\.google\.com\/file\/d\/([\w-]+)/)||u.match(/[?&]id=([\w-]+)/);if(dr)return'<div class="media'+(audio?' audio':'')+'"><iframe src="https://drive.google.com/file/d/'+dr[1]+'/preview" allow="autoplay"></iframe></div>';return'<a class="btn o" href="'+esc(u)+'" target="_blank" rel="noopener">🔗 Ouvrir le média</a>';}
+function wa(tel,txt){return'https://wa.me/'+String(tel).replace(/\D/g,'')+'?text='+encodeURIComponent(txt);}
+function render(d){
+  var app=document.getElementById('app'),ref=d.ref||{},h='';
+  document.getElementById('h1').textContent=d.titre||'Témoignage';document.getElementById('sub').textContent=d.orig==='reseau'?'Expérience personnelle partagée avec son accord · OlyLife × Water Life High Tech':'Témoignage public relayé à titre d\'information · OlyLife × Water Life High Tech';
+  h+='<div class="card">'+(d.orig==='reseau'?'<span class="tag ok">🌿 Membre de notre réseau</span>'+(d.verif?'<span class="tag ok">✅ Témoignage vérifiable</span>':''):'<span class="tag ext">🌍 Témoignage extérieur à notre réseau</span><span class="tag">non vérifié</span>')+(d.appareil?'<span class="tag">'+esc(d.appareil.split('(')[0].trim())+'</span>':'')+(d.besoins||[]).map(function(b){return'<span class="tag">'+esc(b)+'</span>';}).join('')
+    +(d.texte?'<div class="quote">« '+esc(d.texte)+' »</div>':'')
+    +'<div class="info" style="margin-top:10px">'+(d.orig==='reseau'?'<b>'+esc(d.nom||'')+'</b>':(d.source?'Partagé publiquement sur '+esc(d.source)+(d.pays?' ('+esc(d.pays)+')':''):''))+(d.date?' · '+fD(d.date):'')+'</div>'
+    +((d.photos||[]).length?'<div class="gal">'+d.photos.map(function(p){var u=photoUrl(p);return'<img src="'+esc(u)+'" alt="" loading="lazy" onclick="document.getElementById(\'lbi\').src=this.src;document.getElementById(\'lb\').style.display=\'flex\'">';}).join('')+'</div>':'')
+    +(d.orig==='reseau'?(d.type==='video'||d.type==='audio'?embed(d.url,d.type==='audio'):''):(embed(d.video)+embed(d.audio,true)))
+    +'</div>';
+  // vérifiabilité
+  if(d.orig==='reseau'){
+    h+='<div class="card"><h2>Vérifier ce témoignage</h2><div class="info">';
+    if(d.contactDirect&&d.contact&&(d.contact.tel||d.contact.email)){h+=esc(d.contact.prenom||d.nom)+' a accepté d\'être contacté(e) directement pour répondre à vos questions.</div>'+(d.contact.tel?'<a class="btn g" href="'+wa(d.contact.tel,'Bonjour '+(d.contact.prenom||'')+', j\'ai lu votre témoignage OlyLife transmis par '+(ref.nom||'mon conseiller')+' et j\'aimerais échanger quelques minutes avec vous. Merci !')+'" target="_blank" rel="noopener">💬 Lui écrire sur WhatsApp</a>':'')+(d.contact.email?'<a class="btn o" href="mailto:'+esc(d.contact.email)+'?subject='+encodeURIComponent('Votre témoignage OlyLife')+'">✉️ Lui envoyer un e-mail</a>':'');}
+    else if(d.verif){h+='Cette personne accepte que son témoignage soit vérifié. Demandez à votre conseiller'+(ref.nom?' <b>'+esc(ref.nom)+'</b>':'')+' d\'organiser un échange (appel, message ou visio) : il la contactera avec votre question.</div>'+(ref.tel?'<a class="btn g" href="'+wa(ref.tel,'Bonjour, je viens de lire le témoignage « '+(d.titre||'')+' » et j\'aimerais pouvoir le vérifier auprès de la personne. Pouvez-vous organiser un échange ?')+'" target="_blank" rel="noopener">💬 Demander la vérification</a>':'');}
+    else{h+='Témoignage recueilli par notre équipe avec le consentement écrit de la personne.</div>';}
+    h+='</div>';
+  }else{
+    h+='<div class="card"><h2>D\'où vient ce témoignage ?</h2><div class="info">Il a été partagé publiquement par un utilisateur <b>extérieur à notre réseau</b>'+(d.source?' ('+esc(d.source)+')':'')+'. Nous n\'avons <b>pas pu vérifier</b> son identité ni les circonstances de son expérience. Il a été relu par le comité scientifique de l\'association avant diffusion. Pour des retours vérifiables, demandez à votre conseiller un témoignage de membre de notre réseau.</div></div>';
+  }
+  if(ref.nom){h+='<div class="card"><div class="who">'+(ref.photo?'<img src="'+esc(ref.photo)+'" alt="">':'<div class="ini">'+esc((ref.nom||'?').charAt(0))+'</div>')+'<div><b>'+esc(ref.nom)+'</b><small>Votre conseiller · Water Life High Tech</small>'+(ref.tel?'<small>📱 '+esc(ref.tel)+'</small>':'')+'</div></div>'+(ref.tel?'<a class="btn g" href="'+wa(ref.tel,'Bonjour '+ref.nom+', merci pour le témoignage « '+(d.titre||'')+' ». J\'aimerais en parler avec vous.')+'" target="_blank" rel="noopener">💬 En parler avec '+esc(ref.nom.split(' ')[0])+'</a>':'')+(ref.rdv?'<a class="btn o" href="'+esc(ref.rdv)+'" target="_blank" rel="noopener">📅 Réserver un échange découverte</a>':'')+'</div>';}
+  h+='<div class="disc">Ce témoignage est une <b>expérience personnelle</b> : il ne constitue ni une promesse de résultat ni un avis médical et ne remplace pas la consultation d\'un professionnel de santé. Les appareils OlyLife sont des appareils de bien-être, pas des dispositifs médicaux. Association Water Life High Tech — groupe d\'entraide et de partage.</div>';
+  app.innerHTML=h;
+}
+(function(){
+  var t=q('t');if(!t){document.getElementById('app').innerHTML='<div class="err">Lien incomplet.</div>';return;}
+  fetch(GAS,{method:'POST',body:JSON.stringify({op:'temInfo',t:t,r:q('r')})}).then(function(r){return r.text();}).then(function(x){var d;try{d=JSON.parse(x);}catch(e){d={ok:false,error:'reponse'};}
+    if(!d.ok){document.getElementById('app').innerHTML='<div class="err">'+(d.error==='nonpublie'?'Ce témoignage n\'est pas (ou plus) disponible à la diffusion.':d.error==='lien'?'Lien introuvable.':'Service momentanément indisponible — réessayez dans un instant.')+'</div>';return;}
+    render(d);
+  }).catch(function(){document.getElementById('app').innerHTML='<div class="err">Connexion impossible — réessayez dans un instant.</div>';});
+})();
+</script>
+</body>
+</html>
