@@ -268,7 +268,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.33';
+var SRV_VERSION = '3.34';
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
@@ -320,7 +320,7 @@ function payload_(db, user) {
     ok: true,
     user: { id: user.id, nom: user.nom, role: user.role, tags: user.tags || [], tel: user.tel || '', email: user.email || '', photo: user.photo || '', digestEmail: user.digestEmail || '', digestHeure: user.digestHeure || '', calendlyUrl: user.calendlyUrl || '', scope: user.scope === 'tout' ? 'tout' : 'equipes', comite: !!user.comite, voitComite: !!user.voitComite, pubToken: pubTokenOf_(db, user), superAdmin: !!user.superAdmin, push: user.push !== false, zoomUrl: user.zoomUrl || '', memberId: user.memberId || '', rang: user.rang || '' },
     contacts: contacts,
-    config: { srv: SRV_VERSION, referents: referentsFor_(db, user), suiveurs: suiveursFor_(db, user), stocks: db.config.stocks || [], ressources: db.config.ressources || {}, equipe: equipe_(db, user), sessionJours: SESSION_JOURS, params: db.config.params || {}, essais: essaisPublics_(db), leadsNew: leadsFor_(db, user).filter(function (l) { return l.statut !== 'traite'; }).length }
+    config: { srv: SRV_VERSION, referents: referentsFor_(db, user), suiveurs: suiveursFor_(db, user), stocks: db.config.stocks || [], ressources: db.config.ressources || {}, equipe: equipe_(db, user), sessionJours: SESSION_JOURS, params: db.config.params || {}, essais: essaisPublics_(db), annonce: annonceActive_(db), leadsNew: leadsFor_(db, user).filter(function (l) { return l.statut !== 'traite'; }).length }
   };
   if (user.role === 'admin') {
     res.users = (db.users || []).map(function (u) {
@@ -1092,6 +1092,23 @@ function doPost(e) {
         return out_({ ok: true, id: file.getId(), url: 'https://drive.google.com/file/d/' + file.getId() + '/preview' });
       } catch (ue) { return out_({ ok: false, error: String(ue && ue.message ? ue.message : ue) }); }
     }
+    // ── v3.34 — annonce du super-admin : notification push sur tous les téléphones + bandeau dans l'app ──
+    else if (op === 'pushAll') {
+      if (!(user.id === 'root' || user.superAdmin)) return out_({ ok: false, error: 'forbidden' });
+      var pTitre = String(req.titre || '').trim().slice(0, 80), pCorps = String(req.corps || '').trim().slice(0, 400), pCible = String(req.cible || 'tous');
+      if (!pTitre || !pCorps) return out_({ ok: false, error: 'vide' });
+      var pDest = (db.users || []).filter(function (u) { return u.actif !== false && !u.pending && (pCible === 'tous' || u.role === pCible || (pCible === 'comite' && u.comite)); });
+      if (pCible === 'tous' || pCible === 'admin') pDest.push({ id: 'root' });
+      var pOk = pushSend_(db, pDest, pTitre, pCorps, String(req.url || '').slice(0, 300));
+      db.config.annonce = { id: 'an_' + Date.now().toString(36), titre: pTitre, corps: pCorps, url: String(req.url || '').slice(0, 300), cible: pCible, par: user.nom, le: now_() };
+      adminLog_(db, user.nom, 'annonce push', pTitre + ' → ' + pCible + ' (' + pDest.length + ' compte(s))' + (pOk ? '' : ' — push non configuré ou refusé, bandeau seul'));
+      saveDB_(db);
+      return out_({ ok: true, n: pDest.length, push: pOk, annonce: db.config.annonce });
+    }
+    else if (op === 'pushAllClear') {
+      if (!(user.id === 'root' || user.superAdmin)) return out_({ ok: false, error: 'forbidden' });
+      delete db.config.annonce;
+    }
     // ── v3.33 — témoignages extérieurs au réseau (groupes WhatsApp, réseaux) : comité ≥ 2 avis + validation admin ──
     else if (op === 'temExt') {
       db.config.ressources = db.config.ressources || {}; var TX = db.config.ressources.temExt = db.config.ressources.temExt || [];
@@ -1715,7 +1732,47 @@ function envoyerDigests() {
     }
     props.setProperty(key, today);
   });
+  try { pushUrgences_(db, heureNow, today, props); } catch (pe) { Logger.log('push urgences : ' + pe); }
 }
+// ═══ v3.34 — Notification push quotidienne des URGENCES (une par jour et par personne, à l'heure de son résumé ou 8 h) ═══
+function annonceActive_(db) { var a = db.config.annonce; if (!a || !a.le) return null; return (Date.now() - new Date(a.le).getTime()) < 7 * 86400000 ? a : null; }
+function urgencesDe_(db, u) {
+  var mes = contactsDe_(db, u), n = { rappels: 0, tracking: 0, sansSuivi: 0, factures: 0, offres: 0 };
+  db.contacts.forEach(function (c) { if (rappelPour_(c, u) && diffDays(c.rappel.date) <= 0) n.rappels++; });
+  mes.forEach(function (c) {
+    var a = c.actions || {};
+    if (c.tracking && /\d{5}/.test(String(c.tracking)) && !(a.trackingEnvoye && a.trackingEnvoye.done)) n.tracking++;
+    if (c.numCommande && !c.tracking && c.dateCommande && !(a.logistique && a.logistique.done) && diffDays(c.dateCommande) <= -SEUIL_LOGISTIQUE) n.sansSuivi++;
+    (c.factures || []).forEach(function (f) { if (!f.envoyeLe) n.factures++; });
+    (c.offres || []).forEach(function (o) { if (o.statut === 'acceptee' && !(c.numCommande && c.dateCommande && String(c.dateCommande) >= String(o.le).slice(0, 10))) n.offres++; });
+  });
+  n.total = n.rappels + n.tracking + n.sansSuivi + n.factures + n.offres;
+  return n;
+}
+function pushUrgences_(db, heureNow, today, props) {
+  if (!pushKey_() || !pushAppId_(db)) return;
+  var rd = {}; try { rd = JSON.parse(props.getProperty('root_digest') || '{}'); } catch (e) {}
+  var dest = [{ id: 'root', nom: ADMIN_NOM, role: 'admin', tags: [], digestHeure: rd.heure || '07:00' }];
+  (db.users || []).forEach(function (u) { if (u.actif !== false && !u.pending && u.push !== false && u.role !== 'referent') dest.push(u); });
+  dest.forEach(function (u) {
+    var h = parseInt(String(u.digestHeure || '08:00').split(':')[0], 10); if (isNaN(h)) h = 8;
+    if (h !== heureNow) return;
+    var key = 'pushurg_sent_' + u.id; if (props.getProperty(key) === today) return;
+    var n = urgencesDe_(db, u);
+    if (n.total) {
+      var parts = [];
+      if (n.rappels) parts.push(n.rappels + ' rappel' + (n.rappels > 1 ? 's' : ''));
+      if (n.offres) parts.push(n.offres + ' offre' + (n.offres > 1 ? 's' : '') + ' acceptée' + (n.offres > 1 ? 's' : '') + ' à commander');
+      if (n.tracking) parts.push(n.tracking + ' suivi' + (n.tracking > 1 ? 's' : '') + ' de colis à envoyer');
+      if (n.sansSuivi) parts.push(n.sansSuivi + ' commande' + (n.sansSuivi > 1 ? 's' : '') + ' sans suivi');
+      if (n.factures) parts.push(n.factures + ' facture' + (n.factures > 1 ? 's' : '') + ' à envoyer');
+      pushSend_(db, [u], '🔴 ' + n.total + ' action' + (n.total > 1 ? 's' : '') + ' à faire aujourd\'hui', parts.join(' · '), 'https://crm.team-waterlifehightech.com/?go=actions');
+    }
+    props.setProperty(key, today);
+  });
+}
+// ▶ Test : envoie tout de suite au super-admin sa notification d'urgences
+function testerPushUrgences() { var db = getDB_(); var n = urgencesDe_(db, { id: 'root', nom: ADMIN_NOM, role: 'admin', tags: [] }); Logger.log(JSON.stringify(n)); Logger.log(pushSend_(db, [{ id: 'root' }], '🔴 ' + n.total + ' action(s) à faire aujourd\'hui', 'Test — rappels : ' + n.rappels + ' · suivis : ' + n.tracking + ' · factures : ' + n.factures, 'https://crm.team-waterlifehightech.com/?go=actions')); }
 // ▶ Test : envoie immédiatement votre résumé admin à MON_EMAIL
 function testerDigestAdmin() {
   var db = getDB_();

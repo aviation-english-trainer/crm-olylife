@@ -112,6 +112,47 @@ html,body{-webkit-text-size-adjust:100%;overscroll-behavior:none;background:var(
 .st-chip{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px;vertical-align:middle;margin-left:6px;white-space:nowrap;}
 .st-chip.todo{background:#FBE3E5;color:#A42631;}.st-chip.ok{background:#DDF3E4;color:#0E5A33;}
 .om-quick{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+/* v3.42 — cockpit de la fiche */
+#fc-cockpit{background:#fff;border:1px solid var(--bd);border-radius:var(--r);margin-bottom:14px;overflow:hidden;box-shadow:0 6px 18px rgba(18,106,60,.07)}
+.fc-hd{display:flex;align-items:center;gap:12px;padding:14px 14px 10px}
+.fc-ring{--p:0;width:52px;height:52px;border-radius:50%;flex:0 0 auto;background:conic-gradient(#1E9D5A calc(var(--p)*1%),#E6EFE8 0);display:flex;align-items:center;justify-content:center;position:relative}
+.fc-ring::before{content:"";position:absolute;inset:6px;border-radius:50%;background:#fff}
+.fc-ring b{position:relative;font-size:14px;color:var(--tx)}.fc-ring small{font-size:9px}
+.fc-hd-t{flex:1;min-width:0}.fc-hd-t b{display:block;font-size:15.5px;color:var(--tx);line-height:1.25}.fc-hd-t small{display:block;font-size:12px;color:var(--t3);margin-top:2px;line-height:1.4}.fc-hd-t em{font-style:normal;color:var(--g,#126A3C);font-weight:600}
+.fc-all{border:1px solid var(--bd);background:#fff;border-radius:10px;width:40px;height:40px;font-size:17px;cursor:pointer;color:var(--t2);flex:0 0 auto}
+.fc-steps{display:flex;gap:2px;padding:2px 10px 12px;overflow-x:auto;scrollbar-width:none}.fc-steps::-webkit-scrollbar{display:none}
+.fc-st{flex:1 0 58px;text-align:center;position:relative}
+.fc-st::before{content:"";position:absolute;top:13px;left:-50%;width:100%;height:3px;background:#E6EFE8;z-index:0}.fc-st:first-child::before{display:none}
+.fc-st.ok::before,.fc-st.cur::before{background:#1E9D5A}
+.fc-st span{position:relative;z-index:1;display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;background:#EEF3EF;font-size:13px;border:2px solid #fff}
+.fc-st.ok span{background:#1E9D5A;color:#fff;font-weight:700}.fc-st.cur span{background:#fff;border-color:#E0A100;box-shadow:0 0 0 3px rgba(224,161,0,.22)}
+.fc-st small{display:block;font-size:10.5px;color:var(--t3);margin-top:3px;white-space:nowrap}.fc-st.ok small{color:#1E9D5A}.fc-st.cur small{color:#9A6B00;font-weight:700}
+.fc-g{font-size:11.5px;font-weight:700;letter-spacing:.3px;padding:9px 14px 5px;border-top:1px solid var(--bd);text-transform:uppercase}
+.fc-g span{display:inline-block;min-width:20px;text-align:center;border-radius:999px;padding:1px 6px;color:#fff;font-size:11px;margin-left:4px}
+.fc-g.late{color:#C63E47;background:rgba(217,67,79,.05)}.fc-g.late span{background:#D9434F}
+.fc-g.today{color:#B26A00;background:rgba(240,150,0,.06)}.fc-g.today span{background:#E88A00}
+.fc-g.soon{color:#8A7400}.fc-g.soon span{background:#C9A84C}.fc-g.map{color:var(--t3)}
+.fc-it{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 14px;cursor:pointer;border-top:1px solid #F0F4F1}
+.fc-it:active{background:#F6FAF7}
+.fc-it i{width:10px;height:10px;border-radius:50%;flex:0 0 auto;background:#C9A84C}.fc-it.late i{background:#D9434F;box-shadow:0 0 0 4px rgba(217,67,79,.15)}.fc-it.today i{background:#E88A00}
+.fc-tx{flex:1;min-width:0}.fc-tx b{display:block;font-size:13.5px;font-weight:600;color:var(--tx);line-height:1.35}.fc-tx small{display:block;font-size:11.5px;color:var(--t3);margin-top:1px}.fc-tx em{font-style:normal;font-weight:700}
+.fc-it.late .fc-tx em{color:#C63E47}.fc-it.today .fc-tx em{color:#B26A00}
+.fc-btns{display:flex;gap:6px;flex:0 0 auto}
+.fc-btns button{border:none;border-radius:10px;min-height:42px;padding:0 12px;font:inherit;font-size:12.5px;font-weight:700;cursor:pointer}
+.fc-btns .s{background:#25D366;color:#fff}.fc-btns .o{background:#fff;color:#126A3C;border:1.5px solid #BFD9C6}.fc-btns .d{background:#EAF4EC;color:#126A3C;min-width:44px;font-size:16px;padding:0}
+.fc-map{display:flex;flex-wrap:wrap;gap:6px;padding:4px 12px 14px}
+.fc-map button{border:1px solid var(--bd);background:#fff;border-radius:999px;padding:7px 11px;font:inherit;font-size:12px;color:var(--t2);cursor:pointer;min-height:36px}
+.fc-map button b{display:inline-block;min-width:18px;border-radius:999px;padding:0 5px;margin-left:3px;font-size:11px;color:#fff;background:#1E9D5A}
+.fc-map button.todo{border-color:#F1C4C8;background:#FFF8F8;color:#8E2A32}.fc-map button.todo b{background:#D9434F}
+.fc-bdg{display:inline-block;min-width:20px;text-align:center;border-radius:999px;padding:1px 6px;margin-left:8px;font-size:11px;font-weight:700;color:#fff;background:#1E9D5A;vertical-align:middle;letter-spacing:0}
+.fc-bdg.todo{background:#D9434F}
+.od-section.fc-flash{animation:fcfl 1.5s ease}@keyframes fcfl{0%,60%{box-shadow:0 0 0 3px rgba(224,161,0,.55)}100%{box-shadow:0 0 0 0 rgba(224,161,0,0)}}
+#fc-fab{position:sticky;bottom:14px;margin:0 0 10px auto;display:flex;align-items:center;gap:4px;border:none;border-radius:999px;background:#126A3C;color:#fff;font:inherit;font-size:17px;padding:10px 14px;box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer;z-index:5}
+#fc-fab b{font-size:13px;background:#fff;color:#126A3C;border-radius:999px;padding:0 7px}#fc-fab.late{background:#D9434F}#fc-fab.late b{color:#D9434F}#fc-fab.today{background:#E88A00}#fc-fab.today b{color:#B26A00}
+@media (max-width:759px){.fc-it{flex-wrap:wrap}.fc-tx{flex:1 1 calc(100% - 30px)}.fc-btns{flex:1 1 100%;padding-left:20px}.fc-btns .s,.fc-btns .o{flex:1}.fc-btns button{min-height:40px}.fc-st{flex-basis:64px}}
+.lock-bio{display:block;width:100%;max-width:260px;margin:18px auto 6px;border:none;border-radius:16px;background:#E3C36A;color:#1E2B10;font:inherit;font-weight:700;font-size:16px;padding:16px;cursor:pointer}
+#olock.bio-only .lock-dots,#olock.bio-only .lock-pad{display:none}
+
 .om-quick .ob{flex:1 1 calc(33.333% - 6px);min-width:0;max-width:100%;padding-left:6px;padding-right:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 @media (min-width:760px){.om-quick .ob{flex:1 1 0;}}
 .ob.bzoom{background:#2D8CFF;color:#fff;border-color:#2D8CFF;}
@@ -1859,6 +1900,14 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
               <div class="adm-grid"><div class="adm-f"><label>Assistance WhatsApp du formulaire d'inscription — numéro (international, sans +)</label><input type="tel" id="adm-l-watel" placeholder="33651001085"></div><div class="adm-f"><label>Prénom affiché dans la bulle « Écrivez à … »</label><input type="text" id="adm-l-wanom" placeholder="Jean-Charles"></div></div>
               <div class="adm-f" style="margin-top:10px"><label>🔔 Notifications push — OneSignal <b>App ID</b> (gratuit · onesignal.com → votre app → Settings → Keys &amp; IDs)</label><input type="text" id="adm-l-onesignal" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"><div class="hint" style="margin-top:4px">La <b>clé REST API</b> ne se colle jamais ici : propriété de script <code>ONESIGNAL_KEY</code> dans Apps Script (Paramètres du projet → Propriétés du script). Chaque membre active ensuite les notifications depuis <b>Mon profil</b>. Sur iPhone, l'app doit être installée sur l'écran d'accueil.</div></div>
             </div></div>
+          <div class="adm-sec" id="adm-pushall" style="display:none"><h4>📣 Annonce à toute l'équipe — notification sur tous les téléphones</h4>
+            <div style="font-size:12.5px;color:var(--t2);line-height:1.6;margin-bottom:10px">Réservé au super-admin. Le message part en <b>notification push</b> sur les téléphones où elle est activée (Mon profil → 🔔) et s'affiche aussi en <b>bandeau à l'ouverture de l'app</b> pour tous, pendant 7 jours.</div>
+            <div class="adm-f"><label>Titre (80 caractères max)</label><input type="text" id="pa-titre" maxlength="80" placeholder="Ex. : Réunion d'équipe ce soir 20 h"></div>
+            <div class="adm-f"><label>Message (400 caractères max)</label><textarea id="pa-corps" maxlength="400" rows="3" placeholder="Ex. : Zoom à 20 h — présentation du Galaxy G1-MAX. Lien dans l'agenda."></textarea></div>
+            <div class="adm-grid"><div class="adm-f"><label>Destinataires</label><select id="pa-cible"><option value="tous">Toute l'équipe</option><option value="gestionnaire">Gestionnaires</option><option value="referent">Référents</option><option value="comite">Comité scientifique</option><option value="admin">Administrateurs</option></select></div><div class="adm-f"><label>Lien à ouvrir (facultatif)</label><input type="url" id="pa-url" placeholder="https://…"></div></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" class="ob bgold" style="min-height:46px;flex:1" onclick="oPushAll()">📣 Envoyer maintenant</button><button type="button" class="ob bgh" style="min-height:46px" onclick="oPushAllClear()">Retirer le bandeau en cours</button></div>
+            <div id="pa-last" style="font-size:12px;color:var(--t3);margin-top:8px"></div>
+          </div>
           <div class="adm-sec"><h4>Intégrations</h4>
             <div class="hint" id="adm-integ"></div></div>
         </div>
@@ -2187,6 +2236,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <div style="margin-top:16px;padding:12px;background:var(--navy3);border-radius:12px;border:1px solid var(--bd)">
       <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">🔐 Sécurité de cet appareil</div>
       <div id="oprof-pin-row" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px"></div>
+      <div id="oprof-bio-row" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px;margin-top:8px"></div>
       <div style="font-size:12px;font-weight:700;color:var(--gold);margin:12px 0 6px">🔔 Notifications sur cet appareil</div>
       <label class="ochk-row" style="margin:0"><input type="checkbox" id="oprof-push" onchange="pushToggle(this.checked)"><span>Recevoir les alertes même quand l'app est fermée : nouvelle demande, RDV réservé, avance / don, rappel d'échéance.</span></label>
       <div id="oprof-push-st" style="font-size:11.5px;color:var(--t3);margin-top:4px;line-height:1.45"></div>
@@ -2382,6 +2432,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <div class="big">🔒</div>
     <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700">CRM OlyLife</div>
     <div style="font-size:13px;opacity:.8;margin-top:4px" id="olock-sub">Saisissez votre code PIN</div>
+    <button type="button" class="lock-bio" id="olock-bio" style="display:none" onclick="oBioUnlock()">👆 Déverrouiller</button>
     <div class="lock-dots" id="olock-dots"><i></i><i></i><i></i><i></i></div>
     <div class="lock-pad">
       <button onclick="oPinKey('1')">1</button><button onclick="oPinKey('2')">2</button><button onclick="oPinKey('3')">3</button>
@@ -2389,7 +2440,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <button onclick="oPinKey('7')">7</button><button onclick="oPinKey('8')">8</button><button onclick="oPinKey('9')">9</button>
       <button onclick="oPinKey('⌫')" style="font-size:18px">⌫</button><button onclick="oPinKey('0')">0</button><button onclick="oPinKey('OK')" style="background:var(--gold)">OK</button>
     </div>
-    <button class="lock-link" onclick="oPinForgot()">PIN oublié — se reconnecter avec mon code d'accès</button>
+    <button class="lock-link" onclick="oPinForgot()">Impossible de déverrouiller — me reconnecter avec mon code d'accès</button>
   </div>
 </div>
 
@@ -2437,7 +2488,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.41.2 · 14/11';
+var APP_VERSION='v3.42 · 14/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -2562,7 +2613,7 @@ function oLogout(){
   if(TOKEN&&GAS_URL){try{fetch(GAS_URL,{method:'POST',body:JSON.stringify({op:'logout',token:TOKEN})});}catch(e){}}
   try{localStorage.removeItem(cacheKey());}catch(e){}
   CODE='';TOKEN='';USER=null;OC=[];USERS=[];
-  try{localStorage.removeItem('owlht2_code');localStorage.removeItem('owlht2_token');localStorage.removeItem('owlht2_pin');}catch(e){}
+  try{localStorage.removeItem('owlht2_code');localStorage.removeItem('owlht2_token');localStorage.removeItem('owlht2_pin');localStorage.removeItem('owlht2_bio');}catch(e){}
   oHideSetup();oSyncDot('');oShowLogin();
 }
 function oSessionLost(msg){TOKEN='';CODE='';USER=null;try{localStorage.removeItem('owlht2_code');localStorage.removeItem('owlht2_token');}catch(e){}oSyncDot('err');oLoader(false);oShowLogin(msg||'Session expirée ou révoquée — reconnectez-vous avec votre code.');}
@@ -2576,7 +2627,7 @@ function oApplyPayload(d){
       try{var pendIds=obCids();Object.keys(pendIds).forEach(function(id){var lc=prevOC.find(function(x){return x.id===id;});if(!lc)return;var i=OC.findIndex(function(x){return x.id===id;});if(i>=0)OC[i]=lc;else OC.unshift(lc);});}catch(e){}   // v3.29 — les fiches modifiées hors ligne gardent la version locale jusqu'à l'envoi
       CFG=d.config||{referents:[],suiveurs:[]};
       if(d.users)USERS=d.users;
-      oSaveCache();oHideLogin();oSyncDot('ok');obBadge();
+      oSaveCache();oHideLogin();oSyncDot('ok');obBadge();try{annonceShow();}catch(e){}
       oT('Bonjour '+USER.nom+' — '+OC.length+' contact(s)','s');
       setTimeout(obFlush,600);
       applyRole();populateRefUI();oRefresh();oMergeSeedThierry();if(ROLE()==='admin'){var _fp=fixProduits(true);if(_fp)oT('🧹 '+_fp+' fiche(s) : noms de gestionnaires retirés des produits','w');var _np=fichesParasites().length;if(_np)oT('🧽 '+_np+' fiche(s) parasite(s) détectée(s) — Équipe → « Nettoyer les fiches d\'import raté »','w');}
@@ -4552,6 +4603,7 @@ function oOpenF(id){
       +'<button class="ob baqua" onclick="oCalOpen(\''+id+'\')">📅 RDV</button>'
       +'<button class="ob bzoom" onclick="oZoomOpen(\''+id+'\')">🎥 Zoom</button>'
     +'</div>'
+    +'<div id="fc-cockpit"></div>'
     +resBox(c)
     +'<div class="od-section"><div class="od-sec-ttl">Suivi du contact</div><div style="padding:12px 16px">'
       +(isRef?'<div style="margin-bottom:12px">'+stBdg(c)+(c.suiviPar?' <span class="obdg baq">👤 suivi par '+esc(c.suiviPar)+'</span>':' <span class="obdg bgy">pas encore pris en charge</span>')+'</div>'
@@ -4616,6 +4668,8 @@ function oOpenF(id){
       +'<button class="ob bedit" style="flex:1" onclick="oClose();oEdit(\''+id+'\')">Modifier</button>'
       +'<button class="ob bdel" style="flex:1" onclick="oDel(\''+id+'\')">Supprimer</button>'
     +'</div>':'<div style="padding:4px 0 20px"><button class="ob bgh bfull" style="min-height:46px" onclick="oReqModif(\''+id+'\')">📨 Demander une modification à '+esc(suivisDe(c).join(', ')||'l\'administrateur')+'</button><div style="font-size:11px;color:var(--t3);margin-top:6px;text-align:center">Cette fiche est en consultation seule pour vous — la demande est notée dans le journal et envoyée au gestionnaire.</div></div>');
+  document.getElementById('om-b').insertAdjacentHTML('beforeend','<button type="button" id="fc-fab" onclick="fcTop()" title="Revenir à ce qu\'il faut faire">🎯</button>');
+  try{fcBuild(c);}catch(e){console.warn('cockpit',e);}
   oSheetOpen('omo');
   var ob=document.getElementById('omo');if(isDesk())ob.scrollTop=0;
 }
@@ -7771,6 +7825,61 @@ function accHtml(c){
   return'<div class="od-section"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">🌿 Accompagnement — précautions · fiche conseils · témoignage</div><div class="od-bd">'+rows+'</div></div>';
 }
 
+// ═══ v3.42 — COCKPIT DE LA FICHE : ce qu'il faut faire, dans l'ordre, en un coup d'œil ═══
+var FC_ACTS=[],FC_SEC_RX={Relance:/suivi du contact/i,Rappel:/suivi du contact/i,Logistique:/logistique/i,Commande:/merci|logistique/i,Installation:/r[ée]ception|kit/i,Bienvenue:/r[ée]ception|kit/i,Facture:/facture/i,'Précautions':/accompagnement/i,'Fiche conseils':/accompagnement/i,'Témoignage':/accompagnement/i,Offre:/offres/i,Avance:/avances/i,Fiche:/^$/};
+function fcSecFor(type){var rx=FC_SEC_RX[type];if(!rx)return null;var found=null;document.querySelectorAll('#om-b .od-section').forEach(function(s){var t=s.querySelector('.od-sec-ttl');if(!found&&t&&rx.test(t.textContent))found=s;});return found;}
+function fcWhen(d){return d<0?'Retard '+Math.abs(d)+' j':d===0?'Aujourd\'hui':'Dans '+d+' j';}
+function fcSteps(c){
+  var devs=[];(c.produits||[]).forEach(function(pn){var k=precKeyOf(pn);if(k&&devs.indexOf(k)<0)devs.push(k);});
+  var precOk=devs.length>0&&devs.every(function(k){return c.precTransmis&&c.precTransmis[k];});
+  return[{l:'Contact',ic:'👋',ok:true},{l:'Commande',ic:'🛒',ok:!!c.numCommande},{l:'Expédié',ic:'🚚',ok:!!trkClean(c.tracking)},{l:'Reçu',ic:'📦',ok:!!dateRecu(c)},{l:'Mis en route',ic:'⚡',ok:!!c.installConfirm},{l:'Précautions',ic:'📖',ok:precOk},{l:'Témoignage',ic:'🎙',ok:!!((c.temoignages||[]).length||c.temoignageTexte)}];
+}
+function fcBuild(c){
+  var box=document.getElementById('fc-cockpit'),root=document.getElementById('om-b');if(!box||!root)return;
+  var isRef=ROLE()==='referent',acts=[];
+  try{acts=computeActions().filter(function(a){return(a.c._real||a.c).id===c.id;});}catch(e){}
+  if(c.rappel&&c.rappel.date){var dr=diffD(c.rappel.date);if(dr!==null&&dr<=3)acts.push({c:c,key:'@rappel',type:'Rappel',label:'⏰ Rappel'+(c.rappel.heure?' à '+c.rappel.heure:'')+(c.rappel.texte?' — '+c.rappel.texte:''),diff:dr});}
+  var manque=[];try{manque=resManqueX(c);}catch(e){}
+  acts.sort(function(a,b){return a.diff-b.diff;});FC_ACTS=acts;
+  // rubriques : compte « à faire / fait », pastille dans le titre, ouverture selon l'urgence
+  var secs=[],tot={todo:0,ok:0},urgSecs=[];
+  acts.forEach(function(a){if(a.diff<=0){var s=fcSecFor(a.type);if(s&&urgSecs.indexOf(s)<0)urgSecs.push(s);}});
+  root.querySelectorAll('.od-section').forEach(function(s,i){
+    var t=s.querySelector('.od-sec-ttl');if(!t)return;s.id=s.id||('fcs-'+i);
+    var todo=s.querySelectorAll('.acc-row.todo').length,ok=s.querySelectorAll('.acc-row.ok').length;
+    s.querySelectorAll('.st-chip.todo').forEach(function(ch){if(!ch.closest('.acc-row'))todo++;});s.querySelectorAll('.st-chip.ok').forEach(function(ch){if(!ch.closest('.acc-row'))ok++;});
+    tot.todo+=todo;tot.ok+=ok;
+    var old=t.querySelector('.fc-bdg');if(old)old.remove();
+    if(todo||ok){var b=document.createElement('span');b.className='fc-bdg '+(todo?'todo':'ok');b.textContent=todo?String(todo):'✓';b.title=todo?todo+' point(s) à faire':'Tout est fait';t.appendChild(b);
+      var lbl=t.textContent.replace(/[▾▸▼▶]/g,'').replace(/\d+$|✓$/,'').trim().split(/ — | · |\(/)[0].trim();secs.push({id:s.id,l:lbl,todo:todo,ok:ok});}
+    if(t.classList.contains('tog')){var urgent=urgSecs.indexOf(s)>=0;s.classList.toggle('clps',!(urgent||(isDesk()&&todo>0)));}
+  });
+  var late=acts.filter(function(a){return a.diff<0;}),today=acts.filter(function(a){return a.diff===0;}),soon=acts.filter(function(a){return a.diff>0;});
+  var steps=fcSteps(c),cur=-1;steps.forEach(function(s,i){if(cur<0&&!s.ok)cur=i;});
+  var pct=(tot.todo+tot.ok)?Math.round(tot.ok*100/(tot.todo+tot.ok)):100;
+  var item=function(a){var i=acts.indexOf(a),cls=a.diff<0?'late':a.diff===0?'today':'soon',direct=!isRef&&a.msg&&!/^(logistique|offre_|av_|avp_|fact_|@)/.test(a.key)&&((a.tel||a.c.tel)||a.c.email);
+    return'<div class="fc-it '+cls+'" onclick="fcGo('+i+')"><i></i><div class="fc-tx"><b>'+esc(a.label)+'</b><small>'+esc(a.type)+(a.c._ck?' · compte '+esc(a.c.memberIdOlyLife||a.c.cpt||''):'')+' · <em>'+fcWhen(a.diff)+'</em></small></div>'
+      +(isRef?'':'<div class="fc-btns">'+(direct?'<button type="button" class="s" title="Envoyer le message puis marquer comme fait" onclick="event.stopPropagation();fcSend('+i+')">💬 Envoyer</button>':'<button type="button" class="o" onclick="event.stopPropagation();fcGo('+i+')">➜ Ouvrir</button>')+(a.key.charAt(0)==='@'||/^(av_|avp_|fact_)/.test(a.key)?'':'<button type="button" class="d" title="Marquer comme fait" onclick="event.stopPropagation();fcDone('+i+')">✅</button>')+'</div>')+'</div>';};
+  var grp=function(ttl,cls,l){return l.length?'<div class="fc-g '+cls+'">'+ttl+' <span>'+l.length+'</span></div>'+l.map(item).join(''):'';};
+  var h='<div class="fc-hd"><div class="fc-ring" style="--p:'+pct+'"><b>'+pct+'<small>%</small></b></div><div class="fc-hd-t"><b>'+(late.length?'🔴 '+late.length+' en retard':today.length?'🟠 '+today.length+' à faire aujourd\'hui':soon.length?'🟡 Rien d\'urgent — '+soon.length+' à venir':tot.todo?'🟢 Rien d\'urgent':'✅ Fiche à jour')+'</b><small>'+tot.ok+' fait'+(tot.ok>1?'s':'')+' · '+tot.todo+' restant'+(tot.todo>1?'s':'')+(cur>=0?' · prochaine étape : <em>'+steps[cur].l+'</em>':'')+'</small></div><button type="button" class="fc-all" onclick="fcToggleAll()" title="Tout déplier / tout replier">⇅</button></div>'
+    +'<div class="fc-steps">'+steps.map(function(s,i){return'<div class="fc-st '+(s.ok?'ok':i===cur?'cur':'')+'"><span>'+(s.ok?'✓':s.ic)+'</span><small>'+s.l+'</small></div>';}).join('')+'</div>'
+    +grp('🔴 En retard — à faire tout de suite','late',late)+grp('🟠 Aujourd\'hui','today',today)+grp('🟡 Peut attendre (dans les 3 jours)','soon',soon)
+    +(manque.length?'<div class="fc-it soon" onclick="'+(canEditContact(c)?'oClose();oEdit(\''+c.id+'\')':'')+'"><i></i><div class="fc-tx"><b>✍️ Fiche à compléter — '+manque.length+' champ'+(manque.length>1?'s':'')+'</b><small>Sans urgence · quand vous avez l\'information</small></div></div>':'')
+    +(secs.length?'<div class="fc-g map">Par rubrique</div><div class="fc-map">'+secs.map(function(s){return'<button type="button" class="'+(s.todo?'todo':'ok')+'" onclick="fcJump(\''+s.id+'\')">'+esc(s.l.length>30?s.l.slice(0,29)+'…':s.l)+' <b>'+(s.todo?s.todo:'✓')+'</b></button>';}).join('')+'</div>':'');
+  box.innerHTML=h;
+  var fab=document.getElementById('fc-fab');if(fab){var n=late.length+today.length;fab.innerHTML='🎯'+(n?' <b>'+n+'</b>':'');fab.className=n?(late.length?'late':'today'):'';}
+}
+function fcJump(id,flash){var s=document.getElementById(id);if(!s)return;s.classList.remove('clps');try{s.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){s.scrollIntoView();}s.classList.add('fc-flash');setTimeout(function(){s.classList.remove('fc-flash');},1600);}
+function fcGo(i){var a=FC_ACTS[i];if(!a)return;var s=fcSecFor(a.type);if(s){s.id=s.id||'fcs-x';fcJump(s.id);}}
+function fcTop(){var b=document.getElementById('fc-cockpit');if(b)try{b.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){b.scrollIntoView();}}
+function fcToggleAll(){var l=document.querySelectorAll('#om-b .od-section'),anyOpen=false;l.forEach(function(s){var t=s.querySelector('.od-sec-ttl.tog');if(t&&!s.classList.contains('clps'))anyOpen=true;});l.forEach(function(s){if(s.querySelector('.od-sec-ttl.tog'))s.classList.toggle('clps',anyOpen);});}
+function fcSend(i){
+  var a=FC_ACTS[i];if(!a)return;var c=a.c,num=String(a.tel||c.tel||'').replace(/\D/g,''),canal=canalCode(c);
+  if(canal==='mail'&&!c.email)canal='wa';if(canal!=='mail'&&!num){if(c.email)canal='mail';else{sendCopy(a.msg);return;}}
+  sendVia(canal,num,a.msg,c.email);oDone((c._real||c).id,a.key,c._ck);
+}
+function fcDone(i){var a=FC_ACTS[i];if(!a)return;oDone((a.c._real||a.c).id,a.key,a.c._ck);}
+
 // ── KIT DE BIENVENUE (v3.18) ────────────────────────────────────────
 var SITE_URL='https://crm.team-waterlifehightech.com/';
 var KITS={
@@ -8649,6 +8758,7 @@ function admRenderTab(t){
   if(t==='messages'){admMsgFill();}
   if(t==='liens'){
     admLpRender(LIENS_PERSO);
+    try{paRender();}catch(e){}
     document.getElementById('adm-l-boffice').value=BOFFICE_URL;var _pl=(CFG.params&&CFG.params.liens)||{};document.getElementById('adm-l-watel').value=_pl.waSupportTel||'33651001085';document.getElementById('adm-l-wanom').value=_pl.waSupportNom||'Jean-Charles';var _os=document.getElementById('adm-l-onesignal');if(_os)_os.value=_pl.onesignalAppId||'';document.getElementById('adm-l-boly').value=BOLY_URL;document.getElementById('adm-l-olynation').value=OLYNATION_URL;document.getElementById('adm-l-tunnels').value=TUNNELS_URL;document.getElementById('adm-l-youtube').value=YOUTUBE_URL;var _zz=document.getElementById('adm-l-zoom');if(_zz)_zz.value=_pl.zoom||'';var _ad=document.getElementById('adm-l-adhesion');if(_ad)_ad.value=_pl.adhesion||'';var _pp=document.getElementById('adm-l-plan');if(_pp)_pp.value=_pl.planRemu||'';
     var cal=USERS.filter(function(u){return u.calendlyUrl;}).length;
     document.getElementById('adm-integ').innerHTML='📅 <b>Calendly</b> : '+cal+' membre(s) avec un lien de prise de RDV (chacun le renseigne dans Réglages ; la synchronisation des RDV se fait côté script toutes les heures).<br>🗺️ <b>Carte</b> : géolocalisation des adresses via OpenStreetMap (gratuit, sans clé).<br>📧 <b>Résumé quotidien</b> : envoyé par le script Google avec l\'adresse e-mail du profil de chaque membre.<br>🔐 <b>Serveur</b> : <span style="word-break:break-all">'+esc(GAS_URL)+'</span>';
@@ -8763,11 +8873,57 @@ function oShowUpdate(){UPD_READY=true;var b=document.getElementById('oupd');if(b
 function oUpdateNow(){var b=document.getElementById('oupd');if(b)b.classList.remove('on');try{if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration){navigator.serviceWorker.getRegistration().then(function(r){if(r&&r.waiting)r.waiting.postMessage('skipWaiting');setTimeout(function(){location.reload();},150);});return;}}catch(e){}location.reload();}
 try{if(navigator.serviceWorker){var _first=!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener('controllerchange',function(){if(!_first)oShowUpdate();_first=false;});}}catch(e){}
 
+
+// ═══ v3.42 — Annonce du super-admin : push sur tous les téléphones + bandeau dans l'app ═══
+function paRender(){var b=document.getElementById('adm-pushall');if(!b)return;b.style.display=IS_SUPER()?'':'none';var a=CFG&&CFG.annonce,l=document.getElementById('pa-last');if(l)l.innerHTML=a&&a.id?'Dernière annonce : <b>'+esc(a.titre)+'</b> — '+fWhen(a.le)+' · par '+esc(a.par||'')+' · bandeau actif 7 jours':'Aucune annonce en cours.';}
+function oPushAll(){
+  if(!IS_SUPER())return;if(srvNum()<3034){oT('📣 Annonce : script Google v3.34 requis','w');return;}
+  var t=val('pa-titre').trim(),c=val('pa-corps').trim(),cible=val('pa-cible'),lbl=document.getElementById('pa-cible').selectedOptions[0].textContent;
+  if(!t||!c){oT('Titre et message sont obligatoires','e');return;}
+  if(!confirm('Envoyer cette annonce à : '+lbl+' ?\n\n'+t+'\n'+c))return;
+  oPostAsync_({op:'pushAll',titre:t,corps:c,cible:cible,url:val('pa-url').trim()}).then(function(d){
+    if(!d||!d.ok){oT('Envoi impossible : '+((d&&d.error)||'réseau'),'e');return;}
+    CFG.annonce=d.annonce;oSaveCache();document.getElementById('pa-titre').value='';document.getElementById('pa-corps').value='';paRender();
+    oT(d.push?'📣 Annonce envoyée — '+d.n+' compte(s), notification push + bandeau':'📣 Bandeau publié pour '+d.n+' compte(s) — push non parti (OneSignal non configuré)',d.push?'s':'w');
+  }).catch(function(){oT('Hors ligne — annonce non envoyée','e');});
+}
+function oPushAllClear(){if(!IS_SUPER())return;if(!confirm('Retirer le bandeau d\'annonce en cours ?'))return;oPostAsync_({op:'pushAllClear'}).then(function(){CFG.annonce=null;oSaveCache();paRender();oT('Bandeau retiré','s');}).catch(function(){});}
+function annonceShow(){
+  var a=CFG&&CFG.annonce;if(!a||!a.id||!USER)return;
+  if(!(a.cible==='tous'||ROLE()===a.cible||(a.cible==='comite'&&USER.comite)||IS_SUPER()))return;
+  var seen='';try{seen=localStorage.getItem('owlht2_annonce')||'';}catch(e){}if(seen===a.id||document.getElementById('oannonce'))return;
+  var m=document.createElement('div');m.id='oannonce';m.style.cssText='position:fixed;inset:0;z-index:9400;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px';
+  m.innerHTML='<div style="background:#fff;border-radius:20px;max-width:440px;width:100%;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)"><div style="background:linear-gradient(135deg,#0F3B22,#1E6B3A);color:#fff;padding:18px 20px"><div style="font-size:12px;opacity:.85">📣 Annonce de '+esc(a.par||'l\'administrateur')+' · '+fWhen(a.le)+'</div><div style="font-family:Cormorant Garamond,serif;font-size:22px;font-weight:700;margin-top:4px;line-height:1.2">'+esc(a.titre)+'</div></div><div style="padding:18px 20px;font-size:15px;line-height:1.6;color:var(--tx);white-space:pre-wrap">'+esc(a.corps)+'</div><div style="padding:0 20px 20px;display:flex;gap:8px">'+(a.url&&/^https?:\/\//.test(a.url)?'<a class="ob bgh" style="flex:1;min-height:48px" href="'+esc(a.url)+'" target="_blank" rel="noopener">🔗 Ouvrir le lien</a>':'')+'<button type="button" class="ob bgold" style="flex:1;min-height:48px" onclick="annonceVu(\''+a.id+'\')">✅ J\'ai lu</button></div></div>';
+  document.body.appendChild(m);
+}
+function annonceVu(id){try{localStorage.setItem('owlht2_annonce',id);}catch(e){}var m=document.getElementById('oannonce');if(m)m.remove();}
+
 // ── Verrou PIN par appareil (v3.12) ──────────────────────────────────
 var PIN_BUF='',PIN_MODE='check',PIN_TMP='',PIN_HIDDEN_AT=0;
 function pinHash(p){var h=5381;for(var i=0;i<p.length;i++)h=((h<<5)+h+p.charCodeAt(i))|0;return'p'+(h>>>0).toString(36)+'_'+p.length;}
 function pinStored(){try{return localStorage.getItem('owlht2_pin')||'';}catch(e){return'';}}
-function oPinGate(){if(pinStored()){PIN_MODE='check';PIN_BUF='';oPinRender('Saisissez votre code PIN');document.getElementById('olock').classList.add('on');}}
+function oPinGate(){var bio=bioStored(),pin=pinStored();if(!bio&&!pin)return;var L=document.getElementById('olock');if(L.classList.contains('on')&&PIN_MODE==='check')return;PIN_MODE='check';PIN_BUF='';L.classList.toggle('bio-only',!!bio&&!pin);document.getElementById('olock-bio').style.display=bio?'':'none';oPinRender(bio?(pin?'Empreinte / schéma du téléphone — ou votre code PIN':'Déverrouillez avec votre empreinte ou le schéma du téléphone'):'Saisissez votre code PIN');L.classList.add('on');if(bio)setTimeout(oBioUnlock,300);}
+// v3.42 — déverrouillage par l'appareil : empreinte, visage, schéma ou code du téléphone (WebAuthn « authentificateur de plateforme »)
+function bioStored(){try{return localStorage.getItem('owlht2_bio')||'';}catch(e){return'';}}
+function b64u(buf){var b=new Uint8Array(buf),t='';for(var i=0;i<b.length;i++)t+=String.fromCharCode(b[i]);return btoa(t).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
+function ub64(x){x=String(x).replace(/-/g,'+').replace(/_/g,'/');while(x.length%4)x+='=';var t=atob(x),b=new Uint8Array(t.length);for(var i=0;i<t.length;i++)b[i]=t.charCodeAt(i);return b.buffer;}
+function bioAvail(){return !!(window.PublicKeyCredential&&navigator.credentials&&window.isSecureContext);}
+function oBioSet(){
+  if(!bioAvail()){oT('Déverrouillage par l\'appareil non disponible sur ce navigateur','e');return;}
+  PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().then(function(ok){
+    if(!ok){oT('Aucune empreinte ni verrouillage d\'écran configuré sur cet appareil','e');return null;}
+    return navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),rp:{name:'CRM OlyLife — WLHT'},user:{id:crypto.getRandomValues(new Uint8Array(16)),name:(USER&&USER.nom)||'CRM OlyLife',displayName:(USER&&USER.nom)||'CRM OlyLife'},pubKeyCredParams:[{type:'public-key',alg:-7},{type:'public-key',alg:-257}],authenticatorSelection:{authenticatorAttachment:'platform',userVerification:'required',residentKey:'discouraged'},timeout:60000,attestation:'none'}})
+      .then(function(cred){if(!cred)return;try{localStorage.setItem('owlht2_bio',b64u(cred.rawId));}catch(e){}oT('👆 Déverrouillage par empreinte / schéma activé sur cet appareil','s');oProfOpen();});
+  }).catch(function(){oT('Activation annulée ou refusée par l\'appareil','w');});
+}
+function oBioRemove(){try{localStorage.removeItem('owlht2_bio');}catch(e){}oT('Déverrouillage par l\'appareil retiré','s');oProfOpen();}
+var BIO_BUSY=false;
+function oBioUnlock(){
+  var id=bioStored();if(!id||BIO_BUSY||!bioAvail())return;BIO_BUSY=true;
+  navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:ub64(id),transports:['internal']}],userVerification:'required',timeout:60000}})
+    .then(function(a){BIO_BUSY=false;if(a){document.getElementById('olock').classList.remove('on');PIN_BUF='';}})
+    .catch(function(){BIO_BUSY=false;var L=document.getElementById('olock');if(L.classList.contains('on'))oPinRender(pinStored()?'Non reconnu — touchez « Déverrouiller » ou saisissez votre PIN':'Non reconnu — touchez « Déverrouiller » pour réessayer');});
+}
 function oPinRender(sub){document.getElementById('olock-sub').textContent=sub;var d=document.getElementById('olock-dots');d.innerHTML='';for(var i=0;i<Math.max(4,PIN_BUF.length);i++)d.innerHTML+='<i class="'+(i<PIN_BUF.length?'on':'')+'"></i>';}
 function oPinKey(k){
   if(k==='⌫'){PIN_BUF=PIN_BUF.slice(0,-1);oPinRender(document.getElementById('olock-sub').textContent);return;}
@@ -8781,10 +8937,10 @@ function oPinSubmit(){
   if(PIN_MODE==='set1'){PIN_TMP=PIN_BUF;PIN_BUF='';PIN_MODE='set2';oPinRender('Confirmez le code PIN');return;}
   if(PIN_MODE==='set2'){if(PIN_BUF===PIN_TMP){try{localStorage.setItem('owlht2_pin',pinHash(PIN_BUF));}catch(e){}document.getElementById('olock').classList.remove('on');PIN_BUF='';PIN_TMP='';PIN_MODE='check';oT('🔒 Verrou PIN activé sur cet appareil','s');oProfOpen();}else{PIN_BUF='';PIN_TMP='';PIN_MODE='set1';oPinRender('Les deux codes diffèrent — recommencez');}}
 }
-function oPinSet(){PIN_MODE='set1';PIN_BUF='';oPinRender('Choisissez un code PIN (4 à 6 chiffres)');document.getElementById('olock').classList.add('on');}
+function oPinSet(){document.getElementById('olock').classList.remove('bio-only');document.getElementById('olock-bio').style.display='none';PIN_MODE='set1';PIN_BUF='';oPinRender('Choisissez un code PIN (4 à 6 chiffres)');document.getElementById('olock').classList.add('on');}
 function oPinRemove(){try{localStorage.removeItem('owlht2_pin');}catch(e){}oT('Verrou PIN retiré','s');oProfOpen();}
 function oPinForgot(){if(confirm('Vous serez déconnecté de cet appareil ; il faudra ressaisir votre code d\'accès.'))oLogout();document.getElementById('olock').classList.remove('on');}
-document.addEventListener('visibilitychange',function(){if(document.hidden){PIN_HIDDEN_AT=Date.now();}else if(pinStored()&&USER&&PIN_HIDDEN_AT&&Date.now()-PIN_HIDDEN_AT>120000){oPinGate();}});
+document.addEventListener('visibilitychange',function(){if(document.hidden){PIN_HIDDEN_AT=Date.now();}else if((pinStored()||bioStored())&&USER&&PIN_HIDDEN_AT&&Date.now()-PIN_HIDDEN_AT>120000){oPinGate();}});
 
 // ── Sessions / appareils connectés (v3.12) ──────────────────────────
 function sessHtml(list,mine){
@@ -8877,6 +9033,7 @@ function oProfOpen(){
     ?'Votre nom d\'affichage est défini dans le script Google (ADMIN_NOM). Les accès de l\'équipe (noms, rôles, codes, photos) se gèrent dans l\'onglet <b>Équipe</b>.'
     :'Pour changer votre nom affiché ou votre rôle, demandez à l\'administrateur (onglet Équipe).';
   var pr=document.getElementById('oprof-pin-row');if(pr)pr.innerHTML=pinStored()?'<span>🔒 Verrou PIN actif à l\'ouverture</span><button class="ob bgh bsm" type="button" onclick="oPinSet()">Changer</button><button class="ob bgh bsm" type="button" onclick="oPinRemove()">Retirer</button>':'<span>Pas de verrou PIN — conseillé si votre téléphone n\'est pas verrouillé</span><button class="ob bgh bsm" type="button" onclick="oPinSet()">🔒 Activer un PIN</button>';
+  var br=document.getElementById('oprof-bio-row');if(br)br.innerHTML=!bioAvail()?'<span style="color:var(--t3)">👆 Empreinte / schéma : non disponible sur ce navigateur</span>':bioStored()?'<span>👆 Déverrouillage par empreinte / schéma du téléphone actif</span><button class="ob bgh bsm" type="button" onclick="oBioRemove()">Retirer</button>':'<span>👆 Ouvrir l\'app avec l\'empreinte, le visage ou le schéma du téléphone</span><button class="ob bgold bsm" type="button" onclick="oBioSet()">Activer</button>';
   oSessList('', 'oprof-sess');
   var pc=document.getElementById('oprof-canal');if(pc)pc.value=sendPref();
   var oc=document.getElementById('oprof-cal');if(oc){oc.value=USER.calendlyUrl||'';}oProfCalSt();
