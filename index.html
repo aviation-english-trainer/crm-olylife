@@ -2534,7 +2534,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.43 · 14/11';
+var APP_VERSION='v3.44 · 14/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -2670,10 +2670,12 @@ function oApplyPayload(d){
       if(d.config&&typeof d.config.leadsNew==='number'){LEADS_NEW=d.config.leadsNew;}
       var prevOC=OC||[];
       OC=d.contacts||[];OC.forEach(function(c){if(!c.actions)c.actions={};if(!c.produits)c.produits=[];});normAll();
-      try{var pendIds=obCids();Object.keys(pendIds).forEach(function(id){var lc=prevOC.find(function(x){return x.id===id;});if(!lc)return;var i=OC.findIndex(function(x){return x.id===id;});if(i>=0)OC[i]=lc;else OC.unshift(lc);});}catch(e){}   // v3.29 — les fiches modifiées hors ligne gardent la version locale jusqu'à l'envoi
+      try{var pendIds=obCids();Object.keys(pendIds).forEach(function(id){var lc=prevOC.find(function(x){return x.id===id;});if(!lc)return;var i=OC.findIndex(function(x){return x.id===id;});if(i>=0)OC[i]=collabLocal(OC[i],lc);else OC.unshift(lc);});}catch(e){}   // v3.29 — les fiches modifiées hors ligne gardent la version locale jusqu'à l'envoi
+      var rePush=[];try{var dz=dGet(),pend2=obCids(),lim=Date.now()-3*864e5,chg=false;Object.keys(dz).forEach(function(id){if(pend2[id])return;var lc=prevOC.find(function(x){return x.id===id;});var i=OC.findIndex(function(x){return x.id===id;});if(!lc||i<0||dz[id]<lim){delete dz[id];chg=true;return;}OC[i]=collabLocal(OC[i],lc);rePush.push(OC[i]);});if(chg)dSet(dz);}catch(e){}   // v3.44
       CFG=d.config||{referents:[],suiveurs:[]};
       if(d.users)USERS=d.users;
       oSaveCache();oHideLogin();oSyncDot('ok');obBadge();try{annonceShow();}catch(e){}
+      if(rePush.length)setTimeout(function(){oPush(rePush);oT('☁️ '+rePush.length+' fiche(s) modifiée(s) sur cet appareil renvoyée(s) au serveur','i');},1200);
       oT('Bonjour '+USER.nom+' — '+OC.length+' contact(s)','s');
       setTimeout(obFlush,600);
       applyRole();populateRefUI();oRefresh();oMergeSeedThierry();if(ROLE()==='admin'){var _fp=fixProduits(true);if(_fp)oT('🧹 '+_fp+' fiche(s) : noms de gestionnaires retirés des produits','w');var _np=fichesParasites().length;if(_np)oT('🧽 '+_np+' fiche(s) parasite(s) détectée(s) — Équipe → « Nettoyer les fiches d\'import raté »','w');}
@@ -2743,7 +2745,7 @@ function obFlush(){
     var d={};try{d=JSON.parse(t);}catch(e){}
     OB_BUSY=false;
     if(d.ok){
-      var l2=obList().filter(function(x){return x.id!==it.id;});obSave(l2);
+      var l2=obList().filter(function(x){return x.id!==it.id;});obSave(l2);if(p.op==='upsert'){var still=obCids();dClear((it.cids||[]).filter(function(id){return!still[id];}),0);}
       var now=new Date().toISOString();(it.cids||[]).forEach(function(id){var c=OC.find(function(x){return x.id===id;});if(!c)return;(c.journal||[]).forEach(function(e){if(e.pend){e.pend=false;e.syncLe=now;}});});
       oSaveCache();if(d.camp)campApplySrv(d.camp);if(d.notif)avNotifApplySrv(d.notif);
       if(!l2.length){oSyncDot('ok');oT('☁️ Réseau de retour — modifications hors ligne synchronisées et validées','s');oRefresh();var mo=document.getElementById('omo');if(mo&&mo.classList.contains('on')&&typeof ACTIVE_ID!=='undefined'&&ACTIVE_ID)oOpenF(ACTIVE_ID);}
@@ -2763,6 +2765,7 @@ setInterval(function(){if(navigator.onLine&&obList().length)obFlush();},45000);
 function oPost_(payload,silent){
   if(!GAS_URL||(!TOKEN&&!CODE))return;
   var cids=payload.op==='upsert'?(payload.contacts||[]).map(function(c){return c.id;}):(payload.op==='delete'?(payload.ids||[]):[]);
+  var dseq=0;if(payload.op==='upsert'&&cids.length){dseq=Date.now()+Math.random();dMark(cids,dseq);}
   if(!navigator.onLine||obList().length){obEnqueue(payload,cids);oSyncDot('err');if(!silent&&!navigator.onLine)oT('📴 Hors ligne — enregistré sur cet appareil, envoi automatique au retour du réseau','w');if(navigator.onLine)obFlush();return;}
   if(TOKEN)payload.token=TOKEN;else payload.code=CODE;
   oSyncDot('spin');
@@ -2770,17 +2773,32 @@ function oPost_(payload,silent){
     .then(function(r){return r.text();})
     .then(function(txt){
       var d={};try{d=JSON.parse(txt);}catch(e){}
-      if(d.ok){oSyncDot('ok');if(d.camp)campApplySrv(d.camp);if(d.notif)avNotifApplySrv(d.notif);}
+      if(d.ok){oSyncDot('ok');if(dseq)dClear(cids,dseq);if(d.camp)campApplySrv(d.camp);if(d.notif)avNotifApplySrv(d.notif);}
       else{
         oSyncDot('err');
         if(d.error==='auth'||d.error==='session'){oSessionLost();}
-        else if(d.error==='busy'){if(!silent)oT('Serveur occupé — réessayez dans un instant','w');}
+        else if(d.error==='busy'||!d.error){obEnqueue(payload,cids);setTimeout(obFlush,4000);}   // v3.44 — serveur occupé / réponse illisible : on garde et on renvoie tout seul (rien n'est perdu)
         else if(d.error==='super_admin'){oT('👑 Réservé au super-admin : seul Jean-Charles peut créer ou modifier un administrateur','e');try{oPull();}catch(e){}}
         else if(d.error==='op'){if(!silent)oT('Le script Google n\'est pas à jour — collez la dernière version (Réglages → aide)','e');}
-        else if(!silent)oT('Écriture refusée : '+(d.error||'?'),'e');
+        else{if(dseq)dClear(cids,dseq);if(!silent)oT('Écriture refusée : '+(d.error||'?'),'e');}
       }
     })
     .catch(function(){obEnqueue(payload,cids);oSyncDot('err');if(!silent)oT('📴 Réseau indisponible — enregistré sur cet appareil, envoi automatique dès le retour du réseau','w');});
+}
+// v3.44 — fiches modifiées dont l'envoi n'est pas encore confirmé par le serveur : jamais écrasées par une synchronisation, renvoyées d'office
+function dKey(){return'owlht2_dirty_'+((USER&&USER.id)||'x');}
+function dGet(){try{return JSON.parse(localStorage.getItem(dKey())||'{}')||{};}catch(e){return{};}}
+function dSet(o){try{localStorage.setItem(dKey(),JSON.stringify(o));}catch(e){}}
+function dMark(cids,seq){var o=dGet();cids.forEach(function(id){o[id]=seq;});dSet(o);}
+function dClear(cids,seq){var o=dGet();cids.forEach(function(id){if(seq===0||o[id]===seq)delete o[id];});dSet(o);}
+function collabLocal(srv,loc){   // garde la copie locale, y ajoute ce que le serveur a en plus (journal, actions, précautions)
+  try{var del={};(srv.jrnDel||[]).concat(loc.jrnDel||[]).forEach(function(id){del[id]=1;});var by={},ord=[];
+    (srv.journal||[]).concat(loc.journal||[]).forEach(function(e){if(!e||!e.id||del[e.id])return;if(!by[e.id])ord.push(e.id);by[e.id]=e;});
+    loc.journal=ord.map(function(id){return by[id];}).sort(function(a,b){return String(a.ts||'').localeCompare(String(b.ts||''));});
+    var am=function(a,b){var o={},k;a=a||{};b=b||{};for(k in a)o[k]=a[k];for(k in b){if(!o[k]||String((b[k]&&b[k].doneAt)||'')>=String((o[k]&&o[k].doneAt)||''))o[k]=b[k];}return o;};
+    loc.actions=am(srv.actions,loc.actions);var pt={},p;for(p in(srv.precTransmis||{}))pt[p]=srv.precTransmis[p];for(p in(loc.precTransmis||{}))pt[p]=loc.precTransmis[p];if(Object.keys(pt).length)loc.precTransmis=pt;
+    (loc.comptes||[]).forEach(function(k){var o=(srv.comptes||[]).find(function(x){return x&&x.id===k.id;});if(o)k.actions=am(o.actions,k.actions);});
+  }catch(e){}return loc;
 }
 function oPush(list){list=(list||[]).map(function(x){return(x&&x._real)||x;});oSaveCache();oPost_({op:'upsert',contacts:list});}
 function oPostAsync_(payload){
@@ -4172,7 +4190,7 @@ function oJrnDel(cid,eid){
   var e=(c.journal||[]).find(function(x){return x.id===eid;});if(!e)return;
   if(!(jrnCanEdit(c)||(e.auteur===PARTNER_NOM()&&can('journal')))){oT('Suppression réservée au gestionnaire de la fiche','w');return;}
   if(!confirm('Supprimer cette observation ?\n« '+e.texte.slice(0,120)+' »'))return;
-  c.journal=c.journal.filter(function(x){return x.id!==eid;});
+  c.journal=c.journal.filter(function(x){return x.id!==eid;});c.jrnDel=(c.jrnDel||[]).concat([eid]).slice(-200);
   var lastE=c.journal.slice().sort(function(a,b){return new Date(b.ts)-new Date(a.ts);})[0];c.lastActivity=lastE?lastE.ts:'';
   oPush([c]);oT('🗑 Observation supprimée','w');if(document.getElementById('omo').classList.contains('on'))oOpenF(cid);oRefresh();
 }

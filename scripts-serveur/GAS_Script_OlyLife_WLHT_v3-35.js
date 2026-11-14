@@ -168,6 +168,33 @@ function saveDB_(db) {
 }
 
 // ── UTILISATEURS & DROITS ───────────────────────────────────────────
+// ═══ v3.35 — FUSION « COLLABORATIVE » d'une fiche reçue avec celle du serveur ═══
+// Une copie de fiche envoyée par un appareil en retard (ou des envois arrivés dans le désordre) n'efface plus ce qu'un autre appareil a fait :
+// journal = union par id (moins les suppressions connues) · actions = la plus récente par clé · précautions / témoignages envoyés = union ·
+// comptes supplémentaires = mêmes règles pour leurs actions · factures = la marque « envoyée » n'est jamais perdue.
+function actMerge_(a, b) {
+  var out = {}, k; a = a || {}; b = b || {};
+  for (k in a) out[k] = a[k];
+  for (k in b) { if (!out[k]) { out[k] = b[k]; continue; } var ta = String((out[k] && out[k].doneAt) || ''), tb = String((b[k] && b[k].doneAt) || ''); if (tb >= ta) out[k] = b[k]; }
+  return out;
+}
+function collabMerge_(old, nc) {
+  try {
+    if (!old || !nc) return;
+    var del = {}; (old.jrnDel || []).concat(nc.jrnDel || []).forEach(function (id) { if (id) del[id] = 1; });
+    var byId = {}, order = [], kid = function (e) { return e.id || ('t_' + (e.ts || '') + '_' + String(e.texte || '').slice(0, 40)); };
+    (old.journal || []).forEach(function (e) { if (!e) return; var id = kid(e); if (del[id]) return; if (!byId[id]) order.push(id); byId[id] = e; });
+    (nc.journal || []).forEach(function (e) { if (!e) return; var id = kid(e); if (del[id]) return; if (!byId[id]) order.push(id); byId[id] = e; });
+    if (order.length || nc.journal) nc.journal = order.map(function (id) { return byId[id]; }).sort(function (x, y) { return String(x.ts || '').localeCompare(String(y.ts || '')); });
+    var dk = Object.keys(del); if (dk.length) nc.jrnDel = dk.slice(-200);
+    if (old.actions || nc.actions) nc.actions = actMerge_(old.actions, nc.actions);
+    if (old.precTransmis || nc.precTransmis) { var pt = {}, p; for (p in (old.precTransmis || {})) pt[p] = old.precTransmis[p]; for (p in (nc.precTransmis || {})) pt[p] = nc.precTransmis[p]; nc.precTransmis = pt; }
+    if (nc.comptes && old.comptes) nc.comptes.forEach(function (kc) { if (!kc || !kc.id) return; for (var i = 0; i < old.comptes.length; i++) if (old.comptes[i] && old.comptes[i].id === kc.id) { kc.actions = actMerge_(old.comptes[i].actions, kc.actions); break; } });
+    if (nc.factures && old.factures) nc.factures.forEach(function (f) { if (!f || !f.id || f.envoyeLe) return; for (var i = 0; i < old.factures.length; i++) if (old.factures[i] && old.factures[i].id === f.id && old.factures[i].envoyeLe) { f.envoyeLe = old.factures[i].envoyeLe; f.envoyePar = old.factures[i].envoyePar; f.canal = old.factures[i].canal || f.canal; break; } });
+    if (old.temRecus || nc.temRecus) { var seen = {}, tr = []; (old.temRecus || []).concat(nc.temRecus || []).forEach(function (r) { if (!r) return; var key = r.tid + '|' + r.le; if (seen[key]) return; seen[key] = 1; tr.push(r); }); nc.temRecus = tr; }
+    if (old.lastActivity && String(old.lastActivity) > String(nc.lastActivity || '')) nc.lastActivity = old.lastActivity;
+  } catch (e) { Logger.log('collabMerge : ' + e); }
+}
 function findUser_(db, code) {
   if (!code) return null;
   code = String(code).replace(/\s+/g, '').toUpperCase();   // v3.25 — code d'accès insensible à la casse et aux espaces
@@ -270,7 +297,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.34';
+var SRV_VERSION = '3.35';
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
@@ -907,6 +934,7 @@ function doPost(e) {
         for (var i = 0; i < db.contacts.length; i++) { if (db.contacts[i].id === nc.id) { idx = i; break; } }
         if (idx >= 0) {
           if (user.role !== 'admin' && !isVisible_(db.contacts[idx], user)) return; // pas le droit
+          collabMerge_(db.contacts[idx], nc);   // v3.35 — journal, actions faites, précautions… : on additionne, on n'écrase plus (deux appareils, envois croisés)
           var merged = {};
           var k;
           for (k in db.contacts[idx]) merged[k] = db.contacts[idx][k];
