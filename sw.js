@@ -11,12 +11,12 @@ self.addEventListener('install', function (e) {
   }).then(function () { return self.skipWaiting(); }));
 });
 
-/* v3.47 — captures des tutoriels : rangées en cache en arrière-plan (sans retarder l'installation),
-   pour que l'aide reste lisible hors ligne. La liste vient de aide/tutos.json. */
+/* v3.47 — captures du parcours « Bien démarrer » : rangées en cache en arrière-plan (sans retarder
+   l'installation). Celles des autres parcours le sont à la première lecture du tuto. */
 function warmAide() {
   return fetch(new Request('./aide/tutos.json', { cache: 'no-store' })).then(function (r) { return r.json(); }).then(function (d) {
     var imgs = [];
-    (d.tutos || []).forEach(function (t) { (t.etapes || []).forEach(function (s) { if (s.img) imgs.push(new URL('./aide/img/' + s.img, self.location).href); }); });
+    (d.tutos || []).forEach(function (t) { if (t.parcours !== 0) return; (t.etapes || []).forEach(function (s) { if (s.img) imgs.push(new URL('./aide/img/' + s.img, self.location).href); }); });
     return caches.open(VERSION).then(function (c) {
       return imgs.reduce(function (p, u) {
         return p.then(function () { return c.match(u); }).then(function (hit) { if (hit) return; return fetch(u).then(function (r) { if (r && r.ok) return c.put(u, r); }).catch(function () {}); });

@@ -9,14 +9,15 @@ function day(n) { var d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDa
 function at(n, h, m) { var d = day(n); d.setHours(h, m || 0, 0, 0); return d.toISOString(); }
 
 var ROLES = {
-  gestionnaire: { id: 'u_demo_gest', nom: 'Camille Martin', role: 'gestionnaire', tags: ['Camille'] },
-  referent:     { id: 'u_demo_ref',  nom: 'Sophie Lambert', role: 'referent',     tags: ['Sophie'] },
-  admin:        { id: 'u_demo_adm',  nom: 'Alex Morel',     role: 'admin',        tags: ['Alex'] }
+  gestionnaire: { id: 'u_demo_gest', nom: 'Camille Martin', role: 'gestionnaire', tags: ['Camille'], tel: '+33 6 39 98 01 01', email: 'camille.martin@exemple.fr' },
+  referent:     { id: 'u_demo_ref',  nom: 'Sophie Lambert', role: 'referent',     tags: ['Sophie'],  tel: '+33 6 39 98 01 02', email: 'sophie.lambert@exemple.fr' },
+  admin:        { id: 'u_demo_adm',  nom: 'Alex Morel',     role: 'admin',        tags: ['Alex'],    tel: '+33 6 39 98 01 03', email: 'alex.morel@exemple.fr' }
 };
 
 function build(role) {
-  var me = Object.assign({ tel: '+33 6 39 98 01 01', email: 'camille.martin@exemple.fr', photo: '',
-    calendlyUrl: '', zoomUrl: '', memberId: '', rang: '', push: true, actif: true }, ROLES[role || 'gestionnaire']);
+  var me = Object.assign({ photo: '', calendlyUrl: '', zoomUrl: '', memberId: '', rang: '', push: true, actif: true,
+    pubToken: 'DEMO' }, ROLES[role || 'gestionnaire']);
+  if (me.role !== 'referent') me.zoomUrl = 'https://us05web.zoom.us/j/0000000000';
   var G = 'Camille Martin', R = 'Sophie Lambert';
 
   function j(n, h, auteur, type, texte) {
@@ -55,10 +56,11 @@ function build(role) {
   ];
 
   var users = [
-    Object.assign({ tel: '+33 6 39 98 01 01', email: 'camille.martin@exemple.fr', actif: true }, ROLES.gestionnaire),
-    Object.assign({ tel: '+33 6 39 98 01 02', email: 'sophie.lambert@exemple.fr', actif: true, gestionnaire: G }, ROLES.referent),
-    Object.assign({ tel: '+33 6 39 98 01 03', email: 'alex.morel@exemple.fr', actif: true }, ROLES.admin)
+    Object.assign({ actif: true }, ROLES.gestionnaire),
+    Object.assign({ actif: true, gestionnaire: G }, ROLES.referent),
+    Object.assign({ actif: true }, ROLES.admin)
   ];
+  var equipe = [ROLES.gestionnaire, ROLES.admin].map(function (u) { return { nom: u.nom, role: u.role, tel: u.tel, email: u.email, photo: '' }; });
 
   return {
     ok: true,
@@ -66,7 +68,7 @@ function build(role) {
     user: me,
     users: users,
     contacts: contacts,
-    config: { referents: [{ nom: R, tag: 'Sophie' }], suiveurs: [G], params: { liens: { onesignalAppId: '' } }, leadsNew: 0 }
+    config: { srv: '3.37', referents: ['Sophie'], suiveurs: [G], equipe: equipe, params: { liens: { onesignalAppId: '' } }, leadsNew: 0 }
   };
 }
 

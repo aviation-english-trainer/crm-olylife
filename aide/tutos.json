@@ -8,34 +8,110 @@
     "admin": "Administrateur"
   },
   "parcours": [
-    { "id": 0, "titre": "Bien démarrer", "pour": "Tous les rôles", "disponible": true },
-    { "id": 1, "titre": "Référent", "pour": "Ajouter et suivre ses contacts", "disponible": false, "prevus": 8 },
-    { "id": 2, "titre": "Gestionnaire : la fiche et le suivi", "pour": "Fiche, statuts, messages, rendez-vous", "disponible": false, "prevus": 10 },
-    { "id": 3, "titre": "Gestionnaire : commande et livraison", "pour": "Proposition, règlement, logistique", "disponible": false, "prevus": 12 },
-    { "id": 4, "titre": "Gestionnaire : accompagnement", "pour": "Précautions, fiches conseils de soins, témoignages", "disponible": false, "prevus": 8 },
-    { "id": 5, "titre": "Comité scientifique", "pour": "Avis, fiches conseils de soins, propositions", "disponible": false, "prevus": 3 },
-    { "id": 6, "titre": "Administrateur", "pour": "Comptes, droits, modèles, intégrations", "disponible": false, "prevus": 10 }
+    {
+      "id": 0,
+      "titre": "Bien démarrer",
+      "pour": "Tous les rôles",
+      "disponible": true
+    },
+    {
+      "id": 1,
+      "titre": "Référent",
+      "pour": "Ajouter, inscrire et suivre ses contacts",
+      "disponible": true
+    },
+    {
+      "id": 2,
+      "titre": "Gestionnaire : la fiche et le suivi",
+      "pour": "Fiche, statuts, messages, rendez-vous",
+      "disponible": true
+    },
+    {
+      "id": 3,
+      "titre": "Gestionnaire : commande et livraison",
+      "pour": "Proposition, règlement, logistique",
+      "disponible": false,
+      "prevus": 12
+    },
+    {
+      "id": 4,
+      "titre": "Gestionnaire : accompagnement",
+      "pour": "Précautions, fiches conseils de soins, témoignages",
+      "disponible": false,
+      "prevus": 8
+    },
+    {
+      "id": 5,
+      "titre": "Comité scientifique",
+      "pour": "Avis, fiches conseils de soins, propositions",
+      "disponible": false,
+      "prevus": 3
+    },
+    {
+      "id": 6,
+      "titre": "Administrateur",
+      "pour": "Comptes, droits, modèles, intégrations",
+      "disponible": false,
+      "prevus": 10
+    }
   ],
   "tutos": [
     {
       "slug": "se-connecter",
       "titre": "Se connecter avec son code d'accès",
-      "roles": ["referent", "gestionnaire", "comite", "admin"],
+      "roles": [
+        "referent",
+        "gestionnaire",
+        "comite",
+        "admin"
+      ],
       "parcours": 0,
       "ordre": 1,
       "ecran": "login",
       "duree": 2,
       "objectif": "À la fin, vous savez ouvrir le CRM sur votre appareil avec votre code personnel et retrouver vos contacts.",
       "etapes": [
-        { "texte": "Ouvrez **crm.team-waterlifehightech.com** dans votre navigateur. Touchez le champ **Votre code d'accès**.", "img": "se-connecter-1.jpg", "alt": "Écran de connexion du CRM, le champ du code d'accès est entouré." },
-        { "texte": "Saisissez le code que votre administrateur vous a remis. Majuscules, minuscules et espaces n'ont pas d'importance. Touchez **Se connecter**.", "img": "se-connecter-2.jpg", "alt": "Le code est saisi, le bouton Se connecter est entouré." },
-        { "texte": "Votre tableau de bord s'ouvre. Vous n'y voyez que les contacts qui vous concernent : c'est normal, chaque membre de l'équipe a son propre périmètre.", "img": "se-connecter-3.jpg", "alt": "Tableau de bord du CRM après la connexion." },
-        { "texte": "C'est tout. Le code n'est demandé **qu'une fois par appareil**. La session se ferme d'elle-même après 30 jours sans utilisation : il suffit alors de ressaisir votre code." }
+        {
+          "texte": "Ouvrez **crm.team-waterlifehightech.com** dans votre navigateur. Touchez le champ **Votre code d'accès**.",
+          "img": "se-connecter-1.jpg",
+          "alt": "Écran de connexion du CRM, le champ du code d'accès est entouré."
+        },
+        {
+          "texte": "Saisissez le code que votre administrateur vous a remis. Majuscules, minuscules et espaces n'ont pas d'importance. Touchez **Se connecter**.",
+          "img": "se-connecter-2.jpg",
+          "alt": "Le code est saisi, le bouton Se connecter est entouré."
+        },
+        {
+          "texte": "Votre tableau de bord s'ouvre. Vous n'y voyez que les contacts qui vous concernent : c'est normal, chaque membre de l'équipe a son propre périmètre.",
+          "img": "se-connecter-3.jpg",
+          "alt": "Tableau de bord du CRM après la connexion."
+        },
+        {
+          "texte": "C'est tout. Le code n'est demandé **qu'une fois par appareil**. La session se ferme d'elle-même après 30 jours sans utilisation : il suffit alors de ressaisir votre code."
+        }
       ],
       "piege": "Ne tentez pas plusieurs codes au hasard. Après une série de codes refusés, le CRM bloque **toutes** les connexions de l'équipe pendant 10 minutes. Si votre code est refusé deux fois, arrêtez-vous et redemandez-le à votre administrateur. Votre code est personnel : ne le partagez pas.",
       "verif": [
-        { "q": "Combien de fois le code d'accès est-il demandé sur un même téléphone ?", "choix": ["À chaque ouverture", "Une seule fois, puis après 30 jours sans utilisation", "Une fois par semaine"], "bonne": 1, "pourquoi": "Le code ouvre une session propre à l'appareil. Elle reste active tant que vous utilisez le CRM." },
-        { "q": "Votre code est refusé deux fois de suite. Que faites-vous ?", "choix": ["J'essaie d'autres combinaisons", "J'utilise le code d'un collègue", "Je m'arrête et je le redemande à mon administrateur"], "bonne": 2, "pourquoi": "Trop de codes refusés bloquent les connexions de toute l'équipe pendant 10 minutes." }
+        {
+          "q": "Combien de fois le code d'accès est-il demandé sur un même téléphone ?",
+          "choix": [
+            "À chaque ouverture",
+            "Une fois par semaine",
+            "Une seule fois, puis après 30 jours sans utilisation"
+          ],
+          "bonne": 2,
+          "pourquoi": "Le code ouvre une session propre à l'appareil. Elle reste active tant que vous utilisez le CRM."
+        },
+        {
+          "q": "Votre code est refusé deux fois de suite. Que faites-vous ?",
+          "choix": [
+            "J'essaie d'autres combinaisons",
+            "J'utilise le code d'un collègue",
+            "Je m'arrête et je le redemande à mon administrateur"
+          ],
+          "bonne": 2,
+          "pourquoi": "Trop de codes refusés bloquent les connexions de toute l'équipe pendant 10 minutes."
+        }
       ],
       "version": "3.47",
       "video": ""
@@ -43,22 +119,57 @@
     {
       "slug": "installer",
       "titre": "Installer le CRM sur son téléphone",
-      "roles": ["referent", "gestionnaire", "comite", "admin"],
+      "roles": [
+        "referent",
+        "gestionnaire",
+        "comite",
+        "admin"
+      ],
       "parcours": 0,
       "ordre": 2,
       "ecran": "installation",
       "duree": 2,
       "objectif": "À la fin, le CRM s'ouvre depuis une icône verte sur votre écran d'accueil, comme une vraie application.",
       "etapes": [
-        { "texte": "**Sur Android** — juste après la connexion, le CRM vous propose l'installation. Touchez **Installer maintenant**, puis confirmez. Si rien ne se passe, suivez les trois étapes affichées : menu **⋮** de Chrome, puis **Installer l'application**.", "img": "installer-1.jpg", "alt": "Écran Installez l'application CRM sur Android, le bouton Installer maintenant est entouré." },
-        { "texte": "**Sur iPhone** — ouvrez le CRM dans **Safari**. Touchez le bouton **Partager**, faites défiler, choisissez **Sur l'écran d'accueil**, puis **Ajouter**.", "img": "installer-2.jpg", "alt": "Écran d'installation sur iPhone avec les trois étapes Safari." },
-        { "texte": "Fermez le navigateur. Ouvrez désormais le CRM depuis **l'icône verte** de votre écran d'accueil : il s'affiche en plein écran, sans barre d'adresse." },
-        { "texte": "Pas le temps maintenant ? Touchez **Continuer dans le navigateur pour cette fois**. Le CRM vous le reproposera plus tard." }
+        {
+          "texte": "**Sur Android** — juste après la connexion, le CRM vous propose l'installation. Touchez **Installer maintenant**, puis confirmez. Si rien ne se passe, suivez les trois étapes affichées : menu **⋮** de Chrome, puis **Installer l'application**.",
+          "img": "installer-1.jpg",
+          "alt": "Écran Installez l'application CRM sur Android, le bouton Installer maintenant est entouré."
+        },
+        {
+          "texte": "**Sur iPhone** — ouvrez le CRM dans **Safari**. Touchez le bouton **Partager**, faites défiler, choisissez **Sur l'écran d'accueil**, puis **Ajouter**.",
+          "img": "installer-2.jpg",
+          "alt": "Écran d'installation sur iPhone avec les trois étapes Safari."
+        },
+        {
+          "texte": "Fermez le navigateur. Ouvrez désormais le CRM depuis **l'icône verte** de votre écran d'accueil : il s'affiche en plein écran, sans barre d'adresse."
+        },
+        {
+          "texte": "Pas le temps maintenant ? Touchez **Continuer dans le navigateur pour cette fois**. Le CRM vous le reproposera plus tard."
+        }
       ],
       "piege": "Sur iPhone, l'installation ne fonctionne que depuis **Safari** — pas depuis Chrome, ni depuis le navigateur qui s'ouvre dans WhatsApp. Et une fois l'application installée, pensez à passer par l'icône verte : c'est elle qui permet de recevoir les notifications sur iPhone.",
       "verif": [
-        { "q": "Sur iPhone, depuis quel navigateur installe-t-on le CRM ?", "choix": ["Chrome", "Safari", "Le navigateur de WhatsApp"], "bonne": 1, "pourquoi": "Sur iPhone, seul Safari sait ajouter une application à l'écran d'accueil." },
-        { "q": "Une fois installé, comment ouvrez-vous le CRM ?", "choix": ["Depuis l'icône verte de l'écran d'accueil", "En retapant l'adresse dans le navigateur", "Depuis un lien reçu par message"], "bonne": 0, "pourquoi": "L'icône ouvre le CRM en plein écran et active les rappels sur votre téléphone." }
+        {
+          "q": "Sur iPhone, depuis quel navigateur installe-t-on le CRM ?",
+          "choix": [
+            "Le navigateur de WhatsApp",
+            "Chrome",
+            "Safari"
+          ],
+          "bonne": 2,
+          "pourquoi": "Sur iPhone, seul Safari sait ajouter une application à l'écran d'accueil."
+        },
+        {
+          "q": "Une fois installé, comment ouvrez-vous le CRM ?",
+          "choix": [
+            "En retapant l'adresse dans le navigateur",
+            "Depuis l'icône verte de l'écran d'accueil",
+            "Depuis un lien reçu par message"
+          ],
+          "bonne": 1,
+          "pourquoi": "L'icône ouvre le CRM en plein écran et active les rappels sur votre téléphone."
+        }
       ],
       "version": "3.47",
       "video": ""
@@ -66,22 +177,61 @@
     {
       "slug": "proteger",
       "titre": "Protéger l'app : code PIN, empreinte ou schéma",
-      "roles": ["referent", "gestionnaire", "comite", "admin"],
+      "roles": [
+        "referent",
+        "gestionnaire",
+        "comite",
+        "admin"
+      ],
       "parcours": 0,
       "ordre": 3,
       "ecran": "profil-securite",
       "duree": 3,
       "objectif": "À la fin, personne d'autre que vous ne peut ouvrir le CRM sur votre téléphone.",
       "etapes": [
-        { "texte": "Ouvrez le menu **☰**, touchez votre nom pour ouvrir **Mon profil**, puis descendez jusqu'à **Sécurité de cet appareil**. Touchez **Activer un PIN**.", "img": "proteger-1.jpg", "alt": "Mon profil, rubrique Sécurité de cet appareil, le bouton Activer un PIN est entouré." },
-        { "texte": "Choisissez un code de **4 à 6 chiffres**, touchez **OK**, puis saisissez-le une seconde fois pour le confirmer.", "img": "proteger-2.jpg", "alt": "Clavier de choix du code PIN." },
-        { "texte": "Pour aller plus vite, touchez **Activer** sur la ligne de l'empreinte. Votre téléphone affiche alors sa propre fenêtre : posez le doigt, montrez votre visage ou tracez votre schéma, comme pour déverrouiller l'écran.", "img": "proteger-3.jpg", "alt": "Ligne Ouvrir l'app avec l'empreinte, le visage ou le schéma du téléphone, bouton Activer entouré." },
-        { "texte": "À la prochaine ouverture, et chaque fois que le CRM est resté en arrière-plan plus de deux minutes, l'écran de verrouillage s'affiche.", "img": "proteger-4.jpg", "alt": "Écran de verrouillage du CRM avec le clavier du code PIN." }
+        {
+          "texte": "Ouvrez le menu **☰**, touchez votre nom pour ouvrir **Mon profil**, puis descendez jusqu'à **Sécurité de cet appareil**. Touchez **Activer un PIN**.",
+          "img": "proteger-1.jpg",
+          "alt": "Mon profil, rubrique Sécurité de cet appareil, le bouton Activer un PIN est entouré."
+        },
+        {
+          "texte": "Choisissez un code de **4 à 6 chiffres**, touchez **OK**, puis saisissez-le une seconde fois pour le confirmer.",
+          "img": "proteger-2.jpg",
+          "alt": "Clavier de choix du code PIN."
+        },
+        {
+          "texte": "Pour aller plus vite, touchez **Activer** sur la ligne de l'empreinte. Votre téléphone affiche alors sa propre fenêtre : posez le doigt, montrez votre visage ou tracez votre schéma, comme pour déverrouiller l'écran.",
+          "img": "proteger-3.jpg",
+          "alt": "Ligne Ouvrir l'app avec l'empreinte, le visage ou le schéma du téléphone, bouton Activer entouré."
+        },
+        {
+          "texte": "À la prochaine ouverture, et chaque fois que le CRM est resté en arrière-plan plus de deux minutes, l'écran de verrouillage s'affiche.",
+          "img": "proteger-4.jpg",
+          "alt": "Écran de verrouillage du CRM avec le clavier du code PIN."
+        }
       ],
       "piege": "Le verrou ne vaut que pour **cet appareil** : si vous utilisez aussi une tablette, activez-le là aussi. Code PIN oublié ? Touchez **Me reconnecter avec mon code d'accès** : vous êtes déconnecté de l'appareil et vous aurez besoin de votre code d'accès. Gardez-le donc à portée de main.",
       "verif": [
-        { "q": "Vous avez activé le PIN sur votre téléphone. Et sur votre tablette ?", "choix": ["Elle est protégée aussi, automatiquement", "Il faut l'activer aussi sur la tablette", "Le PIN ne fonctionne pas sur tablette"], "bonne": 1, "pourquoi": "Le verrou est enregistré sur l'appareil, pas sur votre compte." },
-        { "q": "La fenêtre qui demande l'empreinte ne ressemble pas au CRM. Est-ce normal ?", "choix": ["Non, il faut fermer l'application", "Oui, c'est la fenêtre de votre téléphone", "Oui, mais seulement sur iPhone"], "bonne": 1, "pourquoi": "L'empreinte, le visage et le schéma sont vérifiés par le téléphone lui-même. Le CRM ne les voit jamais." }
+        {
+          "q": "Vous avez activé le PIN sur votre téléphone. Et sur votre tablette ?",
+          "choix": [
+            "Elle est protégée aussi, automatiquement",
+            "Le PIN ne fonctionne pas sur tablette",
+            "Il faut l'activer aussi sur la tablette"
+          ],
+          "bonne": 2,
+          "pourquoi": "Le verrou est enregistré sur l'appareil, pas sur votre compte."
+        },
+        {
+          "q": "La fenêtre qui demande l'empreinte ne ressemble pas au CRM. Est-ce normal ?",
+          "choix": [
+            "Oui, mais seulement sur iPhone",
+            "Oui, c'est la fenêtre de votre téléphone",
+            "Non, il faut fermer l'application"
+          ],
+          "bonne": 1,
+          "pourquoi": "L'empreinte, le visage et le schéma sont vérifiés par le téléphone lui-même. Le CRM ne les voit jamais."
+        }
       ],
       "version": "3.47",
       "video": ""
@@ -89,22 +239,57 @@
     {
       "slug": "notifications",
       "titre": "Activer les notifications",
-      "roles": ["referent", "gestionnaire", "comite", "admin"],
+      "roles": [
+        "referent",
+        "gestionnaire",
+        "comite",
+        "admin"
+      ],
       "parcours": 0,
       "ordre": 4,
       "ecran": "profil-notifications",
       "duree": 2,
       "objectif": "À la fin, votre téléphone vous prévient d'une nouvelle demande ou d'un rendez-vous, même quand le CRM est fermé.",
       "etapes": [
-        { "texte": "Ouvrez **Mon profil** et descendez jusqu'à **Notifications sur cet appareil**. Cochez la case **Recevoir les alertes même quand l'app est fermée**.", "img": "notifications-1.jpg", "alt": "Mon profil, rubrique Notifications sur cet appareil, la case à cocher est entourée." },
-        { "texte": "Votre téléphone demande l'autorisation d'envoyer des notifications. Touchez **Autoriser**." },
-        { "texte": "La ligne sous la case passe à **✅ Actives sur cet appareil**. Vous serez prévenu pour : une nouvelle demande, un rendez-vous réservé, une avance ou un don, un rappel d'échéance.", "img": "notifications-2.jpg", "alt": "La case est cochée et la ligne Actives sur cet appareil est entourée." },
-        { "texte": "Pour arrêter les alertes sur cet appareil, décochez simplement la case." }
+        {
+          "texte": "Ouvrez **Mon profil** et descendez jusqu'à **Notifications sur cet appareil**. Cochez la case **Recevoir les alertes même quand l'app est fermée**.",
+          "img": "notifications-1.jpg",
+          "alt": "Mon profil, rubrique Notifications sur cet appareil, la case à cocher est entourée."
+        },
+        {
+          "texte": "Votre téléphone demande l'autorisation d'envoyer des notifications. Touchez **Autoriser**."
+        },
+        {
+          "texte": "La ligne sous la case passe à **✅ Actives sur cet appareil**. Vous serez prévenu pour : une nouvelle demande, un rendez-vous réservé, une avance ou un don, un rappel d'échéance.",
+          "img": "notifications-2.jpg",
+          "alt": "La case est cochée et la ligne Actives sur cet appareil est entourée."
+        },
+        {
+          "texte": "Pour arrêter les alertes sur cet appareil, décochez simplement la case."
+        }
       ],
       "piege": "Si vous touchez **Bloquer** par erreur, la case devient grise et le CRM ne peut plus rien demander : il faut réautoriser les notifications dans les réglages du site (le cadenas à côté de l'adresse), puis revenir. Sur iPhone, la case ne s'active qu'une fois le CRM **installé** sur l'écran d'accueil.",
       "verif": [
-        { "q": "Sur iPhone, que faut-il avoir fait avant d'activer les notifications ?", "choix": ["Installer le CRM sur l'écran d'accueil", "Activer le code PIN", "Remplir son rang"], "bonne": 0, "pourquoi": "Sur iPhone, seule l'application installée peut recevoir des notifications." },
-        { "q": "La case est grise et le CRM indique « notifications bloquées ». Que faire ?", "choix": ["Se déconnecter et se reconnecter", "Les réautoriser dans les réglages du site, puis revenir", "Demander un nouveau code d'accès"], "bonne": 1, "pourquoi": "Le blocage vient du navigateur : c'est dans ses réglages qu'il se lève." }
+        {
+          "q": "Sur iPhone, que faut-il avoir fait avant d'activer les notifications ?",
+          "choix": [
+            "Activer le code PIN",
+            "Remplir son rang",
+            "Installer le CRM sur l'écran d'accueil"
+          ],
+          "bonne": 2,
+          "pourquoi": "Sur iPhone, seule l'application installée peut recevoir des notifications."
+        },
+        {
+          "q": "La case est grise et le CRM indique « notifications bloquées ». Que faire ?",
+          "choix": [
+            "Demander un nouveau code d'accès",
+            "Les réautoriser dans les réglages du site, puis revenir",
+            "Se déconnecter et se reconnecter"
+          ],
+          "bonne": 1,
+          "pourquoi": "Le blocage vient du navigateur : c'est dans ses réglages qu'il se lève."
+        }
       ],
       "version": "3.47",
       "video": ""
@@ -112,22 +297,61 @@
     {
       "slug": "profil",
       "titre": "Remplir « Mon profil »",
-      "roles": ["referent", "gestionnaire", "comite", "admin"],
+      "roles": [
+        "referent",
+        "gestionnaire",
+        "comite",
+        "admin"
+      ],
       "parcours": 0,
       "ordre": 5,
       "ecran": "profil",
       "duree": 4,
       "objectif": "À la fin, vos messages partent avec vos coordonnées, votre agenda et votre salle de visio.",
       "etapes": [
-        { "texte": "Ouvrez le menu **☰** en haut à gauche, puis touchez **votre nom**.", "img": "profil-1.jpg", "alt": "Menu du CRM, la carte au nom de l'utilisateur est entourée." },
-        { "texte": "Ajoutez votre **photo**, votre **téléphone / WhatsApp** et votre **e-mail**. Ce sont les coordonnées que vos contacts et votre équipe verront.", "img": "profil-2.jpg", "alt": "Haut de la fenêtre Mon profil : photo, nom, téléphone, e-mail." },
-        { "texte": "Collez votre **lien Calendly** et votre **lien Zoom** (salle de réunion personnelle). Renseignez votre **Member ID** OlyLife et votre **rang** : ils figurent sur vos propositions de commande.", "img": "profil-3.jpg", "alt": "Champs Calendly, Zoom, Member ID et rang remplis avec des valeurs d'exemple." },
-        { "texte": "Touchez **Enregistrer mon profil**. Un message confirme l'enregistrement.", "img": "profil-4.jpg", "alt": "Le bouton Enregistrer mon profil est entouré." }
+        {
+          "texte": "Ouvrez le menu **☰** en haut à gauche, puis touchez **votre nom**.",
+          "img": "profil-1.jpg",
+          "alt": "Menu du CRM, la carte au nom de l'utilisateur est entourée."
+        },
+        {
+          "texte": "Ajoutez votre **photo**, votre **téléphone / WhatsApp** et votre **e-mail**. Ce sont les coordonnées que vos contacts et votre équipe verront.",
+          "img": "profil-2.jpg",
+          "alt": "Haut de la fenêtre Mon profil : photo, nom, téléphone, e-mail."
+        },
+        {
+          "texte": "Collez votre **lien Calendly** et votre **lien Zoom** (salle de réunion personnelle). Renseignez votre **Member ID** OlyLife et votre **rang** : ils figurent sur vos propositions de commande.",
+          "img": "profil-3.jpg",
+          "alt": "Champs Calendly, Zoom, Member ID et rang remplis avec des valeurs d'exemple."
+        },
+        {
+          "texte": "Touchez **Enregistrer mon profil**. Un message confirme l'enregistrement.",
+          "img": "profil-4.jpg",
+          "alt": "Le bouton Enregistrer mon profil est entouré."
+        }
       ],
       "piege": "Rien n'est gardé tant que vous n'avez pas touché **Enregistrer mon profil**. Autre oubli fréquent : sans lien Calendly personnel, vos messages proposent l'agenda par défaut de l'équipe, et vos contacts réservent chez quelqu'un d'autre. Le lien doit commencer par **https://calendly.com/**, celui de Zoom par **https://…zoom.us/**.",
       "verif": [
-        { "q": "Vous n'avez pas renseigné de lien Calendly. Quel agenda vos messages proposent-ils ?", "choix": ["Aucun", "L'agenda par défaut de l'équipe", "Celui du contact"], "bonne": 1, "pourquoi": "Sans lien personnel, le CRM utilise l'agenda par défaut. Un compte Calendly gratuit suffit pour avoir le vôtre." },
-        { "q": "Comment changer le nom affiché sur votre profil ?", "choix": ["En le retapant dans Mon profil", "En le demandant à l'administrateur", "En se reconnectant"], "bonne": 1, "pourquoi": "Le nom et le rôle sont gérés par l'administrateur, dans l'onglet Équipe." }
+        {
+          "q": "Vous n'avez pas renseigné de lien Calendly. Quel agenda vos messages proposent-ils ?",
+          "choix": [
+            "Celui du contact",
+            "L'agenda par défaut de l'équipe",
+            "Aucun"
+          ],
+          "bonne": 1,
+          "pourquoi": "Sans lien personnel, le CRM utilise l'agenda par défaut. Un compte Calendly gratuit suffit pour avoir le vôtre."
+        },
+        {
+          "q": "Comment changer le nom affiché sur votre profil ?",
+          "choix": [
+            "En se reconnectant",
+            "En le retapant dans Mon profil",
+            "En le demandant à l'administrateur"
+          ],
+          "bonne": 2,
+          "pourquoi": "Le nom et le rôle sont gérés par l'administrateur, dans l'onglet Équipe."
+        }
       ],
       "version": "3.47",
       "video": ""
@@ -135,22 +359,59 @@
     {
       "slug": "accueil",
       "titre": "Comprendre l'écran d'accueil et « Ma journée »",
-      "roles": ["referent", "gestionnaire", "comite", "admin"],
+      "roles": [
+        "referent",
+        "gestionnaire",
+        "comite",
+        "admin"
+      ],
       "parcours": 0,
       "ordre": 6,
       "ecran": "dashboard",
       "duree": 3,
       "objectif": "À la fin, vous savez en dix secondes, chaque matin, qui contacter et quels rendez-vous vous attendent.",
       "etapes": [
-        { "texte": "En haut, six compteurs résument votre activité : **À contacter**, **En cours**, **Prêts à closer**, **Dans le réseau**, **Rappels dus**, **RDV 7 jours**. Touchez un compteur pour ouvrir la liste correspondante.", "img": "accueil-1.jpg", "alt": "Tableau de bord, les six compteurs sont entourés." },
-        { "texte": "**Ma journée** réunit ce qui compte aujourd'hui : les rappels en retard (en rouge), les rappels et rendez-vous du jour, ceux de demain, puis les personnes **à contacter en priorité**. Touchez une ligne pour ouvrir la fiche, **📞** pour appeler, **✅** quand le rappel est fait.", "img": "accueil-2.jpg", "alt": "Carte Ma journée avec un rappel en retard, un rappel du jour et un rendez-vous." },
-        { "texte": "La barre du bas mène aux écrans principaux : **Accueil**, **Contacts**, **Agenda**, **Actions**, **Équipe**. Le bouton **+** crée un contact. Le menu **☰** donne accès à tout le reste.", "img": "accueil-3.jpg", "alt": "Barre de navigation du bas entourée." },
-        { "texte": "Prenez l'habitude d'ouvrir **Ma journée** en premier : quand elle affiche « Rien d'urgent aujourd'hui », vous êtes à jour." }
+        {
+          "texte": "En haut, six compteurs résument votre activité : **À contacter**, **En cours**, **Prêts à closer**, **Dans le réseau**, **Rappels dus**, **RDV 7 jours**. Touchez un compteur pour ouvrir la liste correspondante.",
+          "img": "accueil-1.jpg",
+          "alt": "Tableau de bord, les six compteurs sont entourés."
+        },
+        {
+          "texte": "**Ma journée** réunit ce qui compte aujourd'hui : les rappels en retard (en rouge), les rappels et rendez-vous du jour, ceux de demain, puis les personnes **à contacter en priorité**. Touchez une ligne pour ouvrir la fiche, **📞** pour appeler, **✅** quand le rappel est fait.",
+          "img": "accueil-2.jpg",
+          "alt": "Carte Ma journée avec un rappel en retard, un rappel du jour et un rendez-vous."
+        },
+        {
+          "texte": "La barre du bas mène aux écrans principaux : **Accueil**, **Contacts**, **Agenda**, **Actions**, **Équipe**. Le bouton **+** crée un contact. Le menu **☰** donne accès à tout le reste.",
+          "img": "accueil-3.jpg",
+          "alt": "Barre de navigation du bas entourée."
+        },
+        {
+          "texte": "Prenez l'habitude d'ouvrir **Ma journée** en premier : quand elle affiche « Rien d'urgent aujourd'hui », vous êtes à jour."
+        }
       ],
       "piege": "Gestionnaires et administrateurs : les deux boutons **Mes contacts / Toute l'équipe** changent tout ce que l'écran compte. Si un chiffre vous surprend ou qu'un contact « a disparu », regardez d'abord lequel des deux est sélectionné. Les référents, eux, ne voient que leurs propres contacts. Référents et membres du comité scientifique n'ont pas les onglets Actions et Équipe.",
       "verif": [
-        { "q": "Où voyez-vous d'un coup d'œil les rappels en retard ?", "choix": ["Dans Mon profil", "Dans Ma journée, en rouge", "Dans les Réglages"], "bonne": 1, "pourquoi": "Ma journée place les rappels en retard tout en haut, avant ceux du jour." },
-        { "q": "Un compteur affiche un chiffre inattendu. Que vérifiez-vous en premier ?", "choix": ["Le bouton Mes contacts / Toute l'équipe", "Votre code PIN", "La version de l'application"], "bonne": 0, "pourquoi": "Ce bouton change le périmètre de tous les compteurs de l'accueil." }
+        {
+          "q": "Où voyez-vous d'un coup d'œil les rappels en retard ?",
+          "choix": [
+            "Dans Ma journée, en rouge",
+            "Dans Mon profil",
+            "Dans les Réglages"
+          ],
+          "bonne": 0,
+          "pourquoi": "Ma journée place les rappels en retard tout en haut, avant ceux du jour."
+        },
+        {
+          "q": "Un compteur affiche un chiffre inattendu. Que vérifiez-vous en premier ?",
+          "choix": [
+            "La version de l'application",
+            "Votre code PIN",
+            "Le bouton Mes contacts / Toute l'équipe"
+          ],
+          "bonne": 2,
+          "pourquoi": "Ce bouton change le périmètre de tous les compteurs de l'accueil."
+        }
       ],
       "version": "3.47",
       "video": ""
@@ -158,22 +419,59 @@
     {
       "slug": "hors-ligne",
       "titre": "Travailler sans réseau et synchroniser",
-      "roles": ["referent", "gestionnaire", "comite", "admin"],
+      "roles": [
+        "referent",
+        "gestionnaire",
+        "comite",
+        "admin"
+      ],
       "parcours": 0,
       "ordre": 7,
       "ecran": "sync",
       "duree": 3,
       "objectif": "À la fin, vous continuez à noter vos échanges sans connexion, en sachant que rien ne sera perdu.",
       "etapes": [
-        { "texte": "En haut de l'écran, un petit point indique l'état de la connexion : **vert**, tout est enregistré sur le serveur ; **rouge**, le serveur est injoignable.", "img": "hors-ligne-1.jpg", "alt": "Barre du haut du CRM, le point de synchronisation est entouré." },
-        { "texte": "Sans réseau, continuez normalement. Vos saisies sont gardées **sur l'appareil** et un bandeau jaune indique combien de modifications attendent.", "img": "hors-ligne-2.jpg", "alt": "Bandeau jaune : 1 modification en attente, envoi automatique dès le retour du réseau." },
-        { "texte": "Dès que le réseau revient, l'envoi se fait **tout seul** et le bandeau disparaît. Pour récupérer aussi les nouveautés de vos collègues, touchez le bouton **Synchroniser** (la flèche ronde).", "img": "hors-ligne-3.jpg", "alt": "Le point est redevenu vert, le bouton Synchroniser est entouré." },
-        { "texte": "Vous utilisez deux appareils ? Laissez le premier terminer son envoi (point vert) avant de reprendre le travail sur le second." }
+        {
+          "texte": "En haut de l'écran, un petit point indique l'état de la connexion : **vert**, tout est enregistré sur le serveur ; **rouge**, le serveur est injoignable.",
+          "img": "hors-ligne-1.jpg",
+          "alt": "Barre du haut du CRM, le point de synchronisation est entouré."
+        },
+        {
+          "texte": "Sans réseau, continuez normalement. Vos saisies sont gardées **sur l'appareil** et un bandeau jaune indique combien de modifications attendent.",
+          "img": "hors-ligne-2.jpg",
+          "alt": "Bandeau jaune : 1 modification en attente, envoi automatique dès le retour du réseau."
+        },
+        {
+          "texte": "Dès que le réseau revient, l'envoi se fait **tout seul** et le bandeau disparaît. Pour récupérer aussi les nouveautés de vos collègues, touchez le bouton **Synchroniser** (la flèche ronde).",
+          "img": "hors-ligne-3.jpg",
+          "alt": "Le point est redevenu vert, le bouton Synchroniser est entouré."
+        },
+        {
+          "texte": "Vous utilisez deux appareils ? Laissez le premier terminer son envoi (point vert) avant de reprendre le travail sur le second."
+        }
       ],
       "piege": "Tant que le bandeau jaune est affiché, **ne vous déconnectez pas** et n'effacez pas les données du navigateur : les modifications en attente ne sont encore que sur votre appareil, et elles seraient perdues.",
       "verif": [
-        { "q": "Vous notez un appel dans un parking sans réseau. Que devient votre note ?", "choix": ["Elle est perdue", "Elle est gardée sur l'appareil, puis envoyée au retour du réseau", "Elle bloque l'application"], "bonne": 1, "pourquoi": "Le CRM met la modification en attente et l'envoie automatiquement." },
-        { "q": "Le bandeau « modification en attente » est affiché. Que faut-il éviter ?", "choix": ["Continuer à saisir", "Se déconnecter du CRM", "Ouvrir une autre fiche"], "bonne": 1, "pourquoi": "Se déconnecter efface les données gardées sur l'appareil, y compris celles qui ne sont pas encore parties." }
+        {
+          "q": "Vous notez un appel dans un parking sans réseau. Que devient votre note ?",
+          "choix": [
+            "Elle est perdue",
+            "Elle est gardée sur l'appareil, puis envoyée au retour du réseau",
+            "Elle bloque l'application"
+          ],
+          "bonne": 1,
+          "pourquoi": "Le CRM met la modification en attente et l'envoie automatiquement."
+        },
+        {
+          "q": "Le bandeau « modification en attente » est affiché. Que faut-il éviter ?",
+          "choix": [
+            "Continuer à saisir",
+            "Se déconnecter du CRM",
+            "Ouvrir une autre fiche"
+          ],
+          "bonne": 1,
+          "pourquoi": "Se déconnecter efface les données gardées sur l'appareil, y compris celles qui ne sont pas encore parties."
+        }
       ],
       "version": "3.47",
       "video": ""
@@ -181,22 +479,1101 @@
     {
       "slug": "encouragements",
       "titre": "Les encouragements et le compteur du jour",
-      "roles": ["referent", "gestionnaire", "comite", "admin"],
+      "roles": [
+        "referent",
+        "gestionnaire",
+        "comite",
+        "admin"
+      ],
       "parcours": 0,
       "ordre": 8,
       "ecran": "profil-encouragements",
       "duree": 2,
       "objectif": "À la fin, vous savez lire le compteur du jour, et le couper si vous préférez travailler sans.",
       "etapes": [
-        { "texte": "Chaque fois que vous menez une action à son terme — un appel noté, un rendez-vous fixé, une action cochée, un statut mis à jour — un bandeau vous salue et affiche votre **nombre d'actions du jour**.", "img": "encouragements-1.jpg", "alt": "Bandeau d'encouragement en haut de l'écran avec le compteur 4 actions." },
-        { "texte": "La barre dorée montre le chemin jusqu'au prochain palier : **5, 10, 20, 30, 50** actions. La première action de la journée compte aussi vos **jours d'affilée**." },
-        { "texte": "Le bandeau disparaît seul au bout de quelques secondes. Touchez-le pour le fermer tout de suite." },
-        { "texte": "Vous préférez le calme ? Dans **Mon profil**, rubrique **Sécurité de cet appareil**, décochez **Encouragements après chaque action**.", "img": "encouragements-2.jpg", "alt": "Mon profil, la case Encouragements après chaque action est entourée." }
+        {
+          "texte": "Chaque fois que vous menez une action à son terme — un appel noté, un rendez-vous fixé, une action cochée, un statut mis à jour — un bandeau vous salue et affiche votre **nombre d'actions du jour**.",
+          "img": "encouragements-1.jpg",
+          "alt": "Bandeau d'encouragement en haut de l'écran avec le compteur 4 actions."
+        },
+        {
+          "texte": "La barre dorée montre le chemin jusqu'au prochain palier : **5, 10, 20, 30, 50** actions. La première action de la journée compte aussi vos **jours d'affilée**."
+        },
+        {
+          "texte": "Le bandeau disparaît seul au bout de quelques secondes. Touchez-le pour le fermer tout de suite."
+        },
+        {
+          "texte": "Vous préférez le calme ? Dans **Mon profil**, rubrique **Sécurité de cet appareil**, décochez **Encouragements après chaque action**.",
+          "img": "encouragements-2.jpg",
+          "alt": "Mon profil, la case Encouragements après chaque action est entourée."
+        }
       ],
       "piege": "Ce compteur est un repère **personnel**, gardé sur votre appareil : personne d'autre ne le voit, et ce n'est pas un classement. Il repart de zéro chaque matin, et il est distinct sur chaque appareil. Inutile donc de s'inquiéter s'il affiche un autre chiffre sur votre tablette.",
       "verif": [
-        { "q": "Qui voit votre compteur d'actions du jour ?", "choix": ["Toute l'équipe", "Votre gestionnaire", "Vous seul, sur votre appareil"], "bonne": 2, "pourquoi": "Le compteur est enregistré sur l'appareil. Il n'est envoyé à personne." },
-        { "q": "Où coupe-t-on les encouragements ?", "choix": ["Dans Mon profil", "Dans l'Agenda", "On ne peut pas les couper"], "bonne": 0, "pourquoi": "Une case à cocher dans Mon profil les active ou les coupe, appareil par appareil." }
+        {
+          "q": "Qui voit votre compteur d'actions du jour ?",
+          "choix": [
+            "Toute l'équipe",
+            "Vous seul, sur votre appareil",
+            "Votre gestionnaire"
+          ],
+          "bonne": 1,
+          "pourquoi": "Le compteur est enregistré sur l'appareil. Il n'est envoyé à personne."
+        },
+        {
+          "q": "Où coupe-t-on les encouragements ?",
+          "choix": [
+            "Dans Mon profil",
+            "Dans l'Agenda",
+            "On ne peut pas les couper"
+          ],
+          "bonne": 0,
+          "pourquoi": "Une case à cocher dans Mon profil les active ou les coupe, appareil par appareil."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "ajouter-contact",
+      "titre": "Ajouter un contact",
+      "roles": [
+        "referent",
+        "gestionnaire",
+        "comite",
+        "admin"
+      ],
+      "parcours": 1,
+      "ordre": 9,
+      "ecran": "nouvelle",
+      "duree": 2,
+      "objectif": "À la fin, vous savez créer la fiche d'une personne en moins d'une minute, pour que l'équipe puisse la suivre.",
+      "etapes": [
+        {
+          "texte": "Depuis n'importe quel écran, touchez le bouton **+** en bas à droite.",
+          "img": "ajouter-contact-1.jpg",
+          "alt": "Accueil du référent, le bouton plus est entouré."
+        },
+        {
+          "texte": "Remplissez les trois champs obligatoires : **Nom**, **Prénom**, **Téléphone / WhatsApp**. Ajoutez la ville et l'e-mail si vous les avez.",
+          "img": "ajouter-contact-2.jpg",
+          "alt": "Formulaire Nouveau contact avec le nom, le prénom et le téléphone remplis."
+        },
+        {
+          "texte": "Plus bas, cochez le ou les gestionnaires qui suivront cette personne, notez le contexte dans **Notes générales**, puis touchez **Enregistrer la fiche**.",
+          "img": "ajouter-contact-3.jpg",
+          "alt": "Bas du formulaire, le bouton Enregistrer la fiche est entouré."
+        },
+        {
+          "texte": "La fiche apparaît en tête de vos contacts, avec le statut **À contacter**."
+        }
+      ],
+      "piege": "Saisissez le téléphone **avec l'indicatif du pays** (+33, +225…) : c'est lui qui ouvre la bonne conversation WhatsApp. Si le CRM répond **« Doublon refusé »**, la personne existe déjà avec ce numéro : il vous ouvre sa fiche, inutile d'en créer une seconde.",
+      "verif": [
+        {
+          "q": "Quels sont les champs obligatoires d'un nouveau contact ?",
+          "choix": [
+            "Nom, prénom, téléphone",
+            "Prénom et ville",
+            "Nom, e-mail, adresse"
+          ],
+          "bonne": 0,
+          "pourquoi": "Ces trois champs suffisent pour créer la fiche ; le reste se complète plus tard."
+        },
+        {
+          "q": "Le CRM affiche « Doublon refusé ». Que s'est-il passé ?",
+          "choix": [
+            "Le prénom est mal écrit",
+            "Le serveur est en panne",
+            "Une fiche existe déjà avec ce numéro"
+          ],
+          "bonne": 2,
+          "pourquoi": "Le CRM refuse deux fiches avec le même téléphone et ouvre la fiche existante."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "inscription-qr",
+      "titre": "Faire inscrire une personne par QR code ou lien",
+      "roles": [
+        "referent",
+        "gestionnaire",
+        "comite",
+        "admin"
+      ],
+      "parcours": 1,
+      "ordre": 10,
+      "ecran": "demandes",
+      "duree": 3,
+      "objectif": "À la fin, la personne remplit elle-même ses informations sur son téléphone, et sa demande arrive chez vous, déjà rattachée à votre nom.",
+      "etapes": [
+        {
+          "texte": "Ouvrez **Mon profil** et descendez jusqu'à **Mon QR code d'inscription**. Touchez **Afficher mon QR code**.",
+          "img": "inscription-qr-1.jpg",
+          "alt": "Mon profil, le bouton Afficher mon QR code est entouré."
+        },
+        {
+          "texte": "Faites scanner le QR code, ou touchez **Envoyer** pour transmettre le lien par message. **Image PNG** l'enregistre pour l'imprimer ou l'afficher.",
+          "img": "inscription-qr-2.jpg",
+          "alt": "Fenêtre Mon QR code d'inscription avec les boutons Copier le lien, Image PNG et Envoyer."
+        },
+        {
+          "texte": "La personne remplit le formulaire sur son téléphone. Sa demande arrive dans **Demandes reçues** (menu **☰**), à votre nom. De là, **Créer la fiche** l'ajoute à vos contacts.",
+          "img": "inscription-qr-3.jpg",
+          "alt": "Écran Demandes reçues."
+        },
+        {
+          "texte": "Pour un premier contact, préférez **Mon lien découverte** : la personne indique seulement son prénom, son WhatsApp et ce qui l'intéresse."
+        }
+      ],
+      "piege": "Ne demandez **jamais** un mot de passe par message. La personne le saisit elle-même dans le formulaire ; il n'est visible que dans Demandes reçues, le temps de créer le compte, puis il est effacé. Et rappelez-lui d'écrire son identité **exactement comme sur son passeport** ou sa carte d'identité.",
+      "verif": [
+        {
+          "q": "Où arrive la demande d'une personne qui a scanné votre QR code ?",
+          "choix": [
+            "Directement dans le back-office OlyLife",
+            "Dans votre boîte e-mail",
+            "Dans Demandes reçues, rattachée à vous"
+          ],
+          "bonne": 2,
+          "pourquoi": "Le QR code est personnel : la demande porte votre nom."
+        },
+        {
+          "q": "Comment la personne transmet-elle le mot de passe qu'elle souhaite ?",
+          "choix": [
+            "Elle le saisit elle-même dans le formulaire",
+            "Par WhatsApp",
+            "Par téléphone"
+          ],
+          "bonne": 0,
+          "pourquoi": "Le mot de passe ne circule jamais par message."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "suivre-contacts",
+      "titre": "Suivre mes contacts et leur avancement",
+      "roles": [
+        "referent",
+        "comite"
+      ],
+      "parcours": 1,
+      "ordre": 11,
+      "ecran": "contacts",
+      "duree": 3,
+      "objectif": "À la fin, vous savez où en est chacune des personnes que vous avez recommandées, sans avoir à téléphoner à votre gestionnaire.",
+      "etapes": [
+        {
+          "texte": "Ouvrez **Contacts**. Les pastilles du haut filtrent par statut : **À contacter**, **En cours**, **Prêt**, **Réseau**.",
+          "img": "suivre-contacts-1.jpg",
+          "alt": "Liste des contacts, les filtres de statut sont entourés."
+        },
+        {
+          "texte": "Touchez un nom pour ouvrir sa fiche. Le cercle et la frise montrent le chemin parcouru : Contact, Commande, Expédié, Reçu, Mis en route, Précautions, Témoignage.",
+          "img": "suivre-contacts-2.jpg",
+          "alt": "Fiche d'un contact avec le cercle d'avancement et la frise des étapes."
+        },
+        {
+          "texte": "Plus bas, **Suivi du contact** indique qui s'en occupe, et **Journal des actions** garde la trace de chaque échange."
+        },
+        {
+          "texte": "Une information à corriger ? En bas de la fiche, touchez **Demander une modification à…** et écrivez ce qu'il faut changer. Votre gestionnaire est prévenu.",
+          "img": "suivre-contacts-3.jpg",
+          "alt": "Bas de la fiche, le bouton Demander une modification est entouré."
+        }
+      ],
+      "piege": "La fiche est en **consultation seule** pour vous : c'est voulu, une seule personne tient le dossier. Ne créez pas une seconde fiche pour corriger un téléphone ou une adresse : passez par **Demander une modification**.",
+      "verif": [
+        {
+          "q": "Vous repérez une erreur dans l'adresse d'un contact. Que faites-vous ?",
+          "choix": [
+            "J'utilise Demander une modification",
+            "Je crée une nouvelle fiche",
+            "J'attends que quelqu'un la voie"
+          ],
+          "bonne": 0,
+          "pourquoi": "La demande est notée dans le journal et envoyée au gestionnaire."
+        },
+        {
+          "q": "Où lit-on l'historique des échanges avec un contact ?",
+          "choix": [
+            "Dans Mon profil",
+            "Dans le Journal des actions de sa fiche",
+            "Dans les Réglages"
+          ],
+          "bonne": 1,
+          "pourquoi": "Chaque appel, message et rendez-vous y est noté, avec son auteur."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "demande-infos",
+      "titre": "Envoyer une demande d'informations",
+      "roles": [
+        "referent",
+        "gestionnaire",
+        "comite",
+        "admin"
+      ],
+      "parcours": 1,
+      "ordre": 12,
+      "ecran": "decouverte",
+      "duree": 4,
+      "objectif": "À la fin, vous savez envoyer le bon message au bon moment : d'abord la découverte, ensuite seulement l'inscription.",
+      "etapes": [
+        {
+          "texte": "**Temps 1 — la découverte.** Ouvrez le menu **☰**, rubrique **Outils**, puis **Proposer la découverte**.",
+          "img": "demande-infos-1.jpg",
+          "alt": "Menu du CRM, la ligne Proposer la découverte est entourée."
+        },
+        {
+          "texte": "Saisissez le prénom et le WhatsApp, cochez ce qui intéresse la personne, vérifiez l'**aperçu du message**, puis touchez **Envoyer les infos**. Les pages envoyées portent votre nom.",
+          "img": "demande-infos-2.jpg",
+          "alt": "Fenêtre Proposer la découverte, centres d'intérêt cochés."
+        },
+        {
+          "texte": "**Temps 2 — l'inscription.** Quand la personne souhaite commander, ouvrez **Demander les infos d'inscription** : le message contient votre lien personnel vers le formulaire. Touchez **Envoyer sur WhatsApp**.",
+          "img": "demande-infos-3.jpg",
+          "alt": "Fenêtre Demander les infos d'inscription avec l'aperçu du message."
+        },
+        {
+          "texte": "Laissez cochée la case **Créer la fiche contact si elle n'existe pas encore** : le suivi démarre tout seul."
+        }
+      ],
+      "piege": "N'envoyez pas le formulaire d'inscription à quelqu'un qui découvre à peine : il demande une pièce d'identité et une adresse, c'est trop tôt. Respectez les deux temps. Et relisez toujours l'aperçu : c'est exactement ce que la personne va recevoir.",
+      "verif": [
+        {
+          "q": "Quel message envoie-t-on en premier à une personne qui découvre ?",
+          "choix": [
+            "Une proposition de commande",
+            "Les infos d'inscription",
+            "La découverte"
+          ],
+          "bonne": 2,
+          "pourquoi": "La découverte demande le minimum : un prénom, un WhatsApp, un centre d'intérêt."
+        },
+        {
+          "q": "À quoi sert l'aperçu du message ?",
+          "choix": [
+            "À compter les caractères",
+            "À voir exactement ce que la personne recevra",
+            "À choisir la police"
+          ],
+          "bonne": 1,
+          "pourquoi": "Le texte est pré-rédigé : l'aperçu permet de le vérifier avant l'envoi."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "demander-visio",
+      "titre": "Demander une visio à mon gestionnaire",
+      "roles": [
+        "referent"
+      ],
+      "parcours": 1,
+      "ordre": 13,
+      "ecran": "visio-referent",
+      "duree": 2,
+      "objectif": "À la fin, vous savez obtenir une visio avec votre gestionnaire au sujet d'un contact, en trois touches.",
+      "etapes": [
+        {
+          "texte": "Ouvrez la fiche du contact concerné et touchez **🎥 Zoom**.",
+          "img": "demander-visio-1.jpg",
+          "alt": "Fiche d'un contact, le bouton Zoom est entouré."
+        },
+        {
+          "texte": "Choisissez votre gestionnaire. Le message est déjà rédigé, avec le nom du contact ; vous pouvez le compléter.",
+          "img": "demander-visio-2.jpg",
+          "alt": "Fenêtre Demander une visio à mon gestionnaire."
+        },
+        {
+          "texte": "Laissez **Dès que possible**, ou touchez **Je propose un créneau** pour indiquer une date et une heure : elles s'ajoutent au message.",
+          "img": "demander-visio-3.jpg",
+          "alt": "Mode Je propose un créneau, date et heure entourées."
+        },
+        {
+          "texte": "Touchez **Envoyer ma demande** : WhatsApp s'ouvre avec le message prêt pour votre gestionnaire, il reste à l'envoyer. Il vous transmettra le lien de sa salle. La demande est notée dans le journal du contact."
+        }
+      ],
+      "piege": "En tant que référent, vous n'ouvrez pas vous-même la salle : c'est votre gestionnaire qui invite. Si le CRM indique qu'**aucun gestionnaire n'est rattaché** à votre compte, demandez à l'administrateur de vous en attribuer un.",
+      "verif": [
+        {
+          "q": "Qui envoie le lien de la salle Zoom ?",
+          "choix": [
+            "Le gestionnaire",
+            "Le référent",
+            "Le contact"
+          ],
+          "bonne": 0,
+          "pourquoi": "Le référent demande, le gestionnaire ouvre sa salle et invite."
+        },
+        {
+          "q": "Où retrouve-t-on la trace de la demande ?",
+          "choix": [
+            "Nulle part",
+            "Dans Mon profil",
+            "Dans le journal du contact"
+          ],
+          "bonne": 2,
+          "pourquoi": "Chaque demande de visio est notée sur la fiche concernée."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "consentement-email",
+      "titre": "Recueillir le consentement e-mail",
+      "roles": [
+        "referent",
+        "gestionnaire",
+        "admin"
+      ],
+      "parcours": 1,
+      "ordre": 14,
+      "ecran": "consentement",
+      "duree": 3,
+      "objectif": "À la fin, vous savez noter l'accord d'une personne avant tout envoi d'e-mails, et le lui demander proprement si vous ne l'avez pas.",
+      "etapes": [
+        {
+          "texte": "**Au premier contact** — dans **Proposer la découverte**, renseignez l'e-mail. Si la personne vous a dit oui, cochez **Inscrire à la campagne e-mail « Découverte »**.",
+          "img": "consentement-1.jpg",
+          "alt": "Fenêtre Proposer la découverte, la case d'inscription à la campagne e-mail est entourée."
+        },
+        {
+          "texte": "**Sur une fiche existante** (gestionnaire) — ouvrez la rubrique **Campagne e-mail**. Touchez **Demander le consentement** : la personne reçoit un message avec un lien personnel et donne son accord elle-même.",
+          "img": "consentement-2.jpg",
+          "alt": "Fiche d'un contact, rubrique Campagne e-mail, le bouton Demander le consentement est entouré."
+        },
+        {
+          "texte": "L'accord a été donné de vive voix ? Touchez **Noter un accord reçu** et précisez comment et quand il a été donné."
+        },
+        {
+          "texte": "La rubrique affiche alors **Consentement noté**, avec la date. Tant que ce n'est pas le cas, aucun e-mail de campagne ne part."
+        }
+      ],
+      "piege": "Ne cochez jamais la case « pour gagner du temps ». Un accord se **reçoit**, il ne se suppose pas. Et si une personne se désinscrit, la fiche l'indique : on ne la réinscrit pas sans un nouvel accord de sa part.",
+      "verif": [
+        {
+          "q": "Une personne ne vous a rien dit au sujet des e-mails. Cochez-vous la case d'inscription ?",
+          "choix": [
+            "Oui, si elle a donné son e-mail",
+            "Non, je lui demande d'abord son accord",
+            "Oui, elle pourra se désinscrire"
+          ],
+          "bonne": 1,
+          "pourquoi": "Donner son e-mail n'est pas donner son accord pour recevoir une campagne."
+        },
+        {
+          "q": "Que fait le bouton Demander le consentement ?",
+          "choix": [
+            "Il supprime son e-mail",
+            "Il envoie un message avec un lien où elle donne son accord elle-même",
+            "Il inscrit la personne tout de suite"
+          ],
+          "bonne": 1,
+          "pourquoi": "La personne répond elle-même : son accord est daté et rattaché à sa fiche."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "proposer-temoignage",
+      "titre": "Proposer un témoignage",
+      "roles": [
+        "referent",
+        "gestionnaire",
+        "comite",
+        "admin"
+      ],
+      "parcours": 1,
+      "ordre": 15,
+      "ecran": "temoignage-saisie",
+      "duree": 4,
+      "objectif": "À la fin, vous savez recueillir le témoignage d'un membre, avec ses mots et son accord, pour qu'il soit proposé à la validation.",
+      "etapes": [
+        {
+          "texte": "Ouvrez la fiche du client, dépliez la rubrique **Accompagnement**, puis touchez **➕ Témoignage**.",
+          "img": "proposer-temoignage-1.jpg",
+          "alt": "Fiche d'un client, rubrique Accompagnement, le bouton Témoignage est entouré."
+        },
+        {
+          "texte": "Choisissez la forme — **Écrit**, **Audio** ou **Vidéo** —, l'appareil et le thème. Écrivez le texte **avec ses mots**, tel qu'il l'a dit ou écrit.",
+          "img": "proposer-temoignage-2.jpg",
+          "alt": "Formulaire Témoignage : forme, appareil, thème, date et texte."
+        },
+        {
+          "texte": "Ajoutez des photos si la personne en fournit, cochez les **besoins concernés**, puis renseignez l'**accord recueilli** : comment et à quelle date.",
+          "img": "proposer-temoignage-3.jpg",
+          "alt": "Suite du formulaire : photos, besoins concernés, vérifiabilité et accord recueilli."
+        },
+        {
+          "texte": "Enregistrez-le **à valider** : il n'est diffusé qu'une fois publié par la personne chargée de la validation. Si le CRM surligne des termes sensibles, reformulez en ressenti personnel. Le bouton **Formulaire de consentement** de l'écran Témoignages copie le texte d'autorisation à faire signer."
+        }
+      ],
+      "piege": "Un témoignage est une **expérience personnelle** : il ne remplace jamais un avis médical. Gardez les mots de la personne, ne les « améliorez » pas, et n'écrivez aucune promesse de résultat. Les appareils sont des appareils de bien-être, pas des dispositifs médicaux. Sans accord recueilli, pas de témoignage.",
+      "verif": [
+        {
+          "q": "Comment rédige-t-on le texte d'un témoignage ?",
+          "choix": [
+            "Avec les mots de la personne",
+            "En l'embellissant pour convaincre",
+            "En ajoutant des termes médicaux"
+          ],
+          "bonne": 0,
+          "pourquoi": "Le témoignage rapporte une expérience vécue, telle qu'elle a été dite."
+        },
+        {
+          "q": "Que faut-il toujours renseigner avant d'enregistrer ?",
+          "choix": [
+            "Son numéro de commande",
+            "L'accord recueilli",
+            "Le rang de la personne"
+          ],
+          "bonne": 1,
+          "pourquoi": "Sans accord, un témoignage ne peut pas être utilisé."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "contacts-utiles",
+      "titre": "Voir mes contacts utiles",
+      "roles": [
+        "referent",
+        "gestionnaire",
+        "comite",
+        "admin"
+      ],
+      "parcours": 1,
+      "ordre": 16,
+      "ecran": "contacts-utiles",
+      "duree": 2,
+      "objectif": "À la fin, vous savez joindre en deux touches la bonne personne de l'équipe ou le bon service OlyLife.",
+      "etapes": [
+        {
+          "texte": "Sur l'accueil, touchez la carte **Contacts utiles**.",
+          "img": "contacts-utiles-1.jpg",
+          "alt": "Accueil, la carte Contacts utiles est entourée."
+        },
+        {
+          "texte": "En haut, **l'équipe** : administrateurs et gestionnaires, avec téléphone, WhatsApp et e-mail. Le bouton **🎥** demande ou lance une visio.",
+          "img": "contacts-utiles-2.jpg",
+          "alt": "Carte Contacts utiles ouverte : équipe, services OlyLife, suivi colis."
+        },
+        {
+          "texte": "Au-dessous, les **services OlyLife** — logistique, après-vente, compte, question générale — puis les numéros de suivi de colis pour la France."
+        },
+        {
+          "texte": "Touchez un numéro pour appeler, **WhatsApp** pour écrire, une adresse pour envoyer un e-mail."
+        }
+      ],
+      "piege": "Les coordonnées de l'équipe viennent de **Mon profil** de chacun : si un collègue apparaît avec « téléphone non renseigné », c'est qu'il n'a pas rempli le sien. Pour un colis, vérifiez d'abord que le téléphone du destinataire correspond au pays de livraison.",
+      "verif": [
+        {
+          "q": "D'où viennent le téléphone et l'e-mail affichés pour un collègue ?",
+          "choix": [
+            "De sa fiche Mon profil",
+            "D'un annuaire extérieur",
+            "Du back-office OlyLife"
+          ],
+          "bonne": 0,
+          "pourquoi": "Chacun complète ses coordonnées dans Mon profil."
+        },
+        {
+          "q": "Un colis tarde. Quel service OlyLife contactez-vous ?",
+          "choix": [
+            "Logistique",
+            "Compte / système",
+            "Après-vente"
+          ],
+          "bonne": 0,
+          "pourquoi": "La logistique suit les colis et les numéros de suivi."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "lire-fiche",
+      "titre": "Lire une fiche en un coup d'œil",
+      "roles": [
+        "gestionnaire",
+        "admin"
+      ],
+      "parcours": 2,
+      "ordre": 17,
+      "ecran": "fiche",
+      "duree": 3,
+      "objectif": "À la fin, vous savez en dix secondes où en est un contact et quel est le prochain geste à faire.",
+      "etapes": [
+        {
+          "texte": "En haut : le nom, la ville, le parrain, l'étape. Juste dessous, cinq boutons pour agir : **WhatsApp**, **Appel**, **Email**, **RDV**, **Zoom**.",
+          "img": "lire-fiche-1.jpg",
+          "alt": "Haut d'une fiche : identité, boutons d'action, cercle d'avancement et action en retard."
+        },
+        {
+          "texte": "Le **cercle** et la **frise** résument l'avancement. La ligne colorée dit l'urgence : **en retard**, **à faire aujourd'hui** ou **Fiche à jour**. Touchez **Ouvrir** pour vous occuper de l'action signalée."
+        },
+        {
+          "texte": "**Suivi du contact** : le statut, le rappel en cours, et le bouton pour noter un échange. Viennent ensuite les rubriques repliées — touchez un titre pour l'ouvrir.",
+          "img": "lire-fiche-2.jpg",
+          "alt": "Suivi du contact et rubriques repliées : parcours découverte, campagne e-mail, offres de commande, accompagnement, journal."
+        },
+        {
+          "texte": "Le **Journal des actions** garde tout : qui a fait quoi, et quand. En bas de la fiche, **Modifier** ouvre le formulaire complet.",
+          "img": "lire-fiche-3.jpg",
+          "alt": "Journal des actions ouvert, puis boutons Modifier et Supprimer."
+        }
+      ],
+      "piege": "Avant d'appeler, lisez les deux dernières lignes du **journal**. Trente secondes de lecture évitent de reposer une question à laquelle la personne a déjà répondu à un collègue — c'est ce qui donne l'impression d'une équipe qui se parle.",
+      "verif": [
+        {
+          "q": "Que montre la ligne colorée sous le cercle d'avancement ?",
+          "choix": [
+            "Le rang du contact",
+            "L'urgence : en retard, à faire aujourd'hui ou fiche à jour",
+            "La version du CRM"
+          ],
+          "bonne": 1,
+          "pourquoi": "C'est le résumé de ce qui vous attend sur cette fiche."
+        },
+        {
+          "q": "Où voit-on qui a contacté la personne en dernier ?",
+          "choix": [
+            "Dans le Journal des actions",
+            "Dans le Pipeline",
+            "Dans les Réglages"
+          ],
+          "bonne": 0,
+          "pourquoi": "Chaque entrée du journal porte une date et un auteur."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "statuts-pipeline",
+      "titre": "Statuts, étapes et pipeline",
+      "roles": [
+        "gestionnaire",
+        "admin"
+      ],
+      "parcours": 2,
+      "ordre": 18,
+      "ecran": "pipeline",
+      "duree": 3,
+      "objectif": "À la fin, vous savez classer un contact d'une touche et voir tous vos contacts en colonnes.",
+      "etapes": [
+        {
+          "texte": "Sur la fiche, **Suivi du contact** propose cinq statuts : **À contacter**, **En cours**, **Prêt à closer**, **Dans le réseau**, **Abandon**. Touchez une couleur pour fixer le statut.",
+          "img": "statuts-pipeline-1.jpg",
+          "alt": "Fiche, les cinq boutons de statut sont entourés."
+        },
+        {
+          "texte": "Ouvrez **Pipeline** (menu **☰**, ou le bouton à côté de Liste) : une colonne par statut, à faire défiler de gauche à droite.",
+          "img": "statuts-pipeline-2.jpg",
+          "alt": "Écran Pipeline, colonne À contacter."
+        },
+        {
+          "texte": "Un **appui long** sur une carte ouvre le menu rapide : changez le statut, validez un contact, prenez un rendez-vous, sans ouvrir la fiche.",
+          "img": "statuts-pipeline-3.jpg",
+          "alt": "Menu rapide d'un contact, les statuts sont entourés."
+        },
+        {
+          "texte": "Le statut dit où en est **la relation**. L'**étape** (Prospect, Relance en cours, Achat en cours, Client…) se règle dans **Modifier**."
+        }
+      ],
+      "piege": "Quand la fiche affiche **« Statut par défaut — personne ne l'a encore choisi »**, le CRM a deviné. Prenez deux secondes pour le fixer vous-même : c'est le statut qui alimente les compteurs de l'accueil et les colonnes du pipeline de toute l'équipe.",
+      "verif": [
+        {
+          "q": "Comment change-t-on un statut sans ouvrir la fiche ?",
+          "choix": [
+            "Par un appui long sur la carte",
+            "En supprimant le contact",
+            "Depuis Mon profil"
+          ],
+          "bonne": 0,
+          "pourquoi": "L'appui long ouvre le menu rapide, dans la liste comme dans le pipeline."
+        },
+        {
+          "q": "Que signifie « Statut par défaut » ?",
+          "choix": [
+            "Le contact est abandonné",
+            "Personne ne l'a encore fixé : le CRM l'a déduit",
+            "Le statut a été choisi par l'administrateur"
+          ],
+          "bonne": 1,
+          "pourquoi": "Tant que personne ne choisit, le statut est une estimation."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "actions-du-jour",
+      "titre": "Les actions du jour",
+      "roles": [
+        "gestionnaire",
+        "admin"
+      ],
+      "parcours": 2,
+      "ordre": 19,
+      "ecran": "actions",
+      "duree": 3,
+      "objectif": "À la fin, vous savez vider votre liste d'actions sans rien oublier ni rien cocher trop vite.",
+      "etapes": [
+        {
+          "texte": "Ouvrez **Actions**. En haut, vos **rappels** ; en dessous, trois compteurs — **En retard**, **Aujourd'hui**, **Bientôt** — et les filtres par type.",
+          "img": "actions-du-jour-1.jpg",
+          "alt": "Écran Actions : rappels, compteurs et une relance à faire."
+        },
+        {
+          "texte": "Touchez une action pour la déplier : le message est **déjà rédigé** pour ce contact.",
+          "img": "actions-du-jour-2.jpg",
+          "alt": "Une relance dépliée avec son message prêt à envoyer."
+        },
+        {
+          "texte": "Envoyez le message ou appelez, puis touchez **Marquer fait**. L'action disparaît et le journal du contact en garde la trace.",
+          "img": "actions-du-jour-3.jpg",
+          "alt": "Le bouton Marquer fait est entouré."
+        },
+        {
+          "texte": "Pour un rappel : **📞** appelle, **✅** le clôt en notant ce qui s'est dit."
+        }
+      ],
+      "piege": "**Marquer fait** se touche **après** l'envoi ou l'appel, jamais avant. Une action cochée d'avance sort de la liste, et le contact avec elle : personne ne le relancera. Si vous n'avez pas le temps, laissez l'action en place.",
+      "verif": [
+        {
+          "q": "Quand touche-t-on Marquer fait ?",
+          "choix": [
+            "En fin de semaine",
+            "Dès qu'on ouvre l'action",
+            "Une fois le message envoyé ou l'appel passé"
+          ],
+          "bonne": 2,
+          "pourquoi": "Cocher d'avance fait sortir le contact de la liste sans qu'il ait été relancé."
+        },
+        {
+          "q": "Que contient une action dépliée ?",
+          "choix": [
+            "Le mot de passe du contact",
+            "Un message déjà rédigé pour ce contact",
+            "Le plan de la semaine"
+          ],
+          "bonne": 1,
+          "pourquoi": "Le message tient compte du contact et de l'étape : il reste à le relire et l'envoyer."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "envoyer-message",
+      "titre": "Envoyer un message par le bon canal",
+      "roles": [
+        "gestionnaire",
+        "admin"
+      ],
+      "parcours": 2,
+      "ordre": 20,
+      "ecran": "envoi",
+      "duree": 3,
+      "objectif": "À la fin, vous savez envoyer un message préparé par WhatsApp, Telegram, Signal, SMS ou e-mail, selon ce que préfère la personne.",
+      "etapes": [
+        {
+          "texte": "Depuis une action ou une fiche, touchez le bouton d'envoi du message.",
+          "img": "envoyer-message-1.jpg",
+          "alt": "Une action dépliée, le bouton Envoyer sur WhatsApp est entouré."
+        },
+        {
+          "texte": "La fenêtre **Envoyer le message** montre le texte et les canaux : **WhatsApp**, **Telegram**, **Signal**, **SMS**, **E-mail**, **Copier**. Touchez celui que la personne utilise.",
+          "img": "envoyer-message-2.jpg",
+          "alt": "Fenêtre Envoyer le message, les canaux sont entourés."
+        },
+        {
+          "texte": "L'application choisie s'ouvre avec le message prêt : il reste à toucher **Envoyer** dans cette application. Avec Telegram, choisissez le destinataire ; avec Signal, collez le texte, déjà copié."
+        },
+        {
+          "texte": "Vous utilisez toujours le même canal ? Cochez **Toujours utiliser ce canal sans me demander**. Le choix se modifie dans **Mon profil**, ligne **Canal d'envoi des messages**.",
+          "img": "envoyer-message-3.jpg",
+          "alt": "La case Toujours utiliser ce canal est entourée."
+        }
+      ],
+      "piege": "Le CRM **prépare** le message, il ne l'envoie pas à votre place : tant que vous n'avez pas touché Envoyer dans WhatsApp ou votre messagerie, rien n'est parti — même si le journal de la fiche note déjà l'envoi. Vérifiez la coche d'envoi dans l'application.",
+      "verif": [
+        {
+          "q": "Vous avez choisi WhatsApp dans la fenêtre d'envoi. Le message est-il parti ?",
+          "choix": [
+            "Non, il reste à toucher Envoyer dans WhatsApp",
+            "Oui, automatiquement",
+            "Oui, par e-mail aussi"
+          ],
+          "bonne": 0,
+          "pourquoi": "Le CRM ouvre l'application avec le texte prêt ; l'envoi se fait dans l'application."
+        },
+        {
+          "q": "Où modifie-t-on le canal mémorisé ?",
+          "choix": [
+            "On ne peut pas le modifier",
+            "Dans l'Agenda",
+            "Dans Mon profil"
+          ],
+          "bonne": 2,
+          "pourquoi": "La ligne Canal d'envoi des messages permet de revenir à « Me demander à chaque fois »."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "personnaliser-message",
+      "titre": "Personnaliser un message avant l'envoi",
+      "roles": [
+        "gestionnaire",
+        "admin"
+      ],
+      "parcours": 2,
+      "ordre": 21,
+      "ecran": "message",
+      "duree": 2,
+      "objectif": "À la fin, vous savez adapter un message préparé à la personne : sa langue, le ton, et une phrase qui n'appartient qu'à vous.",
+      "etapes": [
+        {
+          "texte": "Dépliez une action. Au-dessus du texte, choisissez la **langue** — Français ou English — puis le **ton** : **Pro**, **Chaleureux** ou **Équipe**.",
+          "img": "personnaliser-message-1.jpg",
+          "alt": "Une action dépliée, les boutons de langue sont entourés."
+        },
+        {
+          "texte": "Touchez ensuite le texte et modifiez-le librement : ajoutez un détail de votre dernier échange, retirez une phrase.",
+          "img": "personnaliser-message-2.jpg",
+          "alt": "La zone du message est entourée."
+        },
+        {
+          "texte": "Relisez, puis envoyez."
+        },
+        {
+          "texte": "Un modèle ne convient jamais ? Signalez-le à votre administrateur : les modèles se corrigent pour toute l'équipe dans Administration → Messages."
+        }
+      ],
+      "piege": "Choisissez la langue et le ton **avant** de retoucher le texte à la main : en changer ensuite réécrit le message et efface vos retouches. Et gardez le vouvoiement du ton Pro tant que la personne ne vous a pas proposé le tutoiement.",
+      "verif": [
+        {
+          "q": "Dans quel ordre personnalise-t-on un message ?",
+          "choix": [
+            "Je retouche le texte, puis je choisis le ton",
+            "L'ordre n'a pas d'importance",
+            "Je choisis la langue et le ton, puis je retouche le texte"
+          ],
+          "bonne": 2,
+          "pourquoi": "Changer de langue ou de ton réécrit le message entier."
+        },
+        {
+          "q": "Qui corrige un modèle de message pour toute l'équipe ?",
+          "choix": [
+            "Chaque gestionnaire",
+            "Le référent",
+            "L'administrateur"
+          ],
+          "bonne": 2,
+          "pourquoi": "Les modèles sont communs ; ils se modifient dans l'administration."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "observation-rappel",
+      "titre": "Noter une observation, poser un rappel",
+      "roles": [
+        "gestionnaire",
+        "admin"
+      ],
+      "parcours": 2,
+      "ordre": 22,
+      "ecran": "suivi",
+      "duree": 3,
+      "objectif": "À la fin, chaque échange laisse une trace utile, et le prochain contact est programmé avant même de raccrocher.",
+      "etapes": [
+        {
+          "texte": "Sur la fiche, touchez **Valider un contact / ajouter une observation**.",
+          "img": "observation-rappel-1.jpg",
+          "alt": "Fiche, le bouton Valider un contact est entouré."
+        },
+        {
+          "texte": "Choisissez le **résultat** — Joint, Pas de réponse, WhatsApp envoyé, Simple observation — puis écrivez l'**observation** : ce qui a été dit, le besoin, la suite prévue. Ajustez le statut si besoin.",
+          "img": "observation-rappel-2.jpg",
+          "alt": "Fenêtre Valider un contact avec une observation saisie."
+        },
+        {
+          "texte": "Cochez **Programmer un rappel** : choisissez la date, l'heure, la personne à qui il est attribué, et son objet.",
+          "img": "observation-rappel-3.jpg",
+          "alt": "La case Programmer un rappel est cochée, date et heure affichées."
+        },
+        {
+          "texte": "Touchez **Enregistrer**. L'observation rejoint le journal ; le rappel apparaîtra dans Ma journée et dans l'Agenda le moment venu."
+        }
+      ],
+      "piege": "L'observation est **obligatoire**, et c'est une chance : écrivez-la pour le collègue qui reprendra le dossier. « RAS » ou « à rappeler » ne lui apprennent rien ; « souhaite en parler à son mari, rappeler jeudi » lui dit tout. Restez factuel : ce que la personne a dit, pas ce que vous en pensez.",
+      "verif": [
+        {
+          "q": "Que doit contenir une bonne observation ?",
+          "choix": [
+            "Ce qui a été dit, le besoin, la suite prévue",
+            "Seulement « RAS »",
+            "Votre avis sur la personne"
+          ],
+          "bonne": 0,
+          "pourquoi": "Une observation utile permet à un collègue de reprendre le dossier sans rappeler."
+        },
+        {
+          "q": "Où réapparaît un rappel programmé ?",
+          "choix": [
+            "Dans Ma journée et dans l'Agenda",
+            "Nulle part, il faut s'en souvenir",
+            "Dans Mon profil"
+          ],
+          "bonne": 0,
+          "pourquoi": "Le jour venu, le rappel remonte en tête de Ma journée."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "prendre-rdv",
+      "titre": "Prendre un rendez-vous",
+      "roles": [
+        "gestionnaire",
+        "admin"
+      ],
+      "parcours": 2,
+      "ordre": 23,
+      "ecran": "agenda",
+      "duree": 3,
+      "objectif": "À la fin, vous savez réserver un rendez-vous pendant l'appel, ou envoyer le lien pour que la personne choisisse elle-même.",
+      "etapes": [
+        {
+          "texte": "Sur la fiche, touchez **📅 RDV**.",
+          "img": "prendre-rdv-1.jpg",
+          "alt": "Fiche, le bouton RDV est entouré."
+        },
+        {
+          "texte": "Choisissez le **type de rendez-vous**. Si la personne est en ligne, touchez **Réserver maintenant dans l'agenda** ; sinon, envoyez-lui le lien par WhatsApp ou par e-mail.",
+          "img": "prendre-rdv-2.jpg",
+          "alt": "Fenêtre Prendre un rendez-vous : types, réservation immédiate, envoi du lien."
+        },
+        {
+          "texte": "Une fois réservé, le rendez-vous revient **tout seul** dans la fiche : journal, statut, agenda — y compris quand la personne a réservé elle-même avec le lien."
+        },
+        {
+          "texte": "L'écran **Agenda** montre votre semaine : rendez-vous, rappels, rappels en retard. Le bouton **Équipe** affiche l'agenda de tous.",
+          "img": "prendre-rdv-3.jpg",
+          "alt": "Écran Agenda de la semaine."
+        }
+      ],
+      "piege": "Sans lien Calendly personnel dans **Mon profil**, c'est l'agenda par défaut de l'équipe qui est proposé : la personne réserve chez quelqu'un d'autre. Vérifiez aussi que votre Calendly est relié à votre agenda, pour ne pas proposer un créneau déjà pris.",
+      "verif": [
+        {
+          "q": "La personne réserve elle-même avec le lien. Faut-il recopier le rendez-vous dans le CRM ?",
+          "choix": [
+            "Non, il revient tout seul dans la fiche",
+            "Oui, à la main",
+            "Oui, dans Mon profil"
+          ],
+          "bonne": 0,
+          "pourquoi": "Le rendez-vous est rattaché à la fiche automatiquement."
+        },
+        {
+          "q": "Pourquoi renseigner son propre lien Calendly ?",
+          "choix": [
+            "Ce n'est pas utile",
+            "Pour changer la couleur du CRM",
+            "Pour que les rendez-vous soient pris dans votre agenda"
+          ],
+          "bonne": 2,
+          "pourquoi": "Sans lien personnel, c'est l'agenda par défaut qui est proposé."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "visio-zoom",
+      "titre": "Lancer une visio Zoom et y ajouter des personnes",
+      "roles": [
+        "gestionnaire",
+        "admin"
+      ],
+      "parcours": 2,
+      "ordre": 24,
+      "ecran": "zoom",
+      "duree": 3,
+      "objectif": "À la fin, vous savez inviter un contact dans votre salle Zoom, tout de suite ou plus tard, avec les bonnes personnes autour de la table.",
+      "etapes": [
+        {
+          "texte": "Sur la fiche, touchez **🎥 Zoom**. Choisissez **Maintenant** — vous ouvrez votre salle, la personne vous rejoint — ou **Plus tard**, avec une date et une heure.",
+          "img": "visio-zoom-1.jpg",
+          "alt": "Fenêtre Visio Zoom, le choix Maintenant est entouré."
+        },
+        {
+          "texte": "Dans **Ajouter une personne à la visio**, touchez un collègue proposé ou cherchez un de vos contacts. Chaque personne ajoutée reçoit son propre message avec le lien.",
+          "img": "visio-zoom-2.jpg",
+          "alt": "Bloc Ajouter une personne à la visio entouré."
+        },
+        {
+          "texte": "Relisez le message, puis touchez **Envoyer et ouvrir ma salle**. L'invitation part par le canal préféré du contact et votre salle s'ouvre.",
+          "img": "visio-zoom-3.jpg",
+          "alt": "Le bouton Envoyer et ouvrir ma salle est entouré."
+        },
+        {
+          "texte": "Chaque envoi est noté dans le journal du contact."
+        }
+      ],
+      "piege": "Le bouton d'envoi reste gris tant qu'aucun lien Zoom n'est renseigné : ajoutez le vôtre dans **Mon profil → Mon lien Zoom**. Avec un compte Zoom gratuit, une réunion dure 40 minutes : annoncez-le en début de visio plutôt que d'être coupé au milieu d'une explication.",
+      "verif": [
+        {
+          "q": "Le bouton Envoyer et ouvrir ma salle est gris. Pourquoi ?",
+          "choix": [
+            "Le contact a refusé",
+            "Aucun lien Zoom n'est renseigné dans Mon profil",
+            "Il est trop tard dans la journée"
+          ],
+          "bonne": 1,
+          "pourquoi": "Le CRM a besoin du lien de votre salle personnelle."
+        },
+        {
+          "q": "Que reçoit une personne ajoutée à la visio ?",
+          "choix": [
+            "Son propre message avec le lien",
+            "Le mot de passe du CRM",
+            "Rien, il faut l'avertir à part"
+          ],
+          "bonne": 0,
+          "pourquoi": "Chaque invité reçoit un message qui lui est adressé."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "fiche-incomplete",
+      "titre": "Compléter une fiche incomplète",
+      "roles": [
+        "gestionnaire",
+        "admin"
+      ],
+      "parcours": 2,
+      "ordre": 25,
+      "ecran": "fiche-a-completer",
+      "duree": 3,
+      "objectif": "À la fin, vous savez repérer ce qui manque sur la fiche d'un membre et le compléter sans chercher.",
+      "etapes": [
+        {
+          "texte": "Dans la liste des contacts, le badge **✍️** suivi d'un chiffre signale une fiche à compléter et le nombre de champs manquants.",
+          "img": "fiche-incomplete-1.jpg",
+          "alt": "Liste des contacts, le badge à compléter est entouré."
+        },
+        {
+          "texte": "Sur la fiche, l'encadré **Fiche à compléter** liste ce qui manque : produits, numéro de commande, transporteur, installation confirmée… Touchez une étiquette, ou **Compléter**.",
+          "img": "fiche-incomplete-2.jpg",
+          "alt": "Encadré Fiche à compléter avec la liste des champs manquants."
+        },
+        {
+          "texte": "Le formulaire s'ouvre : les champs attendus sont **encadrés en rouge**, avec la mention « à compléter ».",
+          "img": "fiche-incomplete-3.jpg",
+          "alt": "Formulaire de la fiche, champs manquants encadrés en rouge."
+        },
+        {
+          "texte": "Remplissez ce que vous savez, puis **Enregistrer la fiche**. Le chiffre du badge diminue d'autant."
+        }
+      ],
+      "piege": "C'est **sans urgence** : complétez quand vous avez l'information. N'inventez jamais une valeur pour faire disparaître le badge — un faux numéro de suivi ou une fausse date de livraison égarera le collègue qui reprendra le dossier.",
+      "verif": [
+        {
+          "q": "Que signifie le badge ✍️ suivi d'un chiffre ?",
+          "choix": [
+            "Le nombre de messages reçus",
+            "Le nombre de champs à compléter sur la fiche",
+            "Le rang du membre"
+          ],
+          "bonne": 1,
+          "pourquoi": "Il concerne les fiches des personnes déjà dans le réseau."
+        },
+        {
+          "q": "Il vous manque le numéro de suivi d'un colis. Que faites-vous ?",
+          "choix": [
+            "Je laisse le champ vide jusqu'à l'avoir",
+            "J'écris un numéro provisoire",
+            "Je supprime la fiche"
+          ],
+          "bonne": 0,
+          "pourquoi": "Un champ vide est honnête ; une valeur inventée trompe l'équipe."
+        }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "doublons",
+      "titre": "Repérer et fusionner les doublons",
+      "roles": [
+        "gestionnaire",
+        "admin"
+      ],
+      "parcours": 2,
+      "ordre": 26,
+      "ecran": "doublons",
+      "duree": 3,
+      "objectif": "À la fin, vous savez éviter de créer deux fois la même personne, et — si vous êtes administrateur — nettoyer les doublons existants.",
+      "etapes": [
+        {
+          "texte": "**À la création** — si le téléphone existe déjà, le CRM affiche **« Doublon refusé »** et ouvre la fiche existante. Si seul le nom est identique, il vous demande : créer quand même, ou ouvrir la fiche existante."
+        },
+        {
+          "texte": "**Administrateur** — ouvrez **Équipe** et descendez jusqu'aux outils. Touchez **Supprimer les doublons**.",
+          "img": "doublons-1.jpg",
+          "alt": "Écran Équipe de l'administrateur, le bouton Supprimer les doublons est entouré."
+        },
+        {
+          "texte": "Le CRM annonce le nombre de doublons trouvés. En confirmant, il garde la fiche **la plus complète** et y rassemble les notes, l'e-mail, le journal et le rappel des autres."
+        },
+        {
+          "texte": "Deux personnes différentes qui partagent un numéro ne sont **jamais** fusionnées : elles apparaissent dans **Téléphones partagés** (Administration → Données), à corriger à la main."
+        }
+      ],
+      "piege": "La suppression des doublons ne s'annule pas. Avant de confirmer, lancez une sauvegarde avec le bouton **Sauvegardes / restauration**, juste en dessous. Et si vous n'êtes pas administrateur, signalez le doublon plutôt que de vider une des deux fiches.",
+      "verif": [
+        {
+          "q": "Deux personnes différentes ont le même numéro de téléphone. Le CRM les fusionne-t-il ?",
+          "choix": [
+            "Oui, toujours",
+            "Non, jamais : elles sont listées dans Téléphones partagés",
+            "Oui, si elles habitent la même ville"
+          ],
+          "bonne": 1,
+          "pourquoi": "Un même téléphone ne suffit pas : les noms ou les e-mails doivent correspondre."
+        },
+        {
+          "q": "Que fait-on avant de lancer Supprimer les doublons ?",
+          "choix": [
+            "On se déconnecte",
+            "Rien de particulier",
+            "Une sauvegarde"
+          ],
+          "bonne": 2,
+          "pourquoi": "La fusion ne s'annule pas ; la sauvegarde permet de revenir en arrière."
+        }
       ],
       "version": "3.47",
       "video": ""

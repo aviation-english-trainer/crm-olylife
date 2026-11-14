@@ -247,9 +247,9 @@ $('q').addEventListener('input',function(){Q=this.value.trim();renderList();});
 function lbClose(){$('lb').classList.remove('on');}
 $('lb').onclick=lbClose;document.addEventListener('keydown',function(e){if(e.key==='Escape')lbClose();});
 
-/* Les captures du parcours sont chargées en avance, pour rester lisibles hors ligne */
+/* Les captures de « Bien démarrer » sont chargées en avance ; les autres sont gardées dès qu'un tuto a été lu */
 function prefetch(){try{if(!navigator.onLine||(navigator.connection&&navigator.connection.saveData))return;}catch(e){}
-  var list=[];dispo().forEach(function(t){t.etapes.forEach(function(e){if(e.img)list.push('img/'+e.img);});});
+  var list=[];dispo().forEach(function(t){if(t.parcours!==0)return;t.etapes.forEach(function(e){if(e.img)list.push('img/'+e.img);});});
   var i=0;(function next(){if(i>=list.length)return;fetch(list[i++]).then(next,next);})();
 }
 
@@ -258,7 +258,7 @@ fetch('tutos.json').then(function(r){if(!r.ok)throw new Error(r.status);return r
   if(p.role&&d.roles[p.role])ROLE=p.role;
   renderChips();
   /* ?ecran=dashboard : le ❓ du CRM ouvre le tuto de l'écran où l'on se trouve */
-  if(p.ecran&&!location.hash){var hit=dispo().filter(function(t){return t.ecran===p.ecran;})[0];if(hit){history.replaceState(null,'',location.pathname+(ROLE?'?role='+ROLE:'')+'#'+hit.slug);}}
+  if(p.ecran&&!location.hash){var hit=dispo().filter(function(t){return t.ecran===p.ecran&&(!ROLE||t.roles.indexOf(ROLE)>=0);})[0];if(hit){history.replaceState(null,'',location.pathname+(ROLE?'?role='+ROLE:'')+'#'+hit.slug);}}
   route();
   setTimeout(prefetch,2500);
 }).catch(function(){$('v-list').classList.add('hide');$('err').classList.remove('hide');});

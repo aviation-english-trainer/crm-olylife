@@ -72,6 +72,8 @@ async function ouvrir(browser, base, opt) {
       if (etat.horsLigne) return route.abort('internetdisconnected');
       var body = {}; try { body = JSON.parse(route.request().postData() || '{}'); } catch (e) {}
       if (body.op === 'login' || body.op === 'pull') return route.fulfill({ contentType: 'application/json', body: JSON.stringify(payload) });
+      if (body.op === 'myQr') return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true, url: 'https://crm.team-waterlifehightech.com/inscription.html?r=DEMO' }) });
+      if (body.op === 'leads' || body.op === 'getLeads') return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true, leads: payload.leads || [] }) });
       return route.fulfill({ contentType: 'application/json', body: JSON.stringify({ ok: true, sessions: [{ id: 's1', label: 'Android · Chrome · app installée', current: true, last: new Date().toISOString() }] }) });
     }
     if (fonts && u.hostname === 'fonts.googleapis.com') return route.fulfill({ contentType: 'text/css', body: fonts.css });
@@ -124,7 +126,7 @@ if (require.main === module) {
   (async function () {
     var scenes = require('./scenes.js');
     var srv = await serve(), base = 'http://127.0.0.1:' + srv.address().port;
-    var browser = await playwright.chromium.launch();
+    var browser = await playwright.chromium.launch({ args: ['--lang=fr-FR'], env: Object.assign({}, process.env, { LANG: 'fr_FR.UTF-8', LANGUAGE: 'fr' }) });
     var fait = 0, rate = 0;
     for (var i = 0; i < scenes.length; i++) {
       var s = scenes[i]; if (ONLY && s.nom.indexOf(ONLY) < 0) continue;

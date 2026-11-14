@@ -1305,7 +1305,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
         <div class="seg" id="d-scope"><button data-s="moi" onclick="oDScope('moi')">Mes contacts</button><button data-s="all" onclick="oDScope('all')">Toute l'équipe</button></div>
       </div>
       <div class="ocard ucbar" style="margin-bottom:14px">
-        <div class="ochd" style="cursor:pointer" onclick="this.parentElement.classList.toggle('oc-open')"><span class="oct">📇 Contacts utiles</span><span style="font-size:11px;color:var(--t3)">toucher pour ouvrir</span></div>
+        <div class="ochd" style="cursor:pointer" onclick="this.parentElement.classList.toggle('oc-open')"><span class="oct">📇 Contacts utiles<button type="button" class="aq" onclick="event.preventDefault();event.stopPropagation();oAide('contacts-utiles')" title="Tutoriel : voir mes contacts utiles" aria-label="Tutoriel : voir mes contacts utiles">?</button></span><span style="font-size:11px;color:var(--t3)">toucher pour ouvrir</span></div>
         <div style="padding:12px 16px;display:none" class="oc-body">
           <div style="font-size:10px;font-weight:700;color:var(--aqua);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Équipe WLHT — admin & gestionnaires</div>
           <div id="uc-equipe" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;font-size:12px"></div>
@@ -1419,7 +1419,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <!-- ACTIONS -->
     <div class="ov" id="ov-actions">
       <div class="ocard" id="a-rap-card" style="margin-bottom:14px">
-        <div class="ochd"><span class="oct">⏰ Rappels <span class="onotif-cnt" id="a-rap-n" style="background:#D9A400">0</span></span></div>
+        <div class="ochd"><span class="oct">⏰ Rappels <span class="onotif-cnt" id="a-rap-n" style="background:#D9A400">0</span><button type="button" class="aq" onclick="event.preventDefault();event.stopPropagation();oAide('actions-du-jour')" title="Tutoriel : les actions du jour" aria-label="Tutoriel : les actions du jour">?</button></span></div>
         <div id="a-rap-l"></div>
       </div>
       <div class="orpg">
@@ -1782,7 +1782,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <div class="ocard" style="padding:14px 16px;margin-bottom:12px">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
           <div style="flex:1;min-width:200px;font-size:13px;color:var(--t2);line-height:1.6">🎙 <b>Témoignages de nos membres</b> — écrits, audio ou vidéo, recueillis avec leur consentement. Un témoignage est une <b>expérience personnelle</b> : il ne remplace jamais un avis médical.</div>
-          <button class="ob bgh bsm" onclick="oTemConsent()">📝 Formulaire de consentement</button>
+          <button class="ob bgh bsm" onclick="oTemConsent()">📝 Formulaire de consentement</button><button type="button" class="aq" onclick="event.preventDefault();event.stopPropagation();oAide('proposer-temoignage')" title="Tutoriel : proposer un témoignage" aria-label="Tutoriel : proposer un témoignage">?</button>
         </div>
       </div>
       <div class="rs-kpi" id="tem-kpi"></div>
@@ -2093,6 +2093,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
   <div class="omo-hd">
     <button class="omo-back" onclick="oClose()">←</button>
     <div class="omo-ttl" id="om-t">Fiche Contact</div>
+    <button type="button" class="aq" style="margin-left:auto;margin-right:4px" onclick="oAideFiche()" title="Tutoriel : lire une fiche" aria-label="Tutoriel : lire une fiche">?</button>
   </div>
   <div class="omo-body" id="om-b"></div>
 </div>
@@ -2329,7 +2330,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 <div id="oreq">
   <div class="omo-hd">
     <button class="omo-back" onclick="oReqClose()">←</button>
-    <div class="omo-ttl">📨 Demander les infos d'inscription</div>
+    <div class="omo-ttl">📨 Demander les infos d'inscription<button type="button" class="aq" onclick="event.preventDefault();event.stopPropagation();oAide('demande-infos')" title="Tutoriel : envoyer une demande d’informations" aria-label="Tutoriel : envoyer une demande d’informations">?</button></div>
   </div>
   <div class="omo-body">
     <div class="os-note" style="margin-bottom:14px">Envoie au futur client / distributeur un message WhatsApp pré-rédigé demandant <b>toutes les informations nécessaires</b> à son enregistrement OlyLife (identité exacte du passeport ou CNI, adresses, e-mail, mot de passe). Le message contient <b>votre lien personnel d\'inscription</b> (celui de votre QR code) : la personne remplit le formulaire et sa demande arrive dans <b>Demandes reçues</b>, rattachée à vous, prête à recopier dans le BO OlyLife. Si elle préfère répondre par écrit, sa réponse se colle telle quelle dans <b>Importer</b>.</div>
@@ -2355,7 +2356,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 <div id="odec">
   <div class="omo-hd">
     <button class="omo-back" onclick="oDecClose()">←</button>
-    <div class="omo-ttl">🌱 Proposer la découverte</div>
+    <div class="omo-ttl">🌱 Proposer la découverte<button type="button" class="aq" onclick="event.preventDefault();event.stopPropagation();oAide('demande-infos')" title="Tutoriel : envoyer une demande d’informations" aria-label="Tutoriel : envoyer une demande d’informations">?</button></div>
   </div>
   <div class="omo-body">
     <div class="os-note" style="margin-bottom:14px"><b>Temps 1</b> — avant toute inscription. Deux façons de faire : <b>vous saisissez</b> prénom, WhatsApp et centres d'intérêt, et le message part avec les bonnes pages (parcours vidéo, appareils, certificats, rendez-vous) ; ou <b>vous envoyez le lien</b> d'une minute et la personne indique elle-même ce qui l'intéresse — sa demande arrive dans « Demandes reçues ». Les pages envoyées portent votre nom et votre WhatsApp, comme avec l'App Tunnels.</div>
@@ -2427,7 +2428,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 <div id="ocal" onclick="if(event.target===this)oCalClose()">
   <div class="osv-card">
     <div class="osv-grab"></div>
-    <div class="osv-ttl">📅 Prendre un rendez-vous</div>
+    <div class="osv-ttl">📅 Prendre un rendez-vous<button type="button" class="aq" onclick="event.preventDefault();event.stopPropagation();oAide('prendre-rdv')" title="Tutoriel : prendre un rendez-vous" aria-label="Tutoriel : prendre un rendez-vous">?</button></div>
     <div class="osv-sub" id="ocal-sub">—</div>
     <div class="ofl" style="margin-bottom:6px">Type de rendez-vous</div>
     <div class="cal-types" id="ocal-types"></div>
@@ -2452,7 +2453,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <div class="osv-ttl" id="osv-ttl">📞 Valider un contact</div>
     <div class="osv-sub" id="osv-sub">—</div>
     <input type="hidden" id="osv-id">
-    <div class="ofl" style="margin-bottom:6px">Résultat</div>
+    <div class="ofl" style="margin-bottom:6px">Résultat<button type="button" class="aq" onclick="event.preventDefault();event.stopPropagation();oAide('observation-rappel')" title="Tutoriel : noter une observation, poser un rappel" aria-label="Tutoriel : noter une observation, poser un rappel">?</button></div>
     <div class="res-pick" id="osv-res">
       <button type="button" class="on" data-v="✅ Joint par téléphone" onclick="oResPick(this)">✅ Joint</button>
       <button type="button" data-v="📵 Pas de réponse" onclick="oResPick(this)">📵 Pas de réponse</button>
@@ -8241,7 +8242,7 @@ function oZoomOpen(cid,teamNom){
   var m=document.createElement('div');m.id='ozoom';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
   var canal=canalCode(c),nom=((c.prenom||'')+' '+(c.nom||'')).trim();
   m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:520px;max-height:90vh;overflow:auto">'
-    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">🎥 Visio Zoom avec '+esc(nom)+'</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'ozoom\').remove()">✕</button></div>'
+    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">🎥 Visio Zoom avec '+esc(nom)+'</b><button type="button" class="aq" onclick="event.preventDefault();event.stopPropagation();oAide(\'visio-zoom\')" title="Tutoriel : lancer une visio Zoom" aria-label="Tutoriel : lancer une visio Zoom">?</button><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'ozoom\').remove()">✕</button></div>'
     +(url?'<div style="font-size:12px;color:var(--t2);margin:6px 0 10px">Lien utilisé : <span style="word-break:break-all">'+esc(url)+'</span>'+(USER&&USER.zoomUrl?' <span class="obdg bgr">votre salle</span>':' <span class="obdg bor">Zoom de l\'association</span>')+'</div>'
         :'<div style="margin:8px 0 10px;padding:10px 12px;border-radius:10px;background:#FFF7E0;border:1px solid #F1DFA0;font-size:12.5px;line-height:1.5">⚠️ Aucun lien Zoom : ajoutez le vôtre dans <b>Mon profil → Mon lien Zoom</b>'+(IS_SUPER()?' (ou le Zoom de l\'association dans Administration → Liens)':'')+'. <button type="button" class="ob bgh bsm" onclick="document.getElementById(\'ozoom\').remove();oProfOpen()">Ouvrir Mon profil</button></div>')
     +'<div class="av-seg" style="margin-top:4px"><button type="button" id="zoom-m-now" class="on" onclick="oZoomMode(\'now\')">⚡ Maintenant<br><small style="font-weight:400">j\'ouvre ma salle, le client me rejoint</small></button><button type="button" id="zoom-m-later" onclick="oZoomMode(\'later\')">📅 Plus tard<br><small style="font-weight:400">date et heure convenues</small></button></div>'
@@ -8300,7 +8301,7 @@ function oZoomAsk(cid,gestNom){
   var m=document.createElement('div');m.id='ozoom';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
   var nomC=c?((c.prenom||'')+' '+(c.nom||'')).trim():'';
   m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:520px;max-height:90vh;overflow:auto">'
-    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">🎥 Demander une visio à mon gestionnaire</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'ozoom\').remove()">✕</button></div>'
+    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">🎥 Demander une visio à mon gestionnaire</b><button type="button" class="aq" onclick="event.preventDefault();event.stopPropagation();oAide(\'demander-visio\')" title="Tutoriel : demander une visio" aria-label="Tutoriel : demander une visio">?</button><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'ozoom\').remove()">✕</button></div>'
     +'<div style="font-size:12px;color:var(--t2);margin:6px 0 10px;line-height:1.5">En tant que référent, vos visios Zoom se font avec votre gestionnaire'+(nomC?' — ici au sujet de <b>'+esc(nomC)+'</b>':'')+'. Il vous enverra le lien de sa salle.</div>'
     +'<label class="ofl">Gestionnaire</label><select class="ofc" id="za-gest" onchange="zaRefresh()">'+gs.map(function(g){return'<option'+(g.nom===gestNom?' selected':'')+'>'+esc(g.nom)+'</option>';}).join('')+'</select>'
     +'<div class="av-seg" style="margin-top:10px"><button type="button" id="zoom-m-now" class="on" onclick="zaMode(\'now\')">⚡ Dès que possible</button><button type="button" id="zoom-m-later" onclick="zaMode(\'later\')">📅 Je propose un créneau</button></div>'
@@ -8634,7 +8635,7 @@ function oSendSheet(url){
   var m=document.createElement('div');m.id='osend';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
   var B=function(c,ic,l,cls){return'<button type="button" class="'+(cls||'')+'" onclick="sendGo(\''+c+'\')"><span class="ic">'+ic+'</span>'+l+'</button>';};
   m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:520px;max-height:88vh;overflow:auto">'
-    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">Envoyer le message</b><span style="font-size:12px;color:var(--t3)">'+(p.num?'→ +'+esc(p.num):'')+'</span><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'osend\').remove()">✕</button></div>'
+    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">Envoyer le message</b><button type="button" class="aq" onclick="event.preventDefault();event.stopPropagation();oAide(\'envoyer-message\')" title="Tutoriel : envoyer un message" aria-label="Tutoriel : envoyer un message">?</button><span style="font-size:12px;color:var(--t3)">'+(p.num?'→ +'+esc(p.num):'')+'</span><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'osend\').remove()">✕</button></div>'
     +'<div class="snd-prev">'+esc(p.text)+'</div>'
     +(att.length?'<div class="snd-att" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"><span style="font-size:11px;color:var(--t3);align-self:center">📎 Joindre :</span>'+att.map(function(o){return'<button type="button" class="ofilter-chip" data-k="'+o.k+'" onclick="sendAttachToggle(\''+o.k+'\')">'+o.l+'</button>';}).join('')+'</div>':'')
     +'<div class="snd-grid">'+B('wa','💬','WhatsApp','wa')+B('tg','✈️','Telegram')+B('signal','🔒','Signal')+B('sms','📱','SMS')+B('mail','✉️',email?'E-mail':'E-mail (sans adresse)')+B('copy','📋','Copier')+(navigator.share?B('share','📤','Partager…'):'')+'</div>'
@@ -9112,6 +9113,7 @@ function oAide(slug,ecran){
   document.getElementById('oaide').classList.add('on');
 }
 function oAideCtx(){oAide('',CUR_VIEW);}
+function oAideFiche(){var r=USER?ROLE():'';oAide(r==='referent'||r==='comite'?'suivre-contacts':'lire-fiche');}
 function oAideClose(){var a=document.getElementById('oaide');if(!a.classList.contains('on'))return;a.classList.remove('on');document.getElementById('oaide-fr').src='about:blank';try{aideCard();}catch(e){}}
 document.addEventListener('keydown',function(e){if(e.key==='Escape')oAideClose();});
 // Parcours « Bien démarrer » sur l'accueil — l'avancement est gardé sur l'appareil (owlht2_tutos), partagé avec la page aide/
