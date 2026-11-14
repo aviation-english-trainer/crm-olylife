@@ -2534,7 +2534,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.45 · 14/11';
+var APP_VERSION='v3.46 · 14/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -8133,7 +8133,7 @@ function oOffreCreate(cid,send){
   if(!o.lignes.length){oT('Cochez au moins un appareil','w');return;}
   o.pied=String(offreParams().pied||OFFRE_PIED_DEF).replace(/\{moi\}/g,PARTNER_NOM());o.lienAdhesion=adhesionUrl(c);
   o.id='of_'+Date.now().toString(36);o.tok=(function(){var a='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',t='';for(var i=0;i<20;i++)t+=a.charAt(Math.floor(Math.random()*a.length));return t;})();
-  o.le=new Date().toISOString();var dn=new Date(),seq=OC.reduce(function(a,x){return a+((x.offres||[]).length);},0)+1;o.num='OF'+String(dn.getFullYear()).slice(2)+('0'+(dn.getMonth()+1)).slice(-2)+'-'+('000'+seq).slice(-4);o.par=PARTNER_NOM();o.parId=USER?USER.id:'';o.memberId=(USER&&USER.memberId)||'';o.rang=(USER&&USER.rang)||'';o.statut='brouillon';o.envois=[];
+  o.le=new Date().toISOString();var dn=new Date(),seq=OC.reduce(function(a,x){return a+((x.offres||[]).length);},0)+1;o.num='OF'+String(dn.getFullYear()).slice(2)+('0'+(dn.getMonth()+1)).slice(-2)+'-'+('000'+seq).slice(-4);o.par=PARTNER_NOM();o.parId=USER?USER.id:'';o.memberId=(USER&&USER.memberId)||'';o.rang=(USER&&USER.rang)||'';o.statut='brouillon';o.envois=[];if(estComiteUser()){o.memberId='';o.rang='';}   // v3.46 — comité scientifique : jamais affiché comme émetteur (le serveur met son référent)
   c.offres=c.offres||[];c.offres.push(o);
   var t=offreTot(o);jrnAdd(c,'fait','💶 Offre de commande créée : '+o.lignes.map(function(l){return(l.qte>1?l.qte+' × ':'')+l.nom.replace(/^OlyLife\s+/i,'');}).join(', ')+' — '+fUSD(t.total)+(o.cot?' + adhésion WLHT':''));
   oPush([c]);var m=document.getElementById('ooffre');if(m)m.remove();emojiBurst(['💶','✨','🌿']);
@@ -8141,6 +8141,10 @@ function oOffreCreate(cid,send){
 }
 function oOffreSend(cid,oid){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;var o=(c.offres||[]).find(function(x){return x.id===oid;});if(!o)return;
+  if(estComiteUser()){
+    if(srvNum()<3037){oT('🧪 Comité scientifique : l\'envoi d\'une proposition attend la mise à jour du script serveur (v3.37), pour que votre nom n\'y apparaisse pas. Prévenez l\'administrateur.','w');return;}
+    var gz=(equipeContacts().filter(function(u){return u.role==='gestionnaire';})[0]||{}).nom;oT('🧪 Votre nom n\'apparaît pas sur la proposition : elle est présentée au nom de '+(gz||'votre référent')+', qui recevra aussi les réponses.','i');
+  }
   var v=tplVars(c,'fr');v.lienOffre=offreUrl(o);var t=offreTot(o);v.montantOffre=fUSD(t.total);v.financementOffre=finLignes(t.total).join(' · ');v.appareilsOffre=o.lignes.map(function(l){return(l.qte>1?l.qte+' × ':'')+l.nom.replace(/^OlyLife\s+/i,'');}).join(', ');v.validiteOffre=String(o.validite||15);
   var text=renderTpl(tplText('offre'),v),canal=canalCode(c),num=String(c.tel||'').replace(/\D/g,'');
   if((canal==='wa'||canal==='sms'||canal==='signal'||canal==='tg')&&!num){if(c.email)canal='mail';else{sendCopy(text,'📋 Pas de téléphone ni d\'e-mail : message copié');return;}}

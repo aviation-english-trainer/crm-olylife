@@ -297,7 +297,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.36';
+var SRV_VERSION = '3.37';
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
@@ -594,6 +594,15 @@ function offreUser_(db, o) {
   for (var k = 0; k < db.users.length; k++) if (db.users[k].nom === o.par) return db.users[k];
   return findUser_(db, ADMIN_CODE) || {};
 }
+// v3.37 — ÉMETTEUR AFFICHÉ : un membre du comité scientifique peut préparer une proposition, mais il n'apparaît jamais comme émetteur.
+// À sa place : son référent (le gestionnaire auquel il est rattaché), sinon le gestionnaire qui suit la fiche, sinon l'administrateur.
+function offreAff_(db, u, c) {
+  if (!estComite_(u)) return u;
+  var gs = []; try { gs = gestsOfUser_(db, u); } catch (e) {}
+  if (gs.length) return gs[0];
+  try { var sv = suivis_(c || {}); for (var i = 0; i < sv.length; i++) for (var k = 0; k < db.users.length; k++) { var x = db.users[k]; if (x.nom === sv[i] && !estComite_(x) && x.actif !== false && (x.role === 'gestionnaire' || x.role === 'admin')) return x; } } catch (e2) {}
+  return findUser_(db, ADMIN_CODE) || { nom: ADMIN_NOM };
+}
 function payTxt_(p, T) {
   if (!p || !p.mode) return '';
   var n2 = function (x) { return (Math.round((+x || 0) * 100) / 100).toFixed(2).replace('.', ','); };
@@ -619,7 +628,10 @@ function handleOffre_(db, req, op) {
   if (c.numCommande && c.dateCommande && o.le && String(c.dateCommande) >= String(o.le).slice(0, 10) && statut !== 'refusee') statut = 'commandee';
   if (op === 'offreInfo') {
     if (!o.vueLe) { o.vueLe = now_(); c.journal = c.journal || []; c.journal.push({ id: 'j_' + Date.now() + '_ov', ts: now_(), auteur: (c.prenom || '') + ' ' + (c.nom || ''), role: '', type: 'systeme', texte: '👀 Offre de commande ouverte par la personne (' + Math.round(total) + ' USD)' }); c.lastActivity = now_(); saveDB_(db); try { pushSend_(db, [u], '👀 Offre ouverte', (c.prenom || '') + ' ' + (c.nom || '') + ' vient d\'ouvrir votre proposition (' + Math.round(total) + ' USD)', ''); } catch (e) {} }
-    var rdv = u.calendlyUrl || ((db.config.params || {}).liens || {}).rdvDecouverte || '';
+    var aff = offreAff_(db, u, c), masque = aff !== u;
+    var rdv = aff.calendlyUrl || ((db.config.params || {}).liens || {}).rdvDecouverte || '';
+    if (masque) u = { nom: aff.nom, photo: aff.photo, tel: aff.tel, email: aff.email, memberId: aff.memberId || '', rang: aff.rang || '' };
+    if (masque) o = (function (src) { var cp = {}; for (var kk in src) cp[kk] = src[kk]; cp.par = aff.nom; cp.memberId = ''; cp.rang = ''; return cp; })(o);
     return out_({ ok: true, statut: statut,
       client: { prenom: c.prenom || '', nom: c.nom || '', adresse: c.adresse || '', cp: c.cp || '', ville: c.ville || '', pays: c.pays || '', liv: { nom: ((c.livPrenom || '') + ' ' + (c.livNom || '')).trim(), adresse: c.livAdresse || '', cp: c.livCp || '', ville: c.livVille || '', pays: c.livPays || '' } },
       ref: { nom: u.nom || o.par || '', photo: u.photo || '', tel: u.tel || '', email: u.email || '', rdv: rdv, memberId: u.memberId || o.memberId || '', rang: u.rang || o.rang || '' },
@@ -654,7 +666,8 @@ function handleOffre_(db, req, op) {
   if (c.statut !== 'reseau' && c.etape !== 'Client') { c.statut = 'pret'; }
   saveDB_(db);
   var qui = (c.prenom || '') + ' ' + (c.nom || '');
-  try { pushSend_(db, [u, { id: 'root' }], (signed ? '✍️ Offre signée' : '✅ Offre acceptée'), qui.trim() + (signed ? ' a signé le bon pour accord (' : ' souhaite commander (') + Math.round(total) + ' USD)', ''); } catch (e) {}
+  var affA = offreAff_(db, u, c);
+  try { pushSend_(db, affA !== u ? [u, affA, { id: 'root' }] : [u, { id: 'root' }], (signed ? '✍️ Offre signée' : '✅ Offre acceptée'), qui.trim() + (signed ? ' a signé le bon pour accord (' : ' souhaite commander (') + Math.round(total) + ' USD)', ''); } catch (e) {}
   try {
     var em = u.email || u.digestEmail || emailDe_(db, u.nom || o.par);
     if (em) {
@@ -1059,6 +1072,8 @@ function doPost(e) {
       var tot = 0; (oo.lignes || []).forEach(function (l) { tot += (+l.usd || 0) * (+l.qte || 1); }); tot = tot + Math.round(tot * (+oo.frais || 0)) / 100;
       var lignesHtml = (oo.lignes || []).map(function (l) { return '<tr><td style="padding:6px 8px;border-bottom:1px solid #E1ECE4">' + (l.ic ? l.ic + ' ' : '') + String(l.nom).replace(/</g, '&lt;') + (l.qte > 1 ? ' × ' + l.qte : '') + '</td><td style="padding:6px 8px;border-bottom:1px solid #E1ECE4;text-align:right;white-space:nowrap">' + Math.round((+l.usd || 0) * (+l.qte || 1)) + ' USD</td></tr>'; }).join('');
       var moi = user.nom, monMail = user.email || user.digestEmail || emailDe_(db, user.nom) || MON_EMAIL;
+      var affM = offreAff_(db, user, oc), copieComite = '';   // v3.37 — comité : l'e-mail part au nom du référent, la réponse lui arrive, le membre du comité garde sa copie
+      if (affM !== user) { copieComite = user.email || user.digestEmail || ''; moi = affM.nom; monMail = affM.email || affM.digestEmail || emailDe_(db, affM.nom) || MON_EMAIL; }
       var corpsC = '<p>Bonjour ' + String(oc.prenom || '').replace(/</g, '&lt;') + ',</p><p>Voici votre proposition OlyLife n° <b>' + String(oo.num || '').replace(/</g, '&lt;') + '</b>, préparée par ' + moi.replace(/</g, '&lt;') + '.</p>'
         + '<table style="width:100%;border-collapse:collapse;font-size:14px">' + lignesHtml + '<tr><td style="padding:8px;font-weight:700">Total estimé, frais OlyLife compris</td><td style="padding:8px;text-align:right;font-weight:700">' + Math.round(tot) + ' USD</td></tr></table>'
         + (oo.paiement && oo.paiement.mode ? '<p><b>Mode de règlement souhaité :</b> ' + payTxt_(oo.paiement, tot) + '</p>' : '')
@@ -1076,6 +1091,7 @@ function doPost(e) {
           + '<p style="text-align:center;margin:18px 0"><a href="' + lien + '" style="background:#126A3C;color:#fff;text-decoration:none;font-weight:700;padding:12px 20px;border-radius:12px;display:inline-block">Ouvrir la proposition</a> &nbsp; <a href="' + lien + '&v=doc" style="background:#fff;color:#126A3C;border:1.5px solid #126A3C;text-decoration:none;font-weight:700;padding:12px 20px;border-radius:12px;display:inline-block">Version document / PDF</a></p>'
           + '<p style="font-size:12px;color:#7F9186">Vous serez prévenu(e) par notification et par e-mail dès qu\'elle sera ouverte, acceptée ou signée.</p>';
         MailApp.sendEmail({ to: monMail, subject: '📋 Copie — proposition OlyLife n° ' + (oo.num || '') + ' pour ' + ((oc.prenom || '') + ' ' + (oc.nom || '')).trim(), htmlBody: avMailShell_('Copie de votre proposition', 'CRM OlyLife — Water Life High Tech', '#0F3B22', corpsM), name: 'CRM OlyLife WLHT' }); sent.copie = true;
+        if (copieComite && copieComite.toLowerCase() !== String(monMail).toLowerCase()) { try { MailApp.sendEmail({ to: copieComite, subject: '📋 Copie — proposition OlyLife n° ' + (oo.num || '') + ' pour ' + ((oc.prenom || '') + ' ' + (oc.nom || '')).trim(), htmlBody: avMailShell_('Copie de la proposition', 'Transmise au nom de ' + moi.replace(/</g, '&lt;') + ' · CRM OlyLife', '#0F3B22', corpsM), name: 'CRM OlyLife WLHT' }); } catch (ce) {} }
       }
       oo.envois = oo.envois || []; oo.envois.push({ ts: now_(), canal: 'mail', par: user.nom, client: sent.client, copie: sent.copie }); if (oo.statut === 'brouillon') oo.statut = 'envoyee';
       oc.journal = oc.journal || []; oc.journal.push({ id: 'j_' + Date.now() + '_om', ts: now_(), auteur: user.nom, role: user.role, type: 'fait', texte: '✉️ Proposition n° ' + (oo.num || '') + (sent.client ? ' envoyée par e-mail à ' + oc.email : ' — pas d\'e-mail sur la fiche') + (sent.copie ? ' · copie à ' + monMail : '') });
