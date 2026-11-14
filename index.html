@@ -2437,7 +2437,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.41.1 · 14/11';
+var APP_VERSION='v3.41.2 · 14/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -7339,7 +7339,9 @@ function livHtml(c){
 function suiviTxt(c){
   var L=c.livraisons||[];
   if(L.length>1)return L.filter(function(r){return r.tracking;}).map(function(r){var u=trackingUrl(r.transporteur,r.tracking);return'• '+((r.produit||'').split('(')[0].trim()||'Colis')+' — '+(r.transporteur||'')+' '+r.tracking+(u?' : '+u:'');}).join('\n');
-  return trackingUrl(c.transporteur,trkClean(c.tracking))||'';
+  var tks=trkClean(c.tracking).split(' / ').filter(Boolean);
+  if(tks.length>1)return'\n'+tks.map(function(t){var u=trackingUrl(c.transporteur,t);return'🔗 '+t+(u?' : '+u:'');}).join('\n');   // v3.41.2 — plusieurs colis DHL/UPS : un lien par n° dans le même message
+  return trackingUrl(c.transporteur,tks[0]||'')||'';
 }
 
 // ── Fiche : autres comptes OlyLife ──
