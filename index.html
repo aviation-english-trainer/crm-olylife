@@ -2437,7 +2437,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.41 · 13/11';
+var APP_VERSION='v3.41.1 · 14/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -3175,8 +3175,7 @@ function uAv(u){return avOf(u&&u.photo,ini(u&&u.nom||'?'));}
 function setAv(id,photo,txt){var e=document.getElementById(id);if(e)e.innerHTML=avOf(photo,txt);}
 function mkWA(tel,msg){var n=(tel||'').replace(/\D/g,'');if(!n)return'#';return'https://wa.me/'+n+'?text='+encodeURIComponent(msg);}
 function trackingUrl(carrier,num){
-  if(!num)return'';
-  num=String(num).split(/\s*[\/,]\s*/)[0].replace(/^GEL\(S\)\s*:?\s*/i,'').trim();
+  num=trkClean(num).split(' / ')[0]||'';if(!num)return'';
   var c=(carrier||'').toLowerCase();if(/^1Z/i.test(num))c='ups';var n=encodeURIComponent(num);
   if(c.indexOf('dhl')>=0)return'https://www.dhl.de/en/privatkunden/pakete-empfangen/verfolgen.html?piececode='+n;
   if(c.indexOf('ups')>=0)return'https://www.ups.com/track?tracknum='+n;
@@ -3375,8 +3374,8 @@ function nomAdresse(c,tone){
 }
 function tplVars(c,lang,tone){
   c=c||{};lang=lang||'fr';tone=tone||c.registre||'pro';
-  var url=trackingUrl(c.transporteur,c.tracking);
-  return{prenom:nomAdresse(c,tone),prenomSeul:prenom1(c),civilite:c.civilite||'',nom:c.nom||'',numCommande:c.numCommande||'',logistique:OLY_SVC.logistics[lang]||OLY_SVC.logistics.fr,transporteur:c.transporteur||'—',tracking:c.tracking||'—',lienSuivi:suiviTxt(c)||url||'',
+  var url=trackingUrl(c.transporteur,trkClean(c.tracking));
+  return{prenom:nomAdresse(c,tone),prenomSeul:prenom1(c),civilite:c.civilite||'',nom:c.nom||'',numCommande:c.numCommande||'',logistique:OLY_SVC.logistics[lang]||OLY_SVC.logistics.fr,transporteur:c.transporteur||'—',tracking:trkClean(c.tracking)||'—',lienSuivi:suiviTxt(c)||url||'',
     tipLivraison:isFR(c)?(lang==='en'?'DHL Parcel: 01 80 14 63 32 · Colissimo/La Poste: 09 72 72 12 13. ':'DHL Parcel : 01 80 14 63 32 · Colissimo/La Poste : 09 72 72 12 13. '):'',
     sav:OLY_SVC.aftersales[lang]||OLY_SVC.aftersales.fr,savEmail:OLY_SVC.aftersales.email,moi:PARTNER_NOM()||'L\'équipe WLHT',
     role:roleLabel(ROLE()),telMoi:(USER&&USER.tel)||'',lienRdv:rdvUrl(),nomComplet:[(tone==='pro'?c.civilite:''),prenom1(c),c.nom||''].filter(Boolean).join(' ').trim(),lienInscription:inscriptionUrl(),sansLien:inscriptionUrl()?'':'1'};
@@ -4701,7 +4700,7 @@ function oSave(){
     ctags:(document.getElementById('fc-ctags').value||'').split(',').map(function(t){return t.trim();}).filter(Boolean),
     etape:document.getElementById('fc-etape').value,qualification:document.getElementById('fc-qualif').value,canal:document.getElementById('fc-canal').value,registre:document.getElementById('fc-registre').value,civilite:val('fc-civ'),emailConsent:document.getElementById('fc-consent').checked,objectifs:document.getElementById('fc-obj').value,
     produits:prods,
-    numCommande:document.getElementById('fl-numcmd').value,memberIdOlyLife:document.getElementById('fl-memberid').value,dateCommande:document.getElementById('fl-datecmd').value,transporteur:document.getElementById('fl-transp').value,tracking:document.getElementById('fl-tracking').value,dateLivraison:document.getElementById('fl-datelivr').value,
+    numCommande:document.getElementById('fl-numcmd').value,memberIdOlyLife:document.getElementById('fl-memberid').value,dateCommande:document.getElementById('fl-datecmd').value,transporteur:document.getElementById('fl-transp').value,tracking:trkClean(document.getElementById('fl-tracking').value)||document.getElementById('fl-tracking').value.trim(),dateLivraison:document.getElementById('fl-datelivr').value,
     installConfirm:document.getElementById('fi-confirm').checked,dateInstall:document.getElementById('fi-date').value,dateReception:document.getElementById('fi-recu').value,notesUsage:document.getElementById('fi-notes').value,
     temoignageTexte:document.getElementById('ft-texte').value,temoignageAutorise:document.getElementById('ft-autorise').checked,
     estPartenaire:document.getElementById('fe-partenaire').checked,sponsor:eaNorm(document.getElementById('fe-sponsor').value),placement:eaNorm(document.getElementById('fe-placement').value),cote:document.getElementById('fe-cote').value,generation:document.getElementById('fe-gen').value,rang:document.getElementById('fe-rang').value,
@@ -5010,7 +5009,8 @@ function parseOlyOrderOcr(text){
   lines.forEach(function(l){var mc=l.match(CARRIERS);if(mc&&!transporteur)transporteur=mc[1].toUpperCase()==='LA POSTE'?'Colissimo / La Poste':mc[1];});
   // Tracking : format postal international XX000000000XX, ou alphanumérique 8+ chars près de "tracking"
   (flat.match(TRK_RX)||[]).forEach(function(t){if(trackingNums.indexOf(t)<0)trackingNums.push(t);});
-  if(!trackingNums.length){var mt=flat.match(/(?:tracking|suivi|n[°o]\s*(?:de\s*)?suivi)\s*(?:number)?\s*[:：]?\s*((?=[A-Z0-9]*\d)[A-Z0-9]{8,20})/i);if(mt)trackingNums.push(mt[1]);}
+  if(!trackingNums.length){var mt=flat.match(/(?:tracking|suivi|n[°o]\s*(?:de\s*)?suivi)\s*(?:number)?\s*[:：]?\s*((?=[A-Z0-9]*\d)[A-Z0-9]{8,20})/i);if(mt&&trkClean(mt[1]))trackingNums.push(trkClean(mt[1]));}
+  if(!trackingNums.length){(flat.match(/\b[A-Z0-9]{2}\d{9}[A-Z0-9]{2}\b/gi)||[]).forEach(function(t){var k=trkClean(t);if(k&&trackingNums.indexOf(k)<0)trackingNums.push(k);});}
   // Date de livraison : YYYY-MM-DD
   lines.forEach(function(l){var md=l.match(/\b(20\d{2}-\d{2}-\d{2})\b/g);if(md)dLivr=md[md.length-1];});
   var LR=delivRows(flat);delivApply(LR,trackingNums,prods,function(t){transporteur=t;},function(d){dLivr=d;});
@@ -5026,7 +5026,7 @@ function parseOlyOrderOcr(text){
   var notes=['Commande OlyLife'+(num?' n°'+num:'')+(dateCmd?' du '+fD(dateCmd):'')+' (lue par OCR — à vérifier)',montant?'Montant : '+montant+' USD':'',type?'Type : '+type:'',paid?'Statut commande : Réglé':'',prodTxt?'Produits : '+prodTxt:'',transporteur?'Transporteur : '+transporteur:'',trackingNums.length?'Tracking : '+trackingNums.join(' / '):'',dLivr?'Date livraison : '+dLivr:'',adr?'Livraison : '+adr:'',destinataire&&destinataire.toLowerCase()!==nomC.toLowerCase()?'Destinataire : '+destinataire:''].filter(Boolean).join('\n');
   var livNom=(destinataire&&destinataire.replace(/\s+/g,' ').toLowerCase()!==nomC.replace(/\s+/g,' ').toLowerCase())?destinataire:'';
   var livTel=(recipTel&&normPhone(recipTel)!==normPhone(tel))?normPhone(recipTel):'';
-  var it={nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,livNom:livNom,livTel:livTel,numCommande:num,memberIdOlyLife:member,pieceId:idcard,dateCommande:dateCmd,rangOly:rang,montantUSD:montantUSD,achatsUSD:montantUSD,produits:prods,transporteur:transporteur,tracking:trackingNums.join(' / '),dateLivraison:dLivr,livraisons:LR.length>1?LR:undefined,etape:'Client',qualification:'Chaud',statut:'reseau',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olylife-ocr'};
+  var it={nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,livNom:livNom,livTel:livTel,numCommande:num,memberIdOlyLife:member,pieceId:idcard,dateCommande:dateCmd,rangOly:rang,montantUSD:montantUSD,achatsUSD:montantUSD,produits:prods,transporteur:transporteur,tracking:trkClean(trackingNums.join(' / ')),dateLivraison:dLivr,livraisons:LR.length>1?LR:undefined,etape:'Client',qualification:'Chaud',statut:'reseau',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olylife-ocr'};
   return(it.nom||it.tel||it.email||it.numCommande)?[it]:[];
 }
 // Page de commande : copier-coller propre (libellé : valeur) sinon lecture OCR
@@ -5142,7 +5142,7 @@ function parseOlyOrders(text){
     var livTel=(recipTel&&normPhone(recipTel)!==normPhone(tel))?normPhone(recipTel):'';
     // v3.36 — la « Mailing information » du BO est l'adresse de livraison : si le colis part chez quelqu'un d'autre, elle ne doit pas devenir l'adresse du client
     var liv={};if(livNom){liv={livAdresse:adr,livCp:cp,livVille:ville,livPays:pays||'France'};adr='';cp='';ville='';}
-    return Object.assign({boCompte:boEA&&boEA!==(member||'').toUpperCase()?boEA:''},liv,{nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,livNom:livNom,livTel:livTel,numCommande:num,memberIdOlyLife:(member||'').toUpperCase(),pieceId:idcard,dateCommande:dateCmd,transporteur:transporteur,tracking:tracking.join(' / '),dateLivraison:dLivr,livraisons:LR.length>1?LR:undefined,rangOly:rang,montantUSD:montantUSD,achatsUSD:montantUSD,produits:prods,etape:'Client',qualification:'Chaud',statut:'reseau',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olylife'});
+    return Object.assign({boCompte:boEA&&boEA!==(member||'').toUpperCase()?boEA:''},liv,{nom:nom,prenom:prenom,tel:normPhone(tel),email:email,pays:pays||'France',ville:ville,adresse:adr,cp:cp,livNom:livNom,livTel:livTel,numCommande:num,memberIdOlyLife:(member||'').toUpperCase(),pieceId:idcard,dateCommande:dateCmd,transporteur:transporteur,tracking:trkClean(tracking.join(' / ')),dateLivraison:dLivr,livraisons:LR.length>1?LR:undefined,rangOly:rang,montantUSD:montantUSD,achatsUSD:montantUSD,produits:prods,etape:'Client',qualification:'Chaud',statut:'reseau',statutPar:PARTNER_NOM(),statutLe:new Date().toISOString(),notes:notes,_src:'olylife'});
   }).filter(function(x){return x.nom||x.tel||x.numCommande;});
 }
 function parseCSV(text){
@@ -7254,13 +7254,13 @@ function logiHtml(c){
   var waMsg='Bonjour, je vous contacte au sujet de la commande OlyLife n°'+(c.numCommande||'')+' (Member ID '+(c.memberIdOlyLife||'')+'), le suivi n\'est toujours pas disponible. Merci de votre retour.';
   var mailSubj='Suivi commande OlyLife n°'+(c.numCommande||'');
   var mailBody='Bonjour,\n\nMerci de me communiquer le statut d\'expédition de la commande n°'+(c.numCommande||'')+' (Member ID '+(c.memberIdOlyLife||'')+').\n\nCordialement,\n'+(PARTNER_NOM()||'');
-  var rows='<div class="acc-row"><span class="em">📦</span><div class="b">Commande n° '+esc(c.numCommande)+' '+st+'<small>'+(c.dateCommande?'commandée le '+fD(c.dateCommande):'date de commande non renseignée')+(c.tracking?' · tracking : '+esc(c.tracking):'')+(c.dateLivraison?' · livrée le '+fD(c.dateLivraison):'')+'</small>'+livHtml(c)+'</div></div>';
+  var rows='<div class="acc-row"><span class="em">📦</span><div class="b">Commande n° '+esc(c.numCommande)+' '+st+'<small>'+(c.dateCommande?'commandée le '+fD(c.dateCommande):'date de commande non renseignée')+(trkClean(c.tracking)?' · tracking : '+esc(trkClean(c.tracking)):'')+(c.dateLivraison?' · livrée le '+fD(c.dateLivraison):'')+'</small>'+livHtml(c)+'</div></div>';
   var aL=(c.actions||{}).logistique,aT=(c.actions||{}).trackingEnvoye,dL=!!(aL&&aL.done),dT=!!(aT&&aT.done);
-  rows+='<div class="'+accCls(dL||dT)+'"><span class="em">💬</span><div class="b">Messages client (pré-rédigés, à envoyer sur WhatsApp)'+stChip(dL,dL?aL.par:'',dL?aL.doneAt:'','Rassurance envoyée','Rassurance à envoyer')+(c.tracking?stChip(dT,dT?aT.par:'',dT?aT.doneAt:'','Tracking transmis','Tracking à transmettre'):'')+'</div><div class="acts">'
-    +(c.tel&&!c.tracking?'<a class="ob bwa bsm" href="'+mkWA(c.tel,msgLogRetard(c,'fr'))+'" target="_blank" rel="noopener" onclick="oDone(\''+c.id+'\',\'logistique\''+ckArg(c)+')">⏳ Rassurer (délai)</a>':'')
-    +(c.tel&&c.tracking?'<a class="ob bwa bsm" href="'+mkWA(c.tel,msgLogOk(c,'fr'))+'" target="_blank" rel="noopener" onclick="oDone(\''+c.id+'\',\'trackingEnvoye\''+ckArg(c)+')">🚚 Envoyer le tracking</a>':'')
-    +(!c.tracking&&!(c.actions&&c.actions.logistique&&c.actions.logistique.done)?'<button class="ob bdone bsm" onclick="oDone(\''+c.id+'\',\'logistique\''+ckArg(c)+')">✅ Fait</button>':'')
-    +(c.tracking&&!(c.actions&&c.actions.trackingEnvoye&&c.actions.trackingEnvoye.done)?'<button class="ob bdone bsm" onclick="oDone(\''+c.id+'\',\'trackingEnvoye\''+ckArg(c)+')">✅ Fait</button>':'')
+  rows+='<div class="'+accCls(dL||dT)+'"><span class="em">💬</span><div class="b">Messages client (pré-rédigés, à envoyer sur WhatsApp)'+stChip(dL,dL?aL.par:'',dL?aL.doneAt:'','Rassurance envoyée','Rassurance à envoyer')+(trkClean(c.tracking)?stChip(dT,dT?aT.par:'',dT?aT.doneAt:'','Tracking transmis','Tracking à transmettre'):'')+'</div><div class="acts">'
+    +(c.tel&&!trkClean(c.tracking)?'<a class="ob bwa bsm" href="'+mkWA(c.tel,msgLogRetard(c,'fr'))+'" target="_blank" rel="noopener" onclick="oDone(\''+c.id+'\',\'logistique\''+ckArg(c)+')">⏳ Rassurer (délai)</a>':'')
+    +(c.tel&&trkClean(c.tracking)?'<a class="ob bwa bsm" href="'+mkWA(c.tel,msgLogOk(c,'fr'))+'" target="_blank" rel="noopener" onclick="oDone(\''+c.id+'\',\'trackingEnvoye\''+ckArg(c)+')">🚚 Envoyer le tracking</a>':'')
+    +(!trkClean(c.tracking)&&!(c.actions&&c.actions.logistique&&c.actions.logistique.done)?'<button class="ob bdone bsm" onclick="oDone(\''+c.id+'\',\'logistique\''+ckArg(c)+')">✅ Fait</button>':'')
+    +(trkClean(c.tracking)&&!(c.actions&&c.actions.trackingEnvoye&&c.actions.trackingEnvoye.done)?'<button class="ob bdone bsm" onclick="oDone(\''+c.id+'\',\'trackingEnvoye\''+ckArg(c)+')">✅ Fait</button>':'')
     +'</div></div>';
   rows+='<div class="acc-row"><span class="em">📨</span><div class="b">Relancer la logistique OlyLife<small>WhatsApp : le service est relancé puis le client est prévenu · E-mail : '+(logiCc(c).length?'copie à '+esc(logiCc(c).join(', ')):'aucune adresse de copie connue')+'</small></div><div class="acts"><button class="ob bgh bsm" onclick="oLogiWA(\''+c.id+'\''+ckArg(c)+')">📨 WhatsApp</button><button class="ob bgh bsm" onclick="oLogiMail(\''+c.id+'\''+ckArg(c)+')">✉️ E-mail</button></div></div>';
   return'<div class="od-section'+(c.installConfirm?' clps':'')+'"><div class="od-sec-ttl tog" onclick="this.parentElement.classList.toggle(\'clps\')">'+ordTitle(c,'🚚 Logistique — commande & messages automatisés')+'</div><div class="od-bd">'+rows+'</div></div>';
@@ -7303,6 +7303,15 @@ function prodFromName(s){
 }
 // Tracking : postal international (XX000000000XX) ou UPS (1Z…)
 var TRK_RX=/\b([A-Z]{2}\d{9}[A-Z]{2}|1Z[A-Z0-9]{16})\b/g;
+// v3.41.1 — nettoyage d'un n° de suivi : retire « GEL(S): », ne garde que des jetons avec ≥ 5 chiffres (un mot comme « Delivery » n'est jamais un n° de suivi), corrige l'OCR (C1… → CI…)
+function trkClean(s){
+  if(!s)return'';var out=[];
+  String(s).replace(/GEL\(S\)\s*:?\s*/gi,' ').split(/\s*[\/,;|]\s*|\s{2,}/).forEach(function(tok){tok=tok.trim().replace(/[^A-Za-z0-9-]/g,'');if(!tok)return;
+    var m=tok.match(/^([A-Z0-9]{2})(\d{9})([A-Z0-9]{2})$/i);if(m)tok=(m[1].replace(/1/g,'I').replace(/0/g,'O')+m[2]+m[3].replace(/1/g,'I').replace(/0/g,'O')).toUpperCase();
+    var nd=(tok.match(/\d/g)||[]).length;if(nd<5||tok.length<8||tok.length>30)return;
+    if(out.indexOf(tok)<0)out.push(tok);});
+  return out.join(' / ');
+}
 // Tableau « Delivery information » : une ligne par colis (n° « commande-1 », « commande-2 »…)
 function delivRows(flat){
   var rx=/\b(20\d{14,})-(\d{1,3})\b/g,pos=[],m;
@@ -7330,7 +7339,7 @@ function livHtml(c){
 function suiviTxt(c){
   var L=c.livraisons||[];
   if(L.length>1)return L.filter(function(r){return r.tracking;}).map(function(r){var u=trackingUrl(r.transporteur,r.tracking);return'• '+((r.produit||'').split('(')[0].trim()||'Colis')+' — '+(r.transporteur||'')+' '+r.tracking+(u?' : '+u:'');}).join('\n');
-  return trackingUrl(c.transporteur,c.tracking)||'';
+  return trackingUrl(c.transporteur,trkClean(c.tracking))||'';
 }
 
 // ── Fiche : autres comptes OlyLife ──
