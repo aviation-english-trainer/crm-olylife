@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#126A3C">
+<title>Aide &amp; tutoriels — CRM OlyLife</title>
+<link rel="icon" type="image/png" sizes="192x192" href="../icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Outfit:wght@400;500;600;700&display=swap">
+<style>
+/* Charte « Clair OlyLife Green » */
+:root{
+  --bg:#F6FAF6; --card:#FFFFFF; --tx:#20362A; --t2:#4C6457; --t3:#7C9186;
+  --em:#126A3C; --em2:#0F5530; --jade:#1E9D5A; --line:#DCE8DF; --soft:#EAF3EC;
+  --gold:#C9A84C; --goldbg:#FBF5E2; --goldbd:#E9D69A; --red:#B3372F; --redbg:#FBECEA;
+  --r:16px; --sh:0 1px 2px rgba(18,60,38,.05),0 8px 24px rgba(18,60,38,.06);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:'Outfit',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Cormorant Garamond',Georgia,serif;font-weight:700;line-height:1.15;margin:0;text-wrap:balance}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:var(--em)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:8px}
+.wrap{max-width:680px;margin:0 auto;padding:0 16px calc(40px + env(safe-area-inset-bottom))}
+
+.top{position:sticky;top:0;z-index:20;background:rgba(246,250,246,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top-in{max-width:680px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:12px}
+.top img{width:36px;height:36px;border-radius:10px;flex:none}
+.top b{font-family:'Cormorant Garamond',Georgia,serif;font-size:21px;line-height:1.1;display:block;color:var(--em2)}
+.top small{font-size:12px;color:var(--t3);display:block}
+.top.in-tuto small{display:none}
+.back{margin-left:auto;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font-size:13.5px;font-weight:600;color:var(--em);min-height:40px;white-space:nowrap}
+
+.lede{font-size:15.5px;color:var(--t2);margin:18px 0 14px}
+.search{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:0 14px;box-shadow:var(--sh)}
+.search svg{flex:none;color:var(--t3)}
+.search input{flex:1;border:0;background:none;font:inherit;color:var(--tx);padding:13px 0;min-width:0;outline:none}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 16px 4px;margin:0 -16px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font-size:13.5px;font-weight:500;color:var(--t2);min-height:40px}
+.chip[aria-pressed="true"]{background:var(--em);border-color:var(--em);color:#fff}
+
+.prog{margin:16px 0 6px;background:linear-gradient(135deg,#0F3B22,#126A3C);color:#fff;border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh)}
+.prog h2{font-size:22px;color:#fff}
+.prog p{margin:4px 0 12px;font-size:14px;color:rgba(255,255,255,.82)}
+.bar{height:8px;border-radius:99px;background:rgba(255,255,255,.2);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#E3C36A,#C9A84C);transition:width .4s}
+.prog button{margin-top:14px;border:0;border-radius:12px;background:#fff;color:var(--em2);font-weight:600;padding:11px 16px;min-height:44px;width:100%;text-align:left;display:flex;justify-content:space-between;gap:10px;align-items:center}
+
+.sec{margin:26px 0 10px;display:flex;align-items:baseline;gap:10px}
+.sec h2{font-size:23px;color:var(--em2)}
+.sec span{font-size:13px;color:var(--t3)}
+.list{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.item{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);min-height:64px}
+.item:active{transform:scale(.995)}
+.num{flex:none;width:34px;height:34px;border-radius:50%;background:var(--soft);color:var(--em);font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center}
+.item.done .num{background:var(--em);color:#fff}
+.item b{display:block;font-weight:600;font-size:16px;line-height:1.3}
+.item small{color:var(--t3);font-size:13px}
+.item .go{margin-left:auto;color:var(--t3);flex:none}
+.empty{background:var(--card);border:1px dashed var(--line);border-radius:var(--r);padding:22px 18px;color:var(--t2);text-align:center}
+.soon{margin:0;padding:0;list-style:none;background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.soon li{display:flex;justify-content:space-between;gap:12px;padding:12px 16px;border-top:1px solid var(--line);font-size:14.5px}
+.soon li:first-child{border-top:0}
+.soon small{color:var(--t3);white-space:nowrap}
+.soon em{font-style:normal;color:var(--t3);display:block;font-size:13px}
+.foot{margin-top:30px;text-align:center;font-size:12.5px;color:var(--t3)}
+
+.eyebrow{margin:20px 0 8px;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--jade)}
+.tuto h1{font-size:32px;color:var(--em2)}
+.goal{margin:14px 0 0;font-size:17px;color:var(--t2)}
+.pills{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 0}
+.pill{font-size:12.5px;background:var(--soft);color:var(--em2);border-radius:999px;padding:4px 10px}
+.video{display:inline-flex;align-items:center;gap:8px;margin-top:14px;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px 14px;font-weight:600;text-decoration:none;min-height:44px}
+.steps{margin:26px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:14px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
+.step-h{display:flex;gap:12px;align-items:flex-start}
+.step-h .num{background:var(--em);color:#fff;margin-top:1px}
+.step-h p{margin:4px 0 0;font-size:16.5px}
+.shot{display:block;margin:14px auto 2px;padding:0;border:6px solid #16281E;border-radius:26px;overflow:hidden;background:#16281E;width:min(100%,290px);box-shadow:0 10px 28px rgba(18,60,38,.18)}
+.shot img{display:block;width:100%;height:auto;border-radius:20px}
+.zoomhint{display:block;text-align:center;font-size:12px;color:var(--t3);margin-top:6px}
+.keep{margin:22px 0 0;background:var(--goldbg);border:1px solid var(--goldbd);border-left:5px solid var(--gold);border-radius:var(--r);padding:16px 18px}
+.keep h2{font-size:22px;color:#6B5413;margin-bottom:6px}
+.keep p{margin:0;font-size:16px}
+.quiz{margin:22px 0 0;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh)}
+.quiz h2{font-size:22px;color:var(--em2)}
+.q{margin-top:16px}
+.q p{margin:0 0 8px;font-weight:600}
+.opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:12px;padding:11px 14px;margin-top:8px;min-height:46px;font-size:15.5px}
+.opt.ok{background:#E3F4E8;border-color:var(--jade);font-weight:600}
+.opt.ko{background:var(--redbg);border-color:#E4B3AE}
+.opt:disabled{cursor:default;color:var(--tx)}
+.why{margin:10px 0 0;font-size:14.5px;color:var(--t2)}
+.done-btn{margin:24px 0 0;width:100%;border:0;border-radius:14px;background:var(--em);color:#fff;font-weight:600;font-size:17px;padding:15px 18px;min-height:54px;box-shadow:0 6px 18px rgba(18,106,60,.25)}
+.done-btn.on{background:var(--card);color:var(--em);border:1px solid var(--jade);box-shadow:none}
+.nav2{display:flex;gap:10px;margin-top:14px}
+.nav2 button{flex:1;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:12px 14px;text-align:left;min-height:60px;min-width:0}
+.nav2 button:last-child{text-align:right}
+.nav2 small{display:block;font-size:12px;color:var(--t3)}
+.nav2 b{display:block;font-weight:600;font-size:14.5px;line-height:1.25}
+.sign{margin-top:22px;text-align:center;font-size:12.5px;color:var(--t3)}
+
+.lb{position:fixed;inset:0;z-index:50;background:rgba(10,24,16,.9);display:none;align-items:center;justify-content:center;padding:16px}
+.lb.on{display:flex}
+.lb img{max-width:100%;max-height:100%;border-radius:18px}
+.lb button{position:absolute;top:calc(12px + env(safe-area-inset-top));right:14px;width:46px;height:46px;border-radius:50%;border:0;background:#fff;font-size:20px}
+.hide{display:none!important}
+@media (min-width:600px){.tuto h1{font-size:38px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{.top,.chips,.search,.done-btn,.nav2,.zoomhint{display:none!important}.shot{width:220px}body{background:#fff}}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <img src="../icon-192.png" alt="">
+  <div><b>Aide &amp; tutoriels</b><small>CRM OlyLife · Water Life High Tech</small></div>
+  <button class="back hide" id="back" type="button">← Tous les tutos</button>
+</div></header>
+
+<main class="wrap">
+  <section id="v-list">
+    <p class="lede">Un tutoriel, un geste. Deux à quatre minutes, à suivre sur votre téléphone, le CRM ouvert à côté.</p>
+    <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="search" id="q" placeholder="Chercher : PIN, notifications, profil…" autocomplete="off" aria-label="Chercher un tutoriel"></label>
+    <div class="chips" id="chips" role="group" aria-label="Filtrer par rôle"></div>
+    <div id="prog"></div>
+    <div id="lists"></div>
+    <div id="soon"></div>
+    <p class="foot" id="foot"></p>
+  </section>
+  <article id="v-tuto" class="tuto hide"></article>
+  <p id="err" class="empty hide" style="margin-top:24px">Les tutoriels n'ont pas pu être chargés. Vérifiez votre connexion, puis rouvrez cette page.</p>
+</main>
+
+<div class="lb" id="lb" role="dialog" aria-label="Capture agrandie"><button type="button" id="lb-x" aria-label="Fermer">✕</button><img id="lb-img" alt=""></div>
+
+<script>
+(function(){
+'use strict';
+var DATA=null, ROLE='', Q='';
+var KEY='owlht2_tutos';
+function $(id){return document.getElementById(id);}
+function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined&&txt!==null)e.textContent=txt;return e;}
+/* Texte avec **gras** — construit nœud par nœud, jamais d'innerHTML */
+function rich(node,txt){String(txt||'').split('**').forEach(function(part,i){if(!part)return;if(i%2){node.appendChild(el('strong','',part));}else{node.appendChild(document.createTextNode(part));}});return node;}
+function norm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');}
+function doneMap(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){return{};}}
+function isDone(slug){return !!doneMap()[slug];}
+function setDone(slug,on){var m=doneMap();if(on)m[slug]=new Date().toISOString();else delete m[slug];try{localStorage.setItem(KEY,JSON.stringify(m));}catch(e){}try{if(window.parent&&window.parent!==window)window.parent.postMessage({type:'wlht-aide-progress'},location.origin);}catch(e){}}
+function params(){var o={};location.search.replace(/^\?/,'').split('&').forEach(function(kv){if(!kv)return;var p=kv.split('=');o[decodeURIComponent(p[0])]=decodeURIComponent((p[1]||'').replace(/\+/g,' '));});return o;}
+function dispo(){return DATA.tutos.filter(function(t){var p=DATA.parcours.filter(function(x){return x.id===t.parcours;})[0];return !p||p.disponible!==false;}).sort(function(a,b){return a.parcours-b.parcours||a.ordre-b.ordre;});}
+function visibles(){var q=norm(Q);return dispo().filter(function(t){
+  if(ROLE&&t.roles.indexOf(ROLE)<0)return false;
+  if(!q)return true;
+  var hay=norm(t.titre+' '+t.objectif+' '+t.piege+' '+t.etapes.map(function(e){return e.texte;}).join(' '));
+  return q.split(/\s+/).every(function(w){return hay.indexOf(w)>=0;});
+});}
+function bySlug(s){return DATA.tutos.filter(function(t){return t.slug===s;})[0];}
+function parcoursOf(t){return DATA.parcours.filter(function(p){return p.id===t.parcours;})[0]||{titre:''};}
+function mins(n){return n+' min';}
+
+/* ── Liste ───────────────────────────────────────────── */
+function renderChips(){var c=$('chips');c.textContent='';
+  [['','Tous les rôles']].concat(Object.keys(DATA.roles).map(function(k){return[k,DATA.roles[k]];})).forEach(function(r){
+    var b=el('button','chip',r[1]);b.type='button';b.setAttribute('aria-pressed',String(ROLE===r[0]));
+    b.onclick=function(){ROLE=r[0];renderChips();renderList();};c.appendChild(b);
+  });
+}
+function renderProg(){var box=$('prog');box.textContent='';
+  var p0=dispo().filter(function(t){return t.parcours===0&&(!ROLE||t.roles.indexOf(ROLE)>=0);});if(!p0.length||Q)return;
+  var n=p0.filter(function(t){return isDone(t.slug);}).length,next=p0.filter(function(t){return !isDone(t.slug);})[0];
+  var d=el('div','prog');d.appendChild(el('h2','',n===p0.length?'Parcours « Bien démarrer » terminé':'Bien démarrer'));
+  d.appendChild(el('p','',n===p0.length?'Les '+p0.length+' gestes de base sont acquis. Vous pouvez y revenir quand vous voulez.':n+' sur '+p0.length+' gestes faits — environ '+p0.reduce(function(x,t){return x+t.duree;},0)+' minutes en tout.'));
+  var bar=el('div','bar'),i=el('i');i.style.width=Math.round(n*100/p0.length)+'%';bar.appendChild(i);d.appendChild(bar);
+  if(next){var b=el('button');b.type='button';b.appendChild(el('span','',(n?'Continuer : ':'Commencer : ')+next.titre));b.appendChild(el('span','','→'));b.onclick=function(){go(next.slug);};d.appendChild(b);}
+  box.appendChild(d);
+}
+function renderList(){renderProg();
+  var box=$('lists');box.textContent='';var ts=visibles();
+  if(!ts.length){box.appendChild(el('p','empty',Q?'Aucun tutoriel ne correspond à « '+Q+' ». Essayez un autre mot, ou retirez le filtre de rôle.':'Aucun tutoriel pour ce rôle pour le moment.'));}
+  DATA.parcours.forEach(function(p){
+    var mine=ts.filter(function(t){return t.parcours===p.id;});if(!mine.length)return;
+    var h=el('div','sec');h.appendChild(el('h2','',p.titre));h.appendChild(el('span','',mine.length+' tuto'+(mine.length>1?'s':'')+' · '+p.pour));box.appendChild(h);
+    var ul=el('ul','list');
+    mine.forEach(function(t){var li=el('li'),b=el('button','item'+(isDone(t.slug)?' done':''));b.type='button';
+      b.appendChild(el('span','num',isDone(t.slug)?'✓':String(t.ordre)));
+      var mid=el('span');mid.appendChild(el('b','',t.titre));mid.appendChild(el('small','',mins(t.duree)+(isDone(t.slug)?' · fait':'')));b.appendChild(mid);
+      b.appendChild(el('span','go','›'));b.onclick=function(){go(t.slug);};li.appendChild(b);ul.appendChild(li);});
+    box.appendChild(ul);
+  });
+  var soon=$('soon');soon.textContent='';
+  var later=DATA.parcours.filter(function(p){return p.disponible===false;});
+  if(later.length&&!Q){var h2=el('div','sec');h2.appendChild(el('h2','','Prochainement'));soon.appendChild(h2);
+    var ul2=el('ul','soon');later.forEach(function(p){var li=el('li'),l=el('span');l.appendChild(document.createTextNode(p.titre));l.appendChild(el('em','',p.pour));li.appendChild(l);li.appendChild(el('small','',p.prevus+' tutos'));ul2.appendChild(li);});soon.appendChild(ul2);}
+  $('foot').textContent='Tutoriels vérifiés sur la version '+DATA.version+' du CRM · Team WLHT';
+}
+
+/* ── Fiche d'un tuto ─────────────────────────────────── */
+function renderTuto(t){var a=$('v-tuto');a.textContent='';
+  var same=dispo().filter(function(x){return x.parcours===t.parcours;}),idx=same.indexOf(t),p=parcoursOf(t);
+  a.appendChild(el('p','eyebrow',p.titre+' · '+(idx+1)+' sur '+same.length+' · '+mins(t.duree)));
+  a.appendChild(el('h1','',t.titre));
+  a.appendChild(el('p','goal',t.objectif));
+  var pills=el('div','pills');t.roles.forEach(function(r){pills.appendChild(el('span','pill',DATA.roles[r]||r));});a.appendChild(pills);
+  if(t.video&&/^https:\/\//.test(t.video)){var v=el('a','video','▶ Voir le geste en vidéo');v.href=t.video;v.target='_blank';v.rel='noopener';a.appendChild(v);}
+  var ol=el('ol','steps');
+  t.etapes.forEach(function(e,i){var li=el('li','step'),h=el('div','step-h');h.appendChild(el('span','num',String(i+1)));h.appendChild(rich(el('p'),e.texte));li.appendChild(h);
+    if(e.img){var b=el('button','shot');b.type='button';b.setAttribute('aria-label','Agrandir la capture : '+(e.alt||''));
+      var im=el('img');im.src='img/'+e.img;im.alt=e.alt||'';im.width=780;im.height=1560;im.loading=i?'lazy':'eager';im.decoding='async';b.appendChild(im);
+      b.onclick=function(){$('lb-img').src=im.src;$('lb-img').alt=im.alt;$('lb').classList.add('on');$('lb-x').focus();};li.appendChild(b);li.appendChild(el('span','zoomhint','Touchez l\'image pour l\'agrandir'));}
+    ol.appendChild(li);});
+  a.appendChild(ol);
+  if(t.piege){var k=el('section','keep');k.appendChild(el('h2','','À retenir — le piège à éviter'));k.appendChild(rich(el('p'),t.piege));a.appendChild(k);}
+  if(t.verif&&t.verif.length){var qz=el('section','quiz');qz.appendChild(el('h2','','Vérification rapide'));
+    t.verif.forEach(function(q){var d=el('div','q');d.appendChild(el('p','',q.q));var why=el('p','why hide'),btns=[];
+      q.choix.forEach(function(c,ci){var b=el('button','opt',c);b.type='button';btns.push(b);
+        b.onclick=function(){btns.forEach(function(x,xi){x.disabled=true;if(xi===q.bonne)x.classList.add('ok');});if(ci!==q.bonne)b.classList.add('ko');
+          why.textContent=(ci===q.bonne?'Exact. ':'Pas tout à fait. ')+q.pourquoi;why.classList.remove('hide');};
+        d.appendChild(b);});
+      d.appendChild(why);qz.appendChild(d);});
+    a.appendChild(qz);}
+  var db=el('button','done-btn');db.type='button';
+  function paint(){var on=isDone(t.slug);db.classList.toggle('on',on);db.textContent=on?'✓ Fait — toucher pour décocher':'J\'ai fait ce geste dans le CRM';db.setAttribute('aria-pressed',String(on));}
+  db.onclick=function(){setDone(t.slug,!isDone(t.slug));paint();};paint();a.appendChild(db);
+  var nav=el('div','nav2'),pv=same[idx-1],nx=same[idx+1];
+  function nb(x,lab){var b=el('button');b.type='button';if(!x){b.style.visibility='hidden';return b;}b.appendChild(el('small','',lab));b.appendChild(el('b','',x.titre));b.onclick=function(){go(x.slug);};return b;}
+  nav.appendChild(nb(pv,'← Précédent'));nav.appendChild(nb(nx,'Suivant →'));a.appendChild(nav);
+  a.appendChild(el('p','sign','Vérifié sur la version '+t.version+' du CRM · Team WLHT'));
+  document.title=t.titre+' — Aide CRM OlyLife';
+}
+
+/* ── Navigation par #slug ────────────────────────────── */
+function go(slug){location.hash=slug?'#'+slug:'';if(!slug)route();}
+function route(){if(!DATA)return;var slug=decodeURIComponent(location.hash.replace(/^#/,'')),t=slug?bySlug(slug):null;
+  $('v-list').classList.toggle('hide',!!t);$('v-tuto').classList.toggle('hide',!t);$('back').classList.toggle('hide',!t);document.querySelector('.top').classList.toggle('in-tuto',!!t);
+  if(t){renderTuto(t);}else{document.title='Aide & tutoriels — CRM OlyLife';renderList();}
+  window.scrollTo(0,0);
+}
+window.addEventListener('hashchange',route);
+window.addEventListener('storage',function(e){if(e.key===KEY&&DATA&&!location.hash.replace('#',''))renderList();});
+$('back').onclick=function(){if(location.hash){history.pushState(null,'',location.pathname+location.search);route();}};
+$('q').addEventListener('input',function(){Q=this.value.trim();renderList();});
+function lbClose(){$('lb').classList.remove('on');}
+$('lb').onclick=lbClose;document.addEventListener('keydown',function(e){if(e.key==='Escape')lbClose();});
+
+/* Les captures du parcours sont chargées en avance, pour rester lisibles hors ligne */
+function prefetch(){try{if(!navigator.onLine||(navigator.connection&&navigator.connection.saveData))return;}catch(e){}
+  var list=[];dispo().forEach(function(t){t.etapes.forEach(function(e){if(e.img)list.push('img/'+e.img);});});
+  var i=0;(function next(){if(i>=list.length)return;fetch(list[i++]).then(next,next);})();
+}
+
+fetch('tutos.json').then(function(r){if(!r.ok)throw new Error(r.status);return r.json();}).then(function(d){
+  DATA=d;var p=params();
+  if(p.role&&d.roles[p.role])ROLE=p.role;
+  renderChips();
+  /* ?ecran=dashboard : le ❓ du CRM ouvre le tuto de l'écran où l'on se trouve */
+  if(p.ecran&&!location.hash){var hit=dispo().filter(function(t){return t.ecran===p.ecran;})[0];if(hit){history.replaceState(null,'',location.pathname+(ROLE?'?role='+ROLE:'')+'#'+hit.slug);}}
+  route();
+  setTimeout(prefetch,2500);
+}).catch(function(){$('v-list').classList.add('hide');$('err').classList.remove('hide');});
+})();
+</script>
+</body>
+</html>

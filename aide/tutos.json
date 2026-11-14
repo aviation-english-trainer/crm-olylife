@@ -1,0 +1,205 @@
+{
+  "version": "3.47",
+  "maj": "2026-11-14",
+  "roles": {
+    "referent": "Référent",
+    "gestionnaire": "Gestionnaire",
+    "comite": "Comité scientifique",
+    "admin": "Administrateur"
+  },
+  "parcours": [
+    { "id": 0, "titre": "Bien démarrer", "pour": "Tous les rôles", "disponible": true },
+    { "id": 1, "titre": "Référent", "pour": "Ajouter et suivre ses contacts", "disponible": false, "prevus": 8 },
+    { "id": 2, "titre": "Gestionnaire : la fiche et le suivi", "pour": "Fiche, statuts, messages, rendez-vous", "disponible": false, "prevus": 10 },
+    { "id": 3, "titre": "Gestionnaire : commande et livraison", "pour": "Proposition, règlement, logistique", "disponible": false, "prevus": 12 },
+    { "id": 4, "titre": "Gestionnaire : accompagnement", "pour": "Précautions, fiches conseils de soins, témoignages", "disponible": false, "prevus": 8 },
+    { "id": 5, "titre": "Comité scientifique", "pour": "Avis, fiches conseils de soins, propositions", "disponible": false, "prevus": 3 },
+    { "id": 6, "titre": "Administrateur", "pour": "Comptes, droits, modèles, intégrations", "disponible": false, "prevus": 10 }
+  ],
+  "tutos": [
+    {
+      "slug": "se-connecter",
+      "titre": "Se connecter avec son code d'accès",
+      "roles": ["referent", "gestionnaire", "comite", "admin"],
+      "parcours": 0,
+      "ordre": 1,
+      "ecran": "login",
+      "duree": 2,
+      "objectif": "À la fin, vous savez ouvrir le CRM sur votre appareil avec votre code personnel et retrouver vos contacts.",
+      "etapes": [
+        { "texte": "Ouvrez **crm.team-waterlifehightech.com** dans votre navigateur. Touchez le champ **Votre code d'accès**.", "img": "se-connecter-1.jpg", "alt": "Écran de connexion du CRM, le champ du code d'accès est entouré." },
+        { "texte": "Saisissez le code que votre administrateur vous a remis. Majuscules, minuscules et espaces n'ont pas d'importance. Touchez **Se connecter**.", "img": "se-connecter-2.jpg", "alt": "Le code est saisi, le bouton Se connecter est entouré." },
+        { "texte": "Votre tableau de bord s'ouvre. Vous n'y voyez que les contacts qui vous concernent : c'est normal, chaque membre de l'équipe a son propre périmètre.", "img": "se-connecter-3.jpg", "alt": "Tableau de bord du CRM après la connexion." },
+        { "texte": "C'est tout. Le code n'est demandé **qu'une fois par appareil**. La session se ferme d'elle-même après 30 jours sans utilisation : il suffit alors de ressaisir votre code." }
+      ],
+      "piege": "Ne tentez pas plusieurs codes au hasard. Après une série de codes refusés, le CRM bloque **toutes** les connexions de l'équipe pendant 10 minutes. Si votre code est refusé deux fois, arrêtez-vous et redemandez-le à votre administrateur. Votre code est personnel : ne le partagez pas.",
+      "verif": [
+        { "q": "Combien de fois le code d'accès est-il demandé sur un même téléphone ?", "choix": ["À chaque ouverture", "Une seule fois, puis après 30 jours sans utilisation", "Une fois par semaine"], "bonne": 1, "pourquoi": "Le code ouvre une session propre à l'appareil. Elle reste active tant que vous utilisez le CRM." },
+        { "q": "Votre code est refusé deux fois de suite. Que faites-vous ?", "choix": ["J'essaie d'autres combinaisons", "J'utilise le code d'un collègue", "Je m'arrête et je le redemande à mon administrateur"], "bonne": 2, "pourquoi": "Trop de codes refusés bloquent les connexions de toute l'équipe pendant 10 minutes." }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "installer",
+      "titre": "Installer le CRM sur son téléphone",
+      "roles": ["referent", "gestionnaire", "comite", "admin"],
+      "parcours": 0,
+      "ordre": 2,
+      "ecran": "installation",
+      "duree": 2,
+      "objectif": "À la fin, le CRM s'ouvre depuis une icône verte sur votre écran d'accueil, comme une vraie application.",
+      "etapes": [
+        { "texte": "**Sur Android** — juste après la connexion, le CRM vous propose l'installation. Touchez **Installer maintenant**, puis confirmez. Si rien ne se passe, suivez les trois étapes affichées : menu **⋮** de Chrome, puis **Installer l'application**.", "img": "installer-1.jpg", "alt": "Écran Installez l'application CRM sur Android, le bouton Installer maintenant est entouré." },
+        { "texte": "**Sur iPhone** — ouvrez le CRM dans **Safari**. Touchez le bouton **Partager**, faites défiler, choisissez **Sur l'écran d'accueil**, puis **Ajouter**.", "img": "installer-2.jpg", "alt": "Écran d'installation sur iPhone avec les trois étapes Safari." },
+        { "texte": "Fermez le navigateur. Ouvrez désormais le CRM depuis **l'icône verte** de votre écran d'accueil : il s'affiche en plein écran, sans barre d'adresse." },
+        { "texte": "Pas le temps maintenant ? Touchez **Continuer dans le navigateur pour cette fois**. Le CRM vous le reproposera plus tard." }
+      ],
+      "piege": "Sur iPhone, l'installation ne fonctionne que depuis **Safari** — pas depuis Chrome, ni depuis le navigateur qui s'ouvre dans WhatsApp. Et une fois l'application installée, pensez à passer par l'icône verte : c'est elle qui permet de recevoir les notifications sur iPhone.",
+      "verif": [
+        { "q": "Sur iPhone, depuis quel navigateur installe-t-on le CRM ?", "choix": ["Chrome", "Safari", "Le navigateur de WhatsApp"], "bonne": 1, "pourquoi": "Sur iPhone, seul Safari sait ajouter une application à l'écran d'accueil." },
+        { "q": "Une fois installé, comment ouvrez-vous le CRM ?", "choix": ["Depuis l'icône verte de l'écran d'accueil", "En retapant l'adresse dans le navigateur", "Depuis un lien reçu par message"], "bonne": 0, "pourquoi": "L'icône ouvre le CRM en plein écran et active les rappels sur votre téléphone." }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "proteger",
+      "titre": "Protéger l'app : code PIN, empreinte ou schéma",
+      "roles": ["referent", "gestionnaire", "comite", "admin"],
+      "parcours": 0,
+      "ordre": 3,
+      "ecran": "profil-securite",
+      "duree": 3,
+      "objectif": "À la fin, personne d'autre que vous ne peut ouvrir le CRM sur votre téléphone.",
+      "etapes": [
+        { "texte": "Ouvrez le menu **☰**, touchez votre nom pour ouvrir **Mon profil**, puis descendez jusqu'à **Sécurité de cet appareil**. Touchez **Activer un PIN**.", "img": "proteger-1.jpg", "alt": "Mon profil, rubrique Sécurité de cet appareil, le bouton Activer un PIN est entouré." },
+        { "texte": "Choisissez un code de **4 à 6 chiffres**, touchez **OK**, puis saisissez-le une seconde fois pour le confirmer.", "img": "proteger-2.jpg", "alt": "Clavier de choix du code PIN." },
+        { "texte": "Pour aller plus vite, touchez **Activer** sur la ligne de l'empreinte. Votre téléphone affiche alors sa propre fenêtre : posez le doigt, montrez votre visage ou tracez votre schéma, comme pour déverrouiller l'écran.", "img": "proteger-3.jpg", "alt": "Ligne Ouvrir l'app avec l'empreinte, le visage ou le schéma du téléphone, bouton Activer entouré." },
+        { "texte": "À la prochaine ouverture, et chaque fois que le CRM est resté en arrière-plan plus de deux minutes, l'écran de verrouillage s'affiche.", "img": "proteger-4.jpg", "alt": "Écran de verrouillage du CRM avec le clavier du code PIN." }
+      ],
+      "piege": "Le verrou ne vaut que pour **cet appareil** : si vous utilisez aussi une tablette, activez-le là aussi. Code PIN oublié ? Touchez **Me reconnecter avec mon code d'accès** : vous êtes déconnecté de l'appareil et vous aurez besoin de votre code d'accès. Gardez-le donc à portée de main.",
+      "verif": [
+        { "q": "Vous avez activé le PIN sur votre téléphone. Et sur votre tablette ?", "choix": ["Elle est protégée aussi, automatiquement", "Il faut l'activer aussi sur la tablette", "Le PIN ne fonctionne pas sur tablette"], "bonne": 1, "pourquoi": "Le verrou est enregistré sur l'appareil, pas sur votre compte." },
+        { "q": "La fenêtre qui demande l'empreinte ne ressemble pas au CRM. Est-ce normal ?", "choix": ["Non, il faut fermer l'application", "Oui, c'est la fenêtre de votre téléphone", "Oui, mais seulement sur iPhone"], "bonne": 1, "pourquoi": "L'empreinte, le visage et le schéma sont vérifiés par le téléphone lui-même. Le CRM ne les voit jamais." }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "notifications",
+      "titre": "Activer les notifications",
+      "roles": ["referent", "gestionnaire", "comite", "admin"],
+      "parcours": 0,
+      "ordre": 4,
+      "ecran": "profil-notifications",
+      "duree": 2,
+      "objectif": "À la fin, votre téléphone vous prévient d'une nouvelle demande ou d'un rendez-vous, même quand le CRM est fermé.",
+      "etapes": [
+        { "texte": "Ouvrez **Mon profil** et descendez jusqu'à **Notifications sur cet appareil**. Cochez la case **Recevoir les alertes même quand l'app est fermée**.", "img": "notifications-1.jpg", "alt": "Mon profil, rubrique Notifications sur cet appareil, la case à cocher est entourée." },
+        { "texte": "Votre téléphone demande l'autorisation d'envoyer des notifications. Touchez **Autoriser**." },
+        { "texte": "La ligne sous la case passe à **✅ Actives sur cet appareil**. Vous serez prévenu pour : une nouvelle demande, un rendez-vous réservé, une avance ou un don, un rappel d'échéance.", "img": "notifications-2.jpg", "alt": "La case est cochée et la ligne Actives sur cet appareil est entourée." },
+        { "texte": "Pour arrêter les alertes sur cet appareil, décochez simplement la case." }
+      ],
+      "piege": "Si vous touchez **Bloquer** par erreur, la case devient grise et le CRM ne peut plus rien demander : il faut réautoriser les notifications dans les réglages du site (le cadenas à côté de l'adresse), puis revenir. Sur iPhone, la case ne s'active qu'une fois le CRM **installé** sur l'écran d'accueil.",
+      "verif": [
+        { "q": "Sur iPhone, que faut-il avoir fait avant d'activer les notifications ?", "choix": ["Installer le CRM sur l'écran d'accueil", "Activer le code PIN", "Remplir son rang"], "bonne": 0, "pourquoi": "Sur iPhone, seule l'application installée peut recevoir des notifications." },
+        { "q": "La case est grise et le CRM indique « notifications bloquées ». Que faire ?", "choix": ["Se déconnecter et se reconnecter", "Les réautoriser dans les réglages du site, puis revenir", "Demander un nouveau code d'accès"], "bonne": 1, "pourquoi": "Le blocage vient du navigateur : c'est dans ses réglages qu'il se lève." }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "profil",
+      "titre": "Remplir « Mon profil »",
+      "roles": ["referent", "gestionnaire", "comite", "admin"],
+      "parcours": 0,
+      "ordre": 5,
+      "ecran": "profil",
+      "duree": 4,
+      "objectif": "À la fin, vos messages partent avec vos coordonnées, votre agenda et votre salle de visio.",
+      "etapes": [
+        { "texte": "Ouvrez le menu **☰** en haut à gauche, puis touchez **votre nom**.", "img": "profil-1.jpg", "alt": "Menu du CRM, la carte au nom de l'utilisateur est entourée." },
+        { "texte": "Ajoutez votre **photo**, votre **téléphone / WhatsApp** et votre **e-mail**. Ce sont les coordonnées que vos contacts et votre équipe verront.", "img": "profil-2.jpg", "alt": "Haut de la fenêtre Mon profil : photo, nom, téléphone, e-mail." },
+        { "texte": "Collez votre **lien Calendly** et votre **lien Zoom** (salle de réunion personnelle). Renseignez votre **Member ID** OlyLife et votre **rang** : ils figurent sur vos propositions de commande.", "img": "profil-3.jpg", "alt": "Champs Calendly, Zoom, Member ID et rang remplis avec des valeurs d'exemple." },
+        { "texte": "Touchez **Enregistrer mon profil**. Un message confirme l'enregistrement.", "img": "profil-4.jpg", "alt": "Le bouton Enregistrer mon profil est entouré." }
+      ],
+      "piege": "Rien n'est gardé tant que vous n'avez pas touché **Enregistrer mon profil**. Autre oubli fréquent : sans lien Calendly personnel, vos messages proposent l'agenda par défaut de l'équipe, et vos contacts réservent chez quelqu'un d'autre. Le lien doit commencer par **https://calendly.com/**, celui de Zoom par **https://…zoom.us/**.",
+      "verif": [
+        { "q": "Vous n'avez pas renseigné de lien Calendly. Quel agenda vos messages proposent-ils ?", "choix": ["Aucun", "L'agenda par défaut de l'équipe", "Celui du contact"], "bonne": 1, "pourquoi": "Sans lien personnel, le CRM utilise l'agenda par défaut. Un compte Calendly gratuit suffit pour avoir le vôtre." },
+        { "q": "Comment changer le nom affiché sur votre profil ?", "choix": ["En le retapant dans Mon profil", "En le demandant à l'administrateur", "En se reconnectant"], "bonne": 1, "pourquoi": "Le nom et le rôle sont gérés par l'administrateur, dans l'onglet Équipe." }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "accueil",
+      "titre": "Comprendre l'écran d'accueil et « Ma journée »",
+      "roles": ["referent", "gestionnaire", "comite", "admin"],
+      "parcours": 0,
+      "ordre": 6,
+      "ecran": "dashboard",
+      "duree": 3,
+      "objectif": "À la fin, vous savez en dix secondes, chaque matin, qui contacter et quels rendez-vous vous attendent.",
+      "etapes": [
+        { "texte": "En haut, six compteurs résument votre activité : **À contacter**, **En cours**, **Prêts à closer**, **Dans le réseau**, **Rappels dus**, **RDV 7 jours**. Touchez un compteur pour ouvrir la liste correspondante.", "img": "accueil-1.jpg", "alt": "Tableau de bord, les six compteurs sont entourés." },
+        { "texte": "**Ma journée** réunit ce qui compte aujourd'hui : les rappels en retard (en rouge), les rappels et rendez-vous du jour, ceux de demain, puis les personnes **à contacter en priorité**. Touchez une ligne pour ouvrir la fiche, **📞** pour appeler, **✅** quand le rappel est fait.", "img": "accueil-2.jpg", "alt": "Carte Ma journée avec un rappel en retard, un rappel du jour et un rendez-vous." },
+        { "texte": "La barre du bas mène aux écrans principaux : **Accueil**, **Contacts**, **Agenda**, **Actions**, **Équipe**. Le bouton **+** crée un contact. Le menu **☰** donne accès à tout le reste.", "img": "accueil-3.jpg", "alt": "Barre de navigation du bas entourée." },
+        { "texte": "Prenez l'habitude d'ouvrir **Ma journée** en premier : quand elle affiche « Rien d'urgent aujourd'hui », vous êtes à jour." }
+      ],
+      "piege": "Gestionnaires et administrateurs : les deux boutons **Mes contacts / Toute l'équipe** changent tout ce que l'écran compte. Si un chiffre vous surprend ou qu'un contact « a disparu », regardez d'abord lequel des deux est sélectionné. Les référents, eux, ne voient que leurs propres contacts. Référents et membres du comité scientifique n'ont pas les onglets Actions et Équipe.",
+      "verif": [
+        { "q": "Où voyez-vous d'un coup d'œil les rappels en retard ?", "choix": ["Dans Mon profil", "Dans Ma journée, en rouge", "Dans les Réglages"], "bonne": 1, "pourquoi": "Ma journée place les rappels en retard tout en haut, avant ceux du jour." },
+        { "q": "Un compteur affiche un chiffre inattendu. Que vérifiez-vous en premier ?", "choix": ["Le bouton Mes contacts / Toute l'équipe", "Votre code PIN", "La version de l'application"], "bonne": 0, "pourquoi": "Ce bouton change le périmètre de tous les compteurs de l'accueil." }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "hors-ligne",
+      "titre": "Travailler sans réseau et synchroniser",
+      "roles": ["referent", "gestionnaire", "comite", "admin"],
+      "parcours": 0,
+      "ordre": 7,
+      "ecran": "sync",
+      "duree": 3,
+      "objectif": "À la fin, vous continuez à noter vos échanges sans connexion, en sachant que rien ne sera perdu.",
+      "etapes": [
+        { "texte": "En haut de l'écran, un petit point indique l'état de la connexion : **vert**, tout est enregistré sur le serveur ; **rouge**, le serveur est injoignable.", "img": "hors-ligne-1.jpg", "alt": "Barre du haut du CRM, le point de synchronisation est entouré." },
+        { "texte": "Sans réseau, continuez normalement. Vos saisies sont gardées **sur l'appareil** et un bandeau jaune indique combien de modifications attendent.", "img": "hors-ligne-2.jpg", "alt": "Bandeau jaune : 1 modification en attente, envoi automatique dès le retour du réseau." },
+        { "texte": "Dès que le réseau revient, l'envoi se fait **tout seul** et le bandeau disparaît. Pour récupérer aussi les nouveautés de vos collègues, touchez le bouton **Synchroniser** (la flèche ronde).", "img": "hors-ligne-3.jpg", "alt": "Le point est redevenu vert, le bouton Synchroniser est entouré." },
+        { "texte": "Vous utilisez deux appareils ? Laissez le premier terminer son envoi (point vert) avant de reprendre le travail sur le second." }
+      ],
+      "piege": "Tant que le bandeau jaune est affiché, **ne vous déconnectez pas** et n'effacez pas les données du navigateur : les modifications en attente ne sont encore que sur votre appareil, et elles seraient perdues.",
+      "verif": [
+        { "q": "Vous notez un appel dans un parking sans réseau. Que devient votre note ?", "choix": ["Elle est perdue", "Elle est gardée sur l'appareil, puis envoyée au retour du réseau", "Elle bloque l'application"], "bonne": 1, "pourquoi": "Le CRM met la modification en attente et l'envoie automatiquement." },
+        { "q": "Le bandeau « modification en attente » est affiché. Que faut-il éviter ?", "choix": ["Continuer à saisir", "Se déconnecter du CRM", "Ouvrir une autre fiche"], "bonne": 1, "pourquoi": "Se déconnecter efface les données gardées sur l'appareil, y compris celles qui ne sont pas encore parties." }
+      ],
+      "version": "3.47",
+      "video": ""
+    },
+    {
+      "slug": "encouragements",
+      "titre": "Les encouragements et le compteur du jour",
+      "roles": ["referent", "gestionnaire", "comite", "admin"],
+      "parcours": 0,
+      "ordre": 8,
+      "ecran": "profil-encouragements",
+      "duree": 2,
+      "objectif": "À la fin, vous savez lire le compteur du jour, et le couper si vous préférez travailler sans.",
+      "etapes": [
+        { "texte": "Chaque fois que vous menez une action à son terme — un appel noté, un rendez-vous fixé, une action cochée, un statut mis à jour — un bandeau vous salue et affiche votre **nombre d'actions du jour**.", "img": "encouragements-1.jpg", "alt": "Bandeau d'encouragement en haut de l'écran avec le compteur 4 actions." },
+        { "texte": "La barre dorée montre le chemin jusqu'au prochain palier : **5, 10, 20, 30, 50** actions. La première action de la journée compte aussi vos **jours d'affilée**." },
+        { "texte": "Le bandeau disparaît seul au bout de quelques secondes. Touchez-le pour le fermer tout de suite." },
+        { "texte": "Vous préférez le calme ? Dans **Mon profil**, rubrique **Sécurité de cet appareil**, décochez **Encouragements après chaque action**.", "img": "encouragements-2.jpg", "alt": "Mon profil, la case Encouragements après chaque action est entourée." }
+      ],
+      "piege": "Ce compteur est un repère **personnel**, gardé sur votre appareil : personne d'autre ne le voit, et ce n'est pas un classement. Il repart de zéro chaque matin, et il est distinct sur chaque appareil. Inutile donc de s'inquiéter s'il affiche un autre chiffre sur votre tablette.",
+      "verif": [
+        { "q": "Qui voit votre compteur d'actions du jour ?", "choix": ["Toute l'équipe", "Votre gestionnaire", "Vous seul, sur votre appareil"], "bonne": 2, "pourquoi": "Le compteur est enregistré sur l'appareil. Il n'est envoyé à personne." },
+        { "q": "Où coupe-t-on les encouragements ?", "choix": ["Dans Mon profil", "Dans l'Agenda", "On ne peut pas les couper"], "bonne": 0, "pourquoi": "Une case à cocher dans Mon profil les active ou les coupe, appareil par appareil." }
+      ],
+      "version": "3.47",
+      "video": ""
+    }
+  ]
+}
