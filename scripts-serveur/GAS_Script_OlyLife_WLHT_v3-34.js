@@ -108,7 +108,9 @@
 // ╔═══════════════════════════════════════════════════════════════╗
 // ║  À PERSONNALISER AVANT DÉPLOIEMENT                            ║
 // ╚═══════════════════════════════════════════════════════════════╝
-var ADMIN_CODE = 'WLHT-OLYLIFE-2026';         // ← code d'accès admin — changez-le si besoin
+// v3.34 — le code admin se lit d'abord dans les Propriétés du script (clé ADMIN_CODE) : il ne se perd plus quand on recolle le script
+//         et n'apparaît plus dans le fichier. À défaut, la valeur ci-dessous s'applique.
+var ADMIN_CODE = (function () { try { var p = PropertiesService.getScriptProperties().getProperty('ADMIN_CODE'); if (p && String(p).trim()) return String(p).trim(); } catch (e) {} return 'WLHT-OLYLIFE-2026'; })();   // ← code d'accès admin par défaut
 var ADMIN_NOM  = 'Jean-Charles';              // ← nom affiché du 1er admin
 var MON_EMAIL  = 'teamwaterlifehightech@gmail.com'; // ← email pour les rappels du matin
 var SESSION_JOURS = 30;        // durée d'une session (jours) avant nouvelle saisie du code

@@ -150,8 +150,6 @@ html,body{-webkit-text-size-adjust:100%;overscroll-behavior:none;background:var(
 #fc-fab{position:sticky;bottom:14px;margin:0 0 10px auto;display:flex;align-items:center;gap:4px;border:none;border-radius:999px;background:#126A3C;color:#fff;font:inherit;font-size:17px;padding:10px 14px;box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer;z-index:5}
 #fc-fab b{font-size:13px;background:#fff;color:#126A3C;border-radius:999px;padding:0 7px}#fc-fab.late{background:#D9434F}#fc-fab.late b{color:#D9434F}#fc-fab.today{background:#E88A00}#fc-fab.today b{color:#B26A00}
 @media (max-width:759px){.fc-it{flex-wrap:wrap}.fc-tx{flex:1 1 calc(100% - 30px)}.fc-btns{flex:1 1 100%;padding-left:20px}.fc-btns .s,.fc-btns .o{flex:1}.fc-btns button{min-height:40px}.fc-st{flex-basis:64px}}
-.lock-bio{display:block;width:100%;max-width:260px;margin:18px auto 6px;border:none;border-radius:16px;background:#E3C36A;color:#1E2B10;font:inherit;font-weight:700;font-size:16px;padding:16px;cursor:pointer}
-#olock.bio-only .lock-dots,#olock.bio-only .lock-pad{display:none}
 
 .om-quick .ob{flex:1 1 calc(33.333% - 6px);min-width:0;max-width:100%;padding-left:6px;padding-right:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 @media (min-width:760px){.om-quick .ob{flex:1 1 0;}}
@@ -539,17 +537,55 @@ tr.qi-row td>div{overflow-wrap:anywhere;}
 #oupd{display:none;position:fixed;left:50%;bottom:calc(var(--bottom-nav,64px) + 12px);transform:translateX(-50%);z-index:9000;background:#1E2B23;color:#fff;border-radius:30px;padding:10px 16px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.3);align-items:center;gap:10px;max-width:calc(100vw - 24px);}
 #oupd.on{display:flex;}
 #oupd button{background:var(--gold);color:#fff;border:none;border-radius:20px;padding:7px 14px;font-weight:700;font-size:12.5px;cursor:pointer;white-space:nowrap;}
-#olock{display:none;position:fixed;inset:0;z-index:9500;background:linear-gradient(160deg,#0F3B22,#1E6B3A);color:#fff;align-items:center;justify-content:center;padding:24px;}
-#olock.on{display:flex;}
-.lock-card{width:100%;max-width:340px;text-align:center;}
-.lock-card .big{font-size:44px;margin-bottom:8px;}
-.lock-dots{display:flex;justify-content:center;gap:12px;margin:18px 0;}
-.lock-dots i{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.7);display:block;}
-.lock-dots i.on{background:#fff;}
-.lock-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:260px;margin:0 auto;}
-.lock-pad button{height:58px;border-radius:16px;border:none;background:rgba(255,255,255,.12);color:#fff;font-size:22px;font-weight:600;cursor:pointer;}
-.lock-pad button:active{background:rgba(255,255,255,.3);}
-.lock-link{background:none;border:none;color:rgba(255,255,255,.75);font-size:12.5px;margin-top:16px;cursor:pointer;text-decoration:underline;}
+#olock{display:none;position:fixed;inset:0;z-index:9500;color:#fff;align-items:center;justify-content:center;padding:28px 24px calc(24px + env(safe-area-inset-bottom));overflow:auto;
+  background:radial-gradient(120% 70% at 50% -10%,rgba(46,160,96,.55),rgba(46,160,96,0) 60%),radial-gradient(90% 60% at 50% 115%,rgba(201,168,76,.16),rgba(201,168,76,0) 65%),linear-gradient(180deg,#0B2F1B,#071F12);}
+#olock.on{display:flex;animation:lkin .35s ease both}@keyframes lkin{from{opacity:0}to{opacity:1}}
+#olock.out{animation:lkout .5s ease both}@keyframes lkout{to{opacity:0;transform:scale(1.04)}}
+.lock-card{width:100%;max-width:330px;text-align:center;display:flex;flex-direction:column;align-items:center}
+.lock-logo{width:92px;height:92px;border-radius:50%;padding:5px;background:linear-gradient(145deg,#F1DC9A,#C9A84C 45%,#8F742B);box-shadow:0 14px 40px rgba(0,0,0,.45),0 0 0 10px rgba(255,255,255,.04);animation:lkup .6s .05s cubic-bezier(.2,.8,.2,1) both}
+.lock-logo img{width:100%;height:100%;border-radius:50%;background:#fff;display:block;object-fit:cover}
+@keyframes lkup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.lock-brand{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;letter-spacing:.3px;margin-top:18px;line-height:1;animation:lkup .6s .12s cubic-bezier(.2,.8,.2,1) both}
+.lock-brand span{color:#E3C36A}
+.lock-org{font-size:10.5px;letter-spacing:3.2px;text-transform:uppercase;color:rgba(227,195,106,.85);margin-top:8px;animation:lkup .6s .18s cubic-bezier(.2,.8,.2,1) both}
+.lock-hello{font-size:17px;font-weight:500;margin-top:30px;animation:lkup .6s .24s cubic-bezier(.2,.8,.2,1) both}
+#olock-sub{font-size:13px;color:rgba(255,255,255,.62);margin-top:6px;min-height:18px;line-height:1.45;animation:lkup .6s .28s cubic-bezier(.2,.8,.2,1) both}
+.lock-bio{position:relative;width:96px;height:96px;border-radius:50%;margin:30px auto 0;border:1.5px solid rgba(227,195,106,.75);background:rgba(255,255,255,.06);color:#E3C36A;cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:transform .15s,background .2s;animation:lkup .6s .34s cubic-bezier(.2,.8,.2,1) both}
+.lock-bio:active{transform:scale(.94);background:rgba(227,195,106,.16)}
+.lock-bio svg{width:44px;height:44px}
+.lock-bio::before,.lock-bio::after{content:"";position:absolute;inset:-1.5px;border-radius:50%;border:1.5px solid rgba(227,195,106,.5);animation:lkpulse 2.6s ease-out infinite}
+.lock-bio::after{animation-delay:1.3s}
+@keyframes lkpulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.55);opacity:0}}
+.lock-bio.busy{color:#fff;border-color:#fff}
+.lock-biolbl{font-size:12.5px;color:rgba(255,255,255,.7);margin-top:14px;letter-spacing:.2px}
+.lock-dots{display:flex;justify-content:center;gap:14px;margin:26px 0 20px}
+.lock-dots i{width:11px;height:11px;border-radius:50%;border:1.5px solid rgba(227,195,106,.8);display:block;transition:all .15s}
+.lock-dots i.on{background:#E3C36A;transform:scale(1.15);box-shadow:0 0 10px rgba(227,195,106,.6)}
+.lock-dots.shake{animation:lkshake .4s}@keyframes lkshake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.lock-pad{display:grid;grid-template-columns:repeat(3,70px);gap:14px 22px;justify-content:center;margin:0 auto}
+.lock-pad button{width:70px;height:70px;border-radius:50%;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);color:#fff;font-family:Outfit,system-ui,sans-serif;font-size:25px;font-weight:300;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background .12s,transform .12s}
+.lock-pad button:active{background:rgba(227,195,106,.28);transform:scale(.93)}
+.lock-pad button.k-x{border-color:transparent;background:transparent;font-size:19px;color:rgba(255,255,255,.75)}
+.lock-pad button.k-ok{border-color:rgba(227,195,106,.8);color:#E3C36A;font-size:15px;font-weight:600;letter-spacing:.5px}
+.lock-alt{background:none;border:none;color:#E3C36A;font:inherit;font-size:13.5px;font-weight:500;margin-top:26px;cursor:pointer;padding:8px 12px}
+.lock-link{background:none;border:none;color:rgba(255,255,255,.45);font:inherit;font-size:11.5px;margin-top:18px;cursor:pointer;padding:8px}
+#olock .lock-pinz{display:none;flex-direction:column;align-items:center}
+#olock.show-pad .lock-pinz{display:flex}
+#olock.show-pad .lock-bioz{display:none}
+#olock.show-pad .lock-hello{margin-top:20px}
+#olock.ok .lock-logo{box-shadow:0 0 0 10px rgba(227,195,106,.25),0 0 60px rgba(227,195,106,.55)}
+@media (max-height:700px){.lock-logo{width:72px;height:72px}.lock-brand{font-size:27px}.lock-hello{margin-top:18px}.lock-pad{grid-template-columns:repeat(3,62px);gap:10px 20px}.lock-pad button{width:62px;height:62px;font-size:22px}.lock-dots{margin:18px 0 14px}}
+@media (prefers-reduced-motion:reduce){.lock-bio::before,.lock-bio::after{animation:none;opacity:0}}
+/* v3.43 — encouragements après chaque action */
+#ocel{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translate(-50%,-140%);z-index:9300;width:min(92vw,380px);background:linear-gradient(135deg,#0F3B22,#17603A);color:#fff;border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 16px 40px rgba(8,40,22,.4);border:1px solid rgba(227,195,106,.45);transition:transform .45s cubic-bezier(.2,.9,.25,1.15);cursor:pointer;overflow:hidden}
+#ocel.on{transform:translate(-50%,0)}
+#ocel .ci{width:44px;height:44px;border-radius:50%;flex:0 0 auto;background:#fff;padding:2px;box-shadow:0 0 0 2px #E3C36A}
+#ocel .ci img{width:100%;height:100%;border-radius:50%;display:block}
+#ocel .ct{flex:1;min-width:0}#ocel .ct b{display:block;font-size:14.5px;line-height:1.25}#ocel .ct small{display:block;font-size:12px;color:rgba(255,255,255,.78);margin-top:2px;line-height:1.35}
+#ocel .cn{flex:0 0 auto;text-align:center;font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:#E3C36A;line-height:1}#ocel .cn small{display:block;font-family:Outfit,system-ui,sans-serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.65);margin-top:2px}
+#ocel .cb{position:absolute;left:0;bottom:0;height:3px;background:linear-gradient(90deg,#C9A84C,#F1DC9A);transition:width .8s ease .2s}
+.cel-cf{position:fixed;top:-12px;width:9px;height:14px;z-index:9299;pointer-events:none;border-radius:2px;animation:celfall linear forwards}
+@keyframes celfall{to{transform:translateY(105vh) rotate(720deg);opacity:.9}}
 .sess-it{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd);font-size:12.5px;}
 .sess-it:last-child{border-bottom:none;}
 .sess-it .b{flex:1;min-width:0;}
@@ -2237,6 +2273,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">🔐 Sécurité de cet appareil</div>
       <div id="oprof-pin-row" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px"></div>
       <div id="oprof-bio-row" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px;margin-top:8px"></div>
+      <label style="display:flex;gap:8px;align-items:center;font-size:12.5px;margin-top:10px;cursor:pointer"><input type="checkbox" id="oprof-cel" onchange="oCelToggle(this)" style="width:18px;height:18px"> 🎉 Encouragements après chaque action (compteur du jour, paliers)</label>
       <div style="font-size:12px;font-weight:700;color:var(--gold);margin:12px 0 6px">🔔 Notifications sur cet appareil</div>
       <label class="ochk-row" style="margin:0"><input type="checkbox" id="oprof-push" onchange="pushToggle(this.checked)"><span>Recevoir les alertes même quand l'app est fermée : nouvelle demande, RDV réservé, avance / don, rappel d'échéance.</span></label>
       <div id="oprof-push-st" style="font-size:11.5px;color:var(--t3);margin-top:4px;line-height:1.45"></div>
@@ -2429,18 +2466,27 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 <div id="oupd">🔄 Nouvelle version disponible<button onclick="oUpdateNow()">Mettre à jour</button></div>
 <div id="olock">
   <div class="lock-card">
-    <div class="big">🔒</div>
-    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700">CRM OlyLife</div>
-    <div style="font-size:13px;opacity:.8;margin-top:4px" id="olock-sub">Saisissez votre code PIN</div>
-    <button type="button" class="lock-bio" id="olock-bio" style="display:none" onclick="oBioUnlock()">👆 Déverrouiller</button>
-    <div class="lock-dots" id="olock-dots"><i></i><i></i><i></i><i></i></div>
-    <div class="lock-pad">
-      <button onclick="oPinKey('1')">1</button><button onclick="oPinKey('2')">2</button><button onclick="oPinKey('3')">3</button>
-      <button onclick="oPinKey('4')">4</button><button onclick="oPinKey('5')">5</button><button onclick="oPinKey('6')">6</button>
-      <button onclick="oPinKey('7')">7</button><button onclick="oPinKey('8')">8</button><button onclick="oPinKey('9')">9</button>
-      <button onclick="oPinKey('⌫')" style="font-size:18px">⌫</button><button onclick="oPinKey('0')">0</button><button onclick="oPinKey('OK')" style="background:var(--gold)">OK</button>
+    <div class="lock-logo"><img src="logo-wlht.png" alt="Water Life High Tech"></div>
+    <div class="lock-brand">CRM <span>OlyLife</span></div>
+    <div class="lock-org">Water Life High Tech</div>
+    <div class="lock-hello" id="olock-hello">Bonjour</div>
+    <div id="olock-sub">Saisissez votre code PIN</div>
+    <div class="lock-bioz" id="olock-bioz">
+      <button type="button" class="lock-bio" id="olock-bio" onclick="oBioUnlock(true)" aria-label="Déverrouiller avec l'empreinte ou le schéma du téléphone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg></button>
+      <div class="lock-biolbl">Touchez pour déverrouiller</div>
+      <button type="button" class="lock-alt" id="olock-topin" onclick="oLockPad(true)">Utiliser mon code PIN</button>
     </div>
-    <button class="lock-link" onclick="oPinForgot()">Impossible de déverrouiller — me reconnecter avec mon code d'accès</button>
+    <div class="lock-pinz">
+      <div class="lock-dots" id="olock-dots"><i></i><i></i><i></i><i></i></div>
+      <div class="lock-pad">
+        <button onclick="oPinKey('1')">1</button><button onclick="oPinKey('2')">2</button><button onclick="oPinKey('3')">3</button>
+        <button onclick="oPinKey('4')">4</button><button onclick="oPinKey('5')">5</button><button onclick="oPinKey('6')">6</button>
+        <button onclick="oPinKey('7')">7</button><button onclick="oPinKey('8')">8</button><button onclick="oPinKey('9')">9</button>
+        <button class="k-x" onclick="oPinKey('⌫')" aria-label="Effacer">⌫</button><button onclick="oPinKey('0')">0</button><button class="k-ok" onclick="oPinKey('OK')">OK</button>
+      </div>
+      <button type="button" class="lock-alt" id="olock-tobio" style="display:none" onclick="oLockPad(false);oBioUnlock(true)">Utiliser l'empreinte ou le schéma</button>
+    </div>
+    <button class="lock-link" onclick="oPinForgot()">Me reconnecter avec mon code d'accès</button>
   </div>
 </div>
 
@@ -2488,7 +2534,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.42 · 14/11';
+var APP_VERSION='v3.43 · 14/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -4092,7 +4138,9 @@ function roleAuteur(){return roleLabel(ROLE());}
 function jrnAdd(c,type,texte){
   c=(c&&c._real)||c;if(!c.journal)c.journal=[];
   var e={id:'j_'+Date.now()+'_'+Math.floor(Math.random()*1000),ts:new Date().toISOString(),auteur:PARTNER_NOM()||'—',role:ROLE(),type:type,texte:texte};
-  c.journal.push(e);c.lastActivity=e.ts;return e;
+  c.journal.push(e);c.lastActivity=e.ts;
+  if(type==='fait'||type==='appel'||type==='rdv'||type==='statut'){try{setTimeout(celebrate,350);}catch(x){}}
+  return e;
 }
 var JRN_IC={appel:'📞',note:'📝',statut:'🎯',rappel:'⏰',fait:'✅',systeme:'⚙️',rdv:'📅'};
 function jrnHtml(c){
@@ -8898,11 +8946,38 @@ function annonceShow(){
 }
 function annonceVu(id){try{localStorage.setItem('owlht2_annonce',id);}catch(e){}var m=document.getElementById('oannonce');if(m)m.remove();}
 
+
+// ═══ v3.43 — ENCOURAGEMENTS : chaque action faite est saluée (compteur du jour, série de jours, paliers) ═══
+var CEL_T=0,CEL_HIDE=null;
+var CEL_MSG=['Bravo {p} !','Bien joué {p} !','Superbe {p} !','Et une de plus, {p} !','Belle action {p} !','Ça avance, {p} !','Top {p} !','Excellent {p} !','Magnifique {p} !','On continue, {p} !'];
+var CEL_SUB=['Chaque contact suivi, c\'est une personne mieux accompagnée.','Votre régularité fait toute la différence.','Un pas de plus pour votre équipe.','Le suivi soigné, c\'est notre signature.','Une chose de moins à penser — on enchaîne.','L\'équipe avance grâce à vous.','C\'est comme ça qu\'on prend soin des gens.','Belle énergie, gardez le rythme.'];
+function celOff(){try{return localStorage.getItem('owlht2_cel_off')==='1';}catch(e){return false;}}
+function celState(){var st={d:'',n:0,streak:0,best:0};try{st=Object.assign(st,JSON.parse(localStorage.getItem('owlht2_cel')||'{}'));}catch(e){}var t=todayYMD();if(st.d!==t){var y=new Date();y.setDate(y.getDate()-1);st.streak=(st.d===ymd(y)&&st.n>0)?(st.streak||0):0;st.d=t;st.n=0;}return st;}
+function celebrate(){
+  if(!USER||celOff())return;var now=Date.now();if(now-CEL_T<900)return;CEL_T=now;
+  var st=celState();st.n++;if(st.n===1)st.streak=(st.streak||0)+1;if(st.n>(st.best||0))st.best=st.n;try{localStorage.setItem('owlht2_cel',JSON.stringify(st));}catch(e){}
+  var p=String(USER.nom||'').trim().split(/\s+/)[0]||'',n=st.n,pal=[5,10,20,30,50],next=pal.filter(function(x){return x>n;})[0]||(Math.ceil((n+1)/25)*25),prev=pal.filter(function(x){return x<=n;}).pop()||0,mile=pal.indexOf(n)>=0;
+  var ttl=n===1?'C\'est parti'+(p?', '+p:'')+' ! ☀️':mile?'🔥 '+n+' actions aujourd\'hui'+(p?', '+p:'')+' !':CEL_MSG[Math.floor(Math.random()*CEL_MSG.length)].replace(' {p}',p?' '+p:'').replace(', {p}',p?', '+p:'');
+  var sub=n===1?(st.streak>1?'🔥 '+st.streak+' jours d\'affilée — première action du jour.':'Première action du jour : le plus dur est fait.'):mile?(n>=20?'Journée exceptionnelle. Merci pour ce que vous faites.':'Quel rythme ! Encore '+(next-n)+' pour le palier suivant.'):CEL_SUB[Math.floor(Math.random()*CEL_SUB.length)]+(next-n<=2?' Plus que '+(next-n)+' avant le palier '+next+' !':'');
+  var el=document.getElementById('ocel');if(!el){el=document.createElement('div');el.id='ocel';el.onclick=function(){el.classList.remove('on');};document.body.appendChild(el);}
+  el.innerHTML='<div class="ci"><img src="logo-wlht.png" alt=""></div><div class="ct"><b>'+esc(ttl)+'</b><small>'+esc(sub)+'</small></div><div class="cn">'+n+'<small>'+(n>1?'actions':'action')+'</small></div><div class="cb" style="width:'+Math.round((n-prev)*100/Math.max(1,next-prev))+'%"></div>';
+  requestAnimationFrame(function(){el.classList.add('on');});clearTimeout(CEL_HIDE);CEL_HIDE=setTimeout(function(){el.classList.remove('on');},mile||n===1?3600:2600);
+  if(mile||n===1)celConfetti(mile?46:18);try{if(mile&&navigator.vibrate)navigator.vibrate([40,60,40]);}catch(e){}
+}
+function celConfetti(k){try{if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;}catch(e){}var col=['#E3C36A','#C9A84C','#1E9D5A','#7FD3A0','#FFFFFF','#2FA8CC'];for(var i=0;i<k;i++){(function(i){var c=document.createElement('i');c.className='cel-cf';c.style.left=(Math.random()*100)+'vw';c.style.background=col[i%col.length];c.style.animationDuration=(1.6+Math.random()*1.6)+'s';c.style.animationDelay=(Math.random()*.4)+'s';c.style.transform='rotate('+(Math.random()*180)+'deg)';if(i%3===0){c.style.borderRadius='50%';c.style.height='9px';}document.body.appendChild(c);setTimeout(function(){c.remove();},3800);})(i);}}
+function oCelToggle(cb){try{if(cb.checked)localStorage.removeItem('owlht2_cel_off');else localStorage.setItem('owlht2_cel_off','1');}catch(e){}if(cb.checked)celebrate();}
+
 // ── Verrou PIN par appareil (v3.12) ──────────────────────────────────
 var PIN_BUF='',PIN_MODE='check',PIN_TMP='',PIN_HIDDEN_AT=0;
 function pinHash(p){var h=5381;for(var i=0;i<p.length;i++)h=((h<<5)+h+p.charCodeAt(i))|0;return'p'+(h>>>0).toString(36)+'_'+p.length;}
 function pinStored(){try{return localStorage.getItem('owlht2_pin')||'';}catch(e){return'';}}
-function oPinGate(){var bio=bioStored(),pin=pinStored();if(!bio&&!pin)return;var L=document.getElementById('olock');if(L.classList.contains('on')&&PIN_MODE==='check')return;PIN_MODE='check';PIN_BUF='';L.classList.toggle('bio-only',!!bio&&!pin);document.getElementById('olock-bio').style.display=bio?'':'none';oPinRender(bio?(pin?'Empreinte / schéma du téléphone — ou votre code PIN':'Déverrouillez avec votre empreinte ou le schéma du téléphone'):'Saisissez votre code PIN');L.classList.add('on');if(bio)setTimeout(oBioUnlock,300);}
+function lockHello(){var h=new Date().getHours(),n='';try{n=String((USER&&USER.nom)||'').trim().split(/\s+/)[0]||'';}catch(e){}return(h>=18||h<5?'Bonsoir':'Bonjour')+(n?' '+n:'');}
+function oLockPad(on){var L=document.getElementById('olock');L.classList.toggle('show-pad',!!on);if(PIN_MODE==='check')oPinRender(on?'Saisissez votre code PIN':'Empreinte, visage ou schéma du téléphone');}
+function lockOpen(){var L=document.getElementById('olock');PIN_BUF='';L.classList.add('ok');setTimeout(function(){L.classList.add('out');},180);setTimeout(function(){L.classList.remove('on','out','ok');},650);}
+function oPinGate(){var bio=bioStored()&&bioAvail(),pin=pinStored();if(!bio&&!pin)return;var L=document.getElementById('olock');if(L.classList.contains('on')&&PIN_MODE==='check')return;PIN_MODE='check';PIN_BUF='';
+  document.getElementById('olock-hello').textContent=lockHello();
+  document.getElementById('olock-bioz').style.display=bio?'':'none';document.getElementById('olock-topin').style.display=pin?'':'none';document.getElementById('olock-tobio').style.display=bio?'':'none';
+  L.classList.remove('out','ok');L.classList.toggle('show-pad',!bio);oPinRender(bio?'Empreinte, visage ou schéma du téléphone':'Saisissez votre code PIN');L.classList.add('on');if(bio)setTimeout(function(){oBioUnlock(false);},350);}
 // v3.42 — déverrouillage par l'appareil : empreinte, visage, schéma ou code du téléphone (WebAuthn « authentificateur de plateforme »)
 function bioStored(){try{return localStorage.getItem('owlht2_bio')||'';}catch(e){return'';}}
 function b64u(buf){var b=new Uint8Array(buf),t='';for(var i=0;i<b.length;i++)t+=String.fromCharCode(b[i]);return btoa(t).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
@@ -8918,11 +8993,11 @@ function oBioSet(){
 }
 function oBioRemove(){try{localStorage.removeItem('owlht2_bio');}catch(e){}oT('Déverrouillage par l\'appareil retiré','s');oProfOpen();}
 var BIO_BUSY=false;
-function oBioUnlock(){
-  var id=bioStored();if(!id||BIO_BUSY||!bioAvail())return;BIO_BUSY=true;
+function oBioUnlock(manual){
+  var id=bioStored();if(!id||BIO_BUSY||!bioAvail())return;BIO_BUSY=true;var bb=document.getElementById('olock-bio');if(bb)bb.classList.add('busy');
   navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:ub64(id),transports:['internal']}],userVerification:'required',timeout:60000}})
-    .then(function(a){BIO_BUSY=false;if(a){document.getElementById('olock').classList.remove('on');PIN_BUF='';}})
-    .catch(function(){BIO_BUSY=false;var L=document.getElementById('olock');if(L.classList.contains('on'))oPinRender(pinStored()?'Non reconnu — touchez « Déverrouiller » ou saisissez votre PIN':'Non reconnu — touchez « Déverrouiller » pour réessayer');});
+    .then(function(a){BIO_BUSY=false;if(bb)bb.classList.remove('busy');if(a)lockOpen();})
+    .catch(function(){BIO_BUSY=false;if(bb)bb.classList.remove('busy');var L=document.getElementById('olock');if(L.classList.contains('on')&&!L.classList.contains('show-pad')){if(manual)oPinRender('Non reconnu — touchez l\'empreinte pour réessayer');}});
 }
 function oPinRender(sub){document.getElementById('olock-sub').textContent=sub;var d=document.getElementById('olock-dots');d.innerHTML='';for(var i=0;i<Math.max(4,PIN_BUF.length);i++)d.innerHTML+='<i class="'+(i<PIN_BUF.length?'on':'')+'"></i>';}
 function oPinKey(k){
@@ -8933,11 +9008,11 @@ function oPinKey(k){
 }
 function oPinSubmit(){
   if(PIN_BUF.length<4){oPinRender('4 à 6 chiffres');return;}
-  if(PIN_MODE==='check'){if(pinHash(PIN_BUF)===pinStored()){document.getElementById('olock').classList.remove('on');PIN_BUF='';}else{PIN_BUF='';oPinRender('PIN incorrect — réessayez');}return;}
+  if(PIN_MODE==='check'){if(pinHash(PIN_BUF)===pinStored()){lockOpen();}else{PIN_BUF='';oPinRender('Code incorrect — réessayez');var dd=document.getElementById('olock-dots');dd.classList.remove('shake');void dd.offsetWidth;dd.classList.add('shake');try{navigator.vibrate&&navigator.vibrate(120);}catch(e){}}return;}
   if(PIN_MODE==='set1'){PIN_TMP=PIN_BUF;PIN_BUF='';PIN_MODE='set2';oPinRender('Confirmez le code PIN');return;}
   if(PIN_MODE==='set2'){if(PIN_BUF===PIN_TMP){try{localStorage.setItem('owlht2_pin',pinHash(PIN_BUF));}catch(e){}document.getElementById('olock').classList.remove('on');PIN_BUF='';PIN_TMP='';PIN_MODE='check';oT('🔒 Verrou PIN activé sur cet appareil','s');oProfOpen();}else{PIN_BUF='';PIN_TMP='';PIN_MODE='set1';oPinRender('Les deux codes diffèrent — recommencez');}}
 }
-function oPinSet(){document.getElementById('olock').classList.remove('bio-only');document.getElementById('olock-bio').style.display='none';PIN_MODE='set1';PIN_BUF='';oPinRender('Choisissez un code PIN (4 à 6 chiffres)');document.getElementById('olock').classList.add('on');}
+function oPinSet(){var L0=document.getElementById('olock');L0.classList.remove('out','ok');L0.classList.add('show-pad');document.getElementById('olock-tobio').style.display='none';document.getElementById('olock-hello').textContent='Code PIN de l\'appareil';PIN_MODE='set1';PIN_BUF='';oPinRender('Choisissez un code PIN (4 à 6 chiffres)');document.getElementById('olock').classList.add('on');}
 function oPinRemove(){try{localStorage.removeItem('owlht2_pin');}catch(e){}oT('Verrou PIN retiré','s');oProfOpen();}
 function oPinForgot(){if(confirm('Vous serez déconnecté de cet appareil ; il faudra ressaisir votre code d\'accès.'))oLogout();document.getElementById('olock').classList.remove('on');}
 document.addEventListener('visibilitychange',function(){if(document.hidden){PIN_HIDDEN_AT=Date.now();}else if((pinStored()||bioStored())&&USER&&PIN_HIDDEN_AT&&Date.now()-PIN_HIDDEN_AT>120000){oPinGate();}});
@@ -9033,6 +9108,7 @@ function oProfOpen(){
     ?'Votre nom d\'affichage est défini dans le script Google (ADMIN_NOM). Les accès de l\'équipe (noms, rôles, codes, photos) se gèrent dans l\'onglet <b>Équipe</b>.'
     :'Pour changer votre nom affiché ou votre rôle, demandez à l\'administrateur (onglet Équipe).';
   var pr=document.getElementById('oprof-pin-row');if(pr)pr.innerHTML=pinStored()?'<span>🔒 Verrou PIN actif à l\'ouverture</span><button class="ob bgh bsm" type="button" onclick="oPinSet()">Changer</button><button class="ob bgh bsm" type="button" onclick="oPinRemove()">Retirer</button>':'<span>Pas de verrou PIN — conseillé si votre téléphone n\'est pas verrouillé</span><button class="ob bgh bsm" type="button" onclick="oPinSet()">🔒 Activer un PIN</button>';
+  var pc0=document.getElementById('oprof-cel');if(pc0)pc0.checked=!celOff();
   var br=document.getElementById('oprof-bio-row');if(br)br.innerHTML=!bioAvail()?'<span style="color:var(--t3)">👆 Empreinte / schéma : non disponible sur ce navigateur</span>':bioStored()?'<span>👆 Déverrouillage par empreinte / schéma du téléphone actif</span><button class="ob bgh bsm" type="button" onclick="oBioRemove()">Retirer</button>':'<span>👆 Ouvrir l\'app avec l\'empreinte, le visage ou le schéma du téléphone</span><button class="ob bgold bsm" type="button" onclick="oBioSet()">Activer</button>';
   oSessList('', 'oprof-sess');
   var pc=document.getElementById('oprof-canal');if(pc)pc.value=sendPref();
