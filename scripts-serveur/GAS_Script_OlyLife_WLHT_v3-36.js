@@ -297,7 +297,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.35';
+var SRV_VERSION = '3.36';
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
@@ -1551,6 +1551,11 @@ function zoomAgenda_(db, user, req) {
   add(user.email || user.digestEmail || emailDe_(db, user.nom));
   suivis_(c).forEach(function (nm) { add(emailDe_(db, nm)); });
   if (req.inviterContact !== false) add(c.email);
+  // v3.36 — personnes ajoutées à la visio : membres de l'équipe (par leur nom) et autres contacts visibles (par leur id) — jamais une adresse libre
+  var extra = [];
+  (req.inviteNoms || []).slice(0, 8).forEach(function (nm) { nm = String(nm || ''); var em = emailDe_(db, nm); if (em) add(em); if (nm) extra.push(nm); });
+  (req.inviteContacts || []).slice(0, 8).forEach(function (id) { var oc = contactById_(db, String(id || '')); if (!oc || (user.role !== 'admin' && !isVisible_(oc, user))) return; add(oc.email); extra.push(((oc.prenom || '') + ' ' + (oc.nom || '')).trim()); });
+  if (extra.length) { titre += ' + ' + extra.join(', '); desc = 'Participants : ' + nomC + ', ' + extra.join(', ') + '\n' + desc; }
   var ev = cal.createEvent(titre, start, end, { description: desc, location: url, guests: guests.join(','), sendInvites: guests.length > 0 });
   try { ev.addPopupReminder(30); ev.addEmailReminder(60); } catch (e) {}
   c.journal = c.journal || [];

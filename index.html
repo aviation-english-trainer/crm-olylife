@@ -2534,7 +2534,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.44 · 14/11';
+var APP_VERSION='v3.45 · 14/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -3437,6 +3437,10 @@ var MSG_DEFAULTS={};
   // v3.30 — invitation Zoom (salle personnelle du gestionnaire, tous canaux)
   MSG_DEFAULTS.zoom_invitation={g:'Rendez-vous',l:'Invitation à une visio Zoom (lien personnel)',vars:['prenom','quand','lienZoom','moi','telMoi'],
     t:'Bonjour {prenom} 🌿\n\nComme convenu, voici le lien de notre visio Zoom{?quand: — {quand}} :\n{lienZoom}\n\nUn clic suffit (l\'application Zoom s\'ouvre, ou le navigateur). Pensez à activer micro et caméra 🙂 Si besoin, je reste joignable{?telMoi: au {telMoi}}.\n\nÀ tout de suite !\n{moi} — Water Life High Tech'};
+  MSG_DEFAULTS.zoom_invitation_tiers={g:'Rendez-vous',l:'Visio Zoom — personne ajoutée (équipe ou autre contact)',vars:['prenom','contact','quand','lienZoom','moi','telMoi'],
+    t:'Bonjour {prenom} 🌿\n\nJe vous invite à une visio Zoom{?contact: avec {contact}}{?quand: — {quand}} :\n{lienZoom}\n\nUn clic suffit (l\'application Zoom s\'ouvre, ou le navigateur). Merci de me confirmer votre présence 🙂\n\n{moi} — Water Life High Tech'};
+  MSG_DEFAULTS.zoom_demande_gest={g:'Rendez-vous',l:'Visio Zoom — demande d\'un référent à son gestionnaire',vars:['gest','contact','quand','moi','telMoi'],
+    t:'Bonjour {gest} 🌿\n\nJe souhaiterais une visio Zoom avec vous{?contact: au sujet de {contact}}{?quand: — {quand}}.\nPouvez-vous me confirmer et m\'envoyer le lien de votre salle ?\n\nMerci beaucoup,\n{moi}{?telMoi: — {telMoi}}'};
   // v3.29 — demande de consentement e-mail à la personne elle-même (lien personnel, tous canaux)
   MSG_DEFAULTS.consent_demande={g:'Campagnes e-mail',l:'Demande de consentement e-mail (lien à cliquer)',vars:['prenom','lienConsent','moi'],
     t:'Bonjour {prenom} 🌿\n\nPour vous envoyer nos informations OlyLife par e-mail (découverte des appareils, retours d\'expérience, invitations aux visios), j\'ai besoin de votre accord — c\'est la règle et c\'est normal.\n\n👉 Un clic suffit, 20 secondes :\n{lienConsent}\n\nVous pourrez vous désinscrire à tout moment, en un clic aussi. Merci 🙏\n{moi} — Water Life High Tech'};
@@ -5659,7 +5663,7 @@ function renderEquipeUtiles(){
   box.innerHTML=l.map(function(u){var tel=(u.tel||'').replace(/\D/g,'');
     return'<div style="display:flex;align-items:center;gap:10px"><span class="ouser-av" style="width:30px;height:30px;font-size:11px">'+avOf(u.photo,ini(u.nom))+'</span><div style="flex:1;min-width:0"><b>'+esc(u.nom)+'</b> <span class="obdg '+(u.role==='admin'?'bgo':u.role==='comite'||u.comite?'bgr':u.role==='referent'?'bpu':'baq')+'">'+roleLabelU(u)+'</span><div style="color:var(--t2)">'
       +(u.tel?'<a href="tel:'+esc(u.tel)+'" style="color:var(--aqua)">'+esc(u.tel)+'</a>'+(tel?' · <a href="https://wa.me/'+telE164(u.tel).replace('+','')+'" target="_blank" rel="noopener" style="color:var(--aqua)">WhatsApp</a>':''):'<span style="color:var(--t3)">téléphone non renseigné</span>')
-      +(u.email?' · <a href="mailto:'+esc(u.email)+'" style="color:var(--aqua)">'+esc(u.email)+'</a>':'')+'</div></div></div>';}).join('')
+      +(u.email?' · <a href="mailto:'+esc(u.email)+'" style="color:var(--aqua)">'+esc(u.email)+'</a>':'')+'</div></div>'+(zoomEquipeOk(u)?'<button type="button" class="ob bzoom bsm" data-n="'+esc(u.nom)+'" onclick="oZoomOpen(\'\',this.getAttribute(\'data-n\'))" title="'+(ROLE()==='referent'?'Demander une visio':'Inviter à une visio Zoom')+'">🎥</button>':'')+'</div>';}).join('')
     +'<div style="font-size:11px;color:var(--t3)">Chacun complète son téléphone et son e-mail dans <b>Mon profil</b> (carte en haut du menu).</div>';
 }
 function oDash(){
@@ -8170,8 +8174,35 @@ function admCatRender(){
 function admCatAdd(){var b=document.getElementById('adm-cat-body');if(!b)return;var tr=document.createElement('tr');tr.innerHTML='<td><input type="checkbox" class="ac-on" checked></td><td><input class="ofc ac-ref" style="width:120px"></td><td><input class="ofc ac-nom" placeholder="OlyLife …" style="min-width:200px"></td><td><input type="number" class="ofc ac-usd" value="0" style="width:84px"></td><td><input type="number" class="ofc ac-pv" value="0" style="width:74px"></td><td><select class="ofc ac-dec" style="min-width:150px"><option value="">— aucun tunnel —</option>'+Object.keys(DECOUV).map(function(k){return'<option value="'+esc(k)+'">'+esc(k)+'</option>';}).join('')+'</select></td><td><input class="ofc ac-ic" value="🧩" style="width:44px;text-align:center"></td><td><textarea class="ofc ac-pitch" style="min-width:260px;min-height:54px"></textarea><input class="ofc ac-img" placeholder="Image (URL ou img/…)" style="margin-top:4px;font-size:11px"><input type="hidden" class="ac-id" value="c_'+Date.now().toString(36)+'"></td><td><button type="button" class="ob bgh bsm" onclick="this.closest(\'tr\').remove()">🗑</button></td>';b.appendChild(tr);}
 function admCatCollect(){var out=[];document.querySelectorAll('#adm-cat-body tr').forEach(function(tr){var q=function(s){return tr.querySelector(s);};var nom=(q('.ac-nom').value||'').trim();if(!nom)return;out.push({id:q('.ac-id').value,ref:(q('.ac-ref').value||'').trim().toUpperCase(),nom:nom,usd:+q('.ac-usd').value||0,pv:+q('.ac-pv').value||0,decouv:q('.ac-dec').value||'',ic:(q('.ac-ic').value||'').trim()||'🧩',pitch:(q('.ac-pitch').value||'').trim(),img:(q('.ac-img').value||'').trim(),actif:q('.ac-on').checked});});return out;}
 
-function oZoomOpen(cid){
-  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+// v3.45 — personnes que l'on peut ajouter à une visio, selon le rôle :
+//   référent → uniquement son/ses gestionnaire(s) (il DEMANDE la visio) · gestionnaire → ses référents, ses contacts, un administrateur · admin → tout le monde
+var ZC=null,ZX=[],ZQ={d:'',h:''};
+function zoomEquipeOk(u){if(!u||!u.nom||u.nom===PARTNER_NOM())return false;var r=ROLE();if(r==='admin')return true;if(r==='gestionnaire')return u.role==='admin'||u.role==='referent';return u.role==='gestionnaire';}
+function zoomEquipe(){var l=equipeContacts().slice();if(ROLE()==='admin')(USERS||[]).forEach(function(u){if(u.actif!==false&&!u.pending&&!l.some(function(x){return x.nom===u.nom;}))l.push({nom:u.nom,role:u.role,comite:!!u.comite,tel:u.tel||'',email:u.email||''});});return l.filter(zoomEquipeOk);}
+function zoomTeamObj(nom){var u=zoomEquipe().find(function(x){return x.nom===nom;});if(!u)return null;var pr=String(u.nom).trim().split(/\s+/);return{id:'',_team:true,_role:u.role,prenom:pr[0]||u.nom,nom:pr.slice(1).join(' '),tel:u.tel||'',email:u.email||'',canal:u.tel?'WhatsApp':'E-mail'};}
+function zxRender(){
+  var box=document.getElementById('zx-sel');if(!box)return;
+  box.innerHTML=ZX.map(function(x,i){return'<span class="obdg '+(x.kind==='team'?'baq':'bgr')+'" style="font-size:12px;padding:5px 9px">'+(x.kind==='team'?'👤 ':'🌿 ')+esc(x.nom)+(x.kind==='team'?' · '+esc(x.roleLbl):'')+' <a href="javascript:void(0)" onclick="ZX.splice('+i+',1);zxRender()" style="color:inherit;margin-left:4px;text-decoration:none">✕</a></span>';}).join(' ');
+  var tm=document.getElementById('zx-team');if(tm)tm.querySelectorAll('button').forEach(function(b){var on=ZX.some(function(x){return x.kind==='team'&&x.nom===b.getAttribute('data-n');});b.classList.toggle('bgr',on);b.classList.toggle('bgh',!on);});
+  var m=document.getElementById('ozoom');if(m&&m._refresh)m._refresh();
+}
+function zxTeam(nom){var i=ZX.findIndex(function(x){return x.kind==='team'&&x.nom===nom;});if(i>=0)ZX.splice(i,1);else{var u=zoomEquipe().find(function(x){return x.nom===nom;});if(!u)return;if(ZX.length>=6){oT('6 personnes ajoutées au maximum','w');return;}ZX.push({kind:'team',nom:u.nom,prenom:String(u.nom).split(/\s+/)[0],roleLbl:roleLabelU(u),tel:u.tel||'',email:u.email||'',canal:u.tel?'wa':'mail'});}zxRender();}
+function zxSearch(){
+  var q=(val('zx-q')||'').trim().toLowerCase(),box=document.getElementById('zx-sug');if(!box)return;if(q.length<2){box.innerHTML='';return;}
+  var l=OC.filter(function(c){return c.id!==(ZC&&ZC.id)&&!ZX.some(function(x){return x.cid===c.id;})&&((c.prenom||'')+' '+(c.nom||'')+' '+(c.nom||'')+' '+(c.prenom||'')).toLowerCase().indexOf(q)>=0;}).slice(0,6);
+  box.innerHTML=l.length?l.map(function(c){return'<button type="button" class="ob bgh bsm" style="margin:3px 4px 0 0" onclick="zxContact(\''+c.id+'\')">＋ '+esc(((c.prenom||'')+' '+(c.nom||'')).trim())+(c.ville?' · '+esc(c.ville):'')+'</button>';}).join(''):'<span style="font-size:12px;color:var(--t3)">Aucun de vos contacts ne correspond.</span>';
+}
+function zxContact(id){var c=OC.find(function(x){return x.id===id;});if(!c)return;if(ZX.length>=6){oT('6 personnes ajoutées au maximum','w');return;}ZX.push({kind:'contact',cid:c.id,nom:((c.prenom||'')+' '+(c.nom||'')).trim(),prenom:c.prenom||c.nom||'',tel:c.tel||'',email:c.email||'',canal:canalCode(c)});document.getElementById('zx-q').value='';document.getElementById('zx-sug').innerHTML='';zxRender();}
+function zxHtml(c){
+  var team=zoomEquipe().filter(function(u){return!(c._team&&u.nom===((c.prenom||'')+' '+(c.nom||'')).trim());}),r=ROLE();
+  return'<div style="margin-top:10px;padding:10px 12px;border-radius:12px;background:#F3F8F4;border:1px solid var(--bd)"><label class="ofl" style="margin:0 0 6px">👥 Ajouter une personne à la visio <span style="font-weight:400;color:var(--t3)">(facultatif)</span></label>'
+    +(team.length?'<div id="zx-team" style="display:flex;flex-wrap:wrap;gap:6px">'+team.map(function(u){return'<button type="button" class="ob bsm bgh" data-n="'+esc(u.nom)+'" onclick="zxTeam(this.getAttribute(\'data-n\'))">'+esc(u.nom)+' <small style="font-weight:400;opacity:.8">· '+esc(roleLabelU(u))+'</small></button>';}).join('')+'</div>':'<div style="font-size:12px;color:var(--t3)">Aucun membre d\'équipe à ajouter.</div>')
+    +'<input class="ofc" id="zx-q" placeholder="🔎 Un autre de mes contacts (nom ou prénom)…" oninput="zxSearch()" style="margin-top:8px;min-height:40px;font-size:13px"><div id="zx-sug"></div><div id="zx-sel" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px"></div>'
+    +'<div style="font-size:11px;color:var(--t3);margin-top:6px">'+(r==='admin'?'Administrateur : toute l\'équipe et tous les contacts.':'Gestionnaire : vos référents, vos contacts, ou un administrateur.')+' Chaque personne ajoutée reçoit son propre message avec le lien.</div></div>';
+}
+function oZoomOpen(cid,teamNom){
+  if(ROLE()==='referent'){oZoomAsk(cid,teamNom);return;}
+  var c=teamNom?zoomTeamObj(teamNom):OC.find(function(x){return x.id===cid;});if(!c)return;ZC=c;ZX=[];ZQ={d:'',h:''};
   var url=zoomUrl();
   var old=document.getElementById('ozoom');if(old)old.remove();
   var m=document.createElement('div');m.id='ozoom';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
@@ -8183,11 +8214,12 @@ function oZoomOpen(cid){
     +'<div class="av-seg" style="margin-top:4px"><button type="button" id="zoom-m-now" class="on" onclick="oZoomMode(\'now\')">⚡ Maintenant<br><small style="font-weight:400">j\'ouvre ma salle, le client me rejoint</small></button><button type="button" id="zoom-m-later" onclick="oZoomMode(\'later\')">📅 Plus tard<br><small style="font-weight:400">date et heure convenues</small></button></div>'
     +'<div id="zoom-later" style="display:none"><div class="ofg2" style="gap:8px;margin-top:8px"><div><label class="ofl">Date</label><input type="date" class="ofc" id="zoom-d"></div><div><label class="ofl">Heure</label><input type="time" class="ofc" id="zoom-h"></div></div>'
     +'<div style="font-size:11px;color:var(--t3);margin-top:4px">La date et l\'heure sont reprises dans le message.</div></div>'
+    +zxHtml(c)
     +'<label class="ochk-row" style="margin-top:8px;font-size:12px;display:none" id="zoom-ag-row"><input type="checkbox" id="zoom-ag" checked><span>📆 Ajouter la visio à l\'<b>agenda Google</b> (notification, invitation au contact'+(c.email?' — '+esc(c.email):' — pas d\'e-mail sur la fiche, invitation à vous seul')+', rappel 30 min avant)</span></label>'
     +'<label class="ofl" style="margin-top:10px">Message</label><textarea class="ofc" id="zoom-txt" style="min-height:150px;font-size:13px;line-height:1.5"></textarea>'
     +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">'
-      +'<button type="button" class="ob '+(canal==='wa'?'bwa':'bgold')+'" style="flex:2" id="zoom-send" '+(url?'':'disabled')+' onclick="oZoomSend(\''+c.id+'\')">📤 Envoyer et ouvrir ma salle ('+esc(CANAL_LBL[canal]||canal)+')</button>'
-      +'<button type="button" class="ob bgh" style="flex:1" '+(url?'':'disabled')+' onclick="window.open(\''+esc(url)+'\',\'_blank\');oZoomLog(\''+c.id+'\',\'ouvert\')">🎥 Ouvrir ma salle</button>'
+      +'<button type="button" class="ob '+(canal==='wa'?'bwa':'bgold')+'" style="flex:2" id="zoom-send" '+(url?'':'disabled')+' onclick="oZoomSend()">📤 Envoyer et ouvrir ma salle ('+esc(CANAL_LBL[canal]||canal)+')</button>'
+      +'<button type="button" class="ob bgh" style="flex:1" '+(url?'':'disabled')+' onclick="window.open(\''+esc(url)+'\',\'_blank\');oZoomLog()">🎥 Ouvrir ma salle</button>'
     +'</div>'
     +'<div style="font-size:11px;color:var(--t3);margin-top:8px">Le texte vient du modèle « Invitation à une visio Zoom » (Administration → Messages). Chaque envoi est noté dans le journal du contact.</div></div>';
   document.body.appendChild(m);
@@ -8198,34 +8230,83 @@ var ZOOM_MODE='now';
 function oZoomMode(mode){
   ZOOM_MODE=mode;var m=document.getElementById('ozoom');if(!m)return;
   document.getElementById('zoom-m-now').classList.toggle('on',mode==='now');document.getElementById('zoom-m-later').classList.toggle('on',mode==='later');
-  document.getElementById('zoom-later').style.display=mode==='later'?'':'none';document.getElementById('zoom-ag-row').style.display=mode==='later'?'':'none';
+  document.getElementById('zoom-later').style.display=mode==='later'?'':'none';document.getElementById('zoom-ag-row').style.display=(mode==='later'&&!(ZC&&ZC._team))?'':'none';
   if(mode==='now'){document.getElementById('zoom-d').value='';document.getElementById('zoom-h').value='';}
   var sb=document.getElementById('zoom-send');if(sb)sb.textContent=mode==='now'?'📤 Envoyer et ouvrir ma salle ('+(CANAL_LBL[m._canal]||m._canal)+')':'📤 Envoyer l\'invitation ('+(CANAL_LBL[m._canal]||m._canal)+')';
   if(m._refresh)m._refresh();
 }
-function zoomQuand(){if(ZOOM_MODE==='now')return'maintenant, je vous attends dans la salle';var d=val('zoom-d'),h=val('zoom-h');if(!d&&!h)return'';var t='';if(d){var dd=new Date(d+'T12:00:00');t=dd.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});}if(h)t+=(t?' à ':'à ')+h.replace(':','h');return t.trim();}
-function zoomMsg(c){var v=tplVars(c,'fr');v.lienZoom=zoomUrl();v.quand=zoomQuand();return renderTpl(tplText('zoom_invitation'),v);}
-function oZoomSend(cid){
-  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
-  var text=val('zoom-txt')||zoomMsg(c),canal=canalCode(c),num=String(c.tel||'').replace(/\D/g,'');
+function zoomQuand(){if(ZOOM_MODE==='now')return'maintenant, je vous attends dans la salle';var d=val('zoom-d')||ZQ.d,h=val('zoom-h')||ZQ.h;if(!d&&!h)return'';var t='';if(d){var dd=new Date(d+'T12:00:00');t=dd.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});}if(h)t+=(t?' à ':'à ')+h.replace(':','h');return t.trim();}
+function zoomMsg(c){
+  if(c._team)return zoomMsgTiers({prenom:c.prenom},null);
+  var v=tplVars(c,'fr');v.lienZoom=zoomUrl();v.quand=zoomQuand();var t=renderTpl(tplText('zoom_invitation'),v);
+  if(ZX.length&&v.lienZoom&&t.indexOf(v.lienZoom)>=0)t=t.replace(v.lienZoom,v.lienZoom+'\n\n👥 '+(ZX.length>1?'Seront aussi avec nous : ':'Sera aussi avec nous : ')+ZX.map(function(x){return x.kind==='team'?x.nom+' ('+x.roleLbl.toLowerCase()+')':x.prenom;}).join(', ')+'.');
+  return t;
+}
+function zoomMsgTiers(x,c){var v=tplVars(c||{},'fr');v.prenom=x.prenom||'';v.lienZoom=zoomUrl();v.quand=zoomQuand().replace('je vous attends dans la salle','la salle est ouverte');v.contact=c?(x.kind==='contact'?(c.prenom||'une autre personne'):((c.prenom||'')+' '+(c.nom||'')).trim()):'';return renderTpl(tplText('zoom_invitation_tiers'),v);}
+function zxSendOne(i){
+  var x=ZX[i],c=ZC;if(!x)return;var text=zoomMsgTiers(x,c&&!c._team?c:null),canal=x.canal||'wa',num=x.kind==='team'?telE164(x.tel).replace('+',''):String(x.tel||'').replace(/\D/g,'');
+  if(canal!=='mail'&&!num){if(x.email)canal='mail';else{sendCopy(text,'📋 '+x.nom+' : ni téléphone ni e-mail — message copié');x.sent=true;zxStep2();return;}}
+  if(canal==='mail'&&!x.email){if(num)canal='wa';else{sendCopy(text,'📋 Message copié');x.sent=true;zxStep2();return;}}
+  sendVia(canal,num,text,x.email);x.sent=true;
+  if(x.kind==='contact'){var oc=OC.find(function(k){return k.id===x.cid;});if(oc){var q=zoomQuand();jrnAdd(oc,'rdv','🎥 Invité(e) à une visio Zoom par '+(CANAL_LBL[canal]||canal)+(c&&!c._team?' (avec '+((c.prenom||'')+' '+(c.nom||'')).trim()+')':'')+(ZOOM_MODE==='now'?' — visio immédiate':(q?' — '+q:'')));var d=val('zoom-d')||ZQ.d,h=val('zoom-h')||ZQ.h||'10:00';if(d){oc.rdvs=oc.rdvs||[];oc.rdvs.push({uri:'zoom_'+Date.now()+'_'+i,source:'zoom',nom:'Visio Zoom',start:d+'T'+h+':00',host:PARTNER_NOM(),joinUrl:zoomUrl(),statut:'active',par:PARTNER_NOM()});}oPush([oc]);}}
+  zxStep2();
+}
+function zxStep2(){
+  var m=document.getElementById('ozoom');if(!m)return;var c=ZC,left=ZX.filter(function(x){return!x.sent;}).length;
+  m.firstChild.innerHTML='<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">👥 Inviter les autres participants</b><button class="ob bgh bsm" style="margin-left:auto" onclick="zxDone()">✕</button></div>'
+    +'<div style="font-size:12.5px;color:var(--t2);margin:6px 0 12px;line-height:1.5">✅ Invitation envoyée à <b>'+esc(((c.prenom||'')+' '+(c.nom||'')).trim())+'</b>. Touchez maintenant chaque personne pour lui envoyer son message (un envoi par personne).</div>'
+    +ZX.map(function(x,i){return'<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--bd)"><div style="flex:1;min-width:0"><b style="font-size:14px">'+esc(x.nom)+'</b><div style="font-size:11.5px;color:var(--t3)">'+(x.kind==='team'?esc(x.roleLbl):'contact')+' · '+esc(CANAL_LBL[x.canal]||x.canal)+(x.tel||x.email?'':' · aucune coordonnée')+'</div></div><button type="button" class="ob '+(x.sent?'bgh':'bwa')+'" style="min-height:44px" onclick="zxSendOne('+i+')">'+(x.sent?'✅ Envoyé — renvoyer':'📤 Envoyer')+'</button></div>';}).join('')
+    +'<button type="button" class="ob '+(left?'bgh':'bgold')+'" style="width:100%;min-height:46px;margin-top:14px" onclick="zxDone()">'+(left?'Terminer ('+left+' non envoyé'+(left>1?'s':'')+')':'✅ Terminé')+'</button>';
+}
+function zxDone(){var m=document.getElementById('ozoom');if(m)m.remove();var c=ZC;ZX=[];if(c&&!c._team&&c.id)oOpenF(c.id);}
+// Référent : il ne lance pas de visio lui-même, il la DEMANDE à son gestionnaire (au sujet d'un contact, ou directement)
+function oZoomAsk(cid,gestNom){
+  var c=cid?OC.find(function(x){return x.id===cid;}):null,gs=zoomEquipe();
+  if(!gs.length){oT('Aucun gestionnaire n\'est rattaché à votre compte — demandez à l\'administrateur de vous en attribuer un','w');return;}
+  var old=document.getElementById('ozoom');if(old)old.remove();ZC=c;ZX=[];ZQ={d:'',h:''};ZOOM_MODE='now';
+  var m=document.createElement('div');m.id='ozoom';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
+  var nomC=c?((c.prenom||'')+' '+(c.nom||'')).trim():'';
+  m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:520px;max-height:90vh;overflow:auto">'
+    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">🎥 Demander une visio à mon gestionnaire</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'ozoom\').remove()">✕</button></div>'
+    +'<div style="font-size:12px;color:var(--t2);margin:6px 0 10px;line-height:1.5">En tant que référent, vos visios Zoom se font avec votre gestionnaire'+(nomC?' — ici au sujet de <b>'+esc(nomC)+'</b>':'')+'. Il vous enverra le lien de sa salle.</div>'
+    +'<label class="ofl">Gestionnaire</label><select class="ofc" id="za-gest" onchange="zaRefresh()">'+gs.map(function(g){return'<option'+(g.nom===gestNom?' selected':'')+'>'+esc(g.nom)+'</option>';}).join('')+'</select>'
+    +'<div class="av-seg" style="margin-top:10px"><button type="button" id="zoom-m-now" class="on" onclick="zaMode(\'now\')">⚡ Dès que possible</button><button type="button" id="zoom-m-later" onclick="zaMode(\'later\')">📅 Je propose un créneau</button></div>'
+    +'<div id="zoom-later" style="display:none"><div class="ofg2" style="gap:8px;margin-top:8px"><div><label class="ofl">Date</label><input type="date" class="ofc" id="zoom-d" onchange="zaRefresh()"></div><div><label class="ofl">Heure</label><input type="time" class="ofc" id="zoom-h" onchange="zaRefresh()"></div></div></div>'
+    +'<label class="ofl" style="margin-top:10px">Message</label><textarea class="ofc" id="zoom-txt" style="min-height:130px;font-size:13px;line-height:1.5"></textarea>'
+    +'<button type="button" class="ob bwa" style="width:100%;min-height:46px;margin-top:12px" onclick="oZoomAskSend()">📤 Envoyer ma demande</button></div>';
+  document.body.appendChild(m);zaRefresh();
+}
+function zaMode(mode){ZOOM_MODE=mode;document.getElementById('zoom-m-now').classList.toggle('on',mode==='now');document.getElementById('zoom-m-later').classList.toggle('on',mode==='later');document.getElementById('zoom-later').style.display=mode==='later'?'':'none';zaRefresh();}
+function zaRefresh(){var c=ZC,g=val('za-gest'),v=tplVars(c||{},'fr');v.gest=String(g).split(/\s+/)[0];v.contact=c?((c.prenom||'')+' '+(c.nom||'')).trim():'';v.quand=ZOOM_MODE==='now'?'dès que vous êtes disponible':zoomQuand();document.getElementById('zoom-txt').value=renderTpl(tplText('zoom_demande_gest'),v);}
+function oZoomAskSend(){
+  var g=zoomEquipe().find(function(x){return x.nom===val('za-gest');});if(!g)return;var text=val('zoom-txt'),num=String(g.tel||'').replace(/\D/g,'');
+  if(num)sendVia('wa',telE164(g.tel).replace('+',''),text,g.email);else if(g.email)sendVia('mail','',text,g.email);else sendCopy(text,'📋 '+g.nom+' n\'a ni téléphone ni e-mail dans son profil — message copié');
+  var c=ZC;if(c&&c.id){var q=ZOOM_MODE==='now'?'':zoomQuand();jrnAdd(c,'rdv','🎥 Visio Zoom demandée à '+g.nom+' (gestionnaire)'+(q?' — créneau proposé : '+q:''));oPush([c]);}
+  var b=document.getElementById('ozoom');if(b)b.remove();if(c&&c.id)oOpenF(c.id);oT('🎥 Demande de visio envoyée à '+g.nom,'s');
+}
+function oZoomSend(){
+  var c=ZC;if(!c)return;var cid=c.id;
+  var text=val('zoom-txt')||zoomMsg(c),canal=c._team?(c.tel?'wa':'mail'):canalCode(c),num=c._team?telE164(c.tel).replace('+',''):String(c.tel||'').replace(/\D/g,'');
   if((canal==='wa'||canal==='sms'||canal==='signal')&&!num){if(c.email)canal='mail';else{sendCopy(text,'📋 Pas de téléphone ni d\'e-mail : message copié');return;}}
   if(canal==='mail'&&!c.email){if(num)canal='wa';else{sendCopy(text,'📋 Message copié');return;}}
   sendVia(canal,num,text,c.email);
   if(ZOOM_MODE==='now'&&zoomUrl())setTimeout(function(){window.open(zoomUrl(),'_blank');},600);   // le gestionnaire entre dans sa salle avant le client
   var q=zoomQuand();
-  var e=jrnAdd(c,'rdv','🎥 Invitation Zoom envoyée par '+(CANAL_LBL[canal]||canal)+(ZOOM_MODE==='now'?' — visio immédiate (salle ouverte)':(q?' — visio '+q:''))+(USER&&USER.zoomUrl?'':' (Zoom de l\'association)'));
+  if(c._team){ZQ={d:val('zoom-d'),h:val('zoom-h')};if(ZX.length){zxStep2();}else{var b0=document.getElementById('ozoom');if(b0)b0.remove();}oT('🎥 Invitation Zoom envoyée à '+c.prenom,'s');return;}
+  var e=jrnAdd(c,'rdv','🎥 Invitation Zoom envoyée par '+(CANAL_LBL[canal]||canal)+(ZOOM_MODE==='now'?' — visio immédiate (salle ouverte)':(q?' — visio '+q:''))+(USER&&USER.zoomUrl?'':' (Zoom de l\'association)')+(ZX.length?' · avec : '+ZX.map(function(x){return x.nom;}).join(', '):''));
   var d=val('zoom-d'),h=val('zoom-h')||'10:00',ag=d&&document.getElementById('zoom-ag')&&document.getElementById('zoom-ag').checked;
   if(d){c.rdvs=c.rdvs||[];c.rdvs.push({uri:'zoom_'+Date.now(),source:'zoom',nom:'Visio Zoom',start:d+'T'+h+':00',host:PARTNER_NOM(),joinUrl:zoomUrl(),statut:'active',par:PARTNER_NOM()});}
-  oPush([c]);var b=document.getElementById('ozoom');if(b)b.remove();oOpenF(cid);oT('🎥 Invitation Zoom envoyée','s');
+  ZQ={d:d,h:val('zoom-h')};var zxN=ZX.filter(function(x){return x.kind==='team';}).map(function(x){return x.nom;}),zxC=ZX.filter(function(x){return x.kind==='contact';}).map(function(x){return x.cid;});
+  oPush([c]);if(ZX.length){zxStep2();}else{var b=document.getElementById('ozoom');if(b)b.remove();oOpenF(cid);}oT('🎥 Invitation Zoom envoyée','s');
   if(ag){
     if(srvNum()<3024){oT('📆 Agenda Google : script serveur v3.24 requis','w');return;}
-    oPostAsync_({op:'zoomAgenda',contactId:cid,date:d,heure:h,duree:45,url:zoomUrl(),inviterContact:true}).then(function(r){
-      if(r&&r.ok){(r.journal||[]).forEach(function(j){if(!c.journal.some(function(x){return x.id===j.id;}))c.journal.push(j);});oSaveCache();oOpenF(cid);oT('📆 Visio ajoutée à l\'agenda Google'+(r.guests&&r.guests.length?' — invitations : '+r.guests.join(', '):''),'s');}
+    oPostAsync_({op:'zoomAgenda',contactId:cid,date:d,heure:h,duree:45,url:zoomUrl(),inviterContact:true,inviteNoms:zxN,inviteContacts:zxC}).then(function(r){
+      if(r&&r.ok){(r.journal||[]).forEach(function(j){if(!c.journal.some(function(x){return x.id===j.id;}))c.journal.push(j);});oSaveCache();if(!document.getElementById('ozoom'))oOpenF(cid);oT('📆 Visio ajoutée à l\'agenda Google'+(r.guests&&r.guests.length?' — invitations : '+r.guests.join(', '):''),'s');}
       else oT('📆 Agenda : '+((r&&r.error)||'impossible'),'e');
     }).catch(function(){oT('📆 Agenda : hors ligne — réessayez depuis la fiche','w');});
   }
 }
-function oZoomLog(cid,quoi){var c=OC.find(function(x){return x.id===cid;});if(!c)return;jrnAdd(c,'rdv','🎥 Salle Zoom ouverte pour la visio');oPush([c]);}
+function oZoomLog(){var c=ZC;if(!c||c._team||!c.id)return;jrnAdd(c,'rdv','🎥 Salle Zoom ouverte pour la visio');oPush([c]);}
 function rdvUrl(){return(USER&&USER.calendlyUrl)||((CFG.params&&CFG.params.liens&&CFG.params.liens.rdvDecouverte)||'')||RDV_DEFAULT;}
 // ── v3.29 — Notifications push (OneSignal, gratuit) : alertes même app fermée ──
 var PUSH_READY=false,PUSH_LOADING=false;
