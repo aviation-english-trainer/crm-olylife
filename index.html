@@ -1668,6 +1668,8 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
               <div class="ofg1"><label class="ofl">Commande passée sur le Back-Office de…</label><input type="text" class="ofc" id="fo-bo" list="bo-list" placeholder="Rechercher un nom ou EA…" autocomplete="off"><datalist id="bo-list"></datalist></div>
               <div class="ofg1"><label class="ofl">N° pièce d'identité (passeport / CNI)</label><input type="text" class="ofc" id="fl-idcard" placeholder="CJ2F2V566" autocomplete="off"></div>
               <div class="ofg1"><label class="ofl">Date de commande</label><input type="date" class="ofc" id="fl-datecmd"></div>
+              <div class="ofg1"><label class="ofl">💳 Règlement de la commande</label><select class="ofc" id="fl-paymode" onchange="flPayFois()"><option value="">— non renseigné —</option></select></div>
+              <div class="ofg1" id="fl-payfois-box" style="display:none"><label class="ofl">Nombre de fois / mensualités</label><select class="ofc" id="fl-payfois"></select></div>
               <div class="ofg1"><label class="ofl">Transporteur</label><input type="text" class="ofc" id="fl-transp" placeholder="DHL" list="carrier-list">
                 <datalist id="carrier-list"><option value="DHL"><option value="UPS"><option value="FedEx"><option value="Chronopost"><option value="Colissimo / La Poste"><option value="EMS"><option value="By Mail / Autre"></datalist>
               </div>
@@ -2534,7 +2536,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.48 · 15/11';
+var APP_VERSION='v3.48.1 · 15/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -4754,6 +4756,7 @@ function oEdit(id,focus){
   document.getElementById('offttl').textContent='Modifier — '+c.prenom+' '+c.nom;
   document.getElementById('obtn-save').textContent='Enregistrer les modifications';
   document.getElementById('fc-eid').value=id;
+  flPayInit(c.paiement);
   oBuildBoList();
   var map={'fc-nm':c.nom,'fc-pr':c.prenom,'fc-tel':c.tel,'fc-em':c.email,'fc-pays':c.pays,'fc-vil':c.ville,'fc-adr':c.adresse,'fc-cp':c.cp,'fo-rang':c.rangOly,'fo-bo':c.boCompte,'fl-idcard':c.pieceId,'liv-nm':c.livNom,'liv-pr':c.livPrenom,'liv-tel':c.livTel,'liv-em':c.livEmail,'liv-adr':c.livAdresse,'liv-cp':c.livCp,'liv-vil':c.livVille,'liv-pays':c.livPays,'fact-adr':c.factAdresse,'fact-cp':c.factCp,'fact-vil':c.factVille,'fact-pays':c.factPays,'fc-ref':c.refere,'fc-suivi':c.suiviPar,'fc-etape':c.etape,'fc-qualif':c.qualification,'fc-canal':c.canal,'fc-registre':c.registre,'fc-civ':c.civilite,'fc-obj':c.objectifs,'fl-numcmd':c.numCommande,'fl-memberid':c.memberIdOlyLife,'fl-datecmd':c.dateCommande,'fl-transp':c.transporteur,'fl-tracking':c.tracking,'fl-datelivr':c.dateLivraison,'fi-date':c.dateInstall,'fi-recu':c.dateReception,'fi-notes':c.notesUsage,'ft-texte':c.temoignageTexte,'fe-sponsor':c.sponsor,'fe-placement':c.placement,'fe-cote':c.cote,'fe-gen':c.generation,'fe-rang':c.rang,'fc-notes':c.notes};
   Object.keys(map).forEach(function(k){var el=document.getElementById(k);if(!el)return;if(k==='fc-ref'){var refVal=map[k]||'';var found=false;for(var i=0;i<el.options.length;i++){if(el.options[i].value===refVal){el.value=refVal;found=true;break;}}if(!found&&refVal){var opt=document.createElement('option');opt.value=refVal;opt.textContent=refVal;el.insertBefore(opt,el.options[el.options.length-1]);el.value=refVal;}document.getElementById('fc-ref-autre').style.display='none';}else{el.value=map[k]||'';}});
@@ -4776,6 +4779,7 @@ function oEdit(id,focus){
 function oReset(){
   resMarkClear();
   document.getElementById('fc-eid').value='';EID=null;
+  flPayInit(null);
   oBuildBoList();
   ['fc-nm','fc-pr','fc-tel','fc-em','fc-pays','fc-vil','fc-adr','fc-cp','fo-bo','fl-idcard','liv-nm','liv-pr','liv-tel','liv-em','liv-adr','liv-cp','liv-vil','liv-pays','fact-adr','fact-cp','fact-vil','fact-pays','fc-obj','fl-numcmd','fl-memberid','fl-datecmd','fl-transp','fl-tracking','fl-datelivr','fi-date','fi-notes','ft-texte','fe-sponsor','fe-placement','fe-gen','fc-notes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('fc-etape').value='Prospect';document.getElementById('fc-qualif').value='Chaud';document.getElementById('fc-canal').value='WhatsApp';document.getElementById('fc-registre').value='pro';document.getElementById('fc-civ').value='';
@@ -4835,6 +4839,7 @@ function oSave(){
   data.suiviPar=data.suivis.join(', ');if(data.comptes===undefined)delete data.comptes;
   if(!EID)data.createdBy=PARTNER_NOM();
   var prevC=EID?OC.find(function(x){return x.id===EID;}):null;
+  var payNew=flPayRead(prevC&&prevC.paiement),payChg=payNew&&payNew!==(prevC&&prevC.paiement);if(payNew)data.paiement=payNew;
   if(data.emailConsent&&!(prevC&&prevC.emailConsent)){data.emailConsentLe=new Date().toISOString();data.emailConsentSrc='noté par '+(PARTNER_NOM()||'—');}
   if(!data.emailConsent&&prevC&&prevC.emailConsent){data.emailConsentRetire=new Date().toISOString();}
   if(!prevC||prevC.etape!==data.etape){data.statut=ET2ST[data.etape]||(prevC?prevC.statut:undefined);data.statutPar=PARTNER_NOM();data.statutLe=new Date().toISOString();}
@@ -4844,6 +4849,7 @@ function oSave(){
   var eid=document.getElementById('fc-eid').value;
   if(eid){var idx=OC.findIndex(function(x){return x.id===eid;});if(idx>=0){OC[idx]=Object.assign({},OC[idx],data);saved=OC[idx];oT(data.prenom+' '+data.nom+' mis à jour !','s');}}
   else{saved=Object.assign({id:'c_'+Date.now(),createdAt:new Date().toISOString().split('T')[0],actions:{}},data);OC.unshift(saved);oT('Fiche de '+data.prenom+' '+data.nom+' créée !','s');}
+  if(saved&&payChg)jrnAdd(saved,'systeme','💳 Règlement de la commande : '+payLbl(saved.paiement));
   if(saved&&data.emailConsent&&!(prevC&&prevC.emailConsent))jrnAdd(saved,'systeme','📧 Consentement e-mail noté ('+data.emailConsentSrc+')');
   if(saved&&!data.emailConsent&&prevC&&prevC.emailConsent){jrnAdd(saved,'systeme','📧 Consentement e-mail retiré');if(saved.campagne&&saved.campagne.parcours&&saved.campagne.parcours!=='stop')campSync(saved,'stop','consentement retiré');}
   if(saved)oPush([saved]);
@@ -7397,6 +7403,23 @@ function payRow(c){
     +'<button class="ob bgh bsm" onclick="oPayOpen(\''+cid+'\''+ckArg(c)+')">'+(p?'✏️ Modifier':'💳 Renseigner')+'</button></div></div>';
 }
 var PAY_ED={mode:'',fois:1};
+// v3.48.1 — le règlement se saisit aussi dans le formulaire (nouveau contact / modifier), rubrique « Commande & logistique »
+function flPayInit(p){
+  var sel=document.getElementById('fl-paymode');if(!sel)return;
+  if(sel.options.length<2)PAY_MODES.forEach(function(m){var o=document.createElement('option');o.value=m.k;o.textContent=m.ic+' '+m.l+(m.s?' — '+m.s:'');sel.appendChild(o);});
+  sel.value=(p&&p.mode)||'';flPayFois(p&&p.fois);
+}
+function flPayFois(cur){
+  var m=payMode(val('fl-paymode')),box=document.getElementById('fl-payfois-box'),sel=document.getElementById('fl-payfois');if(!box||!sel)return;
+  if(!m||m.fois.length<2){box.style.display='none';sel.innerHTML='';return;}
+  var l=m.fois.slice();cur=+cur||0;if(cur&&l.indexOf(cur)<0)l.push(cur);
+  sel.innerHTML=l.map(function(n){return'<option value="'+n+'">'+esc(payFoisLbl(m.k,n))+'</option>';}).join('');sel.value=String(cur||m.def||m.fois[0]);box.style.display='';
+}
+function flPayRead(prev){   // rien de choisi → on garde ce qui existait ; inchangé → on garde l'auteur et la date d'origine
+  var mode=val('fl-paymode');if(!mode)return prev||undefined;var m=payMode(mode),fois=m&&m.fois.length>1?(+val('fl-payfois')||m.def||1):1;
+  if(prev&&prev.mode===mode&&(+prev.fois||1)===fois)return prev;
+  return{mode:mode,fois:fois,note:(prev&&prev.note)||'',par:PARTNER_NOM(),le:todayYMD()};
+}
 function oPayOpen(cid,ck){
   var c0=OC.find(function(x){return x.id===cid;});if(!c0)return;var c=ordView(c0,ck),p=c.paiement&&c.paiement.mode?c.paiement:(paySouhaite(c)||{mode:'',fois:1});
   PAY_ED={mode:p.mode||'',fois:+p.fois||1,cid:cid,ck:ck||'',note:p.note||''};
