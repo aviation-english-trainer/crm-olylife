@@ -2534,7 +2534,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.46 · 14/11';
+var APP_VERSION='v3.48 · 15/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -7371,6 +7371,59 @@ function oTemConsent(){
 }
 
 // ── Fiche : bloc Logistique (messages automatisés) ────────────────
+// ═══ v3.48 — RÈGLEMENT DE LA COMMANDE : comment la personne a payé sur le back-office OlyLife (mode + nombre de fois). Aucune donnée bancaire. ═══
+// Les modes reprennent la liste du BO OlyLife (EC, carte, EC + carte, Binance, EC + Binance, PayPal) + Klarna, proposé sur la page de paiement par carte.
+var PAY_MODES=[
+  {k:'cb',ic:'💳',l:'Carte bancaire',s:'en une fois',fois:[1]},
+  {k:'klarna',ic:'🩷',l:'Klarna',s:'en plusieurs fois, depuis le paiement par carte',fois:[4,3,6,12,18,24,1],def:4},
+  {k:'paypal',ic:'🅿️',l:'PayPal',s:'en une ou plusieurs fois selon le pays',fois:[1,3,4,6,12,24],def:1},
+  {k:'ec',ic:'👛',l:'EC — crédits du portefeuille',s:'e-wallet OlyLife',fois:[1]},
+  {k:'ec_cb',ic:'👛',l:'EC + carte bancaire',s:'une partie en crédits, le reste par carte',fois:[1]},
+  {k:'binance',ic:'🟡',l:'Binance',s:'',fois:[1]},
+  {k:'ec_binance',ic:'👛',l:'EC + Binance',s:'',fois:[1]}
+];
+function payMode(k){return PAY_MODES.find(function(m){return m.k===k;})||null;}
+function payFoisLbl(mode,n){n=+n||1;if(n===1)return mode==='klarna'?'en une fois (Pay now)':'en une fois';if(mode==='klarna'&&n===4)return'4 fois sans frais';if(mode==='paypal'&&n<=4)return n+' fois';return n+' mensualités';}
+function payLbl(p){if(!p||!p.mode)return'';var m=payMode(p.mode);if(!m)return'';return m.l+((m.fois.length>1||+p.fois>1||p.mode==='cb')?' · '+payFoisLbl(p.mode,p.fois):'');}
+function paySouhaite(c){   // mode choisi par la personne sur une proposition acceptée (à confirmer par le gestionnaire)
+  if(c._ck)return null;var o=(c.offres||[]).filter(function(x){return x.paiement&&x.paiement.mode;}).sort(function(a,b){return String(b.acceptLe||b.le||'').localeCompare(String(a.acceptLe||a.le||''));})[0];if(!o)return null;
+  var q=o.paiement;return q.mode==='mensuel'?{mode:'klarna',fois:+q.mois||12}:q.mode==='x4'?{mode:'klarna',fois:4}:q.mode==='paypal'?{mode:'paypal',fois:1}:{mode:'cb',fois:1};
+}
+function payRow(c){
+  var p=c.paiement&&c.paiement.mode?c.paiement:null,w=!p?paySouhaite(c):null,cid=(c._real||c).id;
+  return'<div class="'+accCls(!!p)+'"><span class="em">💳</span><div class="b">Règlement de la commande'+stChip(!!p,p?p.par:'',p?p.le:'',p?payLbl(p):'','Règlement à renseigner')
+    +'<small>'+(p?(p.note?esc(p.note):'Mode utilisé sur le back-office OlyLife'):(w?'Souhaité sur la proposition : <b>'+esc(payLbl(w))+'</b> — à confirmer une fois la commande payée':'Carte, crédits EC, Klarna ou PayPal en plusieurs fois… avec le nombre de mensualités'))+'</small></div><div class="acts">'
+    +(!p&&w?'<button class="ob bdone bsm" onclick="oPaySet(\''+cid+'\',\''+w.mode+'\','+w.fois+',\'\''+ckArg(c)+')">✅ Confirmer</button>':'')
+    +'<button class="ob bgh bsm" onclick="oPayOpen(\''+cid+'\''+ckArg(c)+')">'+(p?'✏️ Modifier':'💳 Renseigner')+'</button></div></div>';
+}
+var PAY_ED={mode:'',fois:1};
+function oPayOpen(cid,ck){
+  var c0=OC.find(function(x){return x.id===cid;});if(!c0)return;var c=ordView(c0,ck),p=c.paiement&&c.paiement.mode?c.paiement:(paySouhaite(c)||{mode:'',fois:1});
+  PAY_ED={mode:p.mode||'',fois:+p.fois||1,cid:cid,ck:ck||'',note:p.note||''};
+  var old=document.getElementById('opay');if(old)old.remove();
+  var m=document.createElement('div');m.id='opay';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center';m.onclick=function(e){if(e.target===m)m.remove();};
+  m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:520px;max-height:92vh;overflow:auto"><div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">💳 Règlement de la commande</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'opay\').remove()">✕</button></div>'
+    +'<div style="font-size:12px;color:var(--t2);margin:6px 0 10px;line-height:1.5">'+esc(((c0.prenom||'')+' '+(c0.nom||'')).trim())+(c.numCommande?' · commande n° '+esc(c.numCommande):'')+(c._ck?' · '+esc(c.cpt||''):'')+'. Indiquez comment la personne a payé sur le back-office OlyLife. On ne note que le mode et le nombre de fois — jamais de numéro de carte ni de compte.</div>'
+    +'<div id="pay-modes" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>'
+    +'<div id="pay-fois-box" style="margin-top:12px"></div>'
+    +'<label class="ofl" style="margin-top:12px">Remarque (facultatif)</label><input class="ofc" id="pay-note" maxlength="120" placeholder="Ex. : 300 EC + le reste par carte" value="'+esc(PAY_ED.note)+'">'
+    +'<div style="display:flex;gap:8px;margin-top:14px"><button type="button" class="ob bgold" style="flex:1;min-height:46px" onclick="oPaySave()">💾 Enregistrer</button>'+(c.paiement&&c.paiement.mode?'<button type="button" class="ob bgh" style="min-height:46px" onclick="oPaySet(PAY_ED.cid,\'\',0,\'\',PAY_ED.ck)">Effacer</button>':'')+'</div></div>';
+  document.body.appendChild(m);payEdRender();
+}
+function payEdRender(){
+  var g=document.getElementById('pay-modes');if(!g)return;
+  g.innerHTML=PAY_MODES.map(function(m){var on=PAY_ED.mode===m.k;return'<button type="button" onclick="payEdMode(\''+m.k+'\')" style="text-align:left;border-radius:12px;padding:10px 12px;min-height:58px;cursor:pointer;font:inherit;border:1.5px solid '+(on?'#126A3C':'var(--bd)')+';background:'+(on?'#EAF4EC':'#fff')+'"><b style="font-size:13.5px;color:var(--tx)">'+m.ic+' '+esc(m.l)+'</b>'+(m.s?'<small style="display:block;font-size:11px;color:var(--t3);margin-top:2px;line-height:1.3">'+esc(m.s)+'</small>':'')+'</button>';}).join('');
+  var m=payMode(PAY_ED.mode),b=document.getElementById('pay-fois-box');
+  b.innerHTML=m&&m.fois.length>1?'<label class="ofl">Nombre de fois</label><div style="display:flex;flex-wrap:wrap;gap:6px">'+m.fois.map(function(n){return'<button type="button" class="ob bsm '+(PAY_ED.fois===n?'bgr':'bgh')+'" onclick="PAY_ED.fois='+n+';payEdRender()">'+esc(payFoisLbl(m.k,n))+'</button>';}).join('')+'</div><div style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12.5px;color:var(--t2)">Autre nombre de mensualités : <input type="number" min="1" max="60" class="ofc" style="width:84px;min-height:38px" value="'+PAY_ED.fois+'" onchange="PAY_ED.fois=Math.max(1,Math.min(60,+this.value||1));payEdRender()"></div>':'';
+}
+function payEdMode(k){var m=payMode(k);if(!m)return;PAY_ED.mode=k;if(m.fois.indexOf(PAY_ED.fois)<0||m.fois.length===1)PAY_ED.fois=m.def||m.fois[0];payEdRender();}
+function oPaySave(){if(!PAY_ED.mode){oT('Choisissez un mode de règlement','e');return;}oPaySet(PAY_ED.cid,PAY_ED.mode,PAY_ED.fois,(val('pay-note')||'').trim(),PAY_ED.ck);}
+function oPaySet(cid,mode,fois,note,ck){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;var k=ck?compteByKey(c,ck):null,o=k&&k.key!=='main'?k.o:c;
+  if(!mode){delete o.paiement;jrnAdd(c,'note','💳 Règlement de la commande effacé'+(k&&k.key!=='main'?' ('+k.lbl+')':''));}
+  else{o.paiement={mode:mode,fois:Math.max(1,+fois||1),note:String(note||'').slice(0,120),par:PARTNER_NOM(),le:todayYMD()};jrnAdd(c,'fait','💳 Règlement de la commande : '+payLbl(o.paiement)+(o.paiement.note?' — '+o.paiement.note:'')+(k&&k.key!=='main'?' ('+k.lbl+')':''));}
+  oPush([c]);var m=document.getElementById('opay');if(m)m.remove();oOpenF(cid);if(mode)oT('💳 Règlement enregistré : '+payLbl(o.paiement),'s');
+}
 function logiHtml(c){
   if(!c.numCommande||!can('factures'))return'';
   var base=c.dateCommande||c.createdAt,age=base?-diffD(base):null;
@@ -7379,6 +7432,7 @@ function logiHtml(c){
   var mailSubj='Suivi commande OlyLife n°'+(c.numCommande||'');
   var mailBody='Bonjour,\n\nMerci de me communiquer le statut d\'expédition de la commande n°'+(c.numCommande||'')+' (Member ID '+(c.memberIdOlyLife||'')+').\n\nCordialement,\n'+(PARTNER_NOM()||'');
   var rows='<div class="acc-row"><span class="em">📦</span><div class="b">Commande n° '+esc(c.numCommande)+' '+st+'<small>'+(c.dateCommande?'commandée le '+fD(c.dateCommande):'date de commande non renseignée')+(trkClean(c.tracking)?' · tracking : '+esc(trkClean(c.tracking)):'')+(c.dateLivraison?' · livrée le '+fD(c.dateLivraison):'')+'</small>'+livHtml(c)+'</div></div>';
+  rows+=payRow(c);
   var aL=(c.actions||{}).logistique,aT=(c.actions||{}).trackingEnvoye,dL=!!(aL&&aL.done),dT=!!(aT&&aT.done);
   rows+='<div class="'+accCls(dL||dT)+'"><span class="em">💬</span><div class="b">Messages client (pré-rédigés, à envoyer sur WhatsApp)'+stChip(dL,dL?aL.par:'',dL?aL.doneAt:'','Rassurance envoyée','Rassurance à envoyer')+(trkClean(c.tracking)?stChip(dT,dT?aT.par:'',dT?aT.doneAt:'','Tracking transmis','Tracking à transmettre'):'')+'</div><div class="acts">'
     +(c.tel&&!trkClean(c.tracking)?'<a class="ob bwa bsm" href="'+mkWA(c.tel,msgLogRetard(c,'fr'))+'" target="_blank" rel="noopener" onclick="oDone(\''+c.id+'\',\'logistique\''+ckArg(c)+')">⏳ Rassurer (délai)</a>':'')
@@ -7402,7 +7456,7 @@ function comptesDe(c){
 }
 function compteByKey(c,key){return comptesDe(c).find(function(x){return x.key===key;})||null;}
 // v3.35 — « vue commande » d'un compte secondaire : les champs de commande viennent du compte, l'identité de la fiche
-var ORD_FIELDS=['memberIdOlyLife','numCommande','dateCommande','transporteur','tracking','dateLivraison','dateReception','dateInstall','installConfirm','produits','livraisons','rangOly','sponsor','placement','cote'];
+var ORD_FIELDS=['memberIdOlyLife','numCommande','dateCommande','transporteur','tracking','dateLivraison','dateReception','dateInstall','installConfirm','produits','livraisons','rangOly','sponsor','placement','cote','paiement'];
 function ordView(c,ck){
   if(!c||!ck||ck==='main')return c;var k=compteByKey(c,ck);if(!k||k.key==='main')return c;var o=k.o;
   var v=Object.create(c);ORD_FIELDS.forEach(function(f){v[f]=o[f]!==undefined?o[f]:(f==='produits'||f==='livraisons'?[]:'');});
