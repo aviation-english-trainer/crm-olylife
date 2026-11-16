@@ -2475,8 +2475,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <div class="lock-hello" id="olock-hello">Bonjour</div>
     <div id="olock-sub">Saisissez votre code PIN</div>
     <div class="lock-bioz" id="olock-bioz">
-      <button type="button" class="lock-bio" id="olock-bio" onclick="oBioUnlock(true)" aria-label="Déverrouiller avec l'empreinte ou le schéma du téléphone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg></button>
-      <div class="lock-biolbl">Touchez pour déverrouiller</div>
+      <button type="button" class="lock-bio" id="olock-bio" onclick="oBioUnlock(true)" aria-label="Appuyer sur le lecteur d'empreinte digital"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg></button>
       <button type="button" class="lock-alt" id="olock-topin" onclick="oLockPad(true)">Utiliser mon code PIN</button>
     </div>
     <div class="lock-pinz">
@@ -2487,7 +2486,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
         <button onclick="oPinKey('7')">7</button><button onclick="oPinKey('8')">8</button><button onclick="oPinKey('9')">9</button>
         <button class="k-x" onclick="oPinKey('⌫')" aria-label="Effacer">⌫</button><button onclick="oPinKey('0')">0</button><button class="k-ok" onclick="oPinKey('OK')">OK</button>
       </div>
-      <button type="button" class="lock-alt" id="olock-tobio" style="display:none" onclick="oLockPad(false);oBioUnlock(true)">Utiliser l'empreinte ou le schéma</button>
+      <button type="button" class="lock-alt" id="olock-tobio" style="display:none" onclick="oLockPad(false);oBioUnlock(true)">Utiliser l'empreinte digitale</button>
     </div>
     <button class="lock-link" onclick="oPinForgot()">Me reconnecter avec mon code d'accès</button>
   </div>
@@ -2537,7 +2536,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.52 · 16/11';
+var APP_VERSION='v3.53 · 16/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -7687,10 +7686,11 @@ function suiviTxt(c){
 // ── Fiche : autres comptes OlyLife ──
 function comptesHtml(c){
   var K=c.comptes||[];if(!K.length)return'';
+  var can=canEditContact(c),vide=cptPrincipalVide(c);
   var rows=K.map(function(k,i){
     var u=trackingUrl(k.transporteur,k.tracking);
     var li=function(l,v){return v?'<div class="od-row"><span class="od-lbl">'+l+'</span><span class="od-val">'+v+'</span></div>':'';};
-    return'<div style="padding:8px 16px 4px;font-weight:700;color:var(--tx)">🆔 '+esc(k.memberIdOlyLife||'ID non renseigné')+' <span style="font-weight:400;color:var(--t3)">· '+(i+2)+'ᵉ compte</span></div>'
+    return'<div style="padding:8px 16px 4px;font-weight:700;color:var(--tx)">🆔 '+esc(k.memberIdOlyLife||'ID non renseigné')+' <span style="font-weight:400;color:var(--t3)">· '+(i+2)+'ᵉ compte</span>'+(can?' <button type="button" class="ob bgh bsm" style="margin-left:6px" onclick="oCptFusion(\''+c.id+'\','+i+')" title="Ce n\'est pas un 2e compte : verser ses informations dans le compte principal et le retirer">⬆️ Un seul compte</button>':'')+'</div>'
       +li('Appareil',esc((k.produits||[]).join(', ')))
       +li('N° commande',esc(k.numCommande||'')+(k.dateCommande?' · '+fD(k.dateCommande):''))
       +li('Livraison',(k.tracking?esc(k.transporteur||'')+' '+(u?'<a href="'+u+'" target="_blank" rel="noopener" style="color:var(--aqua)">'+esc(k.tracking)+' ↗</a>':esc(k.tracking)):'')+(k.dateLivraison?' · '+fD(k.dateLivraison):''))
@@ -7699,7 +7699,38 @@ function comptesHtml(c){
       +li('Suivi',k.installConfirm?'✅ installé':k.dateReception?'📦 reçu le '+fD(k.dateReception):k.tracking?'🚚 expédié':k.numCommande?'⏳ en préparation':'')
       +li('Notes',esc(k.notes||''));
   }).join('');
-  return odSec('🧬 Autres comptes OlyLife ('+K.length+') — même personne',rows,true);
+  var al=(can&&vide)?'<div style="margin:8px 16px 6px;padding:10px 12px;border-radius:12px;background:#FFF6E5;border:1px solid #F0D9A8;font-size:12.5px;line-height:1.6;color:#6B5320">⚠️ Le compte principal de cette fiche est <b>vide</b> : aucun n° de distributeur, aucune commande. C\'est donc très probablement un <b>seul et même compte</b>, mal rangé à l\'import.<br>Touchez <b>⬆️ Un seul compte</b> ci-dessous pour tout ramener sur le compte principal.</div>':'';
+  return odSec('🧬 '+(vide?'Compte OlyLife à regrouper':'Autres comptes OlyLife')+' ('+K.length+') — même personne',al+rows,vide||false);
+}
+// v3.53 — le compte principal de la fiche n'a rien : ni n° de distributeur, ni commande, ni suivi, ni appareil
+function cptPrincipalVide(c){
+  return !String(c.memberIdOlyLife||'').trim()&&!String(c.numCommande||'').trim()&&!String(c.tracking||'').trim()&&!((c.produits||[]).length);
+}
+// v3.53 — verser un « autre compte » dans le compte principal, directement depuis la fiche (sans passer par Modifier)
+var CPT_MLBL={memberIdOlyLife:'n° de distributeur',numCommande:'n° de commande',dateCommande:'date de commande',transporteur:'transporteur',tracking:'n° de suivi',dateLivraison:'date de livraison',dateReception:'date de réception',dateInstall:'date d\'installation',installConfirm:'installation confirmée',produits:'appareil(s)',livraisons:'colis',rangOly:'rang',sponsor:'parrain',placement:'placement',cote:'côté binaire',paiement:'règlement',notes:'notes'};
+function oCptFusion(cid,i){
+  var c=OC.find(function(x){return x.id===cid;});if(!c||!canEditContact(c))return;
+  var k=(c.comptes||[])[i];if(!k){oT('Compte introuvable','e');return;}
+  var chg=[];
+  Object.keys(CPT_MLBL).forEach(function(f){
+    var kv=k[f];if(kv==null||kv===''||kv===false||(Array.isArray(kv)&&!kv.length))return;
+    if(Array.isArray(kv)){var cur=c[f]||[],add=kv.filter(function(x){return cur.indexOf(x)<0;});if(add.length)chg.push('• '+CPT_MLBL[f]+' : + '+(f==='produits'?add.join(', '):add.length+' ligne(s)'));return;}
+    if(f==='installConfirm'){if(!c[f])chg.push('• installation confirmée');return;}
+    var cv=String(c[f]||'').trim(),nv=String(kv).trim();
+    if(!cv)chg.push('• '+CPT_MLBL[f]+' : '+nv);else if(cv!==nv)chg.push('• '+CPT_MLBL[f]+' : '+cv+' → '+nv);
+  });
+  if(!confirm('Un seul compte pour '+((c.prenom||'')+' '+(c.nom||'')).trim()+' ?\n\nCe bloc ('+(k.memberIdOlyLife||'sans ID')+') est versé dans le compte principal :\n\n'+(chg.length?chg.join('\n'):'(rien de nouveau à reprendre)')+'\n\nLes étapes déjà faites et les messages envoyés sont conservés.'))return;
+  Object.keys(CPT_MLBL).forEach(function(f){
+    var kv=k[f];if(kv==null||kv===''||kv===false||(Array.isArray(kv)&&!kv.length))return;
+    if(Array.isArray(kv)){c[f]=(c[f]||[]).slice();kv.forEach(function(x){if(c[f].indexOf(x)<0)c[f].push(x);});return;}
+    if(f==='installConfirm'){c[f]=true;return;}
+    c[f]=kv;
+  });
+  c.actions=c.actions||{};
+  Object.keys(k.actions||{}).forEach(function(a){if(!c.actions[a]||!c.actions[a].done)c.actions[a]=k.actions[a];});
+  c.comptes.splice(i,1);if(!c.comptes.length)delete c.comptes;
+  jrnAdd(c,'systeme','🧬 Comptes regroupés : '+(k.memberIdOlyLife||'bloc sans ID')+' versé dans le compte principal');
+  oPush([c]);oOpenF(cid);oT('⬆️ Un seul compte — fiche regroupée','s');
 }
 
 // ── Fiche : factures & accès au compte OlyLife ──
@@ -9307,12 +9338,12 @@ var PIN_BUF='',PIN_MODE='check',PIN_TMP='',PIN_HIDDEN_AT=0;
 function pinHash(p){var h=5381;for(var i=0;i<p.length;i++)h=((h<<5)+h+p.charCodeAt(i))|0;return'p'+(h>>>0).toString(36)+'_'+p.length;}
 function pinStored(){try{return localStorage.getItem('owlht2_pin')||'';}catch(e){return'';}}
 function lockHello(){var h=new Date().getHours(),n='';try{n=String((USER&&USER.nom)||'').trim().split(/\s+/)[0]||'';}catch(e){}return(h>=18||h<5?'Bonsoir':'Bonjour')+(n?' '+n:'');}
-function oLockPad(on){var L=document.getElementById('olock');L.classList.toggle('show-pad',!!on);if(PIN_MODE==='check')oPinRender(on?'Saisissez votre code PIN':'Empreinte, visage ou schéma du téléphone');}
+function oLockPad(on){var L=document.getElementById('olock');L.classList.toggle('show-pad',!!on);if(PIN_MODE==='check')oPinRender(on?'Saisissez votre code PIN':'Appuyer sur le lecteur d\'empreinte digital');}
 function lockOpen(){var L=document.getElementById('olock');PIN_BUF='';L.classList.add('ok');setTimeout(function(){L.classList.add('out');},180);setTimeout(function(){L.classList.remove('on','out','ok');},650);}
 function oPinGate(){var bio=bioStored()&&bioAvail(),pin=pinStored();if(!bio&&!pin)return;var L=document.getElementById('olock');if(L.classList.contains('on')&&PIN_MODE==='check')return;PIN_MODE='check';PIN_BUF='';
   document.getElementById('olock-hello').textContent=lockHello();
   document.getElementById('olock-bioz').style.display=bio?'':'none';document.getElementById('olock-topin').style.display=pin?'':'none';document.getElementById('olock-tobio').style.display=bio?'':'none';
-  L.classList.remove('out','ok');L.classList.toggle('show-pad',!bio);oPinRender(bio?'Empreinte, visage ou schéma du téléphone':'Saisissez votre code PIN');L.classList.add('on');if(bio)setTimeout(function(){oBioUnlock(false);},350);}
+  L.classList.remove('out','ok');L.classList.toggle('show-pad',!bio);oPinRender(bio?'Appuyer sur le lecteur d\'empreinte digital':'Saisissez votre code PIN');L.classList.add('on');if(bio)setTimeout(function(){oBioUnlock(false);},350);}
 // v3.42 — déverrouillage par l'appareil : empreinte, visage, schéma ou code du téléphone (WebAuthn « authentificateur de plateforme »)
 function bioStored(){try{return localStorage.getItem('owlht2_bio')||'';}catch(e){return'';}}
 function b64u(buf){var b=new Uint8Array(buf),t='';for(var i=0;i<b.length;i++)t+=String.fromCharCode(b[i]);return btoa(t).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
@@ -9332,7 +9363,7 @@ function oBioUnlock(manual){
   var id=bioStored();if(!id||BIO_BUSY||!bioAvail())return;BIO_BUSY=true;var bb=document.getElementById('olock-bio');if(bb)bb.classList.add('busy');
   navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:ub64(id),transports:['internal']}],userVerification:'required',timeout:60000}})
     .then(function(a){BIO_BUSY=false;if(bb)bb.classList.remove('busy');if(a)lockOpen();})
-    .catch(function(){BIO_BUSY=false;if(bb)bb.classList.remove('busy');var L=document.getElementById('olock');if(L.classList.contains('on')&&!L.classList.contains('show-pad')){if(manual)oPinRender('Non reconnu — touchez l\'empreinte pour réessayer');}});
+    .catch(function(){BIO_BUSY=false;if(bb)bb.classList.remove('busy');var L=document.getElementById('olock');if(L.classList.contains('on')&&!L.classList.contains('show-pad')){if(manual)oPinRender('Non reconnu — appuyer sur le lecteur d\'empreinte digital');}});
 }
 function oPinRender(sub){document.getElementById('olock-sub').textContent=sub;var d=document.getElementById('olock-dots');d.innerHTML='';for(var i=0;i<Math.max(4,PIN_BUF.length);i++)d.innerHTML+='<i class="'+(i<PIN_BUF.length?'on':'')+'"></i>';}
 function oPinKey(k){
