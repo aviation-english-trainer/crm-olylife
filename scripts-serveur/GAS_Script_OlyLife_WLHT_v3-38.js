@@ -297,7 +297,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.37';
+var SRV_VERSION = '3.38';
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
@@ -347,13 +347,13 @@ function payload_(db, user) {
   if (user.role !== 'admin') contacts = contacts.map(function (c) { if (!c.pieceId) return c; var cc = {}; for (var k in c) cc[k] = c[k]; cc.pieceId = maskId_(c.pieceId); return cc; });
   var res = {
     ok: true,
-    user: { id: user.id, nom: user.nom, role: user.role, tags: user.tags || [], tel: user.tel || '', email: user.email || '', photo: user.photo || '', digestEmail: user.digestEmail || '', digestHeure: user.digestHeure || '', calendlyUrl: user.calendlyUrl || '', scope: user.scope === 'tout' ? 'tout' : 'equipes', comite: !!user.comite, voitComite: !!user.voitComite, pubToken: pubTokenOf_(db, user), superAdmin: !!user.superAdmin, push: user.push !== false, zoomUrl: user.zoomUrl || '', memberId: user.memberId || '', rang: user.rang || '' },
+    user: { id: user.id, nom: user.nom, role: user.role, tags: user.tags || [], tel: user.tel || '', email: user.email || '', photo: user.photo || '', digestEmail: user.digestEmail || '', digestHeure: user.digestHeure || '', calendlyUrl: user.calendlyUrl || '', scope: user.scope === 'tout' ? 'tout' : 'equipes', comite: !!user.comite, voitComite: !!user.voitComite, pubToken: pubTokenOf_(db, user), superAdmin: !!user.superAdmin, push: user.push !== false, zoomUrl: user.zoomUrl || '', memberId: user.memberId || '', rang: user.rang || '', nomPublic: nomPublicDe_(user), gestDefaut: user.gestDefaut || (user.gests || [])[0] || '', gests: user.gests || [] },
     contacts: contacts,
     config: { srv: SRV_VERSION, referents: referentsFor_(db, user), suiveurs: suiveursFor_(db, user), stocks: db.config.stocks || [], ressources: db.config.ressources || {}, equipe: equipe_(db, user), sessionJours: SESSION_JOURS, params: db.config.params || {}, essais: essaisPublics_(db), annonce: annonceActive_(db), leadsNew: leadsFor_(db, user).filter(function (l) { return l.statut !== 'traite'; }).length }
   };
   if (user.role === 'admin') {
     res.users = (db.users || []).map(function (u) {
-      return { id: u.id, nom: u.nom, role: u.role, tags: u.tags || [], code: u.code, actif: u.actif !== false, tel: u.tel || '', email: u.email || '', photo: u.photo || '', digestEmail: u.digestEmail || '', digestHeure: u.digestHeure || '', calendlyUrl: u.calendlyUrl || '', pending: !!u.pending, proposePar: u.proposePar || '', scope: u.scope === 'tout' ? 'tout' : 'equipes', comite: !!u.comite, voitComite: !!u.voitComite, gests: u.gests || [], sessions: (db.sessions || []).filter(function (s) { return s.userId === u.id; }).length };
+      return { id: u.id, nom: u.nom, role: u.role, tags: u.tags || [], code: u.code, actif: u.actif !== false, tel: u.tel || '', email: u.email || '', photo: u.photo || '', digestEmail: u.digestEmail || '', digestHeure: u.digestHeure || '', calendlyUrl: u.calendlyUrl || '', pending: !!u.pending, proposePar: u.proposePar || '', scope: u.scope === 'tout' ? 'tout' : 'equipes', comite: !!u.comite, voitComite: !!u.voitComite, gests: u.gests || [], nomPublic: nomPublicDe_(u), gestDefaut: u.gestDefaut || '', sessions: (db.sessions || []).filter(function (s) { return s.userId === u.id; }).length };
     });
   } else if (user.role === 'gestionnaire') {
     // Vue équipe en lecture : pas de codes d'accès, pas d'emails — v3.14 : lui-même et ses référents seulement (sauf périmètre « tout »)
@@ -596,9 +596,13 @@ function offreUser_(db, o) {
 }
 // v3.37 — ÉMETTEUR AFFICHÉ : un membre du comité scientifique peut préparer une proposition, mais il n'apparaît jamais comme émetteur.
 // À sa place : son référent (le gestionnaire auquel il est rattaché), sinon le gestionnaire qui suit la fiche, sinon l'administrateur.
+// v3.38 — l'administrateur décide, personne par personne, si le nom du membre du comité peut apparaître (Administration → Utilisateurs).
+// Par défaut : visible pour un gestionnaire ou un admin qui y siège aussi, masqué pour un membre du comité seul (médecin, vétérinaire…).
+function nomPublicDe_(u) { if (!u) return true; if (u.nomPublic === true) return true; if (u.nomPublic === false) return false; return u.role !== 'comite'; }
 function offreAff_(db, u, c) {
-  if (!estComite_(u) || u.role === 'gestionnaire' || u.role === 'admin' || u.id === 'root') return u;   // un gestionnaire ou un admin qui siège aussi au comité reste émetteur sous son nom
+  if (!estComite_(u) || u.role === 'admin' || u.id === 'root' || nomPublicDe_(u)) return u;
   var gs = []; try { gs = gestsOfUser_(db, u); } catch (e) {}
+  if (u.gestDefaut) { for (var d = 0; d < gs.length; d++) if (gs[d].nom === u.gestDefaut) return gs[d]; }   // gestionnaire désigné par défaut
   if (gs.length) return gs[0];
   try { var sv = suivis_(c || {}); for (var i = 0; i < sv.length; i++) for (var k = 0; k < db.users.length; k++) { var x = db.users[k]; if (x.nom === sv[i] && !estComite_(x) && x.actif !== false && (x.role === 'gestionnaire' || x.role === 'admin')) return x; } } catch (e2) {}
   return findUser_(db, ADMIN_CODE) || { nom: ADMIN_NOM };
@@ -608,15 +612,18 @@ function payTxt_(p, T) {
   var n2 = function (x) { return (Math.round((+x || 0) * 100) / 100).toFixed(2).replace('.', ','); };
   if (p.mode === 'mensuel') return p.mois + ' mensualités de ' + n2(p.mensualite) + ' USD (Klarna, ' + n2(p.apr || 13.99) + ' % APR estimé, total ' + n2(p.total) + ' USD)';
   if (p.mode === 'x4') return '4 × ' + n2(T / 4) + ' USD toutes les deux semaines, sans frais (Klarna)';
-  if (p.mode === 'paypal') return 'PayPal (en une fois)';
+  // v3.38 — PayPal peut aussi être choisi en plusieurs fois (formule proposée par PayPal selon le pays)
+  if (p.mode === 'paypal') { var n = parseInt(p.mois, 10) || 1; return n > 1 ? 'PayPal · ' + n + ' fois (≈ ' + n2(T / n) + ' USD par versement' + (n <= 4 ? ', sans frais selon le pays' : ', hors intérêts PayPal') + ')' : 'PayPal (en une fois)'; }
   return 'Paiement en une fois (carte)';
 }
 function payClean_(p, total) {
   if (!p || typeof p !== 'object') return null;
   var mode = String(p.mode || ''); if (['une_fois', 'paypal', 'x4', 'mensuel'].indexOf(mode) < 0) return null;
-  var mois = parseInt(p.mois, 10) || 0; if (mode === 'mensuel' && [3, 6, 12, 18, 24].indexOf(mois) < 0) return null;
+  var mois = parseInt(p.mois, 10) || 0;
+  if (mode === 'mensuel' && [3, 6, 12, 18, 24].indexOf(mois) < 0) return null;
+  if (mode === 'paypal') { if (!mois) mois = 1; if ([1, 3, 4, 6, 12, 24].indexOf(mois) < 0) return null; }
   var apr = Math.max(0, Math.min(35.99, +p.apr || 0)), r = apr / 100 / 12, m = mode === 'mensuel' ? (r ? total * r / (1 - Math.pow(1 + r, -mois)) : total / mois) : 0;
-  return { mode: mode, mois: mode === 'mensuel' ? mois : 0, mensualite: Math.round(m * 100) / 100, total: mode === 'mensuel' ? Math.round(m * mois * 100) / 100 : total, apr: mode === 'mensuel' ? apr : 0, le: now_() };
+  return { mode: mode, mois: mode === 'mensuel' || mode === 'paypal' ? mois : 0, mensualite: Math.round(m * 100) / 100, total: mode === 'mensuel' ? Math.round(m * mois * 100) / 100 : total, apr: mode === 'mensuel' ? apr : 0, le: now_() };
 }
 function handleOffre_(db, req, op) {
   var f = offreByTok_(db, req.t); if (!f) return out_({ ok: false, error: 'lien' });
@@ -1002,6 +1009,8 @@ function doPost(e) {
           tel: u.tel || '', email: u.email || '', photo: u.photo || '', digestEmail: u.digestEmail || '', digestHeure: u.digestHeure || '',
           pending: !!u.pending, proposePar: u.proposePar || '', proposeLe: u.proposeLe || '', calendlyUrl: u.calendlyUrl || '', scope: u.scope === 'tout' ? 'tout' : 'equipes',
           comite: !!u.comite, voitComite: !!u.voitComite, gests: (u.gests || []).filter(Boolean),
+          nomPublic: u.nomPublic === undefined ? (u.role !== 'comite') : !!u.nomPublic,   // v3.38 — son nom peut-il apparaître sur les propositions et pages publiques ?
+          gestDefaut: (u.gests || []).indexOf(u.gestDefaut) >= 0 ? u.gestDefaut : '',     // gestionnaire mis en avant quand il y en a plusieurs
           push: (oldU[u.id] && oldU[u.id].push !== undefined) ? oldU[u.id].push : (u.push !== false),   // v3.20 — préférence push conservée côté serveur
           zoomUrl: /^https:\/\/([a-z0-9-]+\.)?zoom\.(us|com)\//i.test(String(u.zoomUrl || '')) ? u.zoomUrl : ''   // v3.23
         };

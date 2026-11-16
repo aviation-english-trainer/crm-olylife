@@ -124,6 +124,20 @@ body.docmode{background:#e9eeea}
 .payopt.best{border-color:var(--gold);background:#FFFCF2}
 .payopt.on{border-color:var(--g);background:#EAF4EC;box-shadow:0 0 0 2px rgba(18,106,60,.15)}.payopt.on .pr{background:var(--g);color:#fff}
 .payopt[disabled]{opacity:.7;cursor:default}
+.paycard{border:1.5px solid var(--bd);border-radius:14px;padding:12px 14px;margin-top:8px;background:#fff}
+.paycard.on{border-color:var(--g);background:#EAF4EC;box-shadow:0 0 0 2px rgba(18,106,60,.15)}
+.paycard.best{border-color:var(--gold);background:#FFFCF2}
+.paycard.best.on{border-color:var(--g);background:#EAF4EC}
+.paycard h4{margin:0;font-size:15px;font-weight:700;color:var(--tx);display:flex;align-items:center;gap:7px}
+.paycard .desc{display:block;color:var(--t2);font-size:12.5px;margin-top:3px;line-height:1.45}
+.paycard .pick{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.paycard select{flex:1;min-width:150px;min-height:46px;border:1.5px solid var(--bd);border-radius:12px;padding:10px 32px 10px 12px;font:inherit;font-size:14px;color:var(--tx);background:#fff url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23126A3C' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center/16px;-webkit-appearance:none;appearance:none}
+.paycard .go{min-height:46px;border:none;border-radius:12px;background:var(--g);color:#fff;font:inherit;font-weight:700;font-size:14px;padding:0 18px;cursor:pointer;white-space:nowrap}
+.paycard.on .go{background:#0F3B22}
+.paycard .mark{font-size:12.5px;font-weight:700;color:var(--g)}
+.paycard[data-locked] .go,.paycard[data-locked] select{opacity:.6;pointer-events:none}
+.finlink{display:flex;align-items:center;gap:10px;margin-top:12px;padding:12px 14px;border:1.5px dashed var(--g);border-radius:14px;background:#F6FAF6;text-decoration:none;color:var(--tx)}
+.finlink b{display:block;font-size:14px}.finlink small{display:block;font-size:12px;color:var(--t2);margin-top:2px;line-height:1.4}
 .sigpad{border:1.5px dashed var(--g);border-radius:12px;background:#fff;touch-action:none;width:100%;height:160px;display:block}
 .sigrow{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 .sigrow input{flex:1;min-width:160px;border:1.5px solid var(--bd);border-radius:12px;padding:12px;font:inherit;font-size:15px}
@@ -176,16 +190,35 @@ function render(){
 }
 function pmt(P,n,apr){var r=apr/100/12;return r?P*r/(1-Math.pow(1+r,-n)):P/n;}
 var PAY_LBL={une_fois:'Paiement en une fois (carte)',paypal:'PayPal (en une fois)',x4:'4 × sans frais (Klarna)',mensuel:'Mensualités Klarna'};
-function payTxt(p,T){if(!p||!p.mode)return'';if(p.mode==='mensuel')return p.mois+' mensualités de '+n2(p.mensualite)+' USD (Klarna, '+n2(p.apr||13.99)+' % APR estimé, total '+n2(p.total)+' USD)';if(p.mode==='x4')return'4 × '+n2(T/4)+' USD toutes les deux semaines, sans frais (Klarna)';return PAY_LBL[p.mode]||'';}
-function finOpts(o){var T=o.total,APR=13.99,durs=[3,6,12,18,24].filter(function(n){return n!==24||T>=1000;});var l=[{mode:'une_fois',t:'Paiement en une fois',s:'Carte bancaire · '+n2(T)+' USD, aucun frais'},{mode:'paypal',t:'PayPal',s:'En une fois · '+n2(T)+' USD'},{mode:'x4',t:'4 × sans frais',s:n2(T/4)+' USD toutes les deux semaines · 0 % (Klarna)',best:true}];durs.forEach(function(n){var m=pmt(T,n,APR);l.push({mode:'mensuel',mois:n,mensualite:Math.round(m*100)/100,total:Math.round(m*n*100)/100,apr:APR,t:n+' mensualités',s:n2(m)+' USD / mois · total '+n2(m*n)+' USD · 13,99 % APR estimé (Klarna)'});});return l;}
+function payTxt(p,T){if(!p||!p.mode)return'';
+  if(p.mode==='mensuel')return p.mois+' mensualités de '+n2(p.mensualite)+' USD (Klarna, '+n2(p.apr||13.99)+' % APR estimé, total '+n2(p.total)+' USD)';
+  if(p.mode==='x4')return'4 × '+n2(T/4)+' USD toutes les deux semaines, sans frais (Klarna)';
+  if(p.mode==='paypal'){var n=+p.mois||1;return n>1?'PayPal · '+n+' fois'+(n<=4?' (≈ '+n2(T/n)+' USD par versement, sans frais selon le pays)':' (mensualité annoncée par PayPal)'):'PayPal (en une fois)';}
+  return PAY_LBL[p.mode]||'';}
+// v3.49 — Klarna et PayPal passent par un menu déroulant ; PayPal propose aussi le paiement en plusieurs fois (selon le pays)
+var KL_DURS=function(T){return[3,6,12,18,24].filter(function(n){return n!==24||T>=1000;});};
+var PP_DURS=[3,4,6,12,24];
+function klOpts(T){var l=[{mois:0,mode:'x4',t:'4 × sans frais — '+n2(T/4)+' USD toutes les 2 semaines'}];KL_DURS(T).forEach(function(n){var m=pmt(T,n,13.99);l.push({mois:n,mode:'mensuel',mensualite:Math.round(m*100)/100,total:Math.round(m*n*100)/100,apr:13.99,t:n+' mensualités — '+n2(m)+' USD / mois (total '+n2(m*n)+' USD, 13,99 % APR estimé)'});});return l;}
+function ppOpts(T){var l=[{mois:1,t:'En une fois — '+n2(T)+' USD'}];PP_DURS.forEach(function(n){l.push({mois:n,t:n+' fois — '+(n<=4?'≈ '+n2(T/n)+' USD par versement, sans frais selon le pays':'≈ '+n2(T/n)+' USD / mois hors intérêts PayPal')});});return l;}
+function finOpts(o){var T=o.total,l=[{mode:'une_fois',t:'Paiement en une fois',s:'Carte bancaire · '+n2(T)+' USD, aucun frais'}];
+  klOpts(T).forEach(function(x){l.push({mode:x.mode,mois:x.mois,mensualite:x.mensualite,total:x.total,apr:x.apr,t:x.mode==='x4'?'4 × sans frais (Klarna)':x.mois+' mensualités (Klarna)',s:x.t});});
+  ppOpts(T).forEach(function(x){l.push({mode:'paypal',mois:x.mois,t:x.mois>1?'PayPal · '+x.mois+' fois':'PayPal (en une fois)',s:x.t});});
+  return l;}
+function payIdx(mode,mois){var l=finOpts(D.offre);for(var i=0;i<l.length;i++)if(l[i].mode===mode&&(+l[i].mois||0)===(+mois||0))return i;return-1;}
+function payGo(which){var sel=document.getElementById(which==='kl'?'kl-sel':'pp-sel');if(!sel)return;var v=sel.value.split(':');var i=payIdx(v[0],v[1]);if(i>=0)payChoose(i);}
 function finHtml(o,compact){
   var T=o.total,p=o.paiement||null,locked=(D.statut==='commandee'||D.statut==='expiree');
   var q=o.lignes.map(function(l){var id={'OlyLife THZ Tera-P90+':'p90p','OlyLife Tera-P90':'p90','OlyLife Vitality Wand':'wand','OlyLife Shaken Massager':'shaken','OlyLife Galaxy G1-MAX':'g1max'}[l.nom];return id?id+':'+l.qte:'';}).filter(Boolean).join(',');
   var r=D.ref,u='financement.html?q='+encodeURIComponent(q)+'&o='+encodeURIComponent(T_TOK())+(D.client.prenom?'&p='+encodeURIComponent(D.client.prenom):'')+(r.nom?'&d='+encodeURIComponent(r.nom):'')+(r.tel?'&w='+String(r.tel).replace(/\D/g,''):'')+(r.email?'&e='+encodeURIComponent(r.email):'');
-  if(compact){return(p&&p.mode?'<div class="legal" style="margin:0 0 4px"><b>Mode de règlement souhaité :</b> '+esc(payTxt(p,T))+(p.le?' <span style="color:#7F9186">(choisi le '+fd(p.le)+')</span>':'')+'</div>':'<div class="legal" style="margin:0 0 4px">Mode de règlement : à choisir au paiement — 4 × '+n2(T/4)+' USD sans frais, ou 3 à 24 mensualités Klarna (ex. 12 mois : '+n2(pmt(T,12,13.99))+' USD / mois), PayPal, carte.</div>')+'<div class="legal" style="margin:4px 0 0;font-size:11px">Estimation indicative : la proposition Klarna (ou PayPal) s\'affiche au moment du paiement sur le back-office OlyLife et dépend de votre profil (taux annoncé de 0 à 35,99 %).</div>';}
-  var opts=finOpts(o).map(function(x,i){var on=p&&p.mode===x.mode&&(x.mode!=='mensuel'||p.mois===x.mois);return'<button type="button" class="payopt'+(on?' on':'')+(x.best?' best':'')+'" '+(locked?'disabled':'onclick="payChoose('+i+')"')+'><span class="pl"><b>'+esc(x.t)+'</b><small>'+esc(x.s)+'</small></span><span class="pr">'+(on?'✓ votre choix':'choisir')+'</span></button>';}).join('');
-  return'<p class="legal" style="margin:0 0 8px">'+(p&&p.mode?'Vous avez choisi : <b>'+esc(payTxt(p,T))+'</b>. Vous pouvez encore changer.':'Choisissez la formule qui vous convient : elle sera notée sur votre proposition et transmise à '+esc(r.nom)+'. Rien n\'est prélevé ici.')+'</p>'+opts
-    +'<p class="legal" style="margin:10px 0 0">Formules proposées par <b>Klarna</b> via OlyPay, ou <b>PayPal</b>, au moment du paiement sur le back-office OlyLife. Estimation indicative : seule l\'offre affichée au paiement fait foi, la décision appartient à Klarna. Un crédit vous engage.</p><a class="btn o noprint" href="'+u+'" target="_blank" rel="noopener">🧮 Simuler en combinant d\'autres appareils</a>';
+  if(compact){return(p&&p.mode?'<div class="legal" style="margin:0 0 4px"><b>Mode de règlement souhaité :</b> '+esc(payTxt(p,T))+(p.le?' <span style="color:#7F9186">(choisi le '+fd(p.le)+')</span>':'')+'</div>':'<div class="legal" style="margin:0 0 4px">Mode de règlement : à choisir au paiement — carte en une fois, 4 × '+n2(T/4)+' USD sans frais ou 3 à 24 mensualités Klarna (ex. 12 mois : '+n2(pmt(T,12,13.99))+' USD / mois), ou PayPal en une ou plusieurs fois selon le pays.</div>')+'<div class="legal" style="margin:4px 0 0;font-size:11px">Estimation indicative : la proposition Klarna (ou PayPal) s\'affiche au moment du paiement sur le back-office OlyLife et dépend de votre profil (taux annoncé de 0 à 35,99 %).</div>';}
+  var onCB=p&&p.mode==='une_fois',onKL=p&&(p.mode==='x4'||p.mode==='mensuel'),onPP=p&&p.mode==='paypal',lk=locked?' data-locked="1"':'';
+  var klCur=onKL?(p.mode==='x4'?'x4:0':'mensuel:'+p.mois):'x4:0',ppCur=onPP?'paypal:'+(+p.mois||1):'paypal:1';
+  var box='<div class="paycard'+(onCB?' on':'')+'"'+lk+'><h4>💳 Paiement en une fois</h4><span class="desc">Carte bancaire · '+n2(T)+' USD, aucun frais</span><div class="pick">'+(onCB?'<span class="mark">✓ votre choix</span>':'')+'<button type="button" class="go" onclick="payChoose('+payIdx('une_fois',0)+')">'+(onCB?'Garder':'Choisir')+'</button></div></div>'
+    +'<div class="paycard best'+(onKL?' on':'')+'"'+lk+'><h4>🩷 Klarna — en plusieurs fois</h4><span class="desc">4 fois sans frais, ou 3 à 24 mensualités. Proposé au moment du paiement par carte.</span><div class="pick"><select id="kl-sel">'+klOpts(T).map(function(x){var v=x.mode+':'+(x.mois||0);return'<option value="'+v+'"'+(v===klCur?' selected':'')+'>'+esc(x.t)+'</option>';}).join('')+'</select><button type="button" class="go" onclick="payGo(\'kl\')">'+(onKL?'Modifier':'Choisir')+'</button></div>'+(onKL?'<div class="mark" style="margin-top:6px">✓ votre choix : '+esc(payTxt(p,T))+'</div>':'')+'</div>'
+    +'<div class="paycard'+(onPP?' on':'')+'"'+lk+'><h4>🅿️ PayPal</h4><span class="desc">En une fois partout ; en plusieurs fois selon votre pays et votre compte (PayPal décide au paiement).</span><div class="pick"><select id="pp-sel">'+ppOpts(T).map(function(x){var v='paypal:'+x.mois;return'<option value="'+v+'"'+(v===ppCur?' selected':'')+'>'+esc(x.t)+'</option>';}).join('')+'</select><button type="button" class="go" onclick="payGo(\'pp\')">'+(onPP?'Modifier':'Choisir')+'</button></div>'+(onPP?'<div class="mark" style="margin-top:6px">✓ votre choix : '+esc(payTxt(p,T))+'</div>':'')+'</div>';
+  return'<p class="legal" style="margin:0 0 8px">'+(p&&p.mode?'Vous avez choisi : <b>'+esc(payTxt(p,T))+'</b>. Vous pouvez encore changer.':'Choisissez la formule qui vous convient : elle sera notée sur votre proposition et transmise à '+esc(r.nom)+'. Rien n\'est prélevé ici.')+'</p>'+box
+    +'<a class="finlink noprint" href="'+u+'#paypal" target="_blank" rel="noopener"><span style="font-size:24px">🧮</span><span><b>Voir toutes les offres de financement</b><small>Le détail Klarna et PayPal, les formules par pays, le tableau d\'amortissement, et la simulation en combinant plusieurs appareils.</small></span></a>'
+    +'<p class="legal" style="margin:10px 0 0">Formules proposées par <b>Klarna</b> via OlyPay, ou <b>PayPal</b>, au moment du paiement sur le back-office OlyLife. Estimation indicative : seule l\'offre affichée au paiement fait foi, la décision appartient à Klarna ou à PayPal. Un crédit vous engage.</p>';
 }
 function T_TOK(){return T;}
 function payChoose(i){

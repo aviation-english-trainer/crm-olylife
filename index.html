@@ -1451,10 +1451,11 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
                 <option value="admin">Admin — accès complet</option>
                 <option value="comite">Comité scientifique — rédige les fiches conseils et précautions, voit ses contacts</option>
               </select>
-              <label class="ochk-row" id="u-comite-row" style="margin-top:8px"><input type="checkbox" id="u-comite"><span>🔬 <b>Aussi membre du comité scientifique</b> — rédige fiches conseils et précautions, en plus de son rôle</span></label>
+              <label class="ochk-row" id="u-comite-row" style="margin-top:8px"><input type="checkbox" id="u-comite" onchange="oUserRoleUi()"><span>🔬 <b>Aussi membre du comité scientifique</b> — rédige fiches conseils et précautions, en plus de son rôle</span></label>
               <label class="ochk-row" id="u-voitcomite-row"><input type="checkbox" id="u-voitcomite"><span>👁 Peut <b>voir le comité scientifique</b> et échanger avec ses membres (Contacts utiles)</span></label>
+              <label class="ochk-row" id="u-nompublic-row" style="display:none"><input type="checkbox" id="u-nompublic"><span>🪪 <b>Son nom peut apparaître</b> sur les propositions et les pages publiques<br><small style="color:var(--t3)">Décoché (recommandé pour un médecin, vétérinaire ou chirurgien) : ses propositions sont émises au nom de son gestionnaire par défaut, ou du premier administrateur.</small></span></label>
             </div>
-            <div class="ofg1" id="u-gests-wrap"><label class="ofl">Rattaché au(x) gestionnaire(s)</label><div id="u-gests" style="display:flex;flex-wrap:wrap;gap:8px"></div><div style="font-size:11px;color:var(--t3);margin-top:4px">Le gestionnaire voit ce référent, ses contacts et ses demandes ; il reçoit aussi ses alertes « nouvelle demande ».</div></div>
+            <div class="ofg1" id="u-gests-wrap"><label class="ofl">Rattaché au(x) gestionnaire(s) — cochez, puis désignez celui qui apparaît par défaut</label><div id="u-gests" style="display:flex;flex-wrap:wrap;gap:8px"></div><div style="font-size:11px;color:var(--t3);margin-top:4px">Le gestionnaire voit ce référent, ses contacts et ses demandes ; il reçoit aussi ses alertes « nouvelle demande ».</div></div>
             <div class="ofg2" style="gap:10px"><div><label class="ofl">Téléphone / WhatsApp</label><input type="tel" class="ofc" id="u-tel" placeholder="+33 6 00 00 00 00"></div><div><label class="ofl">E-mail (profil)</label><input type="email" class="ofc" id="u-email" placeholder="prenom@gmail.com"></div></div>
             <div class="ofg1"><label class="ofl">Tags référent associés (séparés par des virgules)</label><input type="text" class="ofc" id="u-tags" list="ref-list" placeholder="Sophie"></div>
             <div class="ofg1" id="u-scope-wrap"><label class="ofl">Périmètre (gestionnaire)</label><select class="ofc" id="u-scope"><option value="equipes">Voit ses contacts, ceux de ses référents et de ses équipes (recommandé)</option><option value="tout">Exception : voit tous les contacts du CRM</option></select></div>
@@ -2536,7 +2537,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.48.3 · 16/11';
+var APP_VERSION='v3.49 · 16/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -3163,7 +3164,7 @@ function oUserNew(){
   document.getElementById('u-nom').value='';
   document.getElementById('u-role').value='referent';
   document.getElementById('u-tel').value='';document.getElementById('u-email').value='';
-  document.getElementById('u-scope').value='equipes';document.getElementById('u-comite').checked=false;document.getElementById('u-voitcomite').checked=false;oUserGests([]);oUserRoleUi();
+  document.getElementById('u-scope').value='equipes';document.getElementById('u-comite').checked=false;document.getElementById('u-voitcomite').checked=false;document.getElementById('u-nompublic').checked=false;document.getElementById('u-nompublic-row').style.display='none';oUserGests([],'');oUserRoleUi();
   document.getElementById('u-tags').value='';
   document.getElementById('u-code').value=genCode();
   document.getElementById('u-actif').checked=true;
@@ -3180,7 +3181,7 @@ function oUserEdit(i){
   document.getElementById('u-nom').value=u.nom||'';
   document.getElementById('u-role').value=u.role||'referent';
   document.getElementById('u-tel').value=u.tel||'';document.getElementById('u-email').value=u.email||'';
-  document.getElementById('u-scope').value=u.scope==='tout'?'tout':'equipes';document.getElementById('u-comite').checked=!!u.comite;document.getElementById('u-voitcomite').checked=!!u.voitComite;oUserGests(u.gests||(u.proposePar?[u.proposePar]:[]));oUserRoleUi();
+  document.getElementById('u-scope').value=u.scope==='tout'?'tout':'equipes';document.getElementById('u-comite').checked=!!u.comite;document.getElementById('u-voitcomite').checked=!!u.voitComite;document.getElementById('u-nompublic').checked=u.nomPublic===undefined?u.role!=='comite':!!u.nomPublic;oUserGests(u.gests||(u.proposePar?[u.proposePar]:[]),u.gestDefaut||'');oUserRoleUi();
   document.getElementById('u-tags').value=(u.tags||[]).join(', ');
   document.getElementById('u-code').value=u.code||'';
   document.getElementById('u-actif').checked=u.actif!==false;
@@ -3192,17 +3193,23 @@ function oUserEdit(i){
   var f=document.getElementById('eq-user-form');f.style.display='block';
   setTimeout(function(){f.scrollIntoView({behavior:'smooth',block:'start'});},50);
 }
-function oUserGests(sel){
+function oUserGests(sel,def){
   var box=document.getElementById('u-gests');if(!box)return;var me=val('u-nom');
   var gs=USERS.filter(function(u){return u.role==='gestionnaire'&&u.actif!==false&&u.nom!==me;}).map(function(u){return u.nom;});
-  box.innerHTML=gs.length?gs.map(function(n){return'<label class="ochk-row" style="margin:0"><input type="checkbox" value="'+esc(n)+'"'+((sel||[]).indexOf(n)>=0?' checked':'')+'><span>'+esc(n)+'</span></label>';}).join(''):'<span style="font-size:12px;color:var(--t3)">Aucun gestionnaire actif.</span>';
+  sel=sel||[];if(def===undefined)def=U_GDEF;U_GDEF=def||sel[0]||'';
+  box.innerHTML=gs.length?gs.map(function(n){var on=sel.indexOf(n)>=0;
+    return'<div style="display:flex;align-items:center;gap:10px;width:100%"><label class="ochk-row" style="margin:0;flex:1"><input type="checkbox" value="'+esc(n)+'"'+(on?' checked':'')+' onchange="oUserGestsSync()"><span>'+esc(n)+'</span></label><label class="ochk-row" style="margin:0;font-size:12px;'+(on?'':'opacity:.35;pointer-events:none')+'"><input type="radio" name="u-gdef" value="'+esc(n)+'"'+(on&&U_GDEF===n?' checked':'')+' onchange="U_GDEF=this.value"><span>par défaut</span></label></div>';}).join(''):'<span style="font-size:12px;color:var(--t3)">Aucun gestionnaire actif.</span>';
 }
+var U_GDEF='';
+function oUserGestsSync(){var sel=Array.prototype.map.call(document.querySelectorAll('#u-gests input[type=checkbox]:checked'),function(x){return x.value;});if(sel.indexOf(U_GDEF)<0)U_GDEF=sel[0]||'';oUserGests(sel,U_GDEF);}
 function oUserRoleOpts(){var sel=document.getElementById('u-role');if(!sel)return;var o=sel.querySelector('option[value="admin"]');if(o){o.disabled=!IS_SUPER();o.textContent=IS_SUPER()?'Admin — accès complet (créé par le super-admin)':'Admin — réservé au super-admin (Jean-Charles)';}}
 function oUserRoleUi(){
   var r=val('u-role');
   var sh=function(id,on){var e=document.getElementById(id);if(e)e.style.display=on?'':'none';};
   sh('u-comite-row',r==='gestionnaire'||r==='referent');sh('u-voitcomite-row',r==='gestionnaire'||r==='referent');
   sh('u-gests-wrap',r==='referent'||r==='comite');sh('u-scope-wrap',r==='gestionnaire');
+  var cm=r==='comite'||document.getElementById('u-comite').checked,row=document.getElementById('u-nompublic-row'),was=row.style.display!=='none';
+  sh('u-nompublic-row',cm);if(cm&&!was)document.getElementById('u-nompublic').checked=(r!=='comite');
 }
 function oUserCancel(){document.getElementById('eq-user-form').style.display='none';}
 function oUserDel(i){
@@ -3236,7 +3243,9 @@ function oUserSave(){
     actif:document.getElementById('u-actif').checked,
     digestEmail:digestEmail,digestHeure:digestHeure,email:uEmail,scope:document.getElementById('u-scope').value||'equipes',
     comite:(role==='gestionnaire'||role==='referent')&&document.getElementById('u-comite').checked,voitComite:role!=='admin'&&role!=='comite'&&document.getElementById('u-voitcomite').checked,
-    gests:role==='referent'||role==='comite'?Array.prototype.map.call(document.querySelectorAll('#u-gests input:checked'),function(x){return x.value;}):[],
+    gests:role==='referent'||role==='comite'?Array.prototype.map.call(document.querySelectorAll('#u-gests input[type=checkbox]:checked'),function(x){return x.value;}):[],
+    gestDefaut:(role==='referent'||role==='comite')?(U_GDEF||''):'',
+    nomPublic:(role==='comite'||document.getElementById('u-comite').checked)?document.getElementById('u-nompublic').checked:true,
     photo:document.getElementById('u-photo').value||''
   };
   var calu=(val('u-cal')||'').trim();
@@ -7291,9 +7300,15 @@ function temExtDiffusable(x){return x.statut==='diffusable'&&temOkComite(x)>=2;}
 // v3.48.2 — masquage de l'émetteur sur les propositions : seulement pour un membre du comité qui n'est NI gestionnaire NI administrateur
 // v3.48.3 — un membre du comité envoie librement ses propositions : elles sont émises au nom de son gestionnaire (sinon de l'administrateur).
 // L'émetteur est inscrit dans la proposition elle-même (par / parId), donc cela fonctionne quelle que soit la version du script serveur.
-function offreAffiche(){var eq=equipeContacts(),g=eq.filter(function(u){return u.role==='gestionnaire'&&u.nom!==PARTNER_NOM();})[0];if(g)return{nom:g.nom,parId:'aff'};var a=eq.filter(function(u){return u.role==='admin';})[0];return{nom:(a&&a.nom)||'',parId:'root'};}
+function offreAffiche(){
+  var eq=equipeContacts(),gs=eq.filter(function(u){return u.role==='gestionnaire'&&u.nom!==PARTNER_NOM();});
+  var d=USER&&USER.gestDefaut?gs.filter(function(u){return u.nom===USER.gestDefaut;})[0]:null;   // v3.49 — gestionnaire par défaut choisi par l'administrateur
+  var g=d||gs[0];if(g)return{nom:g.nom,parId:'aff'};
+  var a=eq.filter(function(u){return u.role==='admin';})[0];return{nom:(a&&a.nom)||'',parId:'root'};}
 function offreMasquer(o){if(!comiteMasque()||!o)return null;if(o.creeParId&&o.parId!==(USER&&USER.id))return{nom:o.par};var a=offreAffiche();if(!a.nom)return null;o.creePar=PARTNER_NOM();o.creeParId=USER?USER.id:'';o.par=a.nom;o.parId=a.parId;o.memberId='';o.rang='';return a;}
-function comiteMasque(){var r=ROLE();return estComiteUser()&&r!=='gestionnaire'&&r!=='admin';}
+// Masqué seulement si l'administrateur a décoché « son nom peut apparaître ». Par défaut : masqué pour un membre du comité seul (médecins), visible pour un gestionnaire ou un admin qui y siège aussi.
+function nomPublicUser(){if(!USER)return true;if(USER.nomPublic===true)return true;if(USER.nomPublic===false)return false;return ROLE()!=='comite';}
+function comiteMasque(){return estComiteUser()&&!nomPublicUser()&&ROLE()!=='admin';}
 function estComiteUser(){return ROLE()==='comite'||!!(USER&&USER.comite);}
 // ── photos : redimension + envoi Drive (réutilisé réseau / extérieur) ──
 var TEM_PH={};   // id de liste → tableau de {id,url,name}
@@ -7399,7 +7414,7 @@ function payFoisLbl(mode,n){n=+n||1;if(n===1)return mode==='klarna'?'en une fois
 function payLbl(p){if(!p||!p.mode)return'';var m=payMode(p.mode);if(!m)return'';return m.l+((m.fois.length>1||+p.fois>1||p.mode==='cb')?' · '+payFoisLbl(p.mode,p.fois):'');}
 function paySouhaite(c){   // mode choisi par la personne sur une proposition acceptée (à confirmer par le gestionnaire)
   if(c._ck)return null;var o=(c.offres||[]).filter(function(x){return x.paiement&&x.paiement.mode;}).sort(function(a,b){return String(b.acceptLe||b.le||'').localeCompare(String(a.acceptLe||a.le||''));})[0];if(!o)return null;
-  var q=o.paiement;return q.mode==='mensuel'?{mode:'klarna',fois:+q.mois||12}:q.mode==='x4'?{mode:'klarna',fois:4}:q.mode==='paypal'?{mode:'paypal',fois:1}:{mode:'cb',fois:1};
+  var q=o.paiement;return q.mode==='mensuel'?{mode:'klarna',fois:+q.mois||12}:q.mode==='x4'?{mode:'klarna',fois:4}:q.mode==='paypal'?{mode:'paypal',fois:Math.max(1,+q.mois||1)}:{mode:'cb',fois:1};
 }
 function payRow(c){
   var p=c.paiement&&c.paiement.mode?c.paiement:null,w=!p?paySouhaite(c):null,cid=(c._real||c).id;
@@ -8155,7 +8170,7 @@ function offresHtml(c){
     var st=offreStatut(c,o),sb=OFFRE_ST[st]||OFFRE_ST.brouillon,t=offreTot(o);
     var noms=(o.lignes||[]).map(function(l){return(l.qte>1?l.qte+' × ':'')+l.nom.replace(/^OlyLife\s+/i,'');}).join(', ');
     return'<div style="padding:10px 0;border-bottom:1px solid var(--bd)"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="obdg '+sb[1]+'">'+sb[0]+'</span>'+(o.num?'<span style="font-size:11.5px;color:var(--t3)">'+esc(o.num)+'</span>':'')+'<b style="font-size:13px">'+fUSD(t.total)+'</b><span style="font-size:11.5px;color:var(--t3)">≈ '+fEUR(t.eur)+' · '+fD(o.le.slice(0,10))+' · par '+esc(o.par||'')+(o.creePar?' <span title="Proposition préparée par un membre du comité scientifique">· préparée par '+esc(o.creePar)+'</span>':'')+'</span></div>'
-      +'<div style="font-size:12.5px;color:var(--t2);margin:4px 0 6px">'+esc(noms)+(o.cot?' · + adhésion WLHT':'')+(o.vueLe?' · vue le '+fWhen(o.vueLe):'')+(o.paiement&&o.paiement.mode?' · 💳 '+esc(o.paiement.mode==='mensuel'?o.paiement.mois+' × '+o.paiement.mensualite+' USD (Klarna)':o.paiement.mode==='x4'?'4 × sans frais':o.paiement.mode==='paypal'?'PayPal':'une fois'):'')+(o.acceptLe?' · '+(o.signature&&o.signature.png?'✍️ signée':'acceptée')+' le '+fWhen(o.acceptLe)+(o.signature&&o.signature.nom?' par '+esc(o.signature.nom):'')+(o.acceptMsg?' : « '+esc(o.acceptMsg)+' »':''):'')+'</div>'+(o.signature&&o.signature.png?'<img src="'+o.signature.png+'" alt="Signature" style="max-height:48px;border:1px solid var(--bd);border-radius:8px;background:#fff;margin:0 0 6px">':'')
+      +'<div style="font-size:12.5px;color:var(--t2);margin:4px 0 6px">'+esc(noms)+(o.cot?' · + adhésion WLHT':'')+(o.vueLe?' · vue le '+fWhen(o.vueLe):'')+(o.paiement&&o.paiement.mode?' · 💳 '+esc(o.paiement.mode==='mensuel'?o.paiement.mois+' × '+o.paiement.mensualite+' USD (Klarna)':o.paiement.mode==='x4'?'4 × sans frais':o.paiement.mode==='paypal'?('PayPal'+((+o.paiement.mois||1)>1?' · '+o.paiement.mois+' fois':' · une fois')):'une fois'):'')+(o.acceptLe?' · '+(o.signature&&o.signature.png?'✍️ signée':'acceptée')+' le '+fWhen(o.acceptLe)+(o.signature&&o.signature.nom?' par '+esc(o.signature.nom):'')+(o.acceptMsg?' : « '+esc(o.acceptMsg)+' »':''):'')+'</div>'+(o.signature&&o.signature.png?'<img src="'+o.signature.png+'" alt="Signature" style="max-height:48px;border:1px solid var(--bd);border-radius:8px;background:#fff;margin:0 0 6px">':'')
       +'<div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="ob bwa bsm" onclick="oOffreSend(\''+c.id+'\',\''+o.id+'\')">📨 Envoyer ('+(CANAL_LBL[canalCode(c)]||'WhatsApp')+')</button><a class="ob bgh bsm" href="'+offreUrl(o)+'" target="_blank" rel="noopener">👁 Voir</a><a class="ob bgh bsm" href="'+offreUrl(o)+'&v=doc" target="_blank" rel="noopener">📄 Devis / PDF</a><button type="button" class="ob bgh bsm" onclick="sendCopy(\''+offreUrl(o)+'\',\'🔗 Lien de l\\\'offre copié\')">🔗 Copier le lien</button>'
       +(st!=='commandee'&&st!=='refusee'?'<button type="button" class="ob bgh bsm" onclick="oOffreSet(\''+c.id+'\',\''+o.id+'\',\'commandee\')">🛒 Commandée</button><button type="button" class="ob bgh bsm" onclick="oOffreSet(\''+c.id+'\',\''+o.id+'\',\'refusee\')">❌ Refusée</button>':'')
       +'<button type="button" class="ob bgh bsm" onclick="oOffreOpen(\''+c.id+'\',\''+o.id+'\')">📋 Dupliquer</button></div></div>';
