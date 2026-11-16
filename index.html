@@ -2100,7 +2100,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     </div>
     <button class="ob baqua bfull" style="margin-top:4px" onclick="oImpAnalyse()">🔍 Analyser</button>
     <div class="ocard" id="oimp-prev-card" style="display:none;margin-top:14px">
-      <div class="ochd"><span class="oct" id="oimp-prev-ttl">Aperçu</span></div>
+      <div class="ochd"><span class="oct" id="oimp-prev-ttl">Aperçu</span><span id="oimp-ver" style="margin-left:auto;font-size:11px;color:var(--t3);font-weight:400"></span></div>
       <div id="oimp-prev"></div>
     </div>
     <label class="ochk-row" id="oimp-inc-row" style="display:none;margin-top:10px"><input type="checkbox" id="oimp-inc" onchange="oImpGo_lbl()"><span>Importer aussi les <b id="oimp-inc-n">0</b> fiche(s) sans téléphone ni email</span></label>
@@ -2537,7 +2537,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.50 · 16/11';
+var APP_VERSION='v3.50.1 · 16/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -5491,6 +5491,8 @@ function impMergeSame(items){
   return out;
 }
 function oImpAnalyse(){
+  var vv=document.getElementById('oimp-ver');if(vv)vv.textContent='lu par '+APP_VERSION;   // v3.50.1 — la version qui a lu les captures, visible sur la capture d'écran
+  try{if(SW_REG)SW_REG.update();}catch(e){}
   var raw=document.getElementById('oimp-ta').value.trim();
   if(!raw){oT('Collez d\'abord des données à analyser','e');return;}
   // v3.33.1 — un relevé « Bonus Statement » n'est pas une liste de contacts : on renvoie vers la fiche du membre
