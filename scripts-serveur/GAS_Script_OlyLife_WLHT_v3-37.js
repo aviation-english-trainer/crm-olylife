@@ -597,7 +597,7 @@ function offreUser_(db, o) {
 // v3.37 — ÉMETTEUR AFFICHÉ : un membre du comité scientifique peut préparer une proposition, mais il n'apparaît jamais comme émetteur.
 // À sa place : son référent (le gestionnaire auquel il est rattaché), sinon le gestionnaire qui suit la fiche, sinon l'administrateur.
 function offreAff_(db, u, c) {
-  if (!estComite_(u)) return u;
+  if (!estComite_(u) || u.role === 'gestionnaire' || u.role === 'admin' || u.id === 'root') return u;   // un gestionnaire ou un admin qui siège aussi au comité reste émetteur sous son nom
   var gs = []; try { gs = gestsOfUser_(db, u); } catch (e) {}
   if (gs.length) return gs[0];
   try { var sv = suivis_(c || {}); for (var i = 0; i < sv.length; i++) for (var k = 0; k < db.users.length; k++) { var x = db.users[k]; if (x.nom === sv[i] && !estComite_(x) && x.actif !== false && (x.role === 'gestionnaire' || x.role === 'admin')) return x; } } catch (e2) {}

@@ -2536,7 +2536,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.48.1 · 15/11';
+var APP_VERSION='v3.48.2 · 16/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -7288,6 +7288,8 @@ function temExtById(id){return temExtList().find(function(x){return x.id===id;})
 function drivePhotoUrl(ph){var id=(ph&&ph.id)||'';if(!id&&ph&&ph.url){var m=String(ph.url).match(/\/d\/([^\/]+)/);if(m)id=m[1];}return id?'https://drive.google.com/thumbnail?id='+id+'&sz=w1600':(ph&&ph.url)||'';}
 function temOkComite(x){var ok={};(x.avis||[]).forEach(function(a){if(a.avis==='ok')ok[a.userId||a.par]=1;});return Object.keys(ok).length;}
 function temExtDiffusable(x){return x.statut==='diffusable'&&temOkComite(x)>=2;}
+// v3.48.2 — masquage de l'émetteur sur les propositions : seulement pour un membre du comité qui n'est NI gestionnaire NI administrateur
+function comiteMasque(){var r=ROLE();return estComiteUser()&&r!=='gestionnaire'&&r!=='admin';}
 function estComiteUser(){return ROLE()==='comite'||!!(USER&&USER.comite);}
 // ── photos : redimension + envoi Drive (réutilisé réseau / extérieur) ──
 var TEM_PH={};   // id de liste → tableau de {id,url,name}
@@ -8210,7 +8212,7 @@ function oOffreCreate(cid,send){
   if(!o.lignes.length){oT('Cochez au moins un appareil','w');return;}
   o.pied=String(offreParams().pied||OFFRE_PIED_DEF).replace(/\{moi\}/g,PARTNER_NOM());o.lienAdhesion=adhesionUrl(c);
   o.id='of_'+Date.now().toString(36);o.tok=(function(){var a='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',t='';for(var i=0;i<20;i++)t+=a.charAt(Math.floor(Math.random()*a.length));return t;})();
-  o.le=new Date().toISOString();var dn=new Date(),seq=OC.reduce(function(a,x){return a+((x.offres||[]).length);},0)+1;o.num='OF'+String(dn.getFullYear()).slice(2)+('0'+(dn.getMonth()+1)).slice(-2)+'-'+('000'+seq).slice(-4);o.par=PARTNER_NOM();o.parId=USER?USER.id:'';o.memberId=(USER&&USER.memberId)||'';o.rang=(USER&&USER.rang)||'';o.statut='brouillon';o.envois=[];if(estComiteUser()){o.memberId='';o.rang='';}   // v3.46 — comité scientifique : jamais affiché comme émetteur (le serveur met son référent)
+  o.le=new Date().toISOString();var dn=new Date(),seq=OC.reduce(function(a,x){return a+((x.offres||[]).length);},0)+1;o.num='OF'+String(dn.getFullYear()).slice(2)+('0'+(dn.getMonth()+1)).slice(-2)+'-'+('000'+seq).slice(-4);o.par=PARTNER_NOM();o.parId=USER?USER.id:'';o.memberId=(USER&&USER.memberId)||'';o.rang=(USER&&USER.rang)||'';o.statut='brouillon';o.envois=[];if(comiteMasque()){o.memberId='';o.rang='';}   // v3.46 — comité scientifique : jamais affiché comme émetteur (le serveur met son référent)
   c.offres=c.offres||[];c.offres.push(o);
   var t=offreTot(o);jrnAdd(c,'fait','💶 Offre de commande créée : '+o.lignes.map(function(l){return(l.qte>1?l.qte+' × ':'')+l.nom.replace(/^OlyLife\s+/i,'');}).join(', ')+' — '+fUSD(t.total)+(o.cot?' + adhésion WLHT':''));
   oPush([c]);var m=document.getElementById('ooffre');if(m)m.remove();emojiBurst(['💶','✨','🌿']);
@@ -8218,7 +8220,7 @@ function oOffreCreate(cid,send){
 }
 function oOffreSend(cid,oid){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;var o=(c.offres||[]).find(function(x){return x.id===oid;});if(!o)return;
-  if(estComiteUser()){
+  if(comiteMasque()){
     if(srvNum()<3037){oT('🧪 Comité scientifique : l\'envoi d\'une proposition attend la mise à jour du script serveur (v3.37), pour que votre nom n\'y apparaisse pas. Prévenez l\'administrateur.','w');return;}
     var gz=(equipeContacts().filter(function(u){return u.role==='gestionnaire';})[0]||{}).nom;oT('🧪 Votre nom n\'apparaît pas sur la proposition : elle est présentée au nom de '+(gz||'votre référent')+', qui recevra aussi les réponses.','i');
   }
