@@ -108,9 +108,10 @@
 // ╔═══════════════════════════════════════════════════════════════╗
 // ║  À PERSONNALISER AVANT DÉPLOIEMENT                            ║
 // ╚═══════════════════════════════════════════════════════════════╝
-// v3.34 — le code admin se lit d'abord dans les Propriétés du script (clé ADMIN_CODE) : il ne se perd plus quand on recolle le script
-//         et n'apparaît plus dans le fichier. À défaut, la valeur ci-dessous s'applique.
-var ADMIN_CODE = (function () { try { var p = PropertiesService.getScriptProperties().getProperty('ADMIN_CODE'); if (p && String(p).trim()) return String(p).trim(); } catch (e) {} return 'WLHT-OLYLIFE-2026'; })();   // ← code d'accès admin par défaut
+// v3.39 — DEUX codes admin fonctionnent : celui écrit ci-dessous et celui rangé dans les Propriétés du script (clé ADMIN_CODE).
+//         Plus de piège : modifier l'un n'annule jamais l'autre. ▶ Exécutez « verifierCodeAdmin » pour voir ce que le serveur accepte.
+var ADMIN_CODE_FICHIER = 'WLHT-OLYLIFE-2026';   // ← code d'accès admin écrit dans ce fichier
+var ADMIN_CODE = (function () { try { var p = PropertiesService.getScriptProperties().getProperty('ADMIN_CODE'); if (p && String(p).trim()) return String(p).trim(); } catch (e) {} return ADMIN_CODE_FICHIER; })();
 var ADMIN_NOM  = 'Jean-Charles';              // ← nom affiché du 1er admin
 var MON_EMAIL  = 'teamwaterlifehightech@gmail.com'; // ← email pour les rappels du matin
 var SESSION_JOURS = 30;        // durée d'une session (jours) avant nouvelle saisie du code
@@ -195,10 +196,37 @@ function collabMerge_(old, nc) {
     if (old.lastActivity && String(old.lastActivity) > String(nc.lastActivity || '')) nc.lastActivity = old.lastActivity;
   } catch (e) { Logger.log('collabMerge : ' + e); }
 }
+// v3.39 — les DEUX codes admin sont acceptés : celui des Propriétés du script (clé ADMIN_CODE) et celui écrit dans ce fichier.
+// Plus de piège quand on recolle le script en oubliant la propriété, ou l'inverse. Comparaison sans espaces ni casse, des deux côtés.
+function codeNorm_(v) { return String(v || '').replace(/\s+/g, '').toUpperCase(); }
+function codeSimple_(v) { return String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }   // sans espaces ni tirets : « WLHT-Oly 2026 » = « wlhtoly2026 »
+function adminCodes_() {
+  var l = [], add = function (v) { v = codeNorm_(v); if (v && l.indexOf(v) < 0) l.push(v); };
+  try { add(PropertiesService.getScriptProperties().getProperty('ADMIN_CODE')); } catch (e) {}
+  add(ADMIN_CODE); add(ADMIN_CODE_FICHIER);
+  return l;
+}
+function estCodeAdmin_(code) {
+  var l = adminCodes_(); if (l.indexOf(codeNorm_(code)) >= 0) return true;
+  var s = codeSimple_(code); if (!s) return false;
+  for (var i = 0; i < l.length; i++) if (codeSimple_(l[i]) === s) return true;
+  return false;
+}
+// ▶ À exécuter depuis l'éditeur Apps Script pour savoir quel(s) code(s) admin le serveur accepte réellement
+function verifierCodeAdmin() {
+  var l = adminCodes_(), m = l.map(function (c) { return c.length <= 4 ? c : c.slice(0, 2) + '…' + c.slice(-2) + ' (' + c.length + ' caractères)'; });
+  var p = ''; try { p = PropertiesService.getScriptProperties().getProperty('ADMIN_CODE') || ''; } catch (e) {}
+  Logger.log('Version du script : ' + SRV_VERSION);
+  Logger.log('Propriété ADMIN_CODE : ' + (p ? 'présente' : 'absente'));
+  Logger.log('Codes admin acceptés (' + l.length + ') : ' + m.join('  |  '));
+  Logger.log('La casse, les espaces et les tirets n\'ont pas d\'importance.');
+  return m;
+}
+function rootUser_(db) { var l = adminCodes_(); return l.length ? findUser_(db, l[0]) : null; }   // v3.39 — compte super-admin, quel que soit l'endroit où le code est rangé
 function findUser_(db, code) {
   if (!code) return null;
   code = String(code).replace(/\s+/g, '').toUpperCase();   // v3.25 — code d'accès insensible à la casse et aux espaces
-  if (code === String(ADMIN_CODE).toUpperCase()) {
+  if (estCodeAdmin_(code)) {
     var rd = {};
     try { rd = JSON.parse(PropertiesService.getScriptProperties().getProperty('root_digest') || '{}'); } catch (e) {}
     var rp = (db.config && db.config.rootProfile) || {};   // v3.5 — photo / tél / email de l'admin principal
@@ -297,7 +325,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.38';
+var SRV_VERSION = '3.39';
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
@@ -389,7 +417,7 @@ function pubTokenOf_(db, user) {
 function userByPubToken_(db, r) {
   r = String(r || '').trim(); if (!r || r.length < 8) return null;
   var rp = (db.config && db.config.rootProfile) || {};
-  if (rp.pubToken && rp.pubToken === r) return findUser_(db, ADMIN_CODE);
+  if (rp.pubToken && rp.pubToken === r) return rootUser_(db);
   return (db.users || []).find(function (u) { return u.pubToken === r && u.actif !== false && !u.pending; }) || null;
 }
 function leadsFor_(db, user) {
@@ -433,7 +461,7 @@ function handleLead_(db, req) {
     via = { prenom: S(req.viaPrenom, 60), nom: S(req.viaNom, 60), tel: S(req.viaTel, 30), email: S(req.viaEmail, 120).toLowerCase(), match: '', matchNom: '', matchRole: '', matchTag: '', matchUserId: '', matchContactId: '', prenomOk: false };
     var vd = telDigits_(via.tel), vp = norm_(via.prenom).split(' ')[0];
     if (vd.length >= 8) {
-      var mu = null, root = findUser_(db, ADMIN_CODE);
+      var mu = null, root = rootUser_(db);
       if (root && telDigits_(root.tel) === vd) mu = root;
       if (!mu) mu = (db.users || []).find(function (u) { return u.actif !== false && !u.pending && telDigits_(u.tel) === vd; }) || null;
       if (mu) {
@@ -589,10 +617,10 @@ function handleTemInfo_(db, req) {
   return out_({ ok: false, error: 'lien' });
 }
 function offreUser_(db, o) {
-  if (o.parId === 'root' || !o.parId) { var r = findUser_(db, ADMIN_CODE) || {}; if (!o.parId || r.nom === o.par) return r; }
+  if (o.parId === 'root' || !o.parId) { var r = rootUser_(db) || {}; if (!o.parId || r.nom === o.par) return r; }
   for (var i = 0; i < db.users.length; i++) if (db.users[i].id === o.parId) return db.users[i];
   for (var k = 0; k < db.users.length; k++) if (db.users[k].nom === o.par) return db.users[k];
-  return findUser_(db, ADMIN_CODE) || {};
+  return rootUser_(db) || {};
 }
 // v3.37 — ÉMETTEUR AFFICHÉ : un membre du comité scientifique peut préparer une proposition, mais il n'apparaît jamais comme émetteur.
 // À sa place : son référent (le gestionnaire auquel il est rattaché), sinon le gestionnaire qui suit la fiche, sinon l'administrateur.
@@ -605,7 +633,7 @@ function offreAff_(db, u, c) {
   if (u.gestDefaut) { for (var d = 0; d < gs.length; d++) if (gs[d].nom === u.gestDefaut) return gs[d]; }   // gestionnaire désigné par défaut
   if (gs.length) return gs[0];
   try { var sv = suivis_(c || {}); for (var i = 0; i < sv.length; i++) for (var k = 0; k < db.users.length; k++) { var x = db.users[k]; if (x.nom === sv[i] && !estComite_(x) && x.actif !== false && (x.role === 'gestionnaire' || x.role === 'admin')) return x; } } catch (e2) {}
-  return findUser_(db, ADMIN_CODE) || { nom: ADMIN_NOM };
+  return rootUser_(db) || { nom: ADMIN_NOM };
 }
 function payTxt_(p, T) {
   if (!p || !p.mode) return '';
@@ -739,7 +767,7 @@ function sessionUser_(db, token) {
   for (var i = 0; i < db.sessions.length; i++) {
     var s = db.sessions[i];
     if (s.token !== token) continue;
-    var user = s.userId === 'root' ? findUser_(db, ADMIN_CODE) : (db.users || []).find(function (u) { return u.id === s.userId && u.actif !== false && !u.pending; });
+    var user = s.userId === 'root' ? rootUser_(db) : (db.users || []).find(function (u) { return u.id === s.userId && u.actif !== false && !u.pending; });
     if (!user) { db.sessions.splice(i, 1); return null; }
     s.last = now_(); s.exp = Date.now() + SESSION_JOURS * 86400000;   // session glissante
     return user;
@@ -861,7 +889,7 @@ function doPost(e) {
     if (op === 'myQr') { var tk = pubTokenOf_(db, user); saveDB_(db); return out_({ ok: true, token: tk, url: APP_PUBLIC_URL + 'inscription.html?r=' + tk, urlDecouverte: APP_PUBLIC_URL + 'decouverte.html?r=' + tk }); }
     if (op === 'userQr') {
       if (user.role !== 'admin') return out_({ ok: false, error: 'forbidden' });
-      var uq = req.userId === 'root' ? findUser_(db, ADMIN_CODE) : (db.users || []).find(function (u) { return u.id === req.userId; });
+      var uq = req.userId === 'root' ? rootUser_(db) : (db.users || []).find(function (u) { return u.id === req.userId; });
       if (!uq) return out_({ ok: false, error: 'introuvable' });
       var tk2 = pubTokenOf_(db, uq); saveDB_(db); return out_({ ok: true, token: tk2, url: APP_PUBLIC_URL + 'inscription.html?r=' + tk2, urlDecouverte: APP_PUBLIC_URL + 'decouverte.html?r=' + tk2 });
     }
