@@ -2537,7 +2537,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.51 · 16/11';
+var APP_VERSION='v3.52 · 16/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -4643,7 +4643,7 @@ function avRowHtml(c,a,vuePayeur){
     +(a.notifLe?'<br>✉️ annonce e-mail le '+fD(String(a.notifLe).slice(0,10)):(a.notifier?'<br>✉️ annonce e-mail en attente':''))+'</small></div>'
     +(isRef?'':'<div style="display:flex;gap:4px;flex-shrink:0">'
       +(!done&&c.tel?'<a class="tb-ic" title="Rappel WhatsApp au bénéficiaire" href="'+mkWA(c.tel,avWaMsg(c,a))+'" target="_blank" rel="noopener">💬</a>':'')
-      +(!done&&avParTel(a)?'<a class="tb-ic" title="Informer '+esc(a.par||'le payeur')+' (WhatsApp)" href="'+mkWA(avParTel(a),avWaPayeur(c,a))+'" target="_blank" rel="noopener">📣</a>':'')
+      +(!done&&(avParTel(a)||c.tel||c.email)?'<button class="tb-ic" type="button" title="Prévenir tout le monde, un message après l\'autre" onclick="oAvAnnonceAll(\''+c.id+'\')">📣</button>':'')
       +(a.type==='don'&&(c.tel||c.email)?'<button class="tb-ic" type="button" title="Annoncer le don au bénéficiaire (canal préféré)" onclick="oAvAnnonceGo(\''+c.id+'\',\''+a.id+'\',\'benef\')">💬</button>':'')
       +(a.type==='don'&&(avParTel(a)||avPayeurEmail(a))?'<button class="tb-ic" type="button" title="Remercier '+esc(a.par||'le donateur')+' (canal préféré)" onclick="oAvAnnonceGo(\''+c.id+'\',\''+a.id+'\',\'payeur\')">📣</button>':'')
       +(!done?'<button class="tb-ic go" title="Remboursement partiel ou complet" onclick="oAvOpen(\''+c.id+'\',\''+a.id+'\')">💰</button>':'<button class="tb-ic" title="Modifier" onclick="oAvOpen(\''+c.id+'\',\''+a.id+'\')">✏️</button>')
@@ -6657,20 +6657,30 @@ function oAvAnnonce(cid,ids){
   var old=document.getElementById('oavann');if(old)old.remove();
   var m=document.createElement('div');m.id='oavann';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
   var benefCanal=canalCode(c),benefNom=((c.prenom||'')+' '+(c.nom||'')).trim(),don=avs[0].type==='don';
-  var rows='';
-  rows+='<div class="acc-row" style="align-items:center"><span class="em">👤</span><div class="b"><b>'+esc(benefNom)+'</b> <small style="color:var(--t3)">bénéficiaire · canal préféré : '+esc(CANAL_LBL[benefCanal]||benefCanal)+'</small></div>'
-    +'<button type="button" class="ob '+(benefCanal==='wa'?'bwa':'bgh')+' bsm" id="avann-b" onclick="oAvAnnonceGo(\''+cid+'\',\''+avs[0].id+'\',\'benef\')">📤 Prévenir</button></div>';
+  var rows='',n=0,reste=0;
+  var mnt=function(a){return String(a.montant)+' '+(a.devise||'€');};
+  var btn=function(aid,qui,lbl,cls,sent){n++;if(!sent)reste++;
+    return'<button type="button" class="ob '+(sent?'bgh':cls)+' bsm" data-av="'+aid+'|'+qui+'" onclick="oAvAnnonceGo(\''+cid+'\',\''+aid+'\',\''+qui+'\')">'+(sent?'↻ Renvoyer':lbl)+'</button>';};
+  // v3.52 — une ligne par avance : avec deux prêts, le bénéficiaire reçoit bien les deux messages, l'un après l'autre
+  avs.forEach(function(a){
+    var sent=!!(a.sent&&a.sent.benefWa);
+    rows+='<div class="acc-row" style="align-items:center"><span class="em">👤</span><div class="b"><b>'+esc(benefNom)+'</b> <small style="color:var(--t3)">bénéficiaire · '+esc(mnt(a))+(avs.length>1&&a.par?' (de '+esc(a.par)+')':'')+' · '+esc(CANAL_LBL[benefCanal]||benefCanal)+(sent?' · déjà prévenu le '+fD(a.sent.benefWa):'')+'</small></div>'
+      +btn(a.id,'benef','📤 Prévenir',benefCanal==='wa'?'bwa':'bgh',sent)+'</div>';
+  });
   avs.forEach(function(a){
     var pc=avPayeurCanal(a),isMe=(a.parRef||'').indexOf('u:')===0&&USER&&a.parRef==='u:'+USER.id;
-    if(isMe)return;
-    rows+='<div class="acc-row" style="align-items:center"><span class="em">'+(don?'🎁':'💶')+'</span><div class="b"><b>'+esc(a.par||'?')+'</b> <small style="color:var(--t3)">'+(don?'donateur':'a avancé')+' '+esc(String(a.montant))+' '+esc(a.devise||'€')+' · canal : '+esc(CANAL_LBL[pc]||pc)+'</small></div>'
-      +'<button type="button" class="ob '+(pc==='wa'?'bwa':'bgh')+' bsm" onclick="oAvAnnonceGo(\''+cid+'\',\''+a.id+'\',\'payeur\')">📤 Prévenir</button></div>';
+    if(isMe||!(avParTel(a)||avPayeurEmail(a)))return;
+    var sent=!!(a.sent&&a.sent.payeurWa);
+    rows+='<div class="acc-row" style="align-items:center"><span class="em">'+(don?'🎁':'💶')+'</span><div class="b"><b>'+esc(a.par||'?')+'</b> <small style="color:var(--t3)">'+(don?'donateur':'a avancé')+' '+esc(mnt(a))+' · '+esc(CANAL_LBL[pc]||pc)+(sent?' · déjà prévenu le '+fD(a.sent.payeurWa):'')+'</small></div>'
+      +btn(a.id,'payeur','📤 Prévenir',pc==='wa'?'bwa':'bgh',sent)+'</div>';
   });
+  if(n>1)rows='<div style="font-size:12px;color:var(--t2);padding:0 2px 8px">📲 '+n+' message'+(n>1?'s':'')+' à envoyer, <b>un par un</b> : touchez « Prévenir », envoyez dans WhatsApp, revenez ici — le suivant vous attend.</div>'+rows;
   m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:520px;max-height:88vh;overflow:auto">'
     +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">'+(don?'🎁 Don enregistré — prévenir maintenant ?':'💶 Avance enregistrée — prévenir maintenant ?')+'</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'oavann\').remove()">✕</button></div>'
     +'<div style="font-size:12px;color:var(--t2);margin:6px 0 10px">'+(avs[0].notifier?(srvNum()>=3018?'Les e-mails d\'annonce partent automatiquement (bénéficiaire, '+(don?'donateur':'prêteur')+', gestionnaires, admin). ':'<span style="color:#C0392B">⚠️ Script Google à mettre à jour (v3.18) pour que les e-mails d\'annonce partent automatiquement.</span> '):'')+'Le message ci-dessous est déjà rédigé : un clic l\'ouvre sur le canal préféré indiqué sur la fiche de chacun.</div>'
     +rows
-    +'<div style="font-size:11px;color:var(--t3);margin-top:10px">Vous pourrez renvoyer ces messages plus tard depuis la fiche (boutons 💬 et 📣 de la ligne).</div></div>';
+    +'<div id="avann-next" style="font-size:12.5px;color:var(--g);font-weight:600;margin-top:10px">'+(reste>1?'➡️ <b>'+reste+'</b> messages à envoyer, un par un.':'')+'</div>'
+    +'<div style="font-size:11px;color:var(--t3);margin-top:6px">Vous pourrez renvoyer ces messages plus tard depuis la fiche (boutons 💬 et 📣 de la ligne).</div></div>';
   document.body.appendChild(m);
 }
 function oAvAnnonceGo(cid,aid,qui){
@@ -6683,7 +6693,22 @@ function oAvAnnonceGo(cid,aid,qui){
   sendVia(canal,num,text,email);
   var lib=(a.type==='don'?'🎁 Don':'💶 Avance')+' — annonce envoyée par '+(CANAL_LBL[canal]||canal)+(qui==='benef'?' au bénéficiaire':' à '+(a.par||'la personne qui a avancé'));
   jrnAdd(c,'fait',lib);var ch=[c];if(cible&&cible!==c){jrnAdd(cible,'fait',lib);ch.push(cible);}oPush(ch);
-  var b=document.querySelector('#oavann button[onclick*="\''+aid+'\',\''+qui+'\'"]');if(b){b.textContent='✅ Envoyé';b.disabled=true;}
+  a.sent=a.sent||{};a.sent[qui==='benef'?'benefWa':'payeurWa']=todayYMD();if(ch.indexOf(c)<0)ch.push(c);oPush(ch);
+  var b=document.querySelector('#oavann button[data-av="'+aid+'|'+qui+'"]');
+  if(b){b.textContent='✅ Envoyé';b.classList.remove('bwa');b.classList.add('bgh');b.disabled=true;
+    var left=Array.prototype.filter.call(document.querySelectorAll('#oavann button[data-av]'),function(x){return !x.disabled&&x.textContent.indexOf('Renvoyer')<0;});
+    var inf=document.getElementById('avann-next');
+    if(inf)inf.innerHTML=left.length?'➡️ <b>'+left.length+'</b> message'+(left.length>1?'s':'')+' encore à envoyer — touchez le bouton suivant.':'✅ Tout le monde est prévenu.';
+    if(left.length)try{left[0].scrollIntoView({block:'center'});}catch(e){}
+  }
+}
+// 📣 depuis la fiche : prévenir tout le monde pour toutes les avances en cours
+function oAvAnnonceAll(cid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var ids=(c.avances||[]).filter(function(a){return a.statut!=='rembourse';}).map(function(a){return a.id;});
+  if(!ids.length)ids=(c.avances||[]).map(function(a){return a.id;});
+  if(!ids.length){oT('Aucune avance à annoncer','w');return;}
+  oAvAnnonce(cid,ids);
 }
 function oAvMark(cid,aid){oAvOpen(cid,aid);}
 function oAvDel(cid,aid){
