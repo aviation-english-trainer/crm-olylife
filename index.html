@@ -2536,7 +2536,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.48.2 · 16/11';
+var APP_VERSION='v3.48.3 · 16/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -3527,7 +3527,7 @@ function buildMsgFor(item,lang,tone){
 function computeActions(){
   var items=[];
   OC.forEach(function(c0){[c0].concat(ordViews(c0)).forEach(function(c){
-    var concerne=ROLE()==='admin'||contactMeConcerne(c)||(c.offres||[]).some(function(o){return USER&&o.parId===USER.id;});
+    var concerne=ROLE()==='admin'||contactMeConcerne(c)||(c.offres||[]).some(function(o){return USER&&(o.parId===USER.id||o.creeParId===USER.id);});
     if(!c._ck&&concerne&&(c.etape==='Prospect'||c.etape==='Relance en cours'||!c.etape)&&cStatut(c)==='encours'&&!c.rappel){
       // base = date du 1er contact réel (journal), sinon date de création
       var first=(c.journal||[]).filter(function(e){return e.type==='appel'||e.type==='note'||e.type==='rdv';}).map(function(e){return e.ts;}).sort()[0];
@@ -7289,6 +7289,10 @@ function drivePhotoUrl(ph){var id=(ph&&ph.id)||'';if(!id&&ph&&ph.url){var m=Stri
 function temOkComite(x){var ok={};(x.avis||[]).forEach(function(a){if(a.avis==='ok')ok[a.userId||a.par]=1;});return Object.keys(ok).length;}
 function temExtDiffusable(x){return x.statut==='diffusable'&&temOkComite(x)>=2;}
 // v3.48.2 — masquage de l'émetteur sur les propositions : seulement pour un membre du comité qui n'est NI gestionnaire NI administrateur
+// v3.48.3 — un membre du comité envoie librement ses propositions : elles sont émises au nom de son gestionnaire (sinon de l'administrateur).
+// L'émetteur est inscrit dans la proposition elle-même (par / parId), donc cela fonctionne quelle que soit la version du script serveur.
+function offreAffiche(){var eq=equipeContacts(),g=eq.filter(function(u){return u.role==='gestionnaire'&&u.nom!==PARTNER_NOM();})[0];if(g)return{nom:g.nom,parId:'aff'};var a=eq.filter(function(u){return u.role==='admin';})[0];return{nom:(a&&a.nom)||'',parId:'root'};}
+function offreMasquer(o){if(!comiteMasque()||!o)return null;if(o.creeParId&&o.parId!==(USER&&USER.id))return{nom:o.par};var a=offreAffiche();if(!a.nom)return null;o.creePar=PARTNER_NOM();o.creeParId=USER?USER.id:'';o.par=a.nom;o.parId=a.parId;o.memberId='';o.rang='';return a;}
 function comiteMasque(){var r=ROLE();return estComiteUser()&&r!=='gestionnaire'&&r!=='admin';}
 function estComiteUser(){return ROLE()==='comite'||!!(USER&&USER.comite);}
 // ── photos : redimension + envoi Drive (réutilisé réseau / extérieur) ──
@@ -8150,7 +8154,7 @@ function offresHtml(c){
   var rows=L.slice().sort(function(a,b){return(b.le||'').localeCompare(a.le||'');}).map(function(o){
     var st=offreStatut(c,o),sb=OFFRE_ST[st]||OFFRE_ST.brouillon,t=offreTot(o);
     var noms=(o.lignes||[]).map(function(l){return(l.qte>1?l.qte+' × ':'')+l.nom.replace(/^OlyLife\s+/i,'');}).join(', ');
-    return'<div style="padding:10px 0;border-bottom:1px solid var(--bd)"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="obdg '+sb[1]+'">'+sb[0]+'</span>'+(o.num?'<span style="font-size:11.5px;color:var(--t3)">'+esc(o.num)+'</span>':'')+'<b style="font-size:13px">'+fUSD(t.total)+'</b><span style="font-size:11.5px;color:var(--t3)">≈ '+fEUR(t.eur)+' · '+fD(o.le.slice(0,10))+' · par '+esc(o.par||'')+'</span></div>'
+    return'<div style="padding:10px 0;border-bottom:1px solid var(--bd)"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="obdg '+sb[1]+'">'+sb[0]+'</span>'+(o.num?'<span style="font-size:11.5px;color:var(--t3)">'+esc(o.num)+'</span>':'')+'<b style="font-size:13px">'+fUSD(t.total)+'</b><span style="font-size:11.5px;color:var(--t3)">≈ '+fEUR(t.eur)+' · '+fD(o.le.slice(0,10))+' · par '+esc(o.par||'')+(o.creePar?' <span title="Proposition préparée par un membre du comité scientifique">· préparée par '+esc(o.creePar)+'</span>':'')+'</span></div>'
       +'<div style="font-size:12.5px;color:var(--t2);margin:4px 0 6px">'+esc(noms)+(o.cot?' · + adhésion WLHT':'')+(o.vueLe?' · vue le '+fWhen(o.vueLe):'')+(o.paiement&&o.paiement.mode?' · 💳 '+esc(o.paiement.mode==='mensuel'?o.paiement.mois+' × '+o.paiement.mensualite+' USD (Klarna)':o.paiement.mode==='x4'?'4 × sans frais':o.paiement.mode==='paypal'?'PayPal':'une fois'):'')+(o.acceptLe?' · '+(o.signature&&o.signature.png?'✍️ signée':'acceptée')+' le '+fWhen(o.acceptLe)+(o.signature&&o.signature.nom?' par '+esc(o.signature.nom):'')+(o.acceptMsg?' : « '+esc(o.acceptMsg)+' »':''):'')+'</div>'+(o.signature&&o.signature.png?'<img src="'+o.signature.png+'" alt="Signature" style="max-height:48px;border:1px solid var(--bd);border-radius:8px;background:#fff;margin:0 0 6px">':'')
       +'<div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="ob bwa bsm" onclick="oOffreSend(\''+c.id+'\',\''+o.id+'\')">📨 Envoyer ('+(CANAL_LBL[canalCode(c)]||'WhatsApp')+')</button><a class="ob bgh bsm" href="'+offreUrl(o)+'" target="_blank" rel="noopener">👁 Voir</a><a class="ob bgh bsm" href="'+offreUrl(o)+'&v=doc" target="_blank" rel="noopener">📄 Devis / PDF</a><button type="button" class="ob bgh bsm" onclick="sendCopy(\''+offreUrl(o)+'\',\'🔗 Lien de l\\\'offre copié\')">🔗 Copier le lien</button>'
       +(st!=='commandee'&&st!=='refusee'?'<button type="button" class="ob bgh bsm" onclick="oOffreSet(\''+c.id+'\',\''+o.id+'\',\'commandee\')">🛒 Commandée</button><button type="button" class="ob bgh bsm" onclick="oOffreSet(\''+c.id+'\',\''+o.id+'\',\'refusee\')">❌ Refusée</button>':'')
@@ -8212,7 +8216,7 @@ function oOffreCreate(cid,send){
   if(!o.lignes.length){oT('Cochez au moins un appareil','w');return;}
   o.pied=String(offreParams().pied||OFFRE_PIED_DEF).replace(/\{moi\}/g,PARTNER_NOM());o.lienAdhesion=adhesionUrl(c);
   o.id='of_'+Date.now().toString(36);o.tok=(function(){var a='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',t='';for(var i=0;i<20;i++)t+=a.charAt(Math.floor(Math.random()*a.length));return t;})();
-  o.le=new Date().toISOString();var dn=new Date(),seq=OC.reduce(function(a,x){return a+((x.offres||[]).length);},0)+1;o.num='OF'+String(dn.getFullYear()).slice(2)+('0'+(dn.getMonth()+1)).slice(-2)+'-'+('000'+seq).slice(-4);o.par=PARTNER_NOM();o.parId=USER?USER.id:'';o.memberId=(USER&&USER.memberId)||'';o.rang=(USER&&USER.rang)||'';o.statut='brouillon';o.envois=[];if(comiteMasque()){o.memberId='';o.rang='';}   // v3.46 — comité scientifique : jamais affiché comme émetteur (le serveur met son référent)
+  o.le=new Date().toISOString();var dn=new Date(),seq=OC.reduce(function(a,x){return a+((x.offres||[]).length);},0)+1;o.num='OF'+String(dn.getFullYear()).slice(2)+('0'+(dn.getMonth()+1)).slice(-2)+'-'+('000'+seq).slice(-4);o.par=PARTNER_NOM();o.parId=USER?USER.id:'';o.memberId=(USER&&USER.memberId)||'';o.rang=(USER&&USER.rang)||'';o.statut='brouillon';o.envois=[];offreMasquer(o);   // v3.46 — comité scientifique : jamais affiché comme émetteur (le serveur met son référent)
   c.offres=c.offres||[];c.offres.push(o);
   var t=offreTot(o);jrnAdd(c,'fait','💶 Offre de commande créée : '+o.lignes.map(function(l){return(l.qte>1?l.qte+' × ':'')+l.nom.replace(/^OlyLife\s+/i,'');}).join(', ')+' — '+fUSD(t.total)+(o.cot?' + adhésion WLHT':''));
   oPush([c]);var m=document.getElementById('ooffre');if(m)m.remove();emojiBurst(['💶','✨','🌿']);
@@ -8220,10 +8224,8 @@ function oOffreCreate(cid,send){
 }
 function oOffreSend(cid,oid){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;var o=(c.offres||[]).find(function(x){return x.id===oid;});if(!o)return;
-  if(comiteMasque()){
-    if(srvNum()<3037){oT('🧪 Comité scientifique : l\'envoi d\'une proposition attend la mise à jour du script serveur (v3.37), pour que votre nom n\'y apparaisse pas. Prévenez l\'administrateur.','w');return;}
-    var gz=(equipeContacts().filter(function(u){return u.role==='gestionnaire';})[0]||{}).nom;oT('🧪 Votre nom n\'apparaît pas sur la proposition : elle est présentée au nom de '+(gz||'votre référent')+', qui recevra aussi les réponses.','i');
-  }
+  var affO=offreMasquer(o);
+  if(affO)oT('🧪 Proposition envoyée au nom de '+affO.nom+' : votre nom n\'y apparaît pas.','i');
   var v=tplVars(c,'fr');v.lienOffre=offreUrl(o);var t=offreTot(o);v.montantOffre=fUSD(t.total);v.financementOffre=finLignes(t.total).join(' · ');v.appareilsOffre=o.lignes.map(function(l){return(l.qte>1?l.qte+' × ':'')+l.nom.replace(/^OlyLife\s+/i,'');}).join(', ');v.validiteOffre=String(o.validite||15);
   var text=renderTpl(tplText('offre'),v),canal=canalCode(c),num=String(c.tel||'').replace(/\D/g,'');
   if((canal==='wa'||canal==='sms'||canal==='signal'||canal==='tg')&&!num){if(c.email)canal='mail';else{sendCopy(text,'📋 Pas de téléphone ni d\'e-mail : message copié');return;}}
@@ -8231,7 +8233,8 @@ function oOffreSend(cid,oid){
   sendVia(canal,num,text,c.email);
   o.envois=o.envois||[];o.envois.push({ts:new Date().toISOString(),canal:canal,par:PARTNER_NOM()});if(o.statut==='brouillon')o.statut='envoyee';
   jrnAdd(c,'fait','📨 Offre de commande envoyée par '+(CANAL_LBL[canal]||canal)+' ('+fUSD(t.total)+')');oPush([c]);oOpenF(cid);
-  oOffreMail(cid,o.id,canal==='mail');
+  if(affO&&srvNum()<3037)oT('✉️ E-mail automatique non envoyé : il porterait votre nom. Il partira normalement une fois le script serveur mis à jour (v3.37).','w');
+  else oOffreMail(cid,o.id,canal==='mail');
 }
 function oOffreMail(cid,oid,dejaMail){
   // v3.38.1 — e-mail automatique : la personne reçoit l'offre (si e-mail), l'émetteur reçoit toujours une copie

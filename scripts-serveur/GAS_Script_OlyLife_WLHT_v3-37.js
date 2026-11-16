@@ -667,7 +667,8 @@ function handleOffre_(db, req, op) {
   saveDB_(db);
   var qui = (c.prenom || '') + ' ' + (c.nom || '');
   var affA = offreAff_(db, u, c);
-  try { pushSend_(db, affA !== u ? [u, affA, { id: 'root' }] : [u, { id: 'root' }], (signed ? '✍️ Offre signée' : '✅ Offre acceptée'), qui.trim() + (signed ? ' a signé le bon pour accord (' : ' souhaite commander (') + Math.round(total) + ' USD)', ''); } catch (e) {}
+  var creeU = null; if (o.creeParId) for (var cq = 0; cq < db.users.length; cq++) if (db.users[cq].id === o.creeParId) creeU = db.users[cq];   // membre du comité qui a préparé la proposition : prévenu lui aussi
+  try { pushSend_(db, (affA !== u ? [u, affA, { id: 'root' }] : [u, { id: 'root' }]).concat(creeU ? [creeU] : []), (signed ? '✍️ Offre signée' : '✅ Offre acceptée'), qui.trim() + (signed ? ' a signé le bon pour accord (' : ' souhaite commander (') + Math.round(total) + ' USD)', ''); } catch (e) {}
   try {
     var em = u.email || u.digestEmail || emailDe_(db, u.nom || o.par);
     if (em) {
