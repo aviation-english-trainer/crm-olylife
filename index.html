@@ -2537,7 +2537,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.50.1 · 16/11';
+var APP_VERSION='v3.51 · 16/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -7901,7 +7901,7 @@ function oCompteRender(){
   var box=document.getElementById('fo-comptes');if(!box)return;
   var pl=document.getElementById('prod-list');if(pl)pl.innerHTML=PRODUCTS.map(function(P){return'<option value="'+esc(P)+'">';}).join('');
   box.innerHTML=FORM_COMPTES.map(function(k,i){
-    return'<div class="cpt-box" data-i="'+i+'"><div class="cpt-hd"><b>'+(i+2)+'ᵉ compte</b>'+(k.memberIdOlyLife?' <span style="color:var(--t3)">· '+esc(k.memberIdOlyLife)+'</span>':'')+'<button type="button" class="ob bgh bsm" onclick="oCompteSwap('+i+')" title="Ce compte devient le principal ; l\'actuel principal prend sa place ici">↔ Principal</button> <button type="button" class="ob bgh bsm" onclick="oCompteDel('+i+')">🗑 Retirer</button></div><div class="ofg">'
+    return'<div class="cpt-box" data-i="'+i+'"><div class="cpt-hd"><b>'+(i+2)+'ᵉ compte</b>'+(k.memberIdOlyLife?' <span style="color:var(--t3)">· '+esc(k.memberIdOlyLife)+'</span>':'')+'<button type="button" class="ob bgh bsm" onclick="oCompteMerge('+i+')" title="Ce n\'est pas un 2e compte : verser ses informations dans le compte principal et le retirer">⬆️ Fusionner</button> <button type="button" class="ob bgh bsm" onclick="oCompteSwap('+i+')" title="Ce compte devient le principal ; l\'actuel principal prend sa place ici">↔ Principal</button> <button type="button" class="ob bgh bsm" onclick="oCompteDel('+i+')">🗑 Retirer</button></div><div class="ofg">'
       +CPT_FIELDS.map(function(f){
         var v=f[0]==='produit'?((k.produits||[])[0]||''):f[0]==='installConfirm'?(k.installConfirm?'Oui':''):(k[f[0]]||''),inp;
         if(f[2]==='select'){var o=f[0]==='cote'?['','Gauche','Droite']:f[0]==='installConfirm'?['','Oui']:['','P1 - Starter','P2 - Builder','P3 - Leader','P4 - Supervisor','P5 - Pioneer'];
@@ -7929,6 +7929,21 @@ function oCompteSwap(i){
   k.produits=mp.slice(0,1);
   oCompteRender();oT('↔ Comptes échangés — vérifiez puis enregistrez','s');
 }
+// v3.51 — ce bloc n'était pas un vrai 2e compte (même commande importée deux fois) : on verse ses informations dans le compte principal
+function oCompteMerge(i){
+  oCompteCollect();var k=FORM_COMPTES[i];if(!k)return;
+  var ids={memberIdOlyLife:'fl-memberid',numCommande:'fl-numcmd',dateCommande:'fl-datecmd',transporteur:'fl-transp',tracking:'fl-tracking',dateLivraison:'fl-datelivr',rangOly:'fo-rang',sponsor:'fe-sponsor',placement:'fe-placement',cote:'fe-cote'};
+  var LBL={memberIdOlyLife:'n° de distributeur',numCommande:'n° de commande',dateCommande:'date de commande',transporteur:'transporteur',tracking:'n° de suivi',dateLivraison:'date de livraison',rangOly:'rang',sponsor:'parrain',placement:'placement',cote:'côté'};
+  var chg=[],prod=(k.produits||[])[0]||'';
+  Object.keys(ids).forEach(function(f){var el=document.getElementById(ids[f]);if(!el)return;var kv=String(k[f]||'').trim(),mv=String(el.value||'').trim();
+    if(kv&&kv!==mv)chg.push('• '+LBL[f]+' : '+(mv?mv+' → ':'')+kv);});
+  if(prod&&!document.querySelector('#opg .oprd input[value="'+prod.replace(/"/g,'&quot;')+'"]:checked'))chg.push('• appareil ajouté : '+prod);
+  if(!confirm('Verser ce compte dans le compte principal de la fiche ?\n\n'+(chg.length?chg.join('\n'):'(rien de nouveau à reprendre)')+'\n\nLe bloc sera ensuite retiré.'))return;
+  Object.keys(ids).forEach(function(f){var el=document.getElementById(ids[f]);if(!el)return;var kv=String(k[f]||'').trim();if(kv)el.value=kv;});
+  if(prod)document.querySelectorAll('#opg .oprd').forEach(function(pz){var cb=pz.querySelector('input');if(cb.value===prod&&!cb.checked){cb.checked=true;pz.classList.add('on');}});
+  if(k.installConfirm){var ic=document.getElementById('fl-install');if(ic&&!ic.checked)ic.checked=true;}
+  FORM_COMPTES.splice(i,1);oCompteRender();oT('⬆️ Compte fusionné avec le principal — vérifiez puis enregistrez','s');
+}
 function oCompteDel(i){oCompteCollect();var k=FORM_COMPTES[i];if(k&&(k.memberIdOlyLife||k.numCommande)&&!confirm('Retirer le compte '+(k.memberIdOlyLife||k.numCommande)+' de cette fiche ?'))return;FORM_COMPTES.splice(i,1);oCompteRender();}
 
 // ── Import : un autre n° de distributeur de la même personne devient un compte de plus (pas un écrasement) ──
@@ -7939,7 +7954,9 @@ function impCompteRoute(it,ex){
   var ea=String(it.memberIdOlyLife).toUpperCase(),main=String(ex.memberIdOlyLife||'').toUpperCase();
   if(IMP_IDMODE[ea]==='replace'||!main||main===ea)return null;
   // v3.36 — l'ID principal actuel est le parrain, le placement ou le compte BO de cette commande : ce n'est pas un 2e compte, c'est une erreur à corriger
-  if([it.sponsor,it.placement,it.boCompte].some(function(x){return eaOf(x)===main;})){IMP_IDMODE[ea]='replace';it._idFix=main;return null;}
+  if([it.sponsor,it.placement,it.boCompte,ex.sponsor,ex.placement].some(function(x){return eaOf(x)===main;})){IMP_IDMODE[ea]='replace';it._idFix=main;return null;}
+  // v3.51 — la fiche n'a encore aucune commande ni autre compte : ce n'est pas un 2e compte, c'est son vrai n° qui arrive
+  if(!ex.numCommande&&!ex.dateCommande&&!(ex.comptes||[]).length&&(it.numCommande||it.tracking)){IMP_IDMODE[ea]='replace';it._idFix=main;return null;}
   var k=(ex.comptes||[]).find(function(x){return String(x.memberIdOlyLife||'').toUpperCase()===ea;});
   return k?{k:k,isNew:false}:{k:null,isNew:true};
 }
