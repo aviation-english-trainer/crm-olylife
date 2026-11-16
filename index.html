@@ -2537,7 +2537,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.49 · 16/11';
+var APP_VERSION='v3.50 · 16/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -4948,6 +4948,7 @@ function parseVrac(text){
     line=line.trim();if(!line)return;
     var email=(line.match(/[\w.+-]+@[\w-]+\.[\w.-]+/)||[])[0]||'';
     if(!email&&isLabelLine(line))return; // libellé de formulaire → pas un contact
+    if(!email&&BO_LINE_RX.test(line))return;   // v3.50 — ligne de produit, de montant ou de règlement d'une page back-office
     var phone=(line.match(/\+?\d[\d\s().\u00A0-]{6,}\d/)||[])[0]||'';
     var ref='';
     var mRef=line.match(/(?:envoy[ée]?e?\s+par|r[ée]f[ée]r[ée]?e?\s+par|de la part d[eu']\s*|via)\s+([^,;|]+)$/i);
@@ -4973,6 +4974,8 @@ function parseVrac(text){
 }
 // Libellés de formulaires/exports qui ne sont PAS des contacts
 var LABEL_RX=/^(informations?\b|image\b|id\b|produits?\b|maison$|remarques?|mode de livraison|par courrier|code postal|num[ée]ro|adresse|pays\b|france$|nom\b|surnom|montant|type de commande|prix|quantit|statut|total|sous-total|livraison|exp[ée]dition|destinataire|membre|member|order|commande|date\b|t[ée]l[ée]phone|e-?mail|courriel|ville|r[ée]gion|usd|eur|logo$|index$|language$|settled$|by mail$|return$|operation$|nickname|copyright|my (membership )?order|data management|business management|events hub|network management|financial management|campaign query|contact customer service|document center|announcement notification|basic information|member information|mailing information|delivery (information|method|time|quantity)|order (number|amount|type|status|information)|product (ordered|id|name)|unit price|quantity|phone number|email address|country|detailed address|postal code|recipient|id card|tax identification|logistic company|tracking number|member registration|[\d\s+.,()\-]+$|ea\d{5,}$|\d+\s+(rue|av|avenue|bd|boulevard|chemin|all[ée]e|impasse|place)\b)/i;
+// v3.50 — lignes d'une page de commande qui ne sont jamais des contacts
+var BO_LINE_RX=/(^|\s)(OLY[-\s]?[A-Z0-9]{3,}|USD\s*\$|E-?Wallet|EC Payment|Binance|PayPal|Credit Card Payment|Order (Amount|Settlement)|Total Amount|Fees And Charges|Tax\s*[:：]|Unit Price|Product (ID|Name|Ordered)|Quantity|Delivery (Method|Quantity|Time|information)|Logistic Company|Tracking Number|Sales Order|Autofill|Membership Rank|Placement (ID|Position)|Sponsor ID|ID Card Number|Tax Identification|Confirm (Address|Password)|New Member Password)(\s|$)|^[\s?<>.,;:·—–-]*$|^[\d\s.,$+-]+$|^\?\s*<>?\s*$/i;
 function isLabelLine(s){s=(s||'').trim();return !s||/[:：]\s*$/.test(s)||LABEL_RX.test(s);}
 // Détecte un relevé de commande OlyLife (back-office FR ou EN : "Numéro de commande:" / "Order Number：")
 // v3.15 — page « Commande d'inscription d'un membre » du BO OlyLife (formulaire d'inscription, FR ou EN)
@@ -5070,28 +5073,116 @@ function parseOlyRows(text){
 // Captures multiples : « --- capture n --- » sépare les blocs ; un bloc sans marqueur de début (adresse, écran de succès…) complète le précédent
 function impParseGroups(raw){
   var parts=raw.split(/^--- capture \d+ ---$/m).map(function(x){return x.trim();}).filter(Boolean);
-  var groups=[],curNum='';
+  var groups=[],curNum='',curOrd=false;
   parts.forEach(function(t){
     var num=(deEnt(t).match(/\b(20\d{14,})\b/)||[])[1]||'';
     var isOrd=looksOlyOrder(t)||looksOlyOrderOcr(t);
     // v3.22.4 — pages de commande : nouvelle fiche seulement si un AUTRE n° de commande apparaît ; sinon c'est la suite de la même page
-    var starts=isOrd?(!groups.length||(num&&num!==curNum)||(!num&&!curNum)):(looksOlyReg(t)||looksOlyRows(t));
-    if(starts||!groups.length){groups.push(t);curNum=isOrd?num:'';}
-    else{groups[groups.length-1]+='\n'+t;if(!curNum&&num)curNum=num;}
+    // v3.50 — tant qu'aucun AUTRE numéro de commande n'apparaît, les captures qui se suivent décrivent la même page (panier, adresse, formulaire d'inscription)
+    var isReg=looksOlyReg(t);
+    var starts=isOrd?(!groups.length||!curOrd||(num&&curNum&&num!==curNum)):(isReg?!curOrd:(looksOlyRows(t)||looksCard(t)));
+    if(starts||!groups.length){groups.push(t);curNum=num;curOrd=isOrd||isReg;}
+    else{groups[groups.length-1]+='\n'+t;if(!curNum&&num)curNum=num;if(isOrd||isReg)curOrd=true;}
   });
   var items=[];
   groups.forEach(function(t){
-    var its=(looksOlyOrder(t)||looksOlyOrderOcr(t))?parseOlyOrderAny(t):looksOlyReg(t)?parseOlyReg(t):looksOlyRows(t)?parseOlyRows(t):looksCard(t)?parseCard(t):parseVrac(t);
+    var ordish=looksOlyOrder(t)||looksOlyOrderOcr(t),reg=looksOlyReg(t);
+    var its=ordish?parseOlyOrderAny(t):reg?parseOlyReg(t):looksOlyRows(t)?parseOlyRows(t):looksCard(t)?parseCard(t):parseVrac(t);
+    if(ordish&&reg){var r2=parseOlyReg(t);if(r2.length===1&&its.length===1)impFold(its[0],r2[0]);else if(r2.length===1&&!its.length)its=r2;}   // v3.50 — page de commande + formulaire d'inscription dans les mêmes captures
+    if(ordish||reg)its.forEach(function(it){impCleanBO(it,t);});
     its.forEach(function(it){items.push(it);});
   });
-  return items;
+  return impMergeSame(items);
+}
+// ═══ v3.50 — nettoyage d'une fiche lue sur le back-office OlyLife (OCR de plusieurs captures) ═══
+var BO_NOISE=/^(mailing information|informations? d['’]exp[ée]dition|save time\.?|autofill.*|address confirmed.*|adresse confirm[ée]e.*|confirm address|confirmer l['’]adresse|reset|r[ée]initialiser|search your address|rechercher.*adresse|enter digits only.*|delivery method.*|mode de livraison.*|remarks?.*|remarques?.*|detailed address|adresse d[ée]taill[ée]e|country\s*\/\s*region|pays\s*\/\s*r[ée]gion|full name|nom complet|phone number|num[ée]ro de t[ée]l[ée]phone|region|r[ée]gion|product ordered|produits? command[ée]s?|order settlement|r[ée]glement de la commande|you can submit now.*)[\s:：*]*$/i;
+function boClean(v){
+  return String(v||'').split(/\s{2,}|\s*[,;]\s*(?=[A-ZÀ-Ý][a-zà-ÿ]{3,}\s)|\n/).map(function(x){return x.trim();})
+    .filter(function(x){return x&&!BO_NOISE.test(x);}).join(', ').replace(/\s*,\s*,+/g,', ').replace(/\s+/g,' ').replace(/^[,\s]+|[,\s]+$/g,'');
+}
+function boPaiement(t){
+  var m=String(t||'').match(/(?:order settlement|r[ée]glement de la commande)[\s\S]{0,120}?(EC Payment\s*&?\s*(?:and\s*)?Credit Card Payment|EC Payment\s*&\s*Binance Payment|Credit Card Payment|Binance Payment|EC Payment|PayPal)/i);
+  if(!m)return null;var v=m[1].toLowerCase();
+  return{mode:/ec.*credit|credit.*ec/.test(v)?'ec_cb':/ec.*binance/.test(v)?'ec_binance':/credit/.test(v)?'cb':/binance/.test(v)?'binance':/paypal/.test(v)?'paypal':'ec',fois:1};
+}
+function boCapi(x){return String(x||'').toLowerCase().replace(/(^|[\s'-])([a-zà-ÿ])/g,function(m,a,b){return a+b.toUpperCase();});}
+function boProdMatch(nm){
+  nm=String(nm||'').toLowerCase();if(!nm)return'';
+  if(/p90\s*\+|p90plus|tera-?p90\+/.test(nm))return PRODUCTS[0];
+  if(/p90/.test(nm))return PRODUCTS[1];
+  if(/frost/.test(nm))return PRODUCTS[2];
+  if(/revitaluxe/.test(nm))return PRODUCTS[3];
+  if(/shaken|sk-?m3/.test(nm))return PRODUCTS[4];
+  if(/g1[-\s]?max|g-?1max/.test(nm))return PRODUCTS[5];
+  if(/g-?one|galaxy/.test(nm))return PRODUCTS[6];
+  if(/vitality|wand/.test(nm))return PRODUCTS[7];
+  if(/bama/.test(nm))return PRODUCTS[8];
+  if(/skyline/.test(nm))return PRODUCTS[9];
+  if(/spring\s*water/.test(nm))return PRODUCTS[10];
+  return'';
+}
+function boProduits(t){
+  var out=[],lines=String(t||'').split(/\n/),add=function(nm){var P=boProdMatch(nm);if(P&&out.indexOf(P)<0)out.push(P);};
+  for(var i=0;i<lines.length;i++){
+    var L=lines[i].trim();
+    // une ligne complète : CODE  Nom …  USD $x  PV  Quantité
+    var m=L.match(/^(OLY-[A-Z0-9-]+)[\s\t]+(.{3,}?)[\s\t]+USD\s*\$?[\d.,]+(?:[\s\t]+[\d.,]+)?[\s\t]+(\d{1,2})[\s\t]*$/i);
+    if(m){if(+m[3]>0)add(m[2]);continue;}
+    // colonnes éclatées : CODE / Nom / USD $x / PV / Quantité
+    if(/^OLY-[A-Z0-9-]+$/i.test(L)){
+      var nm=(lines[i+1]||'').trim(),q=null;
+      for(var k=i+1;k<Math.min(i+6,lines.length);k++){var c=(lines[k]||'').trim();if(/^\d{1,2}$/.test(c)&&/USD/i.test(lines[k-2]||lines[k-1]||'')){q=+c;break;}}
+      if(q===null)for(var k2=i+1;k2<Math.min(i+6,lines.length);k2++){var c2=(lines[k2]||'').trim();if(/^\d{1,2}$/.test(c2)){q=+c2;break;}}
+      if(q>0&&nm&&!/^OLY-/i.test(nm))add(nm);
+    }
+  }
+  return out;
+}
+function impCleanBO(it,txt){
+  try{
+    if(it.adresse)it.adresse=boClean(it.adresse);
+    if(it.livAdresse)it.livAdresse=boClean(it.livAdresse);
+    if(it.prenom)it.prenom=String(it.prenom).split(/[,;]/)[0].trim();
+    // nom complet du formulaire d'expédition quand le nom manque
+    if(!it.nom){var fn=String(txt||'').match(/(?:full name|nom complet)\s*\*?\s*[:：]?\s*\n?\s*([A-ZÀ-Ý][A-ZÀ-Ý' -]{3,})\s*$/mi);
+      if(fn){var w=fn[1].trim().split(/\s+/);if(w.length>1){it.nom=w[w.length-1];it.prenom=boCapi(w.slice(0,-1).join(' '));}else it.nom=w[0];}}
+    // le compte affiché en haut du back-office est celui de la personne connectée, pas celui du client
+    var mine=String((USER&&USER.memberId)||'').toUpperCase(),spo=String(it.sponsor||it.parrainOly||'').toUpperCase(),pla=String(it.placement||'').toUpperCase();
+    if(!it.placement){var mpl=String(txt||'').match(/(?:placement id|id de placement)\s*[:：]?\s*\n?\s*((?:EA|AF)\d{5,})/i);if(mpl){it.placement=mpl[1].toUpperCase();pla=it.placement;}}
+    if(!it.sponsor){var msp=String(txt||'').match(/(?:sponsor id|id du parrain|referrer id)\s*[:：]?\s*\n?\s*((?:EA|AF)\d{5,})/i);if(msp){it.sponsor=msp[1].toUpperCase();spo=it.sponsor;}}
+    if(it.memberIdOlyLife){var mid=String(it.memberIdOlyLife).toUpperCase();if(mid===mine||(spo&&mid===spo)||(pla&&mid===pla))it.memberIdOlyLife='';}
+    if(/^(other countries|autres pays)$/i.test(String(it.pays||'')))it.pays='';   // valeur du menu OlyLife, pas un pays
+    if(!it.pays){var rx=/(?:country\s*\/\s*region|pays\s*\/\s*r[ée]gion)\s*\*?\s*[:：]?[^\S\n]*\n?[^\S\n]*(?:[^\x00-\x7F]{1,4}\s*)?([A-Za-zÀ-ÿ][A-Za-zÀ-ÿ'' -]{2,24}?)[^\S\n]*$/gmi,mp2;
+      while((mp2=rx.exec(String(txt||'')))){var v=mp2[1].trim();if(v&&!/^(other countries|autres pays)$/i.test(v)){it.pays=v;break;}}}
+    if(!it.ville){var mv=String(txt||'').match(/^[^\S\n]*city[^\S\n]*\*?[^\S\n]*[:：]?[^\S\n]*\n?[^\S\n]*([A-ZÀ-Ý][A-Za-zÀ-ÿ'' -]{2,28}?)[^\S\n]*$/mi)||String(txt||'').match(/(?:full address|adresse compl[èe]te)\s*[:：]\s*[^\n]*?,\s*\d{4,6}\s*,\s*([A-ZÀ-Ý][A-Za-zÀ-ÿ'' -]{2,28}?)\s*(?:,|$)/mi);
+      if(mv)it.ville=mv[1].trim();}
+    if(it.rangOly&&!/(membership|adh[ée]sion)\s*rank|rang d['’]adh[ée]sion|rank of membership/i.test(String(txt||'')))delete it.rangOly;
+    var pr=boProduits(txt);if(pr.length)it.produits=pr;
+    else if((String(txt||'').match(/OLY-[A-Z0-9]{3,}/gi)||[]).length>=2)it.produits=[];   // plusieurs articles au catalogue sans quantité lisible : on préfère ne rien deviner
+    var pay=boPaiement(txt);if(pay)it.paiement={mode:pay.mode,fois:1,note:'',par:PARTNER_NOM(),le:todayYMD()};
+  }catch(e){}
+  return it;
+}
+// Plusieurs captures d'une même personne → une seule fiche (même téléphone ou même e-mail)
+function impMergeSame(items){
+  var out=[];
+  items.forEach(function(it){
+    var tel=String(it.tel||'').replace(/\D/g,'').slice(-9),mail=String(it.email||'').toLowerCase();
+    var tw=out.filter(function(x){var t2=String(x.tel||'').replace(/\D/g,'').slice(-9),m2=String(x.email||'').toLowerCase();
+      return(tel&&t2&&tel===t2)||(mail&&m2&&mail===m2);})[0];
+    if(tw){var keep=tw._src;impFold(tw,it);if(it.produits&&it.produits.length)tw.produits=it.produits;if(it.paiement)tw.paiement=it.paiement;tw._src=keep;}
+    else out.push(it);
+  });
+  return out;
 }
 // v3.20.2 — page « Informations sur la commande » lue par OCR sur mobile (colonnes mélangées, libellés coupés sur plusieurs lignes)
 function looksOlyOrderOcr(text){
   var t=deEnt(text);
   var hasNum=/\b20\d{14,}\b/.test(t),hasEA=/\b(EA|AF)\d{5,}\b/i.test(t),hasHead=/informations? (sur|de) la commande|order information|informations de base|basic information|informations (sur les|du) membres?|member information|mailing information|informations d'exp[ée]dition|delivery information|informations de livraison|product ordered|produits command[ée]s/i.test(t);
   var hasTel=/@|\+\d{1,3}[\s.-]?\d{6,}/.test(t),hasTrack=/\b[A-Z]{2}\d{9}[A-Z]{2}\b/.test(t);
-  return(hasNum&&(hasEA||hasHead))||(hasHead&&hasEA&&hasTel)||(hasHead&&(hasTrack||/recipient|destinataire/i.test(t)));
+  // v3.50 — une commande en cours de création n'a pas encore de numéro : on la reconnaît à ses repères de page (panier, règlement, adresse de livraison)
+  var marks=0;[/\bproducts? ordered\b|produits? command[ée]/i,/\border settlement\b|r[ée]glement de la commande/i,/\border amount\b|montant de la commande/i,/\bfees and charges\b|frais et charges/i,/\btotal amount\b|montant total/i,/e-?wallet balance|solde du portefeuille/i,/\bdelivery method\b|mode de livraison/i,/\bconfirm address\b|confirmer l['’]adresse/i,/\bproduct id\b.*\bproduct name\b/i,/\bOLY-[A-Z0-9]{3,}\b/].forEach(function(r){if(r.test(t))marks++;});
+  return(hasNum&&(hasEA||hasHead))||(hasHead&&hasEA&&hasTel)||(hasHead&&(hasTrack||/recipient|destinataire/i.test(t)))||marks>=2;
 }
 function parseOlyOrderOcr(text){
   var raw=deEnt(text).replace(/ /g,' ');
