@@ -2263,6 +2263,9 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <div style="margin-top:12px;padding:12px;background:rgba(18,106,60,.07);border-radius:12px;border:1px solid rgba(18,106,60,.18)">
       <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">🎥 Mon lien Zoom (salle de réunion personnelle)</div>
       <input type="url" class="ofc" id="oprof-zoom" placeholder="https://us05web.zoom.us/j/1234567890?pwd=…">
+      <div style="font-size:12px;font-weight:700;color:var(--gold);margin:12px 0 6px">🌍 Mon fuseau horaire</div>
+      <select class="ofc" id="oprof-tz" onchange="oProfTzSave()"></select>
+      <div id="oprof-tz-st" style="font-size:11.5px;line-height:1.5;margin-top:6px;color:var(--t2)"></div>
     </div>
     <div style="margin-top:12px;padding:12px;background:rgba(201,168,76,.10);border-radius:12px;border:1px solid rgba(201,168,76,.35)">
       <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">🧬 Mon compte OlyLife (figure sur mes offres de commande)</div>
@@ -2536,7 +2539,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.53 · 16/11';
+var APP_VERSION='v3.54 · 18/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -8441,25 +8444,74 @@ function admCatRender(){
 function admCatAdd(){var b=document.getElementById('adm-cat-body');if(!b)return;var tr=document.createElement('tr');tr.innerHTML='<td><input type="checkbox" class="ac-on" checked></td><td><input class="ofc ac-ref" style="width:120px"></td><td><input class="ofc ac-nom" placeholder="OlyLife …" style="min-width:200px"></td><td><input type="number" class="ofc ac-usd" value="0" style="width:84px"></td><td><input type="number" class="ofc ac-pv" value="0" style="width:74px"></td><td><select class="ofc ac-dec" style="min-width:150px"><option value="">— aucun tunnel —</option>'+Object.keys(DECOUV).map(function(k){return'<option value="'+esc(k)+'">'+esc(k)+'</option>';}).join('')+'</select></td><td><input class="ofc ac-ic" value="🧩" style="width:44px;text-align:center"></td><td><textarea class="ofc ac-pitch" style="min-width:260px;min-height:54px"></textarea><input class="ofc ac-img" placeholder="Image (URL ou img/…)" style="margin-top:4px;font-size:11px"><input type="hidden" class="ac-id" value="c_'+Date.now().toString(36)+'"></td><td><button type="button" class="ob bgh bsm" onclick="this.closest(\'tr\').remove()">🗑</button></td>';b.appendChild(tr);}
 function admCatCollect(){var out=[];document.querySelectorAll('#adm-cat-body tr').forEach(function(tr){var q=function(s){return tr.querySelector(s);};var nom=(q('.ac-nom').value||'').trim();if(!nom)return;out.push({id:q('.ac-id').value,ref:(q('.ac-ref').value||'').trim().toUpperCase(),nom:nom,usd:+q('.ac-usd').value||0,pv:+q('.ac-pv').value||0,decouv:q('.ac-dec').value||'',ic:(q('.ac-ic').value||'').trim()||'🧩',pitch:(q('.ac-pitch').value||'').trim(),img:(q('.ac-img').value||'').trim(),actif:q('.ac-on').checked});});return out;}
 
+// ── v3.54 — Fuseaux horaires : chaque personne reçoit l'heure du rendez-vous dans SON heure locale ──
+// Fuseau déduit du pays de la fiche, sinon de l'indicatif du téléphone ; corrigeable personne par personne.
+var TZ_CC={'33':'Europe/Paris','32':'Europe/Brussels','41':'Europe/Zurich','352':'Europe/Luxembourg','377':'Europe/Monaco','44':'Europe/London','353':'Europe/Dublin','34':'Europe/Madrid','351':'Europe/Lisbon','39':'Europe/Rome','49':'Europe/Berlin','43':'Europe/Vienna','31':'Europe/Amsterdam','45':'Europe/Copenhagen','46':'Europe/Stockholm','47':'Europe/Oslo','358':'Europe/Helsinki','48':'Europe/Warsaw','30':'Europe/Athens','40':'Europe/Bucharest','90':'Europe/Istanbul','380':'Europe/Kyiv','7':'Europe/Moscow',
+'212':'Africa/Casablanca','213':'Africa/Algiers','216':'Africa/Tunis','218':'Africa/Tripoli','20':'Africa/Cairo',
+'225':'Africa/Abidjan','221':'Africa/Dakar','223':'Africa/Bamako','226':'Africa/Ouagadougou','224':'Africa/Conakry','228':'Africa/Lome','229':'Africa/Porto-Novo','227':'Africa/Niamey','222':'Africa/Nouakchott','220':'Africa/Banjul','245':'Africa/Bissau','231':'Africa/Monrovia','232':'Africa/Freetown','233':'Africa/Accra','238':'Atlantic/Cape_Verde','235':'Africa/Ndjamena','236':'Africa/Bangui','237':'Africa/Douala','240':'Africa/Malabo','241':'Africa/Libreville','242':'Africa/Brazzaville','243':'Africa/Kinshasa','244':'Africa/Luanda','234':'Africa/Lagos','254':'Africa/Nairobi','255':'Africa/Dar_es_Salaam','256':'Africa/Kampala','250':'Africa/Kigali','257':'Africa/Bujumbura','251':'Africa/Addis_Ababa','27':'Africa/Johannesburg','261':'Indian/Antananarivo','230':'Indian/Mauritius','262':'Indian/Reunion','269':'Indian/Comoro','248':'Indian/Mahe',
+'1':'America/New_York','590':'America/Guadeloupe','596':'America/Martinique','594':'America/Cayenne','509':'America/Port-au-Prince','55':'America/Sao_Paulo','52':'America/Mexico_City','54':'America/Argentina/Buenos_Aires','56':'America/Santiago','57':'America/Bogota','51':'America/Lima',
+'971':'Asia/Dubai','974':'Asia/Qatar','966':'Asia/Riyadh','965':'Asia/Kuwait','961':'Asia/Beirut','962':'Asia/Amman','972':'Asia/Jerusalem','98':'Asia/Tehran','91':'Asia/Kolkata','66':'Asia/Bangkok','84':'Asia/Ho_Chi_Minh','65':'Asia/Singapore','60':'Asia/Kuala_Lumpur','62':'Asia/Jakarta','63':'Asia/Manila','86':'Asia/Shanghai','852':'Asia/Hong_Kong','886':'Asia/Taipei','82':'Asia/Seoul','81':'Asia/Tokyo',
+'61':'Australia/Sydney','64':'Pacific/Auckland','687':'Pacific/Noumea','689':'Pacific/Tahiti','262269':'Indian/Mayotte'};
+var TZ_PAYS={'france':'Europe/Paris','belgique':'Europe/Brussels','suisse':'Europe/Zurich','luxembourg':'Europe/Luxembourg','monaco':'Europe/Monaco','royaume uni':'Europe/London','angleterre':'Europe/London','irlande':'Europe/Dublin','espagne':'Europe/Madrid','portugal':'Europe/Lisbon','italie':'Europe/Rome','allemagne':'Europe/Berlin','autriche':'Europe/Vienna','pays bas':'Europe/Amsterdam','hollande':'Europe/Amsterdam','danemark':'Europe/Copenhagen','suede':'Europe/Stockholm','norvege':'Europe/Oslo','finlande':'Europe/Helsinki','pologne':'Europe/Warsaw','grece':'Europe/Athens','roumanie':'Europe/Bucharest','turquie':'Europe/Istanbul','ukraine':'Europe/Kyiv','russie':'Europe/Moscow',
+'maroc':'Africa/Casablanca','algerie':'Africa/Algiers','tunisie':'Africa/Tunis','libye':'Africa/Tripoli','egypte':'Africa/Cairo',
+'cote divoire':'Africa/Abidjan','cote d ivoire':'Africa/Abidjan','rci':'Africa/Abidjan','senegal':'Africa/Dakar','mali':'Africa/Bamako','burkina faso':'Africa/Ouagadougou','burkina':'Africa/Ouagadougou','guinee':'Africa/Conakry','togo':'Africa/Lome','benin':'Africa/Porto-Novo','niger':'Africa/Niamey','mauritanie':'Africa/Nouakchott','gambie':'Africa/Banjul','guinee bissau':'Africa/Bissau','liberia':'Africa/Monrovia','sierra leone':'Africa/Freetown','ghana':'Africa/Accra','cap vert':'Atlantic/Cape_Verde','tchad':'Africa/Ndjamena','centrafrique':'Africa/Bangui','cameroun':'Africa/Douala','guinee equatoriale':'Africa/Malabo','gabon':'Africa/Libreville','congo':'Africa/Brazzaville','rdc':'Africa/Kinshasa','congo kinshasa':'Africa/Kinshasa','angola':'Africa/Luanda','nigeria':'Africa/Lagos','kenya':'Africa/Nairobi','tanzanie':'Africa/Dar_es_Salaam','ouganda':'Africa/Kampala','rwanda':'Africa/Kigali','burundi':'Africa/Bujumbura','ethiopie':'Africa/Addis_Ababa','afrique du sud':'Africa/Johannesburg','madagascar':'Indian/Antananarivo','maurice':'Indian/Mauritius','ile maurice':'Indian/Mauritius','reunion':'Indian/Reunion','la reunion':'Indian/Reunion','mayotte':'Indian/Mayotte','comores':'Indian/Comoro','seychelles':'Indian/Mahe',
+'etats unis':'America/New_York','usa':'America/New_York','canada':'America/Toronto','quebec':'America/Toronto','guadeloupe':'America/Guadeloupe','martinique':'America/Martinique','guyane':'America/Cayenne','haiti':'America/Port-au-Prince','bresil':'America/Sao_Paulo','mexique':'America/Mexico_City','argentine':'America/Argentina/Buenos_Aires','chili':'America/Santiago','colombie':'America/Bogota','perou':'America/Lima',
+'emirats arabes unis':'Asia/Dubai','emirats':'Asia/Dubai','dubai':'Asia/Dubai','qatar':'Asia/Qatar','arabie saoudite':'Asia/Riyadh','koweit':'Asia/Kuwait','liban':'Asia/Beirut','jordanie':'Asia/Amman','israel':'Asia/Jerusalem','iran':'Asia/Tehran','inde':'Asia/Kolkata','thailande':'Asia/Bangkok','vietnam':'Asia/Ho_Chi_Minh','singapour':'Asia/Singapore','malaisie':'Asia/Kuala_Lumpur','indonesie':'Asia/Jakarta','philippines':'Asia/Manila','chine':'Asia/Shanghai','hong kong':'Asia/Hong_Kong','taiwan':'Asia/Taipei','coree du sud':'Asia/Seoul','japon':'Asia/Tokyo',
+'australie':'Australia/Sydney','nouvelle zelande':'Pacific/Auckland','nouvelle caledonie':'Pacific/Noumea','polynesie francaise':'Pacific/Tahiti','tahiti':'Pacific/Tahiti'};
+var TZ_LISTE=['Europe/Paris','Europe/Brussels','Europe/Zurich','Europe/Luxembourg','Europe/London','Europe/Madrid','Europe/Lisbon','Europe/Rome','Europe/Berlin','Europe/Amsterdam','Europe/Athens','Europe/Istanbul','Europe/Moscow','Africa/Casablanca','Africa/Algiers','Africa/Tunis','Africa/Cairo','Africa/Abidjan','Africa/Dakar','Africa/Bamako','Africa/Ouagadougou','Africa/Conakry','Africa/Lome','Africa/Porto-Novo','Africa/Niamey','Africa/Accra','Africa/Ndjamena','Africa/Douala','Africa/Libreville','Africa/Brazzaville','Africa/Kinshasa','Africa/Lagos','Africa/Nairobi','Africa/Johannesburg','Indian/Antananarivo','Indian/Mauritius','Indian/Reunion','Atlantic/Cape_Verde','America/New_York','America/Chicago','America/Denver','America/Los_Angeles','America/Toronto','America/Guadeloupe','America/Martinique','America/Cayenne','America/Sao_Paulo','America/Mexico_City','Asia/Dubai','Asia/Riyadh','Asia/Jerusalem','Asia/Kolkata','Asia/Bangkok','Asia/Shanghai','Asia/Tokyo','Australia/Sydney','Pacific/Noumea','Pacific/Tahiti'];
+function tzNorm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z ]+/g,' ').replace(/\s+/g,' ').trim();}
+function tzVille(tz){return String(tz||'').split('/').pop().replace(/_/g,' ');}
+function tzDeVille(tz){var v=tzVille(tz);return(/^[AEIOUYÀÂÉÈÊËÎÏÔÖÙÛÜH]/i.test(v)?"d'":'de ')+v;}
+function tzValide(tz){if(!tz)return'';try{new Intl.DateTimeFormat('fr-FR',{timeZone:tz});return tz;}catch(e){return'';}}
+function tzDuTel(tel){
+  var n=telE164(tel).replace(/\D/g,'');if(!n)return'';
+  for(var L=4;L>=1;L--){var k=n.slice(0,L);if(TZ_CC[k])return TZ_CC[k];}
+  return'';
+}
+function tzDuPays(p){var k=tzNorm(p);if(!k)return'';if(TZ_PAYS[k])return TZ_PAYS[k];var f='';Object.keys(TZ_PAYS).forEach(function(x){if(!f&&x.length>3&&k.indexOf(x)>=0)f=TZ_PAYS[x];});return f;}
+// Mon fuseau : celui que j'ai choisi, sinon celui de mon téléphone/ordinateur (il suit mes déplacements)
+function tzAppareil(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'Europe/Paris';}catch(e){return'Europe/Paris';}}
+function tzMoi(){var v='';try{v=localStorage.getItem('owlht2_tz')||'';}catch(e){}return tzValide(v)||tzValide(USER&&USER.tz)||tzAppareil();}
+function tzMoiSet(tz){try{if(tz)localStorage.setItem('owlht2_tz',tz);else localStorage.removeItem('owlht2_tz');}catch(e){}if(USER)USER.tz=tz||'';}
+// Fuseau d'une personne : champ tz de la fiche → pays → indicatif du téléphone
+function tzDe(o){if(!o)return'';return tzValide(o.tz)||tzDuPays(o.pays)||tzDuTel(o.tel)||'';}
+// Décalage d'un fuseau (minutes à l'est de UTC) à un instant donné
+function tzOff(tz,dt){
+  try{
+    var f=new Intl.DateTimeFormat('en-US',{timeZone:tz,hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}),p={};
+    f.formatToParts(dt).forEach(function(x){p[x.type]=x.value;});
+    var as=Date.UTC(+p.year,+p.month-1,+p.day,+(p.hour==='24'?'0':p.hour),+p.minute,+p.second);
+    return Math.round((as-dt.getTime())/60000);
+  }catch(e){return 0;}
+}
+// Heure murale (date + heure) dans un fuseau → instant réel
+function tzInstant(d,h,tz){
+  var base=Date.parse(d+'T'+(h||'00:00')+':00Z');if(isNaN(base))return null;
+  var o=tzOff(tz,new Date(base));var dt=new Date(base-o*60000);
+  var o2=tzOff(tz,dt);if(o2!==o)dt=new Date(base-o2*60000);
+  return dt;
+}
+function tzFmtH(inst,tz){try{return new Intl.DateTimeFormat('fr-FR',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false}).format(inst).replace(':','h');}catch(e){return'';}}
+function tzFmtDate(inst,tz){try{return new Intl.DateTimeFormat('fr-FR',{timeZone:tz,weekday:'long',day:'numeric',month:'long'}).format(inst);}catch(e){return'';}}
 // v3.45 — personnes que l'on peut ajouter à une visio, selon le rôle :
 //   référent → uniquement son/ses gestionnaire(s) (il DEMANDE la visio) · gestionnaire → ses référents, ses contacts, un administrateur · admin → tout le monde
 var ZC=null,ZX=[],ZQ={d:'',h:''};
 function zoomEquipeOk(u){if(!u||!u.nom||u.nom===PARTNER_NOM())return false;var r=ROLE();if(r==='admin')return true;if(r==='gestionnaire')return u.role==='admin'||u.role==='referent';return u.role==='gestionnaire';}
 function zoomEquipe(){var l=equipeContacts().slice();if(ROLE()==='admin')(USERS||[]).forEach(function(u){if(u.actif!==false&&!u.pending&&!l.some(function(x){return x.nom===u.nom;}))l.push({nom:u.nom,role:u.role,comite:!!u.comite,tel:u.tel||'',email:u.email||''});});return l.filter(zoomEquipeOk);}
-function zoomTeamObj(nom){var u=zoomEquipe().find(function(x){return x.nom===nom;});if(!u)return null;var pr=String(u.nom).trim().split(/\s+/);return{id:'',_team:true,_role:u.role,prenom:pr[0]||u.nom,nom:pr.slice(1).join(' '),tel:u.tel||'',email:u.email||'',canal:u.tel?'WhatsApp':'E-mail'};}
+function zoomTeamObj(nom){var u=zoomEquipe().find(function(x){return x.nom===nom;});if(!u)return null;var pr=String(u.nom).trim().split(/\s+/);return{id:'',_team:true,_role:u.role,prenom:pr[0]||u.nom,nom:pr.slice(1).join(' '),tel:u.tel||'',email:u.email||'',tz:tzValide(u.tz)||tzDuTel(u.tel),canal:u.tel?'WhatsApp':'E-mail'};}
 function zxRender(){
   var box=document.getElementById('zx-sel');if(!box)return;
   box.innerHTML=ZX.map(function(x,i){return'<span class="obdg '+(x.kind==='team'?'baq':'bgr')+'" style="font-size:12px;padding:5px 9px">'+(x.kind==='team'?'👤 ':'🌿 ')+esc(x.nom)+(x.kind==='team'?' · '+esc(x.roleLbl):'')+' <a href="javascript:void(0)" onclick="ZX.splice('+i+',1);zxRender()" style="color:inherit;margin-left:4px;text-decoration:none">✕</a></span>';}).join(' ');
   var tm=document.getElementById('zx-team');if(tm)tm.querySelectorAll('button').forEach(function(b){var on=ZX.some(function(x){return x.kind==='team'&&x.nom===b.getAttribute('data-n');});b.classList.toggle('bgr',on);b.classList.toggle('bgh',!on);});
   var m=document.getElementById('ozoom');if(m&&m._refresh)m._refresh();
 }
-function zxTeam(nom){var i=ZX.findIndex(function(x){return x.kind==='team'&&x.nom===nom;});if(i>=0)ZX.splice(i,1);else{var u=zoomEquipe().find(function(x){return x.nom===nom;});if(!u)return;if(ZX.length>=6){oT('6 personnes ajoutées au maximum','w');return;}ZX.push({kind:'team',nom:u.nom,prenom:String(u.nom).split(/\s+/)[0],roleLbl:roleLabelU(u),tel:u.tel||'',email:u.email||'',canal:u.tel?'wa':'mail'});}zxRender();}
+function zxTeam(nom){var i=ZX.findIndex(function(x){return x.kind==='team'&&x.nom===nom;});if(i>=0)ZX.splice(i,1);else{var u=zoomEquipe().find(function(x){return x.nom===nom;});if(!u)return;if(ZX.length>=6){oT('6 personnes ajoutées au maximum','w');return;}ZX.push({kind:'team',nom:u.nom,prenom:String(u.nom).split(/\s+/)[0],roleLbl:roleLabelU(u),tel:u.tel||'',email:u.email||'',tz:tzValide(u.tz)||tzDuTel(u.tel),canal:u.tel?'wa':'mail'});}zxRender();}
 function zxSearch(){
   var q=(val('zx-q')||'').trim().toLowerCase(),box=document.getElementById('zx-sug');if(!box)return;if(q.length<2){box.innerHTML='';return;}
   var l=OC.filter(function(c){return c.id!==(ZC&&ZC.id)&&!ZX.some(function(x){return x.cid===c.id;})&&((c.prenom||'')+' '+(c.nom||'')+' '+(c.nom||'')+' '+(c.prenom||'')).toLowerCase().indexOf(q)>=0;}).slice(0,6);
   box.innerHTML=l.length?l.map(function(c){return'<button type="button" class="ob bgh bsm" style="margin:3px 4px 0 0" onclick="zxContact(\''+c.id+'\')">＋ '+esc(((c.prenom||'')+' '+(c.nom||'')).trim())+(c.ville?' · '+esc(c.ville):'')+'</button>';}).join(''):'<span style="font-size:12px;color:var(--t3)">Aucun de vos contacts ne correspond.</span>';
 }
-function zxContact(id){var c=OC.find(function(x){return x.id===id;});if(!c)return;if(ZX.length>=6){oT('6 personnes ajoutées au maximum','w');return;}ZX.push({kind:'contact',cid:c.id,nom:((c.prenom||'')+' '+(c.nom||'')).trim(),prenom:c.prenom||c.nom||'',tel:c.tel||'',email:c.email||'',canal:canalCode(c)});document.getElementById('zx-q').value='';document.getElementById('zx-sug').innerHTML='';zxRender();}
+function zxContact(id){var c=OC.find(function(x){return x.id===id;});if(!c)return;if(ZX.length>=6){oT('6 personnes ajoutées au maximum','w');return;}ZX.push({kind:'contact',cid:c.id,nom:((c.prenom||'')+' '+(c.nom||'')).trim(),prenom:c.prenom||c.nom||'',tel:c.tel||'',email:c.email||'',tz:tzDe(c),canal:canalCode(c)});document.getElementById('zx-q').value='';document.getElementById('zx-sug').innerHTML='';zxRender();}
 function zxHtml(c){
   var team=zoomEquipe().filter(function(u){return!(c._team&&u.nom===((c.prenom||'')+' '+(c.nom||'')).trim());}),r=ROLE();
   return'<div style="margin-top:10px;padding:10px 12px;border-radius:12px;background:#F3F8F4;border:1px solid var(--bd)"><label class="ofl" style="margin:0 0 6px">👥 Ajouter une personne à la visio <span style="font-weight:400;color:var(--t3)">(facultatif)</span></label>'
@@ -8469,7 +8521,7 @@ function zxHtml(c){
 }
 function oZoomOpen(cid,teamNom){
   if(ROLE()==='referent'){oZoomAsk(cid,teamNom);return;}
-  var c=teamNom?zoomTeamObj(teamNom):OC.find(function(x){return x.id===cid;});if(!c)return;ZC=c;ZX=[];ZQ={d:'',h:''};
+  var c=teamNom?zoomTeamObj(teamNom):OC.find(function(x){return x.id===cid;});if(!c)return;ZC=c;ZX=[];ZQ={d:'',h:''};TZ_SAISIE='';
   var url=zoomUrl();
   var old=document.getElementById('ozoom');if(old)old.remove();
   var m=document.createElement('div');m.id='ozoom';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
@@ -8480,7 +8532,7 @@ function oZoomOpen(cid,teamNom){
         :'<div style="margin:8px 0 10px;padding:10px 12px;border-radius:10px;background:#FFF7E0;border:1px solid #F1DFA0;font-size:12.5px;line-height:1.5">⚠️ Aucun lien Zoom : ajoutez le vôtre dans <b>Mon profil → Mon lien Zoom</b>'+(IS_SUPER()?' (ou le Zoom de l\'association dans Administration → Liens)':'')+'. <button type="button" class="ob bgh bsm" onclick="document.getElementById(\'ozoom\').remove();oProfOpen()">Ouvrir Mon profil</button></div>')
     +'<div class="av-seg" style="margin-top:4px"><button type="button" id="zoom-m-now" class="on" onclick="oZoomMode(\'now\')">⚡ Maintenant<br><small style="font-weight:400">j\'ouvre ma salle, le client me rejoint</small></button><button type="button" id="zoom-m-later" onclick="oZoomMode(\'later\')">📅 Plus tard<br><small style="font-weight:400">date et heure convenues</small></button></div>'
     +'<div id="zoom-later" style="display:none"><div class="ofg2" style="gap:8px;margin-top:8px"><div><label class="ofl">Date</label><input type="date" class="ofc" id="zoom-d"></div><div><label class="ofl">Heure</label><input type="time" class="ofc" id="zoom-h"></div></div>'
-    +'<div style="font-size:11px;color:var(--t3);margin-top:4px">La date et l\'heure sont reprises dans le message.</div></div>'
+    +'<div style="font-size:11px;color:var(--t3);margin-top:4px">La date et l\'heure sont reprises dans le message.</div><div id="zoom-tzbox"></div></div>'
     +zxHtml(c)
     +'<label class="ochk-row" style="margin-top:8px;font-size:12px;display:none" id="zoom-ag-row"><input type="checkbox" id="zoom-ag" checked><span>📆 Ajouter la visio à l\'<b>agenda Google</b> (notification, invitation au contact'+(c.email?' — '+esc(c.email):' — pas d\'e-mail sur la fiche, invitation à vous seul')+', rappel 30 min avant)</span></label>'
     +'<label class="ofl" style="margin-top:10px">Message</label><textarea class="ofc" id="zoom-txt" style="min-height:150px;font-size:13px;line-height:1.5"></textarea>'
@@ -8490,7 +8542,7 @@ function oZoomOpen(cid,teamNom){
     +'</div>'
     +'<div style="font-size:11px;color:var(--t3);margin-top:8px">Le texte vient du modèle « Invitation à une visio Zoom » (Administration → Messages). Chaque envoi est noté dans le journal du contact.</div></div>';
   document.body.appendChild(m);
-  var refresh=function(){document.getElementById('zoom-txt').value=zoomMsg(c);};
+  var refresh=function(){zoomTzRender();document.getElementById('zoom-txt').value=zoomMsg(c);};
   document.getElementById('zoom-d').onchange=refresh;document.getElementById('zoom-h').onchange=refresh;m._refresh=refresh;m._canal=canal;ZOOM_MODE='now';refresh();
 }
 var ZOOM_MODE='now';
@@ -8502,20 +8554,96 @@ function oZoomMode(mode){
   var sb=document.getElementById('zoom-send');if(sb)sb.textContent=mode==='now'?'📤 Envoyer et ouvrir ma salle ('+(CANAL_LBL[m._canal]||m._canal)+')':'📤 Envoyer l\'invitation ('+(CANAL_LBL[m._canal]||m._canal)+')';
   if(m._refresh)m._refresh();
 }
-function zoomQuand(){if(ZOOM_MODE==='now')return'maintenant, je vous attends dans la salle';var d=val('zoom-d')||ZQ.d,h=val('zoom-h')||ZQ.h;if(!d&&!h)return'';var t='';if(d){var dd=new Date(d+'T12:00:00');t=dd.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});}if(h)t+=(t?' à ':'à ')+h.replace(':','h');return t.trim();}
+// v3.54 — le fuseau dans lequel l'heure est SAISIE ('' = le mien)
+var TZ_SAISIE='';
+function tzSaisie(){return tzValide(TZ_SAISIE)||tzMoi();}
+function zoomDH(){return{d:val('zoom-d')||ZQ.d,h:val('zoom-h')||ZQ.h};}
+function zoomInstant(){var x=zoomDH();if(!x.d)return null;return tzInstant(x.d,x.h||'10:00',tzSaisie());}
+// Date et heure ramenées dans MON fuseau : c'est ce qui est enregistré dans l'agenda et dans la fiche
+function zoomDHMoi(){
+  var x=zoomDH();if(!x.d)return{d:'',h:x.h||''};
+  var inst=tzInstant(x.d,x.h||'10:00',tzSaisie());if(!inst)return x;
+  var me=tzMoi(),p={};
+  try{new Intl.DateTimeFormat('en-CA',{timeZone:me,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(inst).forEach(function(k){p[k.type]=k.value;});}catch(e){return x;}
+  return{d:p.year+'-'+p.month+'-'+p.day,h:(p.hour==='24'?'00':p.hour)+':'+p.minute};
+}
+// Toutes les personnes de la visio, avec leur fuseau
+function zoomGens(){
+  var l=[{id:'moi',nom:'Vous',tz:tzMoi(),moi:true}],c=ZC;
+  if(c)l.push({id:c._team?'team:'+((c.prenom||'')+' '+(c.nom||'')).trim():'c:'+c.id,nom:((c.prenom||'')+' '+(c.nom||'')).trim(),tz:tzDe(c),obj:c});
+  ZX.forEach(function(x,i){l.push({id:(x.kind==='team'?'team:'+x.nom:'c:'+x.cid),nom:x.nom,tz:tzDe(x),zx:i});});
+  var vu={};return l.filter(function(g){if(vu[g.id])return false;vu[g.id]=1;return true;});
+}
+function zoomTzMulti(){var z={},n=0;zoomGens().forEach(function(g){if(g.tz&&!z[g.tz]){z[g.tz]=1;n++;}});return n>1;}
+// Ligne « heures locales » ajoutée au message quand les participants ne sont pas dans le même fuseau
+function zoomHeuresTxt(tz){
+  var inst=zoomInstant();if(!inst||ZOOM_MODE==='now')return'';
+  var vu={},out=[],add=function(t){if(!t||vu[t])return;vu[t]=1;out.push(tzFmtH(inst,t)+' à '+tzVille(t));};
+  add(tzValide(tz));zoomGens().forEach(function(g){add(g.tz);});
+  return out.length>1?'🌍 Heures locales : '+out.join(' · '):'';
+}
+function zoomQuand(tz){
+  if(ZOOM_MODE==='now')return'maintenant, je vous attends dans la salle';
+  var x=zoomDH();if(!x.d&&!x.h)return'';
+  var src=tzSaisie(),dst=tzValide(tz)||src;
+  if(!x.d)return'à '+String(x.h).replace(':','h');
+  var inst=tzInstant(x.d,x.h||'10:00',src);if(!inst)return'';
+  var t=tzFmtDate(inst,dst);
+  if(x.h)t+=' à '+tzFmtH(inst,dst)+(zoomTzMulti()?' (heure '+tzDeVille(dst)+')':'');
+  return t.trim();
+}
+function zoomTzRender(){
+  var box=document.getElementById('zoom-tzbox');if(!box)return;
+  if(ZOOM_MODE!=='later'){box.innerHTML='';return;}
+  var gens=zoomGens(),inst=zoomInstant(),sai=tzSaisie();
+  var opts=function(sel){return'<option value="">— à préciser —</option>'+TZ_LISTE.map(function(t){return'<option value="'+t+'"'+(t===sel?' selected':'')+'>'+esc(tzVille(t))+'</option>';}).join('');};
+  var zSai=gens.filter(function(g){return g.tz;});
+  var head=zSai.length?'<div style="font-size:12.5px;margin-bottom:8px">🕐 J\'indique l\'heure du fuseau de <select class="ofc" style="display:inline-block;width:auto;min-height:34px;padding:4px 8px;font-size:12.5px;font-weight:700" onchange="zoomTzSaisie(this.value)">'+zSai.map(function(g){return'<option value="'+g.tz+'"'+(g.tz===sai?' selected':'')+'>'+esc(g.moi?'moi':g.nom)+' · '+esc(tzVille(g.tz))+'</option>';}).join('')+'</select></div>':'';
+  var rows=gens.map(function(g){
+    return'<div style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12.5px;border-top:1px solid rgba(0,0,0,.05)"><b style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(g.moi?'Vous':g.nom)+'</b>'
+      +'<span style="font-weight:700;color:var(--g);min-width:54px;text-align:right">'+(g.tz&&inst?esc(tzFmtH(inst,g.tz)):'—')+'</span>'
+      +'<select class="ofc" style="width:auto;min-height:32px;padding:3px 6px;font-size:11.5px;max-width:138px" onchange="zoomTzSet(\''+esc(g.id)+'\',this.value)">'+opts(g.tz)+'</select></div>';
+  }).join('');
+  var inc=gens.filter(function(g){return!g.tz;}).length;
+  box.innerHTML='<div style="margin-top:10px;padding:10px 12px;border-radius:12px;background:#FFFDF5;border:1px solid #EADFC0">'+head
+    +'<div style="font-size:11.5px;color:var(--t3);margin-bottom:2px">🌍 Heure chez chacun — c\'est celle qui figure dans son message</div>'+rows
+    +(inc?'<div style="font-size:11.5px;color:#9A6B1E;margin-top:8px;line-height:1.5">⚠️ '+inc+' fuseau'+(inc>1?'x':'')+' à préciser : choisissez la ville, ou renseignez le pays / l\'indicatif du téléphone sur la fiche. Le choix est mémorisé.</div>':'')+'</div>';
+}
+function zoomTzSaisie(tz){TZ_SAISIE=tzValide(tz)||'';var m=document.getElementById('ozoom');if(m&&m._refresh)m._refresh();}
+function zoomTzSet(gid,tz){
+  tz=tzValide(tz)||'';
+  if(gid==='moi'){tzMoiSet(tz);}
+  else if(gid.indexOf('c:')===0){
+    var id=gid.slice(2),c=OC.find(function(k){return k.id===id;});
+    if(c){c.tz=tz;oPush([c]);}
+    if(ZC&&ZC.id===id)ZC.tz=tz;
+    ZX.forEach(function(x){if(x.kind==='contact'&&x.cid===id)x.tz=tz;});
+  }else{
+    var n=gid.slice(5),u=(USERS||[]).find(function(k){return k.nom===n;});
+    if(u){u.tz=tz;if(can('users'))oPushUsers();}
+    ZX.forEach(function(x){if(x.kind==='team'&&x.nom===n)x.tz=tz;});
+    if(ZC&&ZC._team&&((ZC.prenom||'')+' '+(ZC.nom||'')).trim()===n)ZC.tz=tz;
+    if(u&&USER&&u.id===USER.id)tzMoiSet(tz);
+  }
+  var m=document.getElementById('ozoom');if(m&&m._refresh)m._refresh();
+}
 function zoomMsg(c){
   if(c._team)return zoomMsgTiers({prenom:c.prenom},null);
-  var v=tplVars(c,'fr');v.lienZoom=zoomUrl();v.quand=zoomQuand();var t=renderTpl(tplText('zoom_invitation'),v);
-  if(ZX.length&&v.lienZoom&&t.indexOf(v.lienZoom)>=0)t=t.replace(v.lienZoom,v.lienZoom+'\n\n👥 '+(ZX.length>1?'Seront aussi avec nous : ':'Sera aussi avec nous : ')+ZX.map(function(x){return x.kind==='team'?x.nom+' ('+x.roleLbl.toLowerCase()+')':x.prenom;}).join(', ')+'.');
+  var v=tplVars(c,'fr');v.lienZoom=zoomUrl();v.quand=zoomQuand(tzDe(c));var t=renderTpl(tplText('zoom_invitation'),v);
+  var sup=[];if(ZX.length)sup.push('👥 '+(ZX.length>1?'Seront aussi avec nous : ':'Sera aussi avec nous : ')+ZX.map(function(x){return x.kind==='team'?x.nom+' ('+x.roleLbl.toLowerCase()+')':x.prenom;}).join(', ')+'.');
+  var hh=zoomHeuresTxt(tzDe(c));if(hh)sup.push(hh);
+  if(sup.length&&v.lienZoom&&t.indexOf(v.lienZoom)>=0)t=t.replace(v.lienZoom,v.lienZoom+'\n\n'+sup.join('\n'));
   return t;
 }
-function zoomMsgTiers(x,c){var v=tplVars(c||{},'fr');v.prenom=x.prenom||'';v.lienZoom=zoomUrl();v.quand=zoomQuand().replace('je vous attends dans la salle','la salle est ouverte');v.contact=c?(x.kind==='contact'?(c.prenom||'une autre personne'):((c.prenom||'')+' '+(c.nom||'')).trim()):'';return renderTpl(tplText('zoom_invitation_tiers'),v);}
+function zoomMsgTiers(x,c){var v=tplVars(c||{},'fr');v.prenom=x.prenom||'';v.lienZoom=zoomUrl();v.quand=zoomQuand(tzDe(x)).replace('je vous attends dans la salle','la salle est ouverte');v.contact=c?(x.kind==='contact'?(c.prenom||'une autre personne'):((c.prenom||'')+' '+(c.nom||'')).trim()):'';var t=renderTpl(tplText('zoom_invitation_tiers'),v),hh=zoomHeuresTxt(tzDe(x));
+  if(hh&&v.lienZoom&&t.indexOf(v.lienZoom)>=0)t=t.replace(v.lienZoom,v.lienZoom+'\n\n'+hh);
+  return t;}
 function zxSendOne(i){
   var x=ZX[i],c=ZC;if(!x)return;var text=zoomMsgTiers(x,c&&!c._team?c:null),canal=x.canal||'wa',num=x.kind==='team'?telE164(x.tel).replace('+',''):String(x.tel||'').replace(/\D/g,'');
   if(canal!=='mail'&&!num){if(x.email)canal='mail';else{sendCopy(text,'📋 '+x.nom+' : ni téléphone ni e-mail — message copié');x.sent=true;zxStep2();return;}}
   if(canal==='mail'&&!x.email){if(num)canal='wa';else{sendCopy(text,'📋 Message copié');x.sent=true;zxStep2();return;}}
   sendVia(canal,num,text,x.email);x.sent=true;
-  if(x.kind==='contact'){var oc=OC.find(function(k){return k.id===x.cid;});if(oc){var q=zoomQuand();jrnAdd(oc,'rdv','🎥 Invité(e) à une visio Zoom par '+(CANAL_LBL[canal]||canal)+(c&&!c._team?' (avec '+((c.prenom||'')+' '+(c.nom||'')).trim()+')':'')+(ZOOM_MODE==='now'?' — visio immédiate':(q?' — '+q:'')));var d=val('zoom-d')||ZQ.d,h=val('zoom-h')||ZQ.h||'10:00';if(d){oc.rdvs=oc.rdvs||[];oc.rdvs.push({uri:'zoom_'+Date.now()+'_'+i,source:'zoom',nom:'Visio Zoom',start:d+'T'+h+':00',host:PARTNER_NOM(),joinUrl:zoomUrl(),statut:'active',par:PARTNER_NOM()});}oPush([oc]);}}
+  if(x.kind==='contact'){var oc=OC.find(function(k){return k.id===x.cid;});if(oc){var q=zoomQuand(tzDe(x));jrnAdd(oc,'rdv','🎥 Invité(e) à une visio Zoom par '+(CANAL_LBL[canal]||canal)+(c&&!c._team?' (avec '+((c.prenom||'')+' '+(c.nom||'')).trim()+')':'')+(ZOOM_MODE==='now'?' — visio immédiate':(q?' — '+q:'')));var DH=zoomDHMoi(),d=DH.d,h=DH.h||'10:00';if(d){oc.rdvs=oc.rdvs||[];oc.rdvs.push({uri:'zoom_'+Date.now()+'_'+i,source:'zoom',nom:'Visio Zoom',start:d+'T'+h+':00',tz:tzMoi(),host:PARTNER_NOM(),joinUrl:zoomUrl(),statut:'active',par:PARTNER_NOM()});}oPush([oc]);}}
   zxStep2();
 }
 function zxStep2(){
@@ -8561,9 +8689,9 @@ function oZoomSend(){
   var q=zoomQuand();
   if(c._team){ZQ={d:val('zoom-d'),h:val('zoom-h')};if(ZX.length){zxStep2();}else{var b0=document.getElementById('ozoom');if(b0)b0.remove();}oT('🎥 Invitation Zoom envoyée à '+c.prenom,'s');return;}
   var e=jrnAdd(c,'rdv','🎥 Invitation Zoom envoyée par '+(CANAL_LBL[canal]||canal)+(ZOOM_MODE==='now'?' — visio immédiate (salle ouverte)':(q?' — visio '+q:''))+(USER&&USER.zoomUrl?'':' (Zoom de l\'association)')+(ZX.length?' · avec : '+ZX.map(function(x){return x.nom;}).join(', '):''));
-  var d=val('zoom-d'),h=val('zoom-h')||'10:00',ag=d&&document.getElementById('zoom-ag')&&document.getElementById('zoom-ag').checked;
-  if(d){c.rdvs=c.rdvs||[];c.rdvs.push({uri:'zoom_'+Date.now(),source:'zoom',nom:'Visio Zoom',start:d+'T'+h+':00',host:PARTNER_NOM(),joinUrl:zoomUrl(),statut:'active',par:PARTNER_NOM()});}
-  ZQ={d:d,h:val('zoom-h')};var zxN=ZX.filter(function(x){return x.kind==='team';}).map(function(x){return x.nom;}),zxC=ZX.filter(function(x){return x.kind==='contact';}).map(function(x){return x.cid;});
+  var DH=zoomDHMoi(),d=DH.d,h=DH.h||'10:00',ag=d&&document.getElementById('zoom-ag')&&document.getElementById('zoom-ag').checked;
+  if(d){c.rdvs=c.rdvs||[];c.rdvs.push({uri:'zoom_'+Date.now(),source:'zoom',nom:'Visio Zoom',start:d+'T'+h+':00',tz:tzMoi(),host:PARTNER_NOM(),joinUrl:zoomUrl(),statut:'active',par:PARTNER_NOM()});}
+  ZQ={d:val('zoom-d'),h:val('zoom-h')};var zxN=ZX.filter(function(x){return x.kind==='team';}).map(function(x){return x.nom;}),zxC=ZX.filter(function(x){return x.kind==='contact';}).map(function(x){return x.cid;});
   oPush([c]);if(ZX.length){zxStep2();}else{var b=document.getElementById('ozoom');if(b)b.remove();oOpenF(cid);}oT('🎥 Invitation Zoom envoyée','s');
   if(ag){
     if(srvNum()<3024){oT('📆 Agenda Google : script serveur v3.24 requis','w');return;}
@@ -9479,6 +9607,7 @@ function oProfOpen(){
   oSessList('', 'oprof-sess');
   var pc=document.getElementById('oprof-canal');if(pc)pc.value=sendPref();
   var oc=document.getElementById('oprof-cal');if(oc){oc.value=USER.calendlyUrl||'';}oProfCalSt();
+  oProfTzRender();
   var oz=document.getElementById('oprof-zoom');if(oz)oz.value=USER.zoomUrl||'';var oe=document.getElementById('oprof-ea');if(oe)oe.value=USER.memberId||'';var orr=document.getElementById('oprof-rang');if(orr)orr.value=USER.rang||'';
   pushProfSt();
   oSheetOpen('oprof');
@@ -9487,6 +9616,16 @@ function oProfCalSt(){var st=document.getElementById('oprof-cal-st');if(!st)retu
 function oProfClose(){oSheetClose('oprof');}
 function oProfPhoto(){pickPhoto(function(data){document.getElementById('oprof-photo').value=data;setAv('oprof-av',data,'');document.getElementById('oprof-rm').style.display='';emojiBurst(['📸','✨','⭐']);});}
 function oProfPhotoRm(){document.getElementById('oprof-photo').value='';setAv('oprof-av','',ini(USER.nom||'?'));document.getElementById('oprof-rm').style.display='none';}
+function oProfTzRender(){
+  var sel=document.getElementById('oprof-tz');if(!sel)return;
+  var auto=tzAppareil(),cur='';try{cur=localStorage.getItem('owlht2_tz')||'';}catch(e){}
+  var l=TZ_LISTE.slice();if(l.indexOf(auto)<0)l.unshift(auto);
+  sel.innerHTML='<option value="">📍 Celui de mon téléphone — '+esc(tzVille(auto))+'</option>'
+    +l.map(function(t){return'<option value="'+t+'"'+(t===cur?' selected':'')+'>'+esc(tzVille(t))+' ('+esc(t)+')</option>';}).join('');
+  var st=document.getElementById('oprof-tz-st');
+  if(st){var now=new Date();st.innerHTML='Il est <b>'+esc(tzFmtH(now,tzMoi()))+'</b> chez vous ('+esc(tzVille(tzMoi()))+'). Les invitations Zoom affichent à chaque personne l\'heure de SON pays : '+(cur?'fuseau choisi, il ne changera pas quand vous voyagez.':'il suit automatiquement vos déplacements entre la France et la Côte d\'Ivoire.');}
+}
+function oProfTzSave(){tzMoiSet(val('oprof-tz')||'');oProfTzRender();oT('🌍 Fuseau horaire enregistré','s');}
 function oProfSave(){
   if(!USER)return;
   var calu=(val('oprof-cal')||'').trim();
@@ -9494,12 +9633,12 @@ function oProfSave(){
   var calNew=!!calu&&calu!==(USER.calendlyUrl||'');
   var zoomu=(val('oprof-zoom')||'').trim();
   if(zoomu&&!/^https:\/\/([a-z0-9-]+\.)?zoom\.(us|com)\//i.test(zoomu)){oT('Le lien Zoom doit commencer par https://…zoom.us/','e');return;}
-  USER.tel=(val('oprof-tel')||'').trim();USER.email=(val('oprof-email')||'').trim();USER.photo=val('oprof-photo')||'';USER.calendlyUrl=calu;USER.zoomUrl=zoomu;USER.memberId=eaOf(val('oprof-ea'))||'';USER.rang=val('oprof-rang')||'';
+  USER.tel=(val('oprof-tel')||'').trim();USER.email=(val('oprof-email')||'').trim();USER.photo=val('oprof-photo')||'';USER.calendlyUrl=calu;USER.zoomUrl=zoomu;USER.memberId=eaOf(val('oprof-ea'))||'';USER.rang=val('oprof-rang')||'';USER.tz=tzValide(val('oprof-tz'))||'';
   if(USER.email&&!USER.digestEmail)USER.digestEmail=USER.email;
-  var me=USERS.find(function(u){return u.id===USER.id;});if(me){me.tel=USER.tel;me.email=USER.email;me.photo=USER.photo;me.calendlyUrl=calu;me.zoomUrl=zoomu;if(me.email&&!me.digestEmail)me.digestEmail=me.email;}
+  var me=USERS.find(function(u){return u.id===USER.id;});if(me){me.tel=USER.tel;me.email=USER.email;me.photo=USER.photo;me.calendlyUrl=calu;me.zoomUrl=zoomu;me.tz=USER.tz;if(me.email&&!me.digestEmail)me.digestEmail=me.email;}
   var cu=document.getElementById('my-cal-url');if(cu)cu.value=calu;
   oSaveCache();
-  oPost_({op:'saveMyProfile',tel:USER.tel,email:USER.email,photo:USER.photo,calendlyUrl:calu,zoomUrl:zoomu,push:USER.push!==false,memberId:USER.memberId,rang:USER.rang});
+  oPost_({op:'saveMyProfile',tel:USER.tel,email:USER.email,photo:USER.photo,calendlyUrl:calu,zoomUrl:zoomu,push:USER.push!==false,memberId:USER.memberId,rang:USER.rang,tz:USER.tz});
   if(calNew){try{localStorage.setItem('owlht2_calnudge','done');}catch(e){}oCalNudge();emojiBurst(['📅','✨','🌿']);}
   applyRole();if(typeof renderUsers==='function')renderUsers();
   oProfClose();emojiBurst();oT('✨ Profil enregistré','s');

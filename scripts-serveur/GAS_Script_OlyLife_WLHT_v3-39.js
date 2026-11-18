@@ -1040,7 +1040,8 @@ function doPost(e) {
           nomPublic: u.nomPublic === undefined ? (u.role !== 'comite') : !!u.nomPublic,   // v3.38 — son nom peut-il apparaître sur les propositions et pages publiques ?
           gestDefaut: (u.gests || []).indexOf(u.gestDefaut) >= 0 ? u.gestDefaut : '',     // gestionnaire mis en avant quand il y en a plusieurs
           push: (oldU[u.id] && oldU[u.id].push !== undefined) ? oldU[u.id].push : (u.push !== false),   // v3.20 — préférence push conservée côté serveur
-          zoomUrl: /^https:\/\/([a-z0-9-]+\.)?zoom\.(us|com)\//i.test(String(u.zoomUrl || '')) ? u.zoomUrl : ''   // v3.23
+          zoomUrl: /^https:\/\/([a-z0-9-]+\.)?zoom\.(us|com)\//i.test(String(u.zoomUrl || '')) ? u.zoomUrl : '',   // v3.23
+          tz: /^[A-Za-z]+\/[A-Za-z_\-+0-9\/]+$/.test(String(u.tz || '')) ? String(u.tz).slice(0, 48) : ''   // v3.54 — fuseau horaire (heure locale dans les invitations)
         };
       });
       // journal d'administration : créations, suppressions, désactivations, codes, rôles
@@ -1143,15 +1144,17 @@ function doPost(e) {
       var calOk = /^https:\/\/(www\.)?calendly\.com\//i.test(String(req.calendlyUrl || ''));
       var zoomOk = /^https:\/\/([a-z0-9-]+\.)?zoom\.(us|com)\//i.test(String(req.zoomUrl || ''));   // v3.23
       var eaOk = (String(req.memberId || '').toUpperCase().match(/^(EA|AF)\d{4,}$/) || [])[0] || '', rangOk = /^P[1-5] - /.test(String(req.rang || '')) ? String(req.rang).slice(0, 30) : '';   // v3.29
+      var tzOk = /^[A-Za-z]+\/[A-Za-z_\-+0-9\/]+$/.test(String(req.tz || '')) ? String(req.tz).slice(0, 48) : '';   // v3.54 — fuseau horaire personnel
       if (req.push !== undefined && user.id !== 'root') { for (var pu2 = 0; pu2 < db.users.length; pu2++) if (db.users[pu2].id === user.id) db.users[pu2].push = !!req.push; }   // v3.20 — préférence notifications push
       if (user.id === 'root') {
         db.config.rootProfile = pf;
         if (req.calendlyUrl !== undefined) { var rdc = {}; try { rdc = JSON.parse(PropertiesService.getScriptProperties().getProperty('root_digest') || '{}'); } catch (e) {} rdc.cal = calOk ? req.calendlyUrl : ''; PropertiesService.getScriptProperties().setProperty('root_digest', JSON.stringify(rdc)); }   // v3.19
         if (req.zoomUrl !== undefined) db.config.rootProfile.zoomUrl = zoomOk ? req.zoomUrl : '';   // v3.23
         if (req.memberId !== undefined) { db.config.rootProfile.memberId = eaOk; db.config.rootProfile.rang = rangOk; }   // v3.29
+        if (req.tz !== undefined) db.config.rootProfile.tz = tzOk;   // v3.54
       } else {
         for (var pi = 0; pi < db.users.length; pi++) {
-          if (db.users[pi].id === user.id) { db.users[pi].photo = pf.photo; db.users[pi].tel = pf.tel; db.users[pi].email = pf.email; if (pf.email && !db.users[pi].digestEmail) db.users[pi].digestEmail = pf.email; if (req.calendlyUrl !== undefined) db.users[pi].calendlyUrl = calOk ? req.calendlyUrl : ''; if (req.zoomUrl !== undefined) db.users[pi].zoomUrl = zoomOk ? req.zoomUrl : ''; if (req.memberId !== undefined) { db.users[pi].memberId = eaOk; db.users[pi].rang = rangOk; } }   // v3.6 / v3.19 / v3.29 — e-mail → résumé quotidien ; lien Calendly personnel
+          if (db.users[pi].id === user.id) { db.users[pi].photo = pf.photo; db.users[pi].tel = pf.tel; db.users[pi].email = pf.email; if (pf.email && !db.users[pi].digestEmail) db.users[pi].digestEmail = pf.email; if (req.calendlyUrl !== undefined) db.users[pi].calendlyUrl = calOk ? req.calendlyUrl : ''; if (req.zoomUrl !== undefined) db.users[pi].zoomUrl = zoomOk ? req.zoomUrl : ''; if (req.memberId !== undefined) { db.users[pi].memberId = eaOk; db.users[pi].rang = rangOk; } if (req.tz !== undefined) db.users[pi].tz = tzOk; }   // v3.6 / v3.19 / v3.29 / v3.54 — e-mail → résumé quotidien ; lien Calendly personnel
         }
       }
     }
