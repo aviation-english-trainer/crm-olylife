@@ -2539,7 +2539,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.55.1 · 20/11';
+var APP_VERSION='v3.55.2 · 20/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -6450,7 +6450,9 @@ var BOFFICE_URL='https://www.team-waterlifehightech.com/bo-office/';
 function oTunnels(){window.open(TUNNELS_URL,'_blank');}
 function oBOffice(){window.open(BOFFICE_URL,'_blank');}
 var BOLY_URL='https://www.olylife.com/';
+var BOLY_INSCRIPTION_URL='https://www.olylife.com/?p=Home&c=Net&a=managernet';
 function oBOlylife(){window.open(BOLY_URL,'_blank');}
+function oBOlylifeInscr(){window.open(BOLY_INSCRIPTION_URL,'_blank');}
 var OLYNATION_URL='https://www.olynation.team/';
 function oOlyNation(){window.open(OLYNATION_URL,'_blank');}
 
@@ -9209,7 +9211,7 @@ function oInscrOly(cid){
       +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">📋 Inscription BO OlyLife — '+esc(((c.prenom||'')+' '+(c.nom||'')).trim())+'</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'oinscr\').remove()">✕</button></div>'
       +'<div style="font-size:12.5px;color:var(--t2);line-height:1.5;margin:6px 0 4px">Touchez 📋 pour copier chaque champ, basculez dans l\'onglet du BO OlyLife et collez-le dans le formulaire d\'inscription.</div>'
       +warn+rows
-      +'<div style="display:flex;gap:8px;margin-top:14px"><button type="button" class="ob bgold bfull" style="min-height:46px" onclick="oBOlylife()">🌐 Ouvrir le BO OlyLife</button></div>'
+      +'<div style="display:flex;gap:8px;margin-top:14px"><button type="button" class="ob bgold bfull" style="min-height:46px" onclick="oBOlylifeInscr()">🌐 Ouvrir l\'inscription BO OlyLife</button></div>'
       +'</div>';
     document.body.appendChild(m);
   };
