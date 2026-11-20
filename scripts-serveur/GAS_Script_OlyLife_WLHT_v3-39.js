@@ -880,9 +880,10 @@ function doPost(e) {
       saveDB_(db); return out_({ ok: true });
     }
     if (op === 'leadMdp') {
+      // v3.55 — admin + gestionnaire uniquement : le référent émetteur n'a pas accès au mot de passe ni au n° de pièce d'identité
       var lm = (db.leads || []).find(function (l) { return l.id === req.id; });
       if (!lm) return out_({ ok: false, error: 'introuvable' });
-      if (!(user.role === 'admin' || user.role === 'gestionnaire' || lm.userId === user.id)) return out_({ ok: false, error: 'forbidden' });
+      if (!(user.role === 'admin' || user.role === 'gestionnaire')) return out_({ ok: false, error: 'forbidden' });
       adminLog_(db, user.nom, 'mot de passe QR consulté', (lm.prenom || '') + ' ' + (lm.nom || ''));
       saveDB_(db); return out_({ ok: true, mdp: lm.mdp || '', pieceId: lm.pieceId || '' });
     }

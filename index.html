@@ -2539,7 +2539,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.54 · 18/11';
+var APP_VERSION='v3.55 · 20/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -4724,8 +4724,9 @@ function oOpenF(id){
       +((c.factAdresse||c.factCp||c.factVille||c.factPays)?'<div class="od-row"><span class="od-lbl">Ancienne adresse de facturation</span><span class="od-val">'+esc([c.factAdresse,(c.factCp||'')+' '+(c.factVille||''),c.factPays].map(function(x){return String(x||'').trim();}).filter(Boolean).join(', '))+' <span class="t-muted">(saisie avant la v3.29.3 — à reporter dans l\'adresse si besoin)</span></span></div>':'')
       +'<div class="od-row"><span class="od-lbl">Essai de l\'appareil</span><span class="od-val">'+(c.essaiOk?'✅ accepte de faire essayer — '+essaiLbl(c):c.essaiMode==='non'?'Non':'—')+'</span></div>'
       +(c.geo?'<div class="od-row"><span class="od-lbl">Carte</span><span class="od-val"><a style="color:var(--aqua);cursor:pointer" onclick="oClose();oSw(\'carte\')">Voir sur la carte ↗</a></span></div>':''),false):'')
-    +((c.memberIdOlyLife||c.numCommande||c.rangOly||c.boCompte||c.pieceId)?odSec('🟢 OlyLife — compte & commande',
-      '<div class="od-row"><span class="od-lbl">ID membre</span><span class="od-val">'+esc(c.memberIdOlyLife||'—')+'</span></div>'
+    +((c.memberIdOlyLife||c.numCommande||c.rangOly||c.boCompte||c.pieceId||inscrLead(c))?odSec('🟢 OlyLife — compte & commande',
+      ((ROLE()==='admin'||ROLE()==='gestionnaire')?'<div style="padding:10px 16px 2px"><button type="button" class="ob bgold bsm" style="min-height:40px" onclick="oInscrOly(\''+c.id+'\')">📋 Copier pour l\'inscription BO OlyLife</button></div>':'')
+      +'<div class="od-row"><span class="od-lbl">ID membre</span><span class="od-val">'+esc(c.memberIdOlyLife||'—')+'</span></div>'
       +(c.memberIdOlyLife&&!isRef?'<div class="od-row"><span class="od-lbl">1ʳᵉ commission</span><span class="od-val">'+(function(){var a=(c.actions||{}).premiereCommission;return stChip(!!(a&&a.done),a&&a.par,a&&a.doneAt,'Expliquée','À expliquer quand elle tombe')+' <button class="ob '+(a&&a.done?'bgh':'bgold')+' bsm" style="margin-left:6px" onclick="oCommOpen(\''+c.id+'\')">🎉 '+(a&&a.done?'Renvoyer':'Expliquer la première commission')+'</button>';})()+'</span></div>':'')
       +'<div class="od-row"><span class="od-lbl">Rang</span><span class="od-val">'+esc(c.rangOly||'Aucun rang')+'</span></div>'
       +'<div class="od-row"><span class="od-lbl">Commande sur le BO de</span><span class="od-val">'+esc(c.boCompte||'—')+'</span></div>'
@@ -9067,8 +9068,8 @@ function oLeadsRender(){
       +'<div class="ld-acts">'
         +(l.statut!=='traite'?(canAssign?'<select id="ld-suivi-'+l.id+'"><option value="">Suivi par… (facultatif)</option>'+(CFG.suiveurs||[]).map(function(x){return'<option>'+esc(x)+'</option>';}).join('')+'</select>':'')
           +(isDec?'<button class="ob bwa bsm" style="min-height:40px" onclick="oLeadDecSend(\''+l.id+'\')">🌱 Envoyer les infos</button>':'')
-          +'<button class="ob bgold bsm" style="min-height:40px" onclick="oLeadCreate(\''+l.id+'\')">'+(ex?'🔗 Compléter la fiche':'➕ Créer la fiche')+'</button>'
-          +(isDec?'':'<button class="ob bgh bsm" style="min-height:40px" onclick="oLeadMdp(\''+l.id+'\')">🔑 Mot de passe & pièce</button>'):'')
+          +'<button class="ob bgold bsm" style="min-height:40px" onclick="oLeadCreate(\''+l.id+'\')">'+(ex?'🔗 Compléter la fiche':'➕ Créer la fiche')+'</button>':'')
+        +(!isDec&&canAssign?'<button class="ob bgh bsm" style="min-height:40px" onclick="oLeadMdp(\''+l.id+'\')">🔑 Mot de passe & pièce</button>':'')
         +(l.tel&&!isDec?'<a class="ob bwa bsm" style="min-height:40px;text-decoration:none" target="_blank" href="'+mkWA(l.tel,'Bonjour '+(l.prenom||'').split(' ')[0]+' 🌿 J\'ai bien reçu vos informations d\'inscription OlyLife, je m\'en occupe et reviens vers vous très vite.\n'+rqSignature())+'">💬 WhatsApp</a>':'')
         +(ex?'<button class="ob bgh bsm" style="min-height:40px" onclick="oOpenF(\''+ex.id+'\')">👁 Voir la fiche</button>':'')
         +(isAdm?'<button class="ob bsm" style="min-height:40px;background:var(--rdp);color:var(--rd);border:none;margin-left:auto" onclick="oLeadDel(\''+l.id+'\')">🗑</button>':'')
@@ -9146,6 +9147,73 @@ function oLeadCreate(id){
   oPostAsync_({op:'leadDone',id:id,action:'traite',ficheId:c.id,suiviPar:suivisDe(c).join(', ')}).then(function(){l.statut='traite';l.traitePar=PARTNER_NOM();l.traiteLe=new Date().toISOString();l.suiviPar=suivisDe(c).join(', ');LEADS_NEW=LEADS.filter(function(x){return x.statut!=='traite';}).length;navBadges();oLeadsRender();}).catch(function(){});
   emojiBurst(isDec?['🌱','✨']:['📥','✨']);oT(isDec?(ex?'🔗 Fiche complétée — envoyez-lui les infos découverte depuis la fiche':'➕ Fiche Prospect créée — envoyez-lui les infos découverte depuis la fiche'):(ex?'🔗 Fiche complétée — pensez à récupérer le mot de passe avant de créer le compte OlyLife':'➕ Fiche créée — pensez à récupérer le mot de passe avant de créer le compte OlyLife'),'s');
   oRefresh();oOpenF(c.id);
+}
+// v3.55 — demande d'inscription liée à une fiche (par téléphone, e-mail ou nom+prénom)
+function inscrLead(c){
+  if(!c||!window.LEADS||!LEADS.length)return null;
+  var tel=normPhone(c.tel||''),em=String(c.email||'').toLowerCase();
+  var cand=LEADS.filter(function(l){if((l.type||'inscription')==='decouverte')return false;
+    return(tel&&normPhone(l.tel||'')===tel)||(em&&String(l.email||'').toLowerCase()===em)
+      ||(l.nom&&c.nom&&String(l.nom).toLowerCase()===String(c.nom).toLowerCase()&&String(l.prenom||'').toLowerCase()===String(c.prenom||'').toLowerCase());
+  });
+  if(!cand.length)return null;
+  cand.sort(function(a,b){return String(b.ts||'').localeCompare(String(a.ts||''));});
+  return cand[0];
+}
+// v3.55 — « Copier pour l'inscription OlyLife » : modal avec tous les champs, chacun avec son bouton 📋
+function oInscrOly(cid){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;
+  var r=ROLE();if(r!=='admin'&&r!=='gestionnaire'){oT('Réservé aux gestionnaires et aux administrateurs','w');return;}
+  var l=inscrLead(c),piece=(l&&l.pieceId&&!/^••••/.test(l.pieceId))?l.pieceId:(c.pieceId||'');
+  var openWith=function(mdp,pieceSrv){
+    var addr=[c.adresse,(c.cp||'')+' '+(c.ville||''),c.pays].map(function(x){return String(x||'').trim();}).filter(Boolean).join(', ');
+    var full=((c.prenom||'')+' '+(c.nom||'')).trim();
+    var fields=[
+      ['Nom',(c.nom||'').toUpperCase()],
+      ['Prénom',c.prenom||''],
+      ['Nom complet',full],
+      ['Téléphone',c.tel||''],
+      ['E-mail',c.email||''],
+      ['Pays',c.pays||'France'],
+      ['Adresse',c.adresse||''],
+      ['Code postal',c.cp||''],
+      ['Ville',c.ville||''],
+      ['Adresse complète',addr],
+      ['Pièce d\'identité'+(l&&l.pieceType?' ('+l.pieceType+')':''),pieceSrv||piece],
+      ['Mot de passe souhaité',mdp||''],
+      ['Sponsor (parrain)',c.sponsor||''],
+      ['Placement',c.placement||'']
+    ].filter(function(f){return f[1]&&String(f[1]).trim();});
+    var sanitize=function(x){return String(x||'').replace(/\\\\/g,'\\\\\\\\').replace(/'/g,"\\\\'");};
+    var rows=fields.map(function(f){
+      return'<div style="display:flex;align-items:flex-start;gap:8px;padding:9px 0;border-top:1px solid var(--bd)"><div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.3px">'+esc(f[0])+'</div><div style="font-family:monospace;font-size:14px;word-break:break-word;color:var(--tx);margin-top:2px">'+esc(f[1])+'</div></div><button type="button" class="ob bgh bsm" style="min-height:40px;flex:0 0 auto" onclick="oInscrCopy(this,\''+sanitize(f[1])+'\',\''+sanitize(f[0])+'\')">📋</button></div>';
+    }).join('');
+    var warn=l?'':'<div style="padding:10px 12px;border-radius:12px;background:#FFF7E0;border:1px solid #F1DFA0;font-size:12.5px;color:#7A5C14;margin:8px 0 2px;line-height:1.5">ℹ️ Aucune demande d\'inscription liée trouvée pour cette fiche : le mot de passe souhaité et la pièce d\'identité peuvent ne pas être disponibles.</div>';
+    var m=document.createElement('div');m.id='oinscr';m.style.cssText='position:fixed;inset:0;z-index:2200;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
+    m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:520px;max-height:92vh;overflow:auto">'
+      +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">📋 Inscription BO OlyLife — '+esc(((c.prenom||'')+' '+(c.nom||'')).trim())+'</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'oinscr\').remove()">✕</button></div>'
+      +'<div style="font-size:12.5px;color:var(--t2);line-height:1.5;margin:6px 0 4px">Touchez 📋 pour copier chaque champ, basculez dans l\'onglet du BO OlyLife et collez-le dans le formulaire d\'inscription.</div>'
+      +warn+rows
+      +'<div style="display:flex;gap:8px;margin-top:14px"><button type="button" class="ob bgold bfull" style="min-height:46px" onclick="oBOlylife()">🌐 Ouvrir le BO OlyLife</button></div>'
+      +'</div>';
+    document.body.appendChild(m);
+  };
+  // v3.55 — le mot de passe peut venir de deux endroits : le coffre de la fiche (après intégration), ou le lead (avant)
+  var tryLead=function(){
+    if(l&&l.statut!=='traite'){oPostAsync_({op:'leadMdp',id:l.id}).then(function(d){
+      if(d&&d.ok)openWith(d.mdp||'',d.pieceId||piece);
+      else{if(d&&d.error==='forbidden')oT('Mot de passe réservé aux gestionnaires','w');openWith('',piece);}
+    }).catch(function(){openWith('',piece);});return;}
+    openWith('',piece);
+  };
+  if(c.mdpSet&&c.mdpSet.main){
+    oPostAsync_({op:'mdpGet',contactId:c.id,key:'main'}).then(function(d){
+      if(d&&d.ok&&d.mdp)openWith(d.mdp,piece);else tryLead();
+    }).catch(tryLead);
+  }else tryLead();
+}
+function oInscrCopy(btn,val,lbl){
+  try{navigator.clipboard&&navigator.clipboard.writeText(val).then(function(){var o=btn.textContent;btn.textContent='✅';setTimeout(function(){btn.textContent=o;},900);oT('📋 '+lbl+' copié','s');});}catch(e){oT('Copie impossible','e');}
 }
 function oLeadMdp(id){
   var l=leadById(id);if(!l)return;
