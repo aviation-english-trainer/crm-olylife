@@ -364,6 +364,11 @@ textarea.ofc{resize:vertical;min-height:76px;}
 .sd-av,.ocli-avatar,.tav,.act-av,.ouser-av,.om-av{overflow:hidden;}
 .ouser-av{width:34px;height:34px;border-radius:50%;background:var(--goldp);color:var(--gold);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .om-av{position:relative;cursor:pointer;}
+.dons-tbl{width:100%;border-collapse:collapse;font-size:12.5px;background:#fff}
+.dons-tbl th,.dons-tbl td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--bd);vertical-align:top;white-space:nowrap}
+.dons-tbl thead th{background:#F3F8F4;color:var(--t2);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.3px;position:sticky;top:0;z-index:1}
+.dons-tbl td small{color:var(--t3);font-size:11px}
+@media (max-width:640px){.dons-tbl th,.dons-tbl td{padding:8px 8px;font-size:12px}.dons-tbl td:nth-child(5),.dons-tbl th:nth-child(5){display:none}}
 .om-av .cam{position:absolute;right:-2px;bottom:-2px;width:20px;height:20px;border-radius:50%;background:#fff;border:1px solid var(--bd);font-size:11px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.15);}
 .odr-user{cursor:pointer;position:relative;}
 .odr-user:active{background:rgba(255,255,255,.12);}
@@ -1217,6 +1222,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
         <button class="sd-it" data-nav="pipeline" onclick="oSw('pipeline')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="11" rx="1.5"/><rect x="17" y="4" width="4" height="7" rx="1.5"/></svg><em>Pipeline</em><i class="nbdg" data-b="pipeline"></i></button>
         <button class="sd-it" data-nav="agenda" onclick="oSw('agenda')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><em>Agenda</em><i class="nbdg" data-b="agenda"></i></button>
         <button class="sd-it" data-nav="actions" onclick="oSw('actions')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><em>Actions</em><i class="nbdg" data-b="actions"></i></button>
+        <button class="sd-it" data-nav="dons" onclick="oSw('dons')" title="Récap des avances et dons consentis — par donateur / prêteur"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M5 7h11a3 3 0 0 1 0 6H8a3 3 0 0 0 0 6h11"/></svg><em>Récap dons</em></button>
         <button class="sd-it" data-nav="demandes" onclick="oSw('demandes')" title="Demandes d'inscription reçues via les QR codes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v12H8l-4 4z"/><path d="M8 9h8M8 12h5"/></svg><em>Demandes</em><i class="nbdg" data-b="demandes"></i></button>
       </div></div>
       <div class="sd-grp" data-grp="equipe"><button class="sd-gh" type="button" onclick="navGrp('equipe')" title="Équipe"><span>Équipe</span><i></i></button><div class="sd-gi">
@@ -1792,6 +1798,20 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       </div>
       <div class="prec-tabs" id="prec-tabs"></div>
       <div id="prec-body"></div>
+    </div>
+
+    <!-- RÉCAP AVANCES / DONS (v3.56) : qui a donné / avancé à qui, reste à récupérer, retards -->
+    <div class="ov" id="ov-dons">
+      <div class="ocard" style="padding:14px 16px;margin-bottom:12px">
+        <div style="font-size:13px;color:var(--t2);line-height:1.6">💶 <b>Récap avances & dons consentis</b> — vue par <b>donateur / prêteur</b>, pour que chaque personne qui a aidé puisse voir tout ce qu'elle a donné ou prêté, à qui, où en est le remboursement et quand il arrive à échéance. Le tableau se partage par WhatsApp ou e-mail, se copie dans Excel, s'exporte en CSV ou PDF, et chaque ligne a sa relance en un clic.</div>
+        <div id="dons-bar" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center">
+          <select class="ofc" id="dons-payeur" style="max-width:280px;min-height:40px" onchange="oDonsRender()"></select>
+          <label class="ochk-row" style="font-size:12px"><input type="checkbox" id="dons-done" onchange="oDonsRender()"><span>Afficher les lignes soldées</span></label>
+          <label class="ochk-row" style="font-size:12px"><input type="checkbox" id="dons-don" checked onchange="oDonsRender()"><span>Inclure les dons</span></label>
+        </div>
+        <div id="dons-sum" style="font-size:12.5px;color:var(--tx);margin-top:10px;line-height:1.6"></div>
+      </div>
+      <div id="dons-body"><div class="oemp"><div class="oemp-i">💶</div><div class="oemp-t">Choisissez une personne ci-dessus pour voir tout ce qu'elle a donné ou prêté.</div></div></div>
     </div>
 
     <!-- DEMANDES REÇUES (QR) (v3.16) -->
@@ -2539,7 +2559,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.55.2 · 20/11';
+var APP_VERSION='v3.56 · 21/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -4660,6 +4680,164 @@ function avDonneesHtml(c){
   var tl=Object.keys(tot).filter(function(k){return tot[k]>0;}).map(function(k){return tot[k]+' '+k;}).join(' · ');
   return odSec('💸 Avances / dons consentis ('+rows.length+')',rows.join('')+(tl?'<div style="padding:10px 16px;font-size:12px;color:var(--t2);border-top:1px solid var(--bd)"><b>Reste à récupérer :</b> '+tl+'</div>':''),true);
 }
+// ── v3.56 — Récap par donateur / prêteur ────────────────────────────
+// Collecte toutes les avances consenties par une personne donnée (par id, ou par nom normalisé)
+function donsCollectAll(){
+  var out=[];
+  OC.forEach(function(b){(b.avances||[]).forEach(function(a){out.push({b:b,a:a,parKey:a.parId||nmKey(a.par||'')});});});
+  return out;
+}
+// Agrège par payeur : {key, label, nContact(id OC), rows, totals par devise}
+function donsByPayeur(includeDons){
+  var map={},all=donsCollectAll();
+  all.forEach(function(x){
+    if(!x.parKey)return;
+    if(!includeDons&&x.a.type==='don')return;
+    var who=x.a.par||'',pid=x.a.parId||'';
+    var m=map[x.parKey]||(map[x.parKey]={key:x.parKey,label:who,parId:pid,n:0,rows:[],totAvancé:{},totRendu:{},totReste:{},totDons:{},nRetard:0,nDon:0,nEncours:0});
+    m.n++;if(!m.label&&pid){var p=OC.find(function(c){return c.id===pid;});if(p)m.label=((p.nom||'')+' '+(p.prenom||'')).trim();}
+    if(!m.parId&&pid)m.parId=pid;
+    if(!m.parId){var p2=OC.find(function(c){return avParMatches(x.a,c);});if(p2)m.parId=p2.id;}
+    m.rows.push(x);
+    var d=x.a.devise||'€';
+    if(x.a.type==='don'){m.totDons[d]=(m.totDons[d]||0)+(+x.a.montant||0);m.nDon++;return;}
+    m.totAvancé[d]=(m.totAvancé[d]||0)+(+x.a.montant||0);
+    m.totRendu[d]=(m.totRendu[d]||0)+avRendu(x.a);
+    if(x.a.statut!=='rembourse'){m.totReste[d]=(m.totReste[d]||0)+avReste(x.a);m.nEncours++;if(x.a.echeance&&diffD(x.a.echeance)<0)m.nRetard++;}
+  });
+  return Object.keys(map).map(function(k){return map[k];}).sort(function(a,b){return(b.n||0)-(a.n||0);});
+}
+function donsPayeur(key,includeDons){
+  var l=donsByPayeur(includeDons).filter(function(p){return p.key===key;});return l[0]||null;
+}
+function donsRowSum(x){var a=x.a,b=x.b;return{nom:((b.nom||'')+' '+(b.prenom||'')).trim(),tel:b.tel||'',email:b.email||'',type:a.type==='don'?'🎁 Don':'💶 Avance',montant:(+a.montant||0),devise:a.devise||'€',date:a.date||'',motif:a.motif||'',rendu:avRendu(a),reste:avReste(a),echeance:a.echeance||'',statut:donsLblStatut(a),jours:a.echeance?diffD(a.echeance):null,rembs:(a.rembs||[])};}
+function donsLblStatut(a){if(a.type==='don')return'Don';if(a.statut==='rembourse')return'Remboursé';var d=a.echeance?diffD(a.echeance):null;if(d!==null&&d<0)return'En retard de '+Math.abs(d)+' j';if(d===0)return'Échéance aujourd\'hui';if(avRendu(a)>0)return'Partiel';return'En cours';}
+function donsFmtJours(j,st){if(st==='Remboursé'||st==='Don')return'—';if(j===null)return'sans échéance';if(j<0)return'retard '+Math.abs(j)+' j';if(j===0)return'aujourd\'hui';return'J−'+j;}
+
+function oDonsRender(){
+  var sel=document.getElementById('dons-payeur');if(!sel)return;
+  var showDone=document.getElementById('dons-done').checked,inclDon=document.getElementById('dons-don').checked;
+  var L=donsByPayeur(inclDon);
+  var cur=sel.value;
+  sel.innerHTML='<option value="">— Choisir une personne —</option>'+L.map(function(p){
+    return'<option value="'+esc(p.key)+'">'+esc(p.label||p.key)+' ('+p.n+' ligne'+(p.n>1?'s':'')+(p.nRetard?' · '+p.nRetard+' en retard':'')+')</option>';
+  }).join('');
+  if(cur&&L.some(function(p){return p.key===cur;}))sel.value=cur;
+  var body=document.getElementById('dons-body'),sum=document.getElementById('dons-sum');
+  if(!sel.value){body.innerHTML='<div class="oemp"><div class="oemp-i">💶</div><div class="oemp-t">Choisissez une personne ci-dessus pour voir tout ce qu\'elle a donné ou prêté.</div>'+(L.length?'<div style="font-size:12px;color:var(--t3);margin-top:8px">'+L.length+' personne'+(L.length>1?'s ont':' a')+' consenti une avance ou un don.</div>':'')+'</div>';sum.innerHTML='';return;}
+  var p=L.find(function(x){return x.key===sel.value;});if(!p){body.innerHTML='';return;}
+  var rows=p.rows.map(donsRowSum).filter(function(r){return showDone||r.statut!=='Remboursé';});
+  // tri : retards d'abord, puis échéances proches, puis dons
+  rows.sort(function(a,b){var ja=a.jours===null?99999:a.jours,jb=b.jours===null?99999:b.jours;return ja-jb;});
+  var fmtT=function(t){return Object.keys(t).filter(function(k){return t[k]>0;}).map(function(k){return Math.round(t[k]*100)/100+' '+k;}).join(' · ');};
+  var sTot=[];
+  if(Object.keys(p.totAvancé).length)sTot.push('<b>Avancé :</b> '+esc(fmtT(p.totAvancé)));
+  if(Object.keys(p.totRendu).length)sTot.push('<b>Rendu :</b> '+esc(fmtT(p.totRendu)));
+  if(Object.keys(p.totReste).length)sTot.push('<b style="color:#B5570F">Reste à récupérer :</b> '+esc(fmtT(p.totReste)));
+  if(Object.keys(p.totDons).length)sTot.push('<b>Dons :</b> '+esc(fmtT(p.totDons)));
+  sum.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:10px 16px">'+sTot.join(' · ')+'</div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">'
+      +'<button type="button" class="ob bwa bsm" style="min-height:40px" onclick="oDonsShare(\''+esc(p.key)+'\',\'wa\')">💬 Partager par WhatsApp</button>'
+      +'<button type="button" class="ob bgold bsm" style="min-height:40px" onclick="oDonsShare(\''+esc(p.key)+'\',\'mail\')">✉️ Envoyer par e-mail</button>'
+      +'<button type="button" class="ob bgh bsm" style="min-height:40px" onclick="oDonsExport(\''+esc(p.key)+'\',\'copy\')">📋 Copier (Excel)</button>'
+      +'<button type="button" class="ob bgh bsm" style="min-height:40px" onclick="oDonsExport(\''+esc(p.key)+'\',\'csv\')">⬇️ CSV</button>'
+      +'<button type="button" class="ob bgh bsm" style="min-height:40px" onclick="oDonsPrint(\''+esc(p.key)+'\')">🖨 Imprimer / PDF</button>'
+    +'</div>';
+  // Rendu du tableau
+  if(!rows.length){body.innerHTML='<div class="oemp"><div class="oemp-i">✅</div><div class="oemp-t">Tout est soldé — aucune ligne en cours pour '+esc(p.label||'cette personne')+'.</div></div>';return;}
+  body.innerHTML='<div class="ocard" style="overflow:hidden"><div style="overflow:auto"><table class="dons-tbl"><thead><tr>'
+    +'<th>Bénéficiaire</th><th>Type</th><th>Montant</th><th>Date</th><th>Motif</th><th>Rendu</th><th>Reste</th><th>Échéance</th><th>État</th><th></th>'
+    +'</tr></thead><tbody>'
+    +rows.map(function(r){
+      var row=p.rows.find(function(x){return nmKey(((x.b.nom||'')+' '+(x.b.prenom||'')).trim())===nmKey(r.nom);});
+      var b=row?row.b:null,a=row?row.a:null;
+      var color=r.statut.indexOf('retard')===0?'#C0392B':(r.statut==='Partiel'?'#B5570F':(r.statut==='Don'?'#6B5320':(r.statut==='Remboursé'?'#149B45':'var(--tx)')));
+      var jours=donsFmtJours(r.jours,r.statut);
+      return'<tr>'
+        +'<td><b>'+esc(r.nom||'—')+'</b>'+(r.tel?'<br><small>'+esc(r.tel)+'</small>':'')+'</td>'
+        +'<td>'+esc(r.type)+'</td>'
+        +'<td style="text-align:right;font-variant-numeric:tabular-nums"><b>'+r.montant+'</b> '+esc(r.devise)+'</td>'
+        +'<td>'+(r.date?esc(fD(r.date)):'—')+'</td>'
+        +'<td>'+esc(r.motif||'—')+'</td>'
+        +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+(r.rendu?r.rendu+' '+esc(r.devise):'—')+'</td>'
+        +'<td style="text-align:right;font-variant-numeric:tabular-nums">'+(r.statut==='Don'?'—':'<b>'+r.reste+'</b> '+esc(r.devise))+'</td>'
+        +'<td>'+(r.echeance?esc(fD(r.echeance))+'<br><small>'+esc(jours)+'</small>':'<small>'+esc(jours)+'</small>')+'</td>'
+        +'<td><span style="color:'+color+';font-weight:600">'+esc(r.statut)+'</span></td>'
+        +'<td style="white-space:nowrap">'+(b&&r.statut!=='Remboursé'&&r.statut!=='Don'?(b.tel?'<a class="tb-ic" title="Relancer '+esc(r.nom)+' par WhatsApp" href="'+esc(mkWA(b.tel,avWaMsg(b,a)))+'" target="_blank" rel="noopener">💬</a>':''):'')+(b?'<button type="button" class="tb-ic" title="Ouvrir la fiche de '+esc(r.nom)+'" onclick="oOpenF(\''+esc(b.id)+'\')">👁</button>':'')+'</td>'
+      +'</tr>';
+    }).join('')
+    +'</tbody></table></div></div>';
+}
+
+function donsLines(key,includeDons){
+  var p=donsPayeur(key,includeDons);if(!p)return{p:null,rows:[]};
+  var rows=p.rows.map(donsRowSum).sort(function(a,b){var ja=a.jours===null?99999:a.jours,jb=b.jours===null?99999:b.jours;return ja-jb;});
+  return{p:p,rows:rows};
+}
+function donsCsv(key,includeDons){
+  var d=donsLines(key,includeDons);if(!d.p)return'';
+  var H=['Bénéficiaire','Téléphone','E-mail','Type','Montant','Devise','Date','Motif','Rendu','Reste','Échéance','État','Remboursements'];
+  var esc=function(v){v=String(v==null?'':v);return(/[",;\n]/.test(v))?'"'+v.replace(/"/g,'""')+'"':v;};
+  var out=[H.map(esc).join(';')];
+  d.rows.forEach(function(r){
+    out.push([r.nom,r.tel,r.email,r.type,r.montant,r.devise,r.date?fD(r.date):'',r.motif,r.rendu||'',r.statut==='Don'?'':r.reste,r.echeance?fD(r.echeance):'',r.statut,(r.rembs||[]).map(function(x){return (x.date?fD(x.date):'')+':'+x.montant;}).join(' + ')].map(esc).join(';'));
+  });
+  return out.join('\n');
+}
+function donsTxt(key,includeDons){
+  var d=donsLines(key,includeDons);if(!d.p)return'';var p=d.p;
+  var lines=['📒 Récap avances / dons — '+(p.label||'(sans nom)')];
+  var tot=function(t,lbl){var k=Object.keys(t).filter(function(x){return t[x]>0;});if(!k.length)return'';return lbl+' : '+k.map(function(x){return Math.round(t[x]*100)/100+' '+x;}).join(' · ');};
+  [tot(p.totAvancé,'Avancé'),tot(p.totRendu,'Rendu'),tot(p.totReste,'Reste à récupérer'),tot(p.totDons,'Dons')].filter(Boolean).forEach(function(x){lines.push('• '+x);});
+  lines.push('');
+  d.rows.forEach(function(r){
+    var l='• '+r.nom+' — '+r.type+' '+r.montant+' '+r.devise+(r.date?' du '+fD(r.date):'')+(r.motif?' ('+r.motif+')':'');
+    if(r.statut!=='Don'&&r.statut!=='Remboursé'){l+=' — reste '+r.reste+' '+r.devise+(r.echeance?' · échéance '+fD(r.echeance):'')+' — '+r.statut;}
+    else l+=' — '+r.statut;
+    lines.push(l);
+  });
+  lines.push('');lines.push('— Récap transmis par '+PARTNER_NOM()+' (CRM OlyLife · Water Life High Tech)');
+  return lines.join('\n');
+}
+function oDonsExport(key,mode){
+  var inclDon=document.getElementById('dons-don').checked;
+  var p=donsPayeur(key,inclDon);if(!p)return;
+  var fname=('recap-dons-'+(p.label||key)+'-'+todayYMD()).toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.csv';
+  if(mode==='csv'){var blob=new Blob(['\uFEFF'+donsCsv(key,inclDon)],{type:'text/csv;charset=utf-8'});var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=fname;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove();},300);oT('⬇️ CSV téléchargé','s');return;}
+  if(mode==='copy'){
+    // format tableur : tabulé, utilisable par Excel / Sheets
+    var d=donsLines(key,inclDon),H=['Bénéficiaire','Téléphone','Type','Montant','Devise','Date','Motif','Rendu','Reste','Échéance','État'].join('\t');
+    var body=d.rows.map(function(r){return[r.nom,r.tel,r.type,r.montant,r.devise,r.date?fD(r.date):'',r.motif,r.rendu||'',r.statut==='Don'?'':r.reste,r.echeance?fD(r.echeance):'',r.statut].join('\t');}).join('\n');
+    try{navigator.clipboard.writeText(H+'\n'+body).then(function(){oT('📋 Tableau copié — colle-le dans Excel ou Google Sheets','s');});}catch(e){oT('Copie impossible','e');}
+  }
+}
+function oDonsShare(key,canal){
+  var inclDon=document.getElementById('dons-don').checked,msg=donsTxt(key,inclDon);
+  var p=donsPayeur(key,inclDon);if(!p)return;
+  var ct=p.parId?OC.find(function(c){return c.id===p.parId;}):null,tel=ct?ct.tel:'',email=ct?ct.email:'';
+  if(canal==='wa'){
+    if(!tel){oT('Pas de téléphone pour '+(p.label||'cette personne')+' — copie du message','w');sendCopy(msg,'📋 Récap copié');return;}
+    window.open(mkWA(tel,msg),'_blank');return;
+  }
+  if(canal==='mail'){
+    if(!email){oT('Pas d\'e-mail pour '+(p.label||'cette personne')+' — copie du message','w');sendCopy(msg,'📋 Récap copié');return;}
+    var sub='Récap avances / dons — '+(p.label||'');
+    window.location.href='mailto:'+encodeURIComponent(email)+'?subject='+encodeURIComponent(sub)+'&body='+encodeURIComponent(msg);return;
+  }
+}
+function oDonsPrint(key){
+  var inclDon=document.getElementById('dons-don').checked,d=donsLines(key,inclDon);if(!d.p)return;var p=d.p;
+  var w=window.open('','_blank');if(!w){oT('Autorisez les pop-ups pour imprimer','w');return;}
+  var tot=function(t,lbl){var k=Object.keys(t).filter(function(x){return t[x]>0;});if(!k.length)return'';return'<li><b>'+lbl+' :</b> '+k.map(function(x){return(Math.round(t[x]*100)/100)+' '+x;}).join(' · ')+'</li>';};
+  var totsHtml=[tot(p.totAvancé,'Avancé'),tot(p.totRendu,'Rendu'),tot(p.totReste,'Reste à récupérer'),tot(p.totDons,'Dons')].join('');
+  var rows=d.rows.map(function(r){
+    var st=r.statut.indexOf('retard')===0?'color:#C0392B':(r.statut==='Partiel'?'color:#B5570F':(r.statut==='Don'?'color:#6B5320':(r.statut==='Remboursé'?'color:#149B45':'')));
+    return'<tr><td><b>'+(r.nom||'')+'</b>'+(r.tel?'<br><span style="font-size:11px;color:#666">'+r.tel+'</span>':'')+'</td><td>'+r.type+'</td><td style="text-align:right;font-variant-numeric:tabular-nums"><b>'+r.montant+'</b> '+r.devise+'</td><td>'+(r.date?fD(r.date):'')+'</td><td>'+(r.motif||'')+'</td><td style="text-align:right">'+(r.rendu||'')+'</td><td style="text-align:right"><b>'+(r.statut==='Don'?'—':r.reste)+'</b></td><td>'+(r.echeance?fD(r.echeance):'')+'<br><span style="font-size:11px;color:#666">'+donsFmtJours(r.jours,r.statut)+'</span></td><td style="'+st+';font-weight:600">'+r.statut+'</td></tr>';
+  }).join('');
+  w.document.write('<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Récap avances — '+(p.label||'')+'</title><style>body{font-family:system-ui,sans-serif;color:#1a2b22;max-width:1000px;margin:24px auto;padding:0 20px}h1{font-size:22px;margin:0 0 6px}h2{font-size:14px;color:#5A6E61;margin:0 0 18px;font-weight:400}ul{margin:0 0 18px;padding-left:18px}li{line-height:1.6}table{width:100%;border-collapse:collapse;font-size:12.5px}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #D7E6DB;vertical-align:top}thead th{background:#F3F8F4;color:#5A6E61;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.3px}footer{margin-top:28px;font-size:11px;color:#7F9186;border-top:1px solid #D7E6DB;padding-top:10px}</style></head><body><h1>Récap avances / dons — '+(p.label||'')+'</h1><h2>Généré le '+fD(todayYMD())+' par '+PARTNER_NOM()+' · CRM OlyLife · Water Life High Tech</h2><ul>'+totsHtml+'</ul><table><thead><tr><th>Bénéficiaire</th><th>Type</th><th>Montant</th><th>Date</th><th>Motif</th><th>Rendu</th><th>Reste</th><th>Échéance</th><th>État</th></tr></thead><tbody>'+rows+'</tbody></table><footer>Document interne — ne constitue pas un titre de créance juridique. L\'association Water Life High Tech enregistre ces mouvements pour la seule traçabilité interne.</footer><script>setTimeout(function(){window.print();},250);<\/script></body></html>');
+  w.document.close();
+}
+
 function avListHtml(c){
   var avs=c.avances||[],isRef=!can('avances');
   var rows=avs.map(function(a){return avRowHtml(c,a,false);}).join('');
@@ -5656,7 +5834,7 @@ function oClearFiltersSilent(){
 // v3 — INTERFACE RESPONSIVE : navigation · accueil · contacts (tableau,
 // sélection multiple) · pipeline · agenda · Calendly · raccourcis clavier
 // ═══════════════════════════════════════════════════════════════════
-var VIEW_T={admin:'Administration',demandes:'Demandes reçues',dashboard:'Tableau de bord',contacts:'Contacts',pipeline:'Pipeline',agenda:'Agenda',actions:'Actions',equipe:'Équipe',nouvelle:'Nouveau contact',carte:'Carte des essais',genea:'Généalogie',temoignages:'Témoignages',protocoles:'Fiches conseils de soins',precautions:'Utilisations & précautions'};
+var VIEW_T={admin:'Administration',demandes:'Demandes reçues',dashboard:'Tableau de bord',contacts:'Contacts',pipeline:'Pipeline',agenda:'Agenda',actions:'Actions',equipe:'Équipe',nouvelle:'Nouveau contact',carte:'Carte des essais',genea:'Généalogie',temoignages:'Témoignages',protocoles:'Fiches conseils de soins',precautions:'Utilisations & précautions',dons:'Récap avances / dons'};
 var CUR_VIEW='dashboard',CUR_LIST=[],SORT={k:'statut',d:1},SEL={},SEL_MODE=false,ACTIVE_ID=null,LIST_LIMIT=150;
 function mq(q){try{return window.matchMedia(q).matches;}catch(e){return false;}}
 function isDesk(){return mq('(min-width:760px)');}
@@ -5699,6 +5877,7 @@ function oRefreshView(v){
   else if(v==='demandes'){oLeads();}
   else if(v==='carte')oCarte();else if(v==='genea')oGenea();
   else if(v==='temoignages')oTemView();else if(v==='protocoles')oProtoView();else if(v==='precautions')oPrecView();
+  else if(v==='dons')oDonsRender();
   navBadges();
 }
 function oRefresh(){var v=document.querySelector('.ov.on');if(v)oRefreshView(v.id.replace('ov-',''));}
@@ -7697,6 +7876,7 @@ function comptesHtml(c){
     var u=trackingUrl(k.transporteur,k.tracking);
     var li=function(l,v){return v?'<div class="od-row"><span class="od-lbl">'+l+'</span><span class="od-val">'+v+'</span></div>':'';};
     return'<div style="padding:8px 16px 4px;font-weight:700;color:var(--tx)">🆔 '+esc(k.memberIdOlyLife||'ID non renseigné')+' <span style="font-weight:400;color:var(--t3)">· '+(i+2)+'ᵉ compte</span>'+(can?' <button type="button" class="ob bgh bsm" style="margin-left:6px" onclick="oCptFusion(\''+c.id+'\','+i+')" title="Ce n\'est pas un 2e compte : verser ses informations dans le compte principal et le retirer">⬆️ Un seul compte</button>':'')+'</div>'
+      +li('E-mail du compte',k.email?'<a href="mailto:'+esc(k.email)+'" style="color:var(--aqua)">'+esc(k.email)+'</a>':'<span style="color:#C63E47">⚠️ à renseigner — chaque compte OlyLife exige une adresse différente</span>')
       +li('Appareil',esc((k.produits||[]).join(', ')))
       +li('N° commande',esc(k.numCommande||'')+(k.dateCommande?' · '+fD(k.dateCommande):''))
       +li('Livraison',(k.tracking?esc(k.transporteur||'')+' '+(u?'<a href="'+u+'" target="_blank" rel="noopener" style="color:var(--aqua)">'+esc(k.tracking)+' ↗</a>':esc(k.tracking)):'')+(k.dateLivraison?' · '+fD(k.dateLivraison):''))
@@ -7713,7 +7893,7 @@ function cptPrincipalVide(c){
   return !String(c.memberIdOlyLife||'').trim()&&!String(c.numCommande||'').trim()&&!String(c.tracking||'').trim()&&!((c.produits||[]).length);
 }
 // v3.53 — verser un « autre compte » dans le compte principal, directement depuis la fiche (sans passer par Modifier)
-var CPT_MLBL={memberIdOlyLife:'n° de distributeur',numCommande:'n° de commande',dateCommande:'date de commande',transporteur:'transporteur',tracking:'n° de suivi',dateLivraison:'date de livraison',dateReception:'date de réception',dateInstall:'date d\'installation',installConfirm:'installation confirmée',produits:'appareil(s)',livraisons:'colis',rangOly:'rang',sponsor:'parrain',placement:'placement',cote:'côté binaire',paiement:'règlement',notes:'notes'};
+var CPT_MLBL={memberIdOlyLife:'n° de distributeur',email:'e-mail du compte',numCommande:'n° de commande',dateCommande:'date de commande',transporteur:'transporteur',tracking:'n° de suivi',dateLivraison:'date de livraison',dateReception:'date de réception',dateInstall:'date d\'installation',installConfirm:'installation confirmée',produits:'appareil(s)',livraisons:'colis',rangOly:'rang',sponsor:'parrain',placement:'placement',cote:'côté binaire',paiement:'règlement',notes:'notes'};
 function oCptFusion(cid,i){
   var c=OC.find(function(x){return x.id===cid;});if(!c||!canEditContact(c))return;
   var k=(c.comptes||[])[i];if(!k){oT('Compte introuvable','e');return;}
@@ -7958,7 +8138,7 @@ function oFactDel(cid,fid){
 
 // ── Formulaire : autres comptes OlyLife (même personne) ──
 var FORM_COMPTES=[];
-var CPT_FIELDS=[['memberIdOlyLife','Member ID (EA…)','text','EA932687'],['numCommande','N° commande','text',''],['dateCommande','Date de commande','date',''],['produit','Appareil','text',''],['transporteur','Transporteur','text','DHL'],['tracking','N° de tracking','text',''],['dateReception','Date de réception','date',''],['installConfirm','Installation confirmée','select',''],['dateLivraison','Date de livraison','date',''],['sponsor','Sponsor (parrain)','text','Rechercher un nom ou EA…'],['placement','Placement (position arbre)','text','Rechercher un nom ou EA…'],['cote','Côté binaire','select',''],['rangOly','Rang OlyLife','select',''],['notes','Notes','text','']];
+var CPT_FIELDS=[['memberIdOlyLife','Member ID (EA…)','text','EA932687'],['email','E-mail du compte (différent du principal)','email','prenom.autre@gmail.com'],['numCommande','N° commande','text',''],['dateCommande','Date de commande','date',''],['produit','Appareil','text',''],['transporteur','Transporteur','text','DHL'],['tracking','N° de tracking','text',''],['dateReception','Date de réception','date',''],['installConfirm','Installation confirmée','select',''],['dateLivraison','Date de livraison','date',''],['sponsor','Sponsor (parrain)','text','Rechercher un nom ou EA…'],['placement','Placement (position arbre)','text','Rechercher un nom ou EA…'],['cote','Côté binaire','select',''],['rangOly','Rang OlyLife','select',''],['notes','Notes','text','']];
 function oCompteRender(){
   var box=document.getElementById('fo-comptes');if(!box)return;
   var pl=document.getElementById('prod-list');if(pl)pl.innerHTML=PRODUCTS.map(function(P){return'<option value="'+esc(P)+'">';}).join('');
@@ -7977,7 +8157,7 @@ function oCompteCollect(){
   document.querySelectorAll('#fo-comptes .cpt-box').forEach(function(b){
     var k=FORM_COMPTES[+b.getAttribute('data-i')];if(!k)return;
     b.querySelectorAll('[data-f]').forEach(function(el){var f=el.getAttribute('data-f'),v=el.value.trim();
-      if(f==='produit')k.produits=v?[v]:[];else if(f==='memberIdOlyLife')k[f]=v.toUpperCase();else if(f==='installConfirm')k[f]=v==='Oui';else if(f==='sponsor'||f==='placement')k[f]=eaNorm(v);else k[f]=v;});
+      if(f==='produit')k.produits=v?[v]:[];else if(f==='memberIdOlyLife')k[f]=v.toUpperCase();else if(f==='installConfirm')k[f]=v==='Oui';else if(f==='sponsor'||f==='placement')k[f]=eaNorm(v);else if(f==='email')k[f]=v.toLowerCase().trim();else k[f]=v;});
   });
   return FORM_COMPTES.filter(function(k){return k.memberIdOlyLife||k.numCommande||k.tracking||(k.produits&&k.produits.length);});
 }
@@ -8010,7 +8190,7 @@ function oCompteDel(i){oCompteCollect();var k=FORM_COMPTES[i];if(k&&(k.memberIdO
 
 // ── Import : un autre n° de distributeur de la même personne devient un compte de plus (pas un écrasement) ──
 var IMP_IDMODE={};
-var CPT_IMPORT_KEYS=['memberIdOlyLife','numCommande','dateCommande','transporteur','tracking','dateLivraison','rangOly','sponsor','placement','cote','livraisons'];
+var CPT_IMPORT_KEYS=['memberIdOlyLife','email','numCommande','dateCommande','transporteur','tracking','dateLivraison','rangOly','sponsor','placement','cote','livraisons'];
 function impCompteRoute(it,ex){
   if(!ex||!it.memberIdOlyLife)return null;
   var ea=String(it.memberIdOlyLife).toUpperCase(),main=String(ex.memberIdOlyLife||'').toUpperCase();
