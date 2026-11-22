@@ -2559,7 +2559,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.56 · 21/11';
+var APP_VERSION='v3.57 · 22/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -2687,7 +2687,25 @@ function oLogout(){
   try{localStorage.removeItem('owlht2_code');localStorage.removeItem('owlht2_token');localStorage.removeItem('owlht2_pin');localStorage.removeItem('owlht2_bio');}catch(e){}
   oHideSetup();oSyncDot('');oShowLogin();
 }
-function oSessionLost(msg){TOKEN='';CODE='';USER=null;try{localStorage.removeItem('owlht2_code');localStorage.removeItem('owlht2_token');}catch(e){}oSyncDot('err');oLoader(false);oShowLogin(msg||'Session expirée ou révoquée — reconnectez-vous avec votre code.');}
+function oSessionLost(msg){
+  // v3.57 — si la bio ou le PIN est actif sur l'appareil, le code reste disponible pour une reconnexion silencieuse une fois le verrou passé.
+  var keepCode=!!(CODE&&(bioStored()||pinStored()));
+  TOKEN='';USER=null;try{localStorage.removeItem('owlht2_token');}catch(e){}
+  if(keepCode){try{localStorage.setItem('owlht2_code',CODE);}catch(e){}oSyncDot('err');oLoader(false);oT('🔒 Session à renouveler — déverrouillez l\'app, la reconnexion est automatique','i');return;}
+  CODE='';try{localStorage.removeItem('owlht2_code');}catch(e){}
+  oSyncDot('err');oLoader(false);oShowLogin(msg||'Session expirée ou révoquée — reconnectez-vous avec votre code.');
+}
+// v3.57 — reconnexion silencieuse avec le code conservé localement, au moment où le verrou est levé
+function oReLoginSilent(){
+  if(TOKEN||!CODE||!GAS_URL)return;
+  oSyncDot('spin');
+  fetch(GAS_URL,{method:'POST',body:JSON.stringify({op:'login',code:CODE,device:deviceInfo()})})
+    .then(function(r){return r.text();}).then(function(t){var d={};try{d=JSON.parse(t);}catch(e){}
+      if(d&&d.ok&&d.token){TOKEN=d.token;oSaveCfg();oApplyPayload(d);oSyncDot('ok');oT('🔓 Session renouvelée','s');}
+      else if(d&&d.error==='auth'){CODE='';try{localStorage.removeItem('owlht2_code');}catch(e){}oShowLogin('Le code d\'accès enregistré n\'est plus valide — recommencez la connexion.');}
+      else oSyncDot('err');
+    }).catch(function(){oSyncDot('err');});
+}
 function oApplyPayload(d){
       oLoader(false);
       USER=d.user;
@@ -6737,9 +6755,17 @@ function avRembRender(){
   var a=AV_CUR;if(!a)return;
   var box=document.getElementById('av-remb-list');
   var rs=(a.rembs||[]).slice().sort(function(x,y){return(x.date||'')<(y.date||'')?-1:1;});
-  box.innerHTML=(rs.length?rs.map(function(r,i){return'<div class="row"><span style="flex:1">'+fD(r.date)+' — <b>'+r.montant+' '+esc(a.devise||'€')+'</b>'+(r.complet?' <span class="obdg bgr">solde</span>':' <span class="obdg baq">partiel</span>')+'</span><button class="tb-ic" type="button" title="Retirer" onclick="oAvRembDel('+i+')">🗑</button></div>';}).join(''):'<div style="font-size:12px;color:var(--t3)">Aucun remboursement enregistré.</div>')
+  // v3.57 — chaque remboursement est modifiable (date + montant) directement dans la liste, admin + gestionnaire
+  box.innerHTML=(rs.length?rs.map(function(r,i){return'<div class="row" style="align-items:center;gap:6px"><input type="date" class="ofc" style="width:140px;min-height:32px;padding:4px 6px;font-size:12px" value="'+esc(r.date||'')+'" onchange="oAvRembEdit('+i+',\'date\',this.value)"><input type="number" step="0.01" class="ofc" style="width:100px;min-height:32px;padding:4px 6px;font-size:12px;text-align:right" value="'+esc(String(r.montant))+'" onchange="oAvRembEdit('+i+',\'montant\',this.value)"><span style="font-size:12px;color:var(--t3)">'+esc(a.devise||'€')+'</span>'+(r.complet?' <span class="obdg bgr" title="Marque le solde">solde</span>':' <span class="obdg baq">partiel</span>')+'<button class="tb-ic" type="button" title="Retirer" onclick="oAvRembDel('+i+')">🗑</button></div>';}).join(''):'<div style="font-size:12px;color:var(--t3)">Aucun remboursement enregistré.</div>')
     +'<div style="font-size:12px;margin-top:6px;color:var(--t2)">Rendu : <b>'+avRendu(a)+'</b> / '+a.montant+' '+esc(a.devise||'€')+' · reste <b>'+avReste(a)+' '+esc(a.devise||'€')+'</b></div>';
   document.getElementById('av-r-date').value=todayYMD();document.getElementById('av-r-montant').value='';
+}
+function oAvRembEdit(i,field,v){
+  var a=AV_CUR;if(!a||!a.rembs)return;
+  var rs=a.rembs.slice().sort(function(x,y){return(x.date||'')<(y.date||'')?-1:1;});var r=rs[i];if(!r)return;
+  if(field==='date'){r.date=String(v||'').slice(0,10);}
+  else if(field==='montant'){var m=parseFloat(v);if(isNaN(m)||m<=0){oT('Montant invalide','e');avRembRender();return;}r.montant=Math.round(m*100)/100;}
+  avRembRender();oT('✏️ Remboursement modifié','s');
 }
 function oAvRembAdd(complet){
   var a=AV_CUR;if(!a)return;
@@ -9732,7 +9758,7 @@ function pinHash(p){var h=5381;for(var i=0;i<p.length;i++)h=((h<<5)+h+p.charCode
 function pinStored(){try{return localStorage.getItem('owlht2_pin')||'';}catch(e){return'';}}
 function lockHello(){var h=new Date().getHours(),n='';try{n=String((USER&&USER.nom)||'').trim().split(/\s+/)[0]||'';}catch(e){}return(h>=18||h<5?'Bonsoir':'Bonjour')+(n?' '+n:'');}
 function oLockPad(on){var L=document.getElementById('olock');L.classList.toggle('show-pad',!!on);if(PIN_MODE==='check')oPinRender(on?'Saisissez votre code PIN':'Appuyer sur le lecteur d\'empreinte digital');}
-function lockOpen(){var L=document.getElementById('olock');PIN_BUF='';L.classList.add('ok');setTimeout(function(){L.classList.add('out');},180);setTimeout(function(){L.classList.remove('on','out','ok');},650);}
+function lockOpen(){var L=document.getElementById('olock');PIN_BUF='';L.classList.add('ok');setTimeout(function(){L.classList.add('out');},180);setTimeout(function(){L.classList.remove('on','out','ok');},650);try{if(!TOKEN&&CODE&&GAS_URL)setTimeout(oReLoginSilent,100);}catch(e){}}
 function oPinGate(){var bio=bioStored()&&bioAvail(),pin=pinStored();if(!bio&&!pin)return;var L=document.getElementById('olock');if(L.classList.contains('on')&&PIN_MODE==='check')return;PIN_MODE='check';PIN_BUF='';
   document.getElementById('olock-hello').textContent=lockHello();
   document.getElementById('olock-bioz').style.display=bio?'':'none';document.getElementById('olock-topin').style.display=pin?'':'none';document.getElementById('olock-tobio').style.display=bio?'':'none';
