@@ -325,7 +325,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.59';   // v3.59 — échéanciers de financement + contrat signé en ligne (contrat.html) · sessions multiples par accès
+var SRV_VERSION = '3.62';   // v3.59 — échéanciers de financement + contrat signé en ligne (contrat.html) · sessions multiples par accès
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
@@ -671,7 +671,9 @@ function handleOffre_(db, req, op) {
       client: { prenom: c.prenom || '', nom: c.nom || '', adresse: c.adresse || '', cp: c.cp || '', ville: c.ville || '', pays: c.pays || '', liv: { nom: ((c.livPrenom || '') + ' ' + (c.livNom || '')).trim(), adresse: c.livAdresse || '', cp: c.livCp || '', ville: c.livVille || '', pays: c.livPays || '' } },
       ref: { nom: u.nom || o.par || '', photo: u.photo || '', tel: u.tel || '', email: u.email || '', rdv: rdv, memberId: u.memberId || o.memberId || '', rang: u.rang || o.rang || '' },
       lienAdhesion: o.lienAdhesion || '',
-      offre: { num: o.num || ('OF-' + String(o.id || '').slice(-6).toUpperCase()), le: o.le, fin: fin.toISOString(), lignes: (o.lignes || []).map(function (l) { return { nom: l.nom, usd: +l.usd || 0, qte: +l.qte || 1, ic: l.ic || '', pitch: l.pitch || '', tunnel: l.tunnel || '', img: l.img || '' }; }), signature: o.signature ? { png: o.signature.png || '', nom: o.signature.nom || '', le: o.signature.le || '' } : null, produits: prod, frais: frais, fraisPct: +o.frais || 0, total: total, eur: +o.eur || 0, eurTotal: Math.round(total * (+o.eur || 0) * 100) / 100, note: o.note || '', pied: o.pied || '', cot: !!o.cot, acceptLe: o.acceptLe || '', paiement: o.paiement || null } });
+      offre: { num: o.num || ('OF-' + String(o.id || '').slice(-6).toUpperCase()), le: o.le, fin: fin.toISOString(), lignes: (o.lignes || []).map(function (l) { return { nom: l.nom, usd: +l.usd || 0, qte: +l.qte || 1, ic: l.ic || '', pitch: l.pitch || '', tunnel: l.tunnel || '', img: l.img || '' }; }), signature: o.signature ? { png: o.signature.png || '', nom: o.signature.nom || '', le: o.signature.le || '' } : null, produits: prod, frais: frais, fraisPct: +o.frais || 0, total: total, eur: +o.eur || 0, eurTotal: Math.round(total * (+o.eur || 0) * 100) / 100, note: o.note || '', pied: o.pied || '', cot: !!o.cot, acceptLe: o.acceptLe || '', paiement: o.paiement || null,
+        participation: o.participation ? { usd: +o.participation.usd || 0, type: o.participation.type === 'don' ? 'don' : 'avance' } : null,   // v3.62 — prise en charge par le proposant
+        rib: (o.rib && o.rib.on) ? { usd: +o.rib.usd || 0, titulaire: o.rib.titulaire || '', iban: o.rib.iban || '', bic: o.rib.bic || '', banque: o.rib.banque || '', adresse: o.rib.adresse || '' } : null } });   // v3.62 — virement à l'association
   }
   // offreAct : accepter
   var cache = CacheService.getScriptCache(), ck = 'off_' + String(req.t).slice(0, 20), n = parseInt(cache.get(ck) || '0', 10) + 1; cache.put(ck, String(n), 3600);
@@ -2081,6 +2083,7 @@ function rappelsAvances(force) {
   (db.contacts || []).forEach(function (c) {
     (c.avances || []).forEach(function (a) {
       if (!a || a.type === 'don' || a.statut === 'rembourse' || !a.echeance) return;   // v3.5 — les dons n'ont ni échéance ni rappel
+      if (a.statut === 'demande' || a.statut === 'refusee' || (a.demande && a.demande.etat !== 'validee')) return;   // v3.62 — une demande non validée n'a pas de rappel
       var rendu = (a.rembs || []).reduce(function (t, r) { return t + (+r.montant || 0); }, 0), reste = Math.max(0, planTotal_(a) - rendu);
       if (a.plan) { var nx = planProchaine_(a); if (!nx) return; a.echeance = nx.date; }   // v3.59 — échéancier : le rappel porte sur le prochain versement non soldé
       var d = diffDays(a.echeance);
@@ -2174,7 +2177,8 @@ function avWaPayeurAnnonce_(c, a, signataire) {
 }
 function avNotifNouvelles_(db, c, user, notifUpd) {
   if (!c || !c.avances || !c.avances.length) return;
-  var aFaire = c.avances.filter(function (a) { return a && a.notifier && !a.notifLe; });
+  try { avDemandesNotif_(db, c, user); } catch (e) { Logger.log('avDemandesNotif : ' + e); }   // v3.62
+  var aFaire = c.avances.filter(function (a) { return a && a.notifier && !a.notifLe && a.statut !== 'demande' && a.statut !== 'refusee'; });
   if (!aFaire.length) return;
   var rd = {}; try { rd = JSON.parse(PropertiesService.getScriptProperties().getProperty('root_digest') || '{}'); } catch (e) {}
   var adminEmail = rd.email || MON_EMAIL, qui = (user && user.nom) || 'système';
@@ -2194,25 +2198,29 @@ function avNotifNouvelles_(db, c, user, notifUpd) {
     if (a.plan) { lib = '📅 Échéancier'; coul = '#6B3FA0'; }
     // v3.60.2 — Tier Bonus reversé : placement en jambe faible par un partenaire ; la prime lui revient (seule condition)
     var T = a.tier || null, membreTxt = T ? ((T.nom ? T.nom + (T.b || T.a ? ' (' + (T.b || T.a) + ')' : '') : (T.b || T.a || 'un membre'))) : '';
+    var REP = (a.notifType === 'report' && a.echeancePrec) ? a.echeancePrec : '';   // v3.62 — report d'échéance : même recap, texte adapté
+    if (REP) { lib = '📅 Report d\'échéance'; coul = '#B07A1E'; recap += '<br><b>Ancienne échéance :</b> ' + fmtDate_(REP) + ' → <b>nouvelle : ' + fmtDate_(a.echeance) + '</b>'; }
     if (T) { lib = '💸 Tier Bonus à reverser'; coul = '#1B5E8A';
       recap = '<b>Tier Bonus touché le :</b> ' + fmtDate_(a.date) + '<br><b>Membre placé par ' + (a.par || 'le partenaire') + ' :</b> ' + membreTxt + '<br><b>Prime nette :</b> ' + (T.net || a.montant) + ' ' + dev + (T.brut ? ' (brut ' + T.brut + ' ' + dev + ')' : '') + '<br><b>À reverser :</b> ' + a.montant + ' ' + dev + ' en USDT, de wallet à wallet<br><b>Reversement prévu :</b> ' + fmtDate_(a.echeance) + ' (après le prochain retrait OlyLife)'; }
     // 1) bénéficiaire
     if (c.email && droit_(db, 'client', 'annonceAvances', true)) {
       var corpsB = 'Bonjour ' + avPrenom_(c) + ',<br><br>'
-        + (T ? 'Pour mémoire : <b>' + (a.par || 'votre partenaire') + '</b> a placé <b>' + membreTxt + '</b> dans votre jambe la plus faible, et le <b>Tier Bonus</b> du ' + fmtDate_(a.date) + ' — <b>' + a.montant + ' ' + dev + ' net</b> — est tombé sur votre compte. Une aide précieuse pour équilibrer vos deux jambes.<br>Seule condition de ce coup de pouce : <b>reverser la prime à ' + (a.par || 'votre partenaire') + '</b>, en USDT de wallet à wallet, après votre prochain retrait OlyLife (prévu autour du <b>' + fmtDate_(a.echeance) + '</b>). Vous recevrez un rappel 3 jours avant, la veille et le jour J.'
+        + (REP ? 'Comme convenu, nous avons <b>décalé l\'échéance</b> de remboursement de l\'avance de <b>' + a.montant + ' ' + dev + '</b>' + (a.motif ? ' pour votre ' + a.motif : '') + (a.par ? ' (avancée par <b>' + a.par + '</b>)' : '') + ' du ' + fmtDate_(a.date) + '.<br>📅 <b>Nouvelle date : ' + fmtDate_(a.echeance) + '</b> — au lieu du ' + fmtDate_(REP) + '. Les rappels suivront cette nouvelle date. Au moindre souci, dites-le simplement : on trouve une solution ensemble.'
+               : T ? 'Pour mémoire : <b>' + (a.par || 'votre partenaire') + '</b> a placé <b>' + membreTxt + '</b> dans votre jambe la plus faible, et le <b>Tier Bonus</b> du ' + fmtDate_(a.date) + ' — <b>' + a.montant + ' ' + dev + ' net</b> — est tombé sur votre compte. Une aide précieuse pour équilibrer vos deux jambes.<br>Seule condition de ce coup de pouce : <b>reverser la prime à ' + (a.par || 'votre partenaire') + '</b>, en USDT de wallet à wallet, après votre prochain retrait OlyLife (prévu autour du <b>' + fmtDate_(a.echeance) + '</b>). Vous recevrez un rappel 3 jours avant, la veille et le jour J.'
                : don ? 'Bonne nouvelle : un <b>don de ' + a.montant + ' ' + dev + '</b>' + (a.motif ? ' pour votre ' + a.motif : '') + ' vous est fait' + (a.par ? ' par <b>' + a.par + '</b>' : '') + '. Il s\'agit d\'un don : <b>aucun remboursement n\'est attendu</b> 🎁'
                : a.plan ? 'Voici votre <b>échéancier</b> pour le financement de <b>' + a.montant + ' ' + dev + '</b>' + (a.motif ? ' (' + a.motif + ')' : '') + (a.par ? ', avancé par <b>' + a.par + '</b>' : '') + '. Vous recevrez un rappel par e-mail avant chaque versement (3 jours avant, la veille et le jour J).'
                : 'C\'est confirmé : une <b>avance de ' + a.montant + ' ' + dev + '</b>' + (a.motif ? ' pour votre ' + a.motif : '') + ' vous est accordée' + (a.par ? ' par <b>' + a.par + '</b>' : '') + '.<br>Le remboursement est prévu le <b>' + fmtDate_(a.echeance) + '</b>. Vous recevrez un rappel par e-mail 3 jours avant, la veille et le jour J — rien à faire d\'ici là.')
         + '<br><br><div style="background:#F6FAF6;border-radius:10px;padding:10px 14px">' + recap + '</div>'
         + (lienContrat ? '<br>Pour que tout soit clair pour chacun, merci de lire et <b>signer le contrat en ligne</b> (reconnaissance de dette et échéancier, 2 minutes) :' + avBtn_(lienContrat, '✍️ Lire et signer le contrat', '#6B3FA0') : '') + '<br>'
         + 'Pour toute question : ' + gestNom + (gestTel ? ' · ' + gestTel : '') + (gestEmail ? ' · ' + gestEmail : '') + '<br><br>Bien à vous,<br>' + gestNom + ' — Water Life High Tech';
-      try { MailApp.sendEmail({ to: c.email, subject: T ? '💸 Tier Bonus de ' + a.montant + ' ' + dev + ' à reverser à ' + (a.par || 'votre partenaire') + ' — Water Life High Tech' : (don ? '🎁 Un don de ' : a.plan ? '📅 Votre échéancier de ' : '💶 Votre avance de ') + a.montant + ' ' + dev + (don ? ' vous est fait' : a.plan ? ' en ' + a.plan.nb + ' versements' : ' est enregistrée') + ' — Water Life High Tech', htmlBody: avMailShell_(T ? '💸 Tier Bonus à reverser' : don ? '🎁 Un don vous est fait' : a.plan ? '📅 Votre échéancier de remboursement' : '💶 Votre avance est enregistrée', 'Water Life High Tech', coul, corpsB), name: 'Water Life High Tech', replyTo: gestEmail || adminEmail }); envoyes.push('bénéficiaire'); } catch (e) { Logger.log('avNotif bénéficiaire : ' + e); }
+      try { MailApp.sendEmail({ to: c.email, subject: REP ? '📅 Nouvelle échéance : ' + fmtDate_(a.echeance) + ' — avance de ' + a.montant + ' ' + dev + ' — Water Life High Tech' : T ? '💸 Tier Bonus de ' + a.montant + ' ' + dev + ' à reverser à ' + (a.par || 'votre partenaire') + ' — Water Life High Tech' : (don ? '🎁 Un don de ' : a.plan ? '📅 Votre échéancier de ' : '💶 Votre avance de ') + a.montant + ' ' + dev + (don ? ' vous est fait' : a.plan ? ' en ' + a.plan.nb + ' versements' : ' est enregistrée') + ' — Water Life High Tech', htmlBody: avMailShell_(REP ? '📅 Échéance reportée' : T ? '💸 Tier Bonus à reverser' : don ? '🎁 Un don vous est fait' : a.plan ? '📅 Votre échéancier de remboursement' : '💶 Votre avance est enregistrée', 'Water Life High Tech', coul, corpsB), name: 'Water Life High Tech', replyTo: gestEmail || adminEmail }); envoyes.push('bénéficiaire'); } catch (e) { Logger.log('avNotif bénéficiaire : ' + e); }
     }
     // 2) prêteur / donateur
     var pEmail = avPayeurEmail_(db, a);
     if (pEmail && pEmail !== c.email) {
       var corpsP = 'Bonjour ' + String(a.par || '').split(' ')[0] + ',<br><br>'
-        + (T ? 'Un grand merci : en plaçant <b>' + membreTxt + '</b> dans la jambe la plus faible de <b>' + avNomC_(c) + '</b>, vous lui avez permis de toucher le <b>Tier Bonus</b> du ' + fmtDate_(a.date) + ' — <b>' + a.montant + ' ' + dev + ' net</b>. Une vraie aide pour équilibrer ses deux jambes.<br>Comme convenu, cette prime vous revient intégralement : <b>' + avNomC_(c) + '</b> vous la reverse en USDT, de wallet à wallet, après son prochain retrait OlyLife — prévu autour du <b>' + fmtDate_(a.echeance) + '</b>. Vous serez prévenu(e) du virement.'
+        + (REP ? 'Pour information : l\'échéance de remboursement de votre avance de <b>' + a.montant + ' ' + dev + '</b> à <b>' + avNomC_(c) + '</b>' + (a.motif ? ' (' + a.motif + ')' : '') + ' du ' + fmtDate_(a.date) + ' est <b>reportée</b>.<br>📅 <b>Nouvelle date : ' + fmtDate_(a.echeance) + '</b> — au lieu du ' + fmtDate_(REP) + '. Vous recevrez les rappels à la nouvelle date, et chaque remboursement reçu vous sera confirmé.'
+               : T ? 'Un grand merci : en plaçant <b>' + membreTxt + '</b> dans la jambe la plus faible de <b>' + avNomC_(c) + '</b>, vous lui avez permis de toucher le <b>Tier Bonus</b> du ' + fmtDate_(a.date) + ' — <b>' + a.montant + ' ' + dev + ' net</b>. Une vraie aide pour équilibrer ses deux jambes.<br>Comme convenu, cette prime vous revient intégralement : <b>' + avNomC_(c) + '</b> vous la reverse en USDT, de wallet à wallet, après son prochain retrait OlyLife — prévu autour du <b>' + fmtDate_(a.echeance) + '</b>. Vous serez prévenu(e) du virement.'
                : don ? 'Votre <b>don de ' + a.montant + ' ' + dev + '</b> à <b>' + avNomC_(c) + '</b>' + (a.motif ? ' pour ' + a.motif : '') + ' est bien enregistré. Il est tracé sur sa fiche et sur la vôtre ; aucun remboursement n\'est attendu. Merci pour votre générosité 🙏'
                : a.plan ? 'L\'<b>échéancier</b> de <b>' + avNomC_(c) + '</b> pour les <b>' + a.montant + ' ' + dev + '</b>' + (a.motif ? ' (' + a.motif + ')' : '') + ' que vous avancez est enregistré. Vous serez prévenu(e), comme le bénéficiaire, avant chaque versement.'
                : 'Votre <b>avance de ' + a.montant + ' ' + dev + '</b> à <b>' + avNomC_(c) + '</b>' + (a.motif ? ' pour ' + a.motif : '') + ' est bien enregistrée.<br>Le remboursement est prévu le <b>' + fmtDate_(a.echeance) + '</b>. Vous recevrez, comme le bénéficiaire, un rappel par e-mail 3 jours avant, la veille et le jour J.')
@@ -2220,7 +2228,7 @@ function avNotifNouvelles_(db, c, user, notifUpd) {
         + (lienContrat ? '<br>Le contrat est à signer en ligne par les deux parties — votre signature de prêteur :' + avBtn_(lienContrat, '✍️ Signer le contrat (prêteur)', '#6B3FA0') : '')
         + avBtn_(waBenef, '💬 Message prêt pour ' + avPrenom_(c), '#25D366')
         + '<br>Bien à vous,<br>' + gestNom + ' — Water Life High Tech';
-      try { MailApp.sendEmail({ to: pEmail, subject: T ? '💸 Merci ! Tier Bonus de ' + a.montant + ' ' + dev + ' — ' + avNomC_(c) + ' vous le reverse le ' + fmtDate_(a.echeance) : (don ? '🎁 Votre don de ' : a.plan ? '📅 Échéancier de ' : '💶 Votre avance de ') + a.montant + ' ' + dev + (a.plan ? ' — ' + avNomC_(c) + ' (' + a.plan.nb + ' versements)' : ' à ' + avNomC_(c) + ' est enregistré' + (don ? '' : 'e')), htmlBody: avMailShell_(T ? '💸 Merci pour ce placement' : don ? '🎁 Don enregistré — merci' : a.plan ? '📅 Échéancier enregistré' : '💶 Avance enregistrée', avNomC_(c), coul, corpsP), name: 'Water Life High Tech', replyTo: gestEmail || adminEmail }); envoyes.push(don ? 'donateur' : 'prêteur'); } catch (e) { Logger.log('avNotif payeur : ' + e); }
+      try { MailApp.sendEmail({ to: pEmail, subject: REP ? '📅 Échéance reportée au ' + fmtDate_(a.echeance) + ' — ' + avNomC_(c) + ' · ' + a.montant + ' ' + dev : T ? '💸 Merci ! Tier Bonus de ' + a.montant + ' ' + dev + ' — ' + avNomC_(c) + ' vous le reverse le ' + fmtDate_(a.echeance) : (don ? '🎁 Votre don de ' : a.plan ? '📅 Échéancier de ' : '💶 Votre avance de ') + a.montant + ' ' + dev + (a.plan ? ' — ' + avNomC_(c) + ' (' + a.plan.nb + ' versements)' : ' à ' + avNomC_(c) + ' est enregistré' + (don ? '' : 'e')), htmlBody: avMailShell_(REP ? '📅 Échéance reportée' : T ? '💸 Merci pour ce placement' : don ? '🎁 Don enregistré — merci' : a.plan ? '📅 Échéancier enregistré' : '💶 Avance enregistrée', avNomC_(c), coul, corpsP), name: 'Water Life High Tech', replyTo: gestEmail || adminEmail }); envoyes.push(don ? 'donateur' : 'prêteur'); } catch (e) { Logger.log('avNotif payeur : ' + e); }
     }
     // 3) gestionnaires de la fiche + admin (sans doublon avec les deux précédents)
     var dest = {}; dest[adminEmail] = true;
@@ -2268,6 +2276,28 @@ function testerRappelsAvances() { rappelsAvances(true); }
 // Page publique contrat.html?t=<tok> : ops « contratInfo » (lecture) et « contratSign » (signature d'une partie).
 // Quand les deux parties ont signé, le contrat PDF est envoyé aux deux + gestionnaire + admin, et archivé sur Drive.
 // ═══════════════════════════════════════════════════════════════════
+// v3.62 — DEMANDES d'avance / don : push + e-mail au gestionnaire destinataire (nouvelle demande, relance), puis au demandeur (réponse)
+function avDemandesNotif_(db, c, user) {
+  (c.avances || []).forEach(function (a) {
+    var d = a && a.demande; if (!d) return;
+    var dev = a.devise || '€', lib = (a.type === 'don' ? 'Don' : a.plan ? 'Échéancier' : 'Avance') + ' de ' + a.montant + ' ' + dev + ' pour ' + avNomC_(c) + (a.par ? ' (prêteur : ' + a.par + ')' : '');
+    var lien = APP_PUBLIC_URL + '?go=c:' + encodeURIComponent(c.id);
+    if (d.etat === 'attente' && !d.notifLe) {
+      var dests = usersByNoms_(db, [d.gest]).concat([{ id: 'root' }]);
+      try { pushSend_(db, dests, (d.relances ? '🔔 Relance — ' : '📨 ') + 'Demande à valider : ' + (a.type === 'don' ? 'don' : 'avance'), lib + ' — demandé par ' + (d.par || '?'), lien); } catch (e) {}
+      var em = emailDe_(db, d.gest);
+      if (em) { try { MailApp.sendEmail({ to: em, subject: (d.relances ? '🔔 Relance — ' : '📨 ') + 'Demande à valider : ' + lib, htmlBody: avMailShell_('📨 Demande à valider', 'de ' + (d.par || '?'), '#B07A1E', 'Bonjour ' + String(d.gest || '').split(' ')[0] + ',<br><br><b>' + (d.par || '?') + '</b> sollicite votre validation :<br><br><div style="background:#F6FAF6;border-radius:10px;padding:10px 14px"><b>' + lib + '</b>' + (a.motif ? '<br>Motif : ' + a.motif : '') + (a.echeance ? '<br>Remboursement prévu le ' + fmtDate_(a.echeance) : '') + (d.note ? '<br><br>💬 ' + d.note : '') + '</div><br>Ouvrez la fiche dans le CRM (section Avances / dons) : les boutons <b>Valider</b> / <b>Refuser</b> y sont.' + avBtn_(lien, '➡️ Ouvrir la fiche dans le CRM', '#126A3C') + '<br>Water Life High Tech'), name: 'Water Life High Tech' }); } catch (e) { Logger.log('demande mail : ' + e); } }
+      d.notifLe = now_();
+    }
+    if ((d.etat === 'validee' || d.etat === 'refusee') && !d.repNotifLe) {
+      var ok = d.etat === 'validee', dem = usersByNoms_(db, [d.par]);
+      try { pushSend_(db, dem, ok ? '✅ Demande validée' : '❌ Demande refusée', lib + (ok ? ' — par ' + (d.repPar || '') : (d.motifRefus ? ' — ' + d.motifRefus : '')), lien); } catch (e) {}
+      var em2 = emailDe_(db, d.par);
+      if (em2) { try { MailApp.sendEmail({ to: em2, subject: (ok ? '✅ Validée : ' : '❌ Refusée : ') + lib, htmlBody: avMailShell_(ok ? '✅ Demande validée' : '❌ Demande refusée', 'par ' + (d.repPar || ''), ok ? '#126A3C' : '#8E2A31', 'Bonjour ' + String(d.par || '').split(' ')[0] + ',<br><br>Votre demande — <b>' + lib + '</b> — a été <b>' + (ok ? 'validée' : 'refusée') + '</b> par ' + (d.repPar || '') + ' le ' + fmtDate_(String(d.repLe || '').slice(0, 10)) + '.' + (ok ? '<br>Elle est enregistrée sur la fiche avec les e-mails d\'annonce et les rappels habituels.' : (d.motifRefus ? '<br>Motif : ' + d.motifRefus : '')) + avBtn_(lien, '➡️ Voir la fiche', '#126A3C') + '<br>Water Life High Tech'), name: 'Water Life High Tech' }); } catch (e) { Logger.log('demande rep mail : ' + e); } }
+      d.repNotifLe = now_();
+    }
+  });
+}
 function planTotal_(a) { return (a && a.plan && a.plan.total) ? +a.plan.total : (+(a && a.montant) || 0); }
 function planFraisTxt_(p, dev) { var f = (p && p.frais) || {}; return f.mode === 'mensuel' ? f.montant + ' ' + dev + ' par versement (' + p.fraisTot + ' ' + dev + ' au total)' : f.mode === 'global' ? p.fraisTot + ' ' + dev + ' au total (répartis sur les versements)' : 'aucuns frais'; }
 function planEtat_(a) {

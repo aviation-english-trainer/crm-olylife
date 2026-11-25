@@ -1804,7 +1804,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <div class="ov" id="ov-dons">
       <div class="ocard" style="padding:14px 16px;margin-bottom:12px">
         <div style="font-size:13px;color:var(--t2);line-height:1.6">💶 <b>Récap avances & dons consentis</b> — vue par <b>donateur / prêteur</b>, pour que chaque personne qui a aidé puisse voir tout ce qu'elle a donné ou prêté, à qui, où en est le remboursement et quand il arrive à échéance. Le tableau se partage par WhatsApp ou e-mail, se copie dans Excel, s'exporte en CSV ou PDF, et chaque ligne a sa relance en un clic.</div>
-        <div id="dons-bar" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center">
+        <div id="dons-demandes"></div><div id="dons-bar" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center">
           <select class="ofc" id="dons-payeur" style="max-width:280px;min-height:40px" onchange="oDonsRender()"></select>
           <label class="ochk-row" style="font-size:12px"><input type="checkbox" id="dons-done" onchange="oDonsRender()"><span>Afficher les lignes soldées</span></label>
           <label class="ochk-row" style="font-size:12px"><input type="checkbox" id="dons-don" checked onchange="oDonsRender()"><span>Inclure les dons</span></label>
@@ -2178,6 +2178,19 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <label class="ochk-row" style="margin-top:12px;font-size:12.5px" id="av-notif-row"><input type="checkbox" id="av-notif" checked><span>✉️ <b>Prévenir par e-mail dès l'enregistrement</b> : le bénéficiaire, la personne qui avance / donne l'argent, les gestionnaires de la fiche et l'admin.</span></label>
     <div class="os-note" style="margin-top:8px;font-size:11.5px" id="av-notif-done" hidden></div>
     <div class="os-note" style="margin-top:8px;font-size:11.5px" id="av-note">⏰ Rappels automatiques par <b>e-mail</b> 3 jours avant, la veille et le jour J (aux gestionnaires du contact et à l'admin). Le message <b>WhatsApp</b> pré-rempli est à un clic depuis la fiche et depuis l'écran Actions.</div>
+    <!-- v3.62 — demande (rôle sans droit « avances ») : gestionnaire destinataire + mot -->
+    <div id="av-dem" style="display:none;margin-top:10px;padding:10px 12px;border-radius:12px;background:#FFF8E6;border:1.5px solid #E8C25A;font-size:12.5px;line-height:1.5">
+      <b>📨 Demande à valider</b> — vous n'enregistrez pas directement : votre gestionnaire reçoit une notification dans l'application et un message, puis valide ou refuse. Vous suivez l'état sur la fiche et pouvez relancer.
+      <label class="ofl" style="margin-top:8px">Gestionnaire destinataire</label><select class="ofc" id="av-dem-gest"></select>
+      <label class="ofl" style="margin-top:8px">Un mot pour expliquer (facultatif)</label><textarea class="ofc" id="av-dem-note" style="min-height:60px" placeholder="Pourquoi cette avance, pour quel appareil, ce que la personne a dit…"></textarea>
+    </div>
+    <!-- v3.62 — après modification d'une ligne existante : que renvoyer ? -->
+    <div id="av-modbox" style="display:none;margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--navy2);border:1.5px solid var(--bd);font-size:12.5px;line-height:1.5">
+      <b>🔁 Après cette modification</b>
+      <label class="ochk-row" style="margin-top:6px"><input type="checkbox" id="av-renotif"><span>✉️ <b>Renvoyer l'annonce</b> par e-mail (bénéficiaire, prêteur, gestionnaires) et proposer le message WhatsApp avec les nouvelles informations</span></label>
+      <label class="ochk-row" style="margin-top:4px"><input type="checkbox" id="av-rearm"><span>⏰ <b>Réarmer les rappels automatiques</b> (J-3, veille, jour J) pour la nouvelle échéance — sinon ceux déjà envoyés ne repartent pas</span></label>
+      <div id="av-mod-hint" style="font-size:11.5px;color:var(--t3);margin-top:4px">Les deux cases se cochent d'elles-mêmes quand vous changez l'échéance : le message devient un « report d'échéance » qui garde le texte d'origine.</div>
+    </div>
     <button class="ob bgold bfull" style="margin-top:14px;min-height:48px" id="av-save-btn" onclick="oAvSave()">Enregistrer l'avance</button>
   </div>
 </div>
@@ -2576,7 +2589,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.61.5 · 25/11';
+var APP_VERSION='v3.62 · 25/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -3534,6 +3547,20 @@ var MSG_DEFAULTS={};
     t:'Bonjour {payeur} 🌿\n\nUn grand merci : en plaçant {membreTxt} dans ma jambe la plus faible, vous m\'avez permis de toucher le Tier Bonus du {date} — {montant} {devise} net. C\'est une vraie aide pour équilibrer mes deux jambes, et je le mesure.\n\nComme convenu entre nous, cette prime vous revient intégralement : je vous reverse les {montant} {devise} en USDT, de mon wallet vers le vôtre, dès mon prochain retrait OlyLife — prévu autour du {echeance}. Je vous confirme le virement dès qu\'il est parti.\n\nBelle collaboration, et encore merci 🙏\n{moi} — Water Life High Tech'};
   MSG_DEFAULTS.tier_benef_info={g:'Avances d\'argent',l:'Tier Bonus — rappel pour celui qui a touché la prime et doit la reverser',vars:['prenom','payeur','membreTxt','montant','devise','date','echeance','moi'],
     t:'Bonjour {prenom} 🌿\n\nPour mémoire : {payeur} a placé {membreTxt} dans votre jambe la plus faible, et le Tier Bonus du {date} — {montant} {devise} net — est tombé sur votre compte.\n\nSeule condition de ce coup de pouce : reverser la prime à {payeur}, en USDT de wallet à wallet, après votre prochain retrait OlyLife (prévu autour du {echeance}). Le CRM vous le rappellera 3 jours avant, la veille et le jour même.\n\n{moi} — Water Life High Tech'};
+  // v3.62 — report d'échéance (le texte d'origine est conservé, la nouvelle date est annoncée)
+  MSG_DEFAULTS.avance_report_benef={g:'Avances d\'argent',l:'Report d\'échéance — au bénéficiaire',vars:['prenom','montant','devise','date','motif','payeur','ancienneEcheance','echeance','reste','moi'],
+    t:'Bonjour {prenom} 🌿\n\nComme convenu, nous avons décalé l\'échéance de remboursement de l\'avance de {montant} {devise}{?motif: pour votre {motif}}{?payeur: (avancée par {payeur})} du {date}.\n\n📅 Nouvelle date : {echeance} — au lieu du {ancienneEcheance}.{?reste: Reste à rembourser : {reste} {devise}.}\n\nLes rappels suivront cette nouvelle date. Merci de votre confiance, et au moindre souci, dites-le simplement : on trouve une solution ensemble 🙏\n{moi} — Water Life High Tech'};
+  MSG_DEFAULTS.avance_report_payeur={g:'Avances d\'argent',l:'Report d\'échéance — au prêteur',vars:['payeur','client','montant','devise','date','motif','ancienneEcheance','echeance','reste','moi'],
+    t:'Bonjour {payeur} 🌿\n\nPour information : l\'échéance de remboursement de votre avance de {montant} {devise} à {client}{?motif: ({motif})} du {date} est reportée.\n\n📅 Nouvelle date : {echeance} — au lieu du {ancienneEcheance}.{?reste: Reste dû : {reste} {devise}.}\n\nVous recevrez les rappels à la nouvelle date, et je vous confirme chaque remboursement reçu. Merci pour votre patience 🙏\n{moi} — Water Life High Tech'};
+  // v3.62 — demandes d'avance / don (rôle sans droit) : au gestionnaire, relance, réponses
+  MSG_DEFAULTS.avance_demande_gest={g:'Avances d\'argent',l:'Demande d\'avance / don — au gestionnaire (par un référent)',vars:['gest','client','typeLbl','montant','devise','motif','payeur','echeance','note','lienFiche','moi'],
+    t:'Bonjour {gest} 🌿\n\nJe sollicite votre validation pour {typeLbl} de {montant} {devise} au profit de {client}{?motif: — {motif}}{?payeur:, avancé par {payeur}}{?echeance:, remboursement prévu le {echeance}}.{?note:\n\n💬 {note}}\n\nLa demande est dans le CRM (fiche {client} › Avances / dons), avec les boutons Valider / Refuser :\n{lienFiche}\n\nMerci d\'avance 🙏\n{moi} — Water Life High Tech'};
+  MSG_DEFAULTS.avance_demande_relance={g:'Avances d\'argent',l:'Demande d\'avance / don — relance du gestionnaire',vars:['gest','client','typeLbl','montant','devise','lienFiche','moi'],
+    t:'Bonjour {gest} 🌿\n\nPetite relance : ma demande de {typeLbl} de {montant} {devise} pour {client} attend votre validation dans le CRM (fiche {client} › Avances / dons) :\n{lienFiche}\n\nMerci 🙏\n{moi} — Water Life High Tech'};
+  MSG_DEFAULTS.avance_demande_ok={g:'Avances d\'argent',l:'Demande d\'avance / don — validée (au demandeur)',vars:['demandeur','client','typeLbl','montant','devise','echeance','moi'],
+    t:'Bonjour {demandeur} 🌿\n\nC\'est validé : {typeLbl} de {montant} {devise} pour {client} est enregistré{?echeance:, remboursement prévu le {echeance}}. Les e-mails d\'annonce sont partis et les rappels sont programmés.\n\n{moi} — Water Life High Tech'};
+  MSG_DEFAULTS.avance_demande_non={g:'Avances d\'argent',l:'Demande d\'avance / don — refusée (au demandeur)',vars:['demandeur','client','typeLbl','montant','devise','motifRefus','moi'],
+    t:'Bonjour {demandeur} 🌿\n\nJe ne peux pas valider {typeLbl} de {montant} {devise} pour {client} pour le moment{?motifRefus: : {motifRefus}}. On en parle de vive voix si vous voulez.\n\n{moi} — Water Life High Tech'};
   MSG_DEFAULTS.avance_concerne={g:'Avances d\'argent',l:'Virement reçu — information de la personne concernée (ni bénéficiaire, ni prêteur)',vars:['prenom','montant','devise','date','motif','payeur','client','echeance','moi'],
     t:'Bonjour {prenom} 🌿\n\nBonne nouvelle : les {montant} {devise}{?motif: pour {motif}} ont bien été reçus le {date} sur le compte OlyLife de {client}, avancés par {payeur}. Tout est en place pour la suite — je vous tiens au courant de chaque étape.\n\nSi vous avez la moindre question, je suis là 🙏\n{moi} — Water Life High Tech'};
   MSG_DEFAULTS.don_benef_info={g:'Avances d\'argent',l:'Annonce du don au bénéficiaire',vars:['prenom','montant','devise','date','motif','payeur','moi'],
@@ -4687,6 +4714,21 @@ function resBdg(c,small){var m=resManque(c);if(!m.length)return'';return'<span c
 function resBox(c){var m=resManqueX(c);if(!m.length)return'';var can=canEditContact(c);return'<div class="res-box res-pulse"><span style="font-size:20px">✍️</span><div style="flex:1;min-width:0"><b>Fiche à compléter — '+m.length+' champ'+(m.length>1?'s':'')+' manquant'+(m.length>1?'s':'')+'</b><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">'+m.map(function(x){return can||x.id==='@fact'?'<button type="button" class="miss-chip" onclick="oResGo(\''+c.id+'\',\''+x.id+'\')">'+esc(x.l)+' →</button>':'<span class="miss-chip">'+esc(x.l)+'</span>';}).join('')+'</div></div>'+(can?'<button class="ob bgold bsm" style="min-height:36px" onclick="oResGo(\''+c.id+'\',\'first\')">Compléter</button>':'')+'</div>';}
 function avanceEnCours(c){return(c.avances||[]).some(function(a){return a.type!=='don'&&a.statut!=='rembourse';});}
 function avRendu(a){return(a.rembs||[]).reduce(function(t,r){return t+(+r.montant||0);},0);}
+// ── v3.62 — PROPRIÉTÉ & DEMANDES ──
+// Une avance / un don saisi par un gestionnaire n'est modifiable que par lui, l'admin ou le super-admin.
+// Un référent (ou tout rôle sans le droit « avances ») passe par une DEMANDE à valider par le gestionnaire du contact.
+function avEstDemande(a){return !!(a&&a.demande&&a.demande.etat==='attente');}
+function avEstRefusee(a){return !!(a&&a.demande&&a.demande.etat==='refusee');}
+function avActive(a){return a&&!avEstDemande(a)&&!avEstRefusee(a);}
+function avPeutModifier(a){
+  var r=ROLE();if(r==='admin'||IS_SUPER())return true;
+  if(!a)return can('avances')||can('echeancier');
+  if(avEstDemande(a)||avEstRefusee(a))return a.demande.par===PARTNER_NOM()||avPeutValider(null,a);
+  if(r==='gestionnaire')return can('avances')&&(!a.saisiPar||a.saisiPar===PARTNER_NOM());
+  return false;
+}
+function avPeutValider(c,a){var r=ROLE();if(r==='admin'||IS_SUPER())return true;if(r!=='gestionnaire'||!can('avances'))return false;if(a&&a.demande&&a.demande.gest)return a.demande.gest===PARTNER_NOM();return c?estSuiviPar(c,PARTNER_NOM()):true;}
+function avGestsPossibles(c){var l=[];var noms=c?suivisDe(c):[];(USERS||[]).forEach(function(u){if(u.actif===false||u.pending)return;if(u.role==='gestionnaire'&&(noms.indexOf(u.nom)>=0||!noms.length))l.push(u);});if(!l.length)(USERS||[]).forEach(function(u){if(u.role==='gestionnaire'&&u.actif!==false&&!u.pending)l.push(u);});(USERS||[]).forEach(function(u){if(u.role==='admin'&&u.actif!==false&&!l.some(function(x){return x.nom===u.nom;}))l.push(u);});return l.filter(function(u){return u.nom!==PARTNER_NOM();});}
 // v3.59 — total dû : capital + frais de l'échéancier (0 pour une avance simple ou un échéancier gratuit)
 function avTotal(a){return a&&a.plan&&a.plan.total?+a.plan.total:(+(a&&a.montant)||0);}
 function avReste(a){return Math.max(0,avTotal(a)-avRendu(a));}
@@ -4716,6 +4758,7 @@ function planTxt(a,sep){
 }
 function planFraisTxt(p,dev){if(!p)return'';var f=p.frais||{};return f.mode==='mensuel'?f.montant+' '+dev+' par versement ('+p.fraisTot+' '+dev+' au total)':f.mode==='global'?p.fraisTot+' '+dev+' au total (répartis sur les versements)':'aucuns frais';}
 function avRecalc(a){
+  if(avEstDemande(a)){a.statut='demande';return;}if(avEstRefusee(a)){a.statut='refusee';return;}
   if(a.type==='don'){a.statut='don';delete a.plan;return;}
   var rd=avRendu(a),tot=avTotal(a);
   if(a.plan){var nx=planProchaine(a);if(nx)a.echeance=nx.date;}   // l'échéance « active » = prochain versement non soldé (rappels J-3 · veille · J dessus)
@@ -4731,6 +4774,12 @@ function avParMatches(a,c){
   return k===nmKey((c.nom||'')+' '+(c.prenom||''))||k===nmKey((c.prenom||'')+' '+(c.nom||''));
 }
 function avStBdg(a){
+  if(avEstDemande(a))return'<span class="obdg bor">⏳ demande de '+esc(a.demande.par||'?')+' du '+fD(String(a.demande.le||'').slice(0,10))+(a.demande.gest?' → à valider par '+esc(a.demande.gest):'')+(a.demande.relances?' · relancée '+a.demande.relances+' fois':'')+'</span>';
+  if(avEstRefusee(a))return'<span class="obdg brd">❌ demande refusée'+(a.demande.repPar?' par '+esc(a.demande.repPar):'')+(a.demande.motifRefus?' — '+esc(a.demande.motifRefus):'')+'</span>';
+  if(a.demande&&a.demande.etat==='validee'&&a.statut==='encours')return'<span class="obdg bgr" title="Demandée par '+esc(a.demande.par||'')+'">✅ validée par '+esc(a.demande.repPar||'')+'</span> '+avStBdg0(a);
+  return avStBdg0(a);
+}
+function avStBdg0(a){
   if(a.type==='don')return'<span class="obdg av-tag-don">🎁 don · sans remboursement</span>';
   var diff=a.echeance?diffD(a.echeance):null,done=a.statut==='rembourse',rd=avRendu(a);
   if(done)return'<span class="obdg bgr">✅ remboursée'+(a.rembourseLe?' le '+fD(a.rembourseLe):'')+'</span>';
@@ -4744,7 +4793,13 @@ function avStBdg(a){
     :'<span class="obdg bgo">échéance '+fD(a.echeance)+'</span>');
 }
 function avRowHtml(c,a,vuePayeur){
-  var isRef=!can('avances')&&!(a.plan&&can('echeancier')),done=a.statut==='rembourse'||a.type==='don',rd=avRendu(a),tot=avTotal(a),pct=tot?Math.min(100,Math.round(rd/tot*100)):0;
+  var isRef=!avPeutModifier(a),done=a.statut==='rembourse'||a.type==='don',rd=avRendu(a),tot=avTotal(a),pct=tot?Math.min(100,Math.round(rd/tot*100)):0;
+  var dem=avEstDemande(a),moiDem=a.demande&&a.demande.par===PARTNER_NOM();
+  var demBtns=dem?'<div style="display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">'
+      +(avPeutValider(c,a)?'<button class="ob bgold bsm" type="button" onclick="oAvDemandeRep(\''+c.id+'\',\''+a.id+'\',\'validee\')">✅ Valider</button><button class="ob bgh bsm" type="button" onclick="oAvDemandeRep(\''+c.id+'\',\''+a.id+'\',\'refusee\')">❌ Refuser</button>':'')
+      +(moiDem||avPeutValider(c,a)?'<button class="tb-ic" type="button" title="Relancer le gestionnaire" onclick="oAvDemandeRelance(\''+c.id+'\',\''+a.id+'\')">🔔</button><button class="tb-ic" type="button" title="Modifier la demande" onclick="oAvOpen(\''+c.id+'\',\''+a.id+'\')">✏️</button><button class="tb-ic" title="Retirer la demande" onclick="oAvDel(\''+c.id+'\',\''+a.id+'\')">🗑</button>':'')+'</div>':'';
+  if(dem||avEstRefusee(a))return'<div class="av-it" style="background:'+(dem?'#FFF8E6':'#FBF1F1')+'"><div class="av-b"><span class="av-m">'+esc(String(a.montant))+' '+esc(a.devise||'€')+'</span> '+avStBdg(a)
+    +'<small>'+(a.type==='don'?'Don':a.plan?'Échéancier':'Avance')+' souhaité'+(a.type==='don'||a.plan?'':'e')+(a.par?' de <b>'+esc(a.par)+'</b>':'')+(a.motif?' · '+esc(a.motif):'')+(a.echeance?' · remboursement le '+fD(a.echeance):'')+(a.demande.note?'<br>💬 '+esc(a.demande.note):'')+(a.demande.repLe?'<br>Réponse le '+fD(String(a.demande.repLe).slice(0,10)):'')+'</small></div>'+(avEstRefusee(a)&&(moiDem||avPeutValider(c,a))?'<button class="tb-ic" title="Retirer" onclick="oAvDel(\''+c.id+'\',\''+a.id+'\')">🗑</button>':demBtns)+'</div>';
   return'<div class="av-it"><div class="av-b"><span class="av-m">'+esc(String(a.montant))+' '+esc(a.devise||'€')+'</span> '+avStBdg(a)
     +(a.type!=='don'&&rd>0&&!done?'<div class="av-bar"><i style="width:'+pct+'%"></i></div>':'')
     +'<small>'+(a.type==='don'?'Donné':a.tier?'Tier Bonus touché':a.plan?'Financé':'Avancé')+' le '+fD(a.date)+(a.motif?' · '+esc(a.motif):'')
@@ -4752,7 +4807,8 @@ function avRowHtml(c,a,vuePayeur){
     +(a.pour&&a.pour.nom?' · pour <b>'+esc(a.pour.nom)+'</b>':'')
     +(a.plan?'<br>📅 '+a.plan.nb+' versements '+(PLAN_PER[a.plan.per]||PLAN_PER.mois).l+' de '+a.plan.mensualite+' '+esc(a.devise||'€')+' · frais : '+esc(planFraisTxt(a.plan,a.devise||'€'))+' · total dû '+a.plan.total+' '+esc(a.devise||'€')+(a.plan.anticipe?' · remboursement anticipé possible sans frais':''):'')
     +((a.rembs||[]).length?'<br>↩ '+a.rembs.map(function(r){return fD(r.date)+' : '+r.montant+' '+esc(a.devise||'€');}).join(' · '):'')
-    +(a.notifLe?'<br>✉️ annonce e-mail le '+fD(String(a.notifLe).slice(0,10)):(a.notifier?'<br>✉️ annonce e-mail en attente':''))+'</small></div>'
+    +(a.notifLe?'<br>✉️ annonce e-mail le '+fD(String(a.notifLe).slice(0,10)):(a.notifier?'<br>✉️ annonce e-mail en attente':''))
+    +(isRef&&a.saisiPar&&ROLE()==='gestionnaire'?'<br>🔒 saisie par <b>'+esc(a.saisiPar)+'</b> — seul '+(a.saisiPar.split(' ')[0])+', l\'admin ou le super-admin peuvent la modifier':'')+'</small></div>'
     +(isRef?'':'<div style="display:flex;gap:4px;flex-shrink:0">'
       +(a.plan&&a.plan.contrat&&a.plan.contrat.tok?'<a class="tb-ic" title="Ouvrir le contrat (échéancier à signer / signé)" href="'+esc(contratUrl(a))+'" target="_blank" rel="noopener">📄</a><button class="tb-ic" type="button" title="Envoyer le lien du contrat au bénéficiaire et au prêteur" onclick="oContratSend(\''+c.id+'\',\''+a.id+'\')">✍️</button>':'')
       +(!done&&c.tel?'<a class="tb-ic" title="Rappel WhatsApp au bénéficiaire" href="'+mkWA(c.tel,avWaMsg(c,a))+'" target="_blank" rel="noopener">💬</a>':'')
@@ -4775,7 +4831,7 @@ function avDonneesHtml(c){
 // Collecte toutes les avances consenties par une personne donnée (par id, ou par nom normalisé)
 function donsCollectAll(){
   var out=[];
-  OC.forEach(function(b){(b.avances||[]).forEach(function(a){out.push({b:b,a:a,parKey:a.parId||nmKey(a.par||'')});});});
+  OC.forEach(function(b){(b.avances||[]).forEach(function(a){if(!avActive(a))return;out.push({b:b,a:a,parKey:a.parId||nmKey(a.par||'')});});});
   return out;
 }
 // Agrège par payeur : {key, label, nContact(id OC), rows, totals par devise}
@@ -4805,7 +4861,20 @@ function donsRowSum(x){var a=x.a,b=x.b;return{nom:((b.nom||'')+' '+(b.prenom||''
 function donsLblStatut(a){if(a.type==='don')return'Don';if(a.statut==='rembourse')return'Remboursé';var d=a.echeance?diffD(a.echeance):null;if(d!==null&&d<0)return'En retard de '+Math.abs(d)+' j';if(d===0)return'Échéance aujourd\'hui';if(avRendu(a)>0)return'Partiel';return'En cours';}
 function donsFmtJours(j,st){if(st==='Remboursé'||st==='Don')return'—';if(j===null)return'sans échéance';if(j<0)return'retard '+Math.abs(j)+' j';if(j===0)return'aujourd\'hui';return'J−'+j;}
 
+// v3.62 — suivi des demandes d'avance / don : en attente (à valider ou à relancer), validées, refusées
+function donsDemandesHtml(){
+  var me=PARTNER_NOM(),adm=ROLE()==='admin'||IS_SUPER(),rows=[];
+  OC.forEach(function(c){(c.avances||[]).forEach(function(a){if(!a.demande)return;var d=a.demande;if(!(adm||d.par===me||d.gest===me||estSuiviPar(c,me)))return;rows.push({c:c,a:a,d:d});});});
+  if(!rows.length)return'';
+  rows.sort(function(x,y){return(x.d.etat==='attente'?0:1)-(y.d.etat==='attente'?0:1)||String(y.d.le||'').localeCompare(String(x.d.le||''));});
+  var ET={attente:['⏳ en attente','bor'],validee:['✅ validée','bgr'],refusee:['❌ refusée','brd']};
+  return'<div class="ocard" style="margin-bottom:12px"><div style="font-weight:700;margin-bottom:6px">📨 Demandes d\'avances / dons <span class="obdg bgy">'+rows.length+'</span></div>'
+    +rows.map(function(x){var a=x.a,d=x.d,c=x.c,st=ET[d.etat]||ET.attente;
+      return'<div style="display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;padding:7px 0;border-top:1px solid var(--bd);font-size:12.5px"><span class="obdg '+st[1]+'">'+st[0]+'</span><b>'+a.montant+' '+esc(a.devise||'')+'</b> <span>'+(a.type==='don'?'don':'avance')+' pour <a href="#" onclick="oOpenF(\''+c.id+'\');return false"><b>'+esc(((c.prenom||'')+' '+(c.nom||'')).trim())+'</b></a></span><span style="color:var(--t3)">demandé par '+esc(d.par||'?')+' le '+fD(String(d.le||'').slice(0,10))+(d.gest?' → '+esc(d.gest):'')+(d.relances?' · relancé '+d.relances+'×':'')+(d.repPar?' · réponse de '+esc(d.repPar)+' le '+fD(String(d.repLe||'').slice(0,10)):'')+(d.motifRefus?' — '+esc(d.motifRefus):'')+'</span>'
+        +(d.etat==='attente'?'<span style="margin-left:auto;display:flex;gap:4px">'+(avPeutValider(c,a)?'<button class="ob bgold bsm" type="button" onclick="oAvDemandeRep(\''+c.id+'\',\''+a.id+'\',\'validee\');oDonsRender()">✅ Valider</button><button class="ob bgh bsm" type="button" onclick="oAvDemandeRep(\''+c.id+'\',\''+a.id+'\',\'refusee\');oDonsRender()">❌</button>':'')+(d.par===me||adm?'<button class="ob bgh bsm" type="button" onclick="oAvDemandeRelance(\''+c.id+'\',\''+a.id+'\');oDonsRender()">🔔 Relancer</button>':'')+'</span>':'')+'</div>';}).join('')+'</div>';
+}
 function oDonsRender(){
+  var dd=document.getElementById('dons-demandes');if(dd)dd.innerHTML=donsDemandesHtml();
   var sel=document.getElementById('dons-payeur');if(!sel)return;
   var showDone=document.getElementById('dons-done').checked,inclDon=document.getElementById('dons-don').checked;
   var L=donsByPayeur(inclDon);
@@ -4932,7 +5001,7 @@ function oDonsPrint(key){
 function avListHtml(c){
   var avs=c.avances||[],isRef=!can('avances'),okPlan=can('echeancier');
   var rows=avs.map(function(a){return avRowHtml(c,a,false);}).join('');
-  return rows+(isRef&&!okPlan?'':'<div style="padding:10px 16px;display:flex;gap:8px;flex-wrap:wrap">'+(isRef?'':'<button class="ob baqua bsm" onclick="oAvOpen(\''+c.id+'\')">➕ Avance ou don</button>')+(okPlan?'<button class="ob bgh bsm" onclick="oAvOpen(\''+c.id+'\',\'\',\'plan\')">📅 Proposer un échéancier</button>':'')+'</div>');
+  return rows+'<div style="padding:10px 16px;display:flex;gap:8px;flex-wrap:wrap">'+(isRef?'<button class="ob baqua bsm" onclick="oAvOpen(\''+c.id+'\')">📨 Demander une avance / un don</button>':'<button class="ob baqua bsm" onclick="oAvOpen(\''+c.id+'\')">➕ Avance ou don</button>')+(okPlan&&!isRef?'<button class="ob bgh bsm" onclick="oAvOpen(\''+c.id+'\',\'\',\'plan\')">📅 Proposer un échéancier</button>':'')+'</div>';
 }
 function oOpenF(id){
   var c=OC.find(function(x){return x.id===id;});if(!c)return;
@@ -6849,11 +6918,12 @@ function oCheckUpdate(){
     else hard();
   }catch(e){hard();}
 }
-var GO_TARGET=(function(){try{var m=location.search.match(/[?&]go=([a-z]+)/);var t=m?m[1]:'';return['demandes','contacts','dashboard','pipeline','agenda','actions','carte','equipe','admin'].indexOf(t)>=0?t:'';}catch(e){return'';}})();
+var GO_TARGET=(function(){try{var m=location.search.match(/[?&]go=([A-Za-z]+(?::[A-Za-z0-9_\-]+)?)/);var t=m?decodeURIComponent(m[1]):'';if(t.indexOf('c:')===0)return t;return['demandes','contacts','dashboard','pipeline','agenda','actions','carte','equipe','admin'].indexOf(t)>=0?t:'';}catch(e){return'';}})();
 var GO_USED=false;
 function oGoDeep(){
   if(!GO_TARGET)return;var t=GO_TARGET;GO_TARGET='';GO_USED=true;
   try{history.replaceState(null,'',location.pathname);}catch(e){}
+  if(t.indexOf('c:')===0){var id=t.slice(2);try{oSw('contacts');}catch(e){}setTimeout(function(){if(OC.some(function(x){return x.id===id;}))oOpenF(id);},300);return;}   // v3.62 — lien direct vers une fiche (?go=c:<id>)
   try{oSw(t);}catch(e){}
 }
 function installFlag(){try{return localStorage.getItem('owlht2_installed')==='1';}catch(e){return false;}}
@@ -7004,7 +7074,7 @@ function avLineHtml(i,a){
     +'<label class="ofl" style="margin-top:4px">Qui ?</label><select class="ofc l-par">'+AV_OPTS+'</select>'
     +'<div class="ofg2"><div><label class="ofl">Montant <span class="oreq">*</span></label><input type="number" class="ofc l-montant" placeholder="500" min="0" step="0.01" inputmode="decimal" value="'+(a?a.montant:'')+'" oninput="oPlanPreview()"></div>'
     +'<div><label class="ofl l-date-lbl">'+(t==='don'?'Date du don':t==='plan'?'Date de l\'accord':'Date de l\'avance')+'</label><input type="date" class="ofc l-date" value="'+(a?(a.date||''):todayYMD())+'" onchange="oPlanPreview()"></div></div>'
-    +'<div class="l-ech"><label class="ofl" style="margin-top:6px">Échéance de remboursement <span class="oreq">*</span></label><input type="date" class="ofc l-ech-in" value="'+(a?(a.echeance||''):'')+'"></div></div>';
+    +'<div class="l-ech"><label class="ofl" style="margin-top:6px">Échéance de remboursement <span class="oreq">*</span></label><input type="date" class="ofc l-ech-in" value="'+(a?(a.echeance||''):'')+'" onchange="oAvModUI()"></div></div>';
 }
 function oAvLineAdd(a,parV){
   var box=document.getElementById('av-lines'),i=box.children.length;
@@ -7022,8 +7092,10 @@ function avLines(){
   });
 }
 function oAvType(t){
-  var onlyPlan=!can('avances')&&can('echeancier');if(onlyPlan)t='plan';   // un référent ne peut que proposer un échéancier
+  var demande=!can('avances')&&!(ROLE()==='admin'||IS_SUPER()),onlyPlan=false;   // v3.62 — sans le droit « avances » : tout passe par une demande au gestionnaire
   document.getElementById('av-type').value=t;
+  document.getElementById('av-dem').style.display=demande?'':'none';
+  if(demande){var gs=avGestsPossibles(AV_C||null),sel=document.getElementById('av-dem-gest');sel.innerHTML=gs.map(function(u){return'<option value="'+esc(u.nom)+'">'+esc(u.nom)+' ('+esc(u.role)+')</option>';}).join('')||'<option value="">— aucun gestionnaire —</option>';if(AV_CUR&&AV_CUR.demande&&AV_CUR.demande.gest)sel.value=AV_CUR.demande.gest;if(AV_CUR&&AV_CUR.demande)document.getElementById('av-dem-note').value=AV_CUR.demande.note||'';}
   document.getElementById('av-t-avance').classList.toggle('on',t==='avance');
   document.getElementById('av-t-plan').classList.toggle('on',t==='plan');
   document.getElementById('av-t-don').classList.toggle('on',t==='don');
@@ -7040,12 +7112,18 @@ function oAvType(t){
     :t==='plan'
     ?'📅 L\'<b>échéancier</b> est envoyé par <b>e-mail</b> au bénéficiaire et au prêteur (tableau des versements + lien du contrat à signer), et un message est <b>prêt à envoyer</b> à chacun sur son canal préféré. Rappels automatiques avant <b>chaque versement</b> (3 jours avant, la veille, le jour J). Chaque versement reçu s\'enregistre ici (💰) et le solde se met à jour ; un remboursement anticipé solde le reste.'
     :'⏰ Rappels automatiques par <b>e-mail</b> 3 jours avant, la veille et le jour J : au <b>bénéficiaire</b> (rappel courtois), à la personne qui a avancé, aux gestionnaires du contact et à l\'admin. Après l\'enregistrement, un message d\'annonce est <b>prêt à envoyer</b> au bénéficiaire et au prêteur, sur le canal préféré de chacun (WhatsApp, Telegram, Signal, SMS, e-mail).';
-  document.getElementById('av-save-btn').textContent=t==='don'?'Enregistrer le don':t==='plan'?(AV_CUR&&AV_CUR.id?'Enregistrer l\'échéancier':'Proposer l\'échéancier'):'Enregistrer l\'avance';
+  document.getElementById('av-save-btn').textContent=demande?'📨 Envoyer la demande à mon gestionnaire':t==='don'?'Enregistrer le don':t==='plan'?(AV_CUR&&AV_CUR.id?'Enregistrer l\'échéancier':'Proposer l\'échéancier'):AV_CUR&&AV_CUR.id?'Enregistrer les modifications':'Enregistrer l\'avance';
+  var mb=document.getElementById('av-modbox');mb.style.display=(AV_CUR&&AV_CUR.id&&!demande&&!avEstDemande(AV_CUR))?'':'none';oAvModUI();
   var rb=document.getElementById('av-remb');rb.style.display=(t!=='don'&&AV_CUR&&AV_CUR.id)?'':'none';
   if(t==='plan')oPlanPreview();
 }
 // ── v3.59 — Échéancier : lecture des réglages, aperçu en direct ──
-var PL_FRAIS='gratuit';
+var PL_FRAIS='gratuit',AV_C=null;
+// v3.62 — cases « après modification » : cochées d'office si l'échéance a changé
+function oAvModUI(){var mb=document.getElementById('av-modbox');if(!mb||mb.style.display==='none'||!AV_CUR)return;var l0=avLines()[0],ech=l0?l0.ech:'',chg=!!(ech&&AV_CUR.echeance&&ech!==AV_CUR.echeance);var h=document.getElementById('av-mod-hint');
+  if(chg&&!mb.dataset.auto){document.getElementById('av-renotif').checked=true;document.getElementById('av-rearm').checked=true;mb.dataset.auto='1';}
+  if(!chg)mb.dataset.auto='';
+  h.innerHTML=chg?'📅 Échéance modifiée : du <b>'+fD(AV_CUR.echeance)+'</b> au <b>'+fD(ech)+'</b> — le message et l\'e-mail diront « report d\'échéance » en gardant le texte d\'origine.':'Les deux cases se cochent d\'elles-mêmes quand vous changez l\'échéance : le message devient un « report d\'échéance » qui garde le texte d\'origine.';}
 function oPlanFrais(m){PL_FRAIS=m;['gratuit','mensuel','global'].forEach(function(k){document.getElementById('pl-f-'+k).classList.toggle('on',k===m);});document.getElementById('pl-frais-wrap').style.display=m==='gratuit'?'none':'';if(m!=='gratuit')setTimeout(function(){document.getElementById('pl-frais').focus();},50);oPlanPreview();}
 function planFromUI(montant){
   return planBuild(montant,{nb:val('pl-nb'),per:val('pl-per'),premiere:val('pl-prem'),frais:{mode:PL_FRAIS,montant:val('pl-frais')},anticipe:document.getElementById('pl-anticipe').checked});
@@ -7107,8 +7185,8 @@ function avParTel(a){if(a.parTel)return a.parTel;var pi=avParInfo(a.parRef||'');
 function oAvOpen(cid,aid,mode){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
   var a=aid?(c.avances||[]).find(function(x){return x.id===aid;}):null;
-  if(!can('avances')&&!(can('echeancier')&&(mode==='plan'||(a&&a.plan)))){oT('Réservé aux gestionnaires et administrateurs','w');return;}
-  AV_CUR=a?JSON.parse(JSON.stringify(a)):null;
+  if(a&&!avPeutModifier(a)){oT('🔒 Cette ligne a été saisie par '+(a.saisiPar||'un autre gestionnaire')+' : seul lui, l\'admin ou le super-admin peuvent la modifier','w');return;}
+  AV_CUR=a?JSON.parse(JSON.stringify(a)):null;AV_C=c;
   // v3.59 — réglages de l'échéancier (valeurs de la ligne existante, sinon défauts)
   var P=(a&&a.plan)||{};PL_FRAIS=(P.frais&&P.frais.mode)||'gratuit';
   document.getElementById('pl-nb').value=P.nb||12;document.getElementById('pl-per').value=P.per||'mois';document.getElementById('pl-prem').value=P.premiere||'';
@@ -7144,7 +7222,9 @@ function oAvSave(){
   var cid=document.getElementById('av-cid').value;
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
   var typeUI=val('av-type')||'avance',isPlan=typeUI==='plan',type=isPlan?'avance':typeUI,devise=val('av-devise'),motif=val('av-motif').trim();
-  if(!can('avances')&&!(isPlan&&can('echeancier'))){oT('Réservé aux gestionnaires et administrateurs','w');return;}
+  var demande=!can('avances')&&!(ROLE()==='admin'||IS_SUPER());   // v3.62 — rôle sans droit : demande à valider
+  if(demande&&!val('av-dem-gest')){oT('Aucun gestionnaire à qui adresser la demande — voyez avec l\'administrateur','e');return;}
+  if(AV_CUR&&AV_CUR.id&&!avPeutModifier(AV_CUR)){oT('🔒 Modification réservée à '+(AV_CUR.saisiPar||'son auteur')+', à l\'admin ou au super-admin','w');return;}
   var lines=avLines();if(isPlan)lines=lines.slice(0,1);
   var plan=null;
   if(isPlan){
@@ -7184,7 +7264,15 @@ function oAvSave(){
     if(L.parV.indexOf('u:')===0){var pm=OC.find(function(x){return nmKey((x.nom||'')+' '+(x.prenom||''))===nmKey(a.par)||nmKey((x.prenom||'')+' '+(x.nom||''))===nmKey(a.par);});if(pm){a.parId=pm.id;if(!a.parTel)a.parTel=pm.tel||'';if(!a.parEmail)a.parEmail=pm.email||'';}}
     a.rembs=(!isNew&&AV_CUR&&AV_CUR.rembs)||a.rembs||[];
     if(type==='don')a.rembs=[];
-    avRecalc(a);if(isNew){a.sent={};a.notifier=!!document.getElementById('av-notif').checked;a.notifLe='';a.notifA=[];}   // v3.27 — le serveur envoie les e-mails d'annonce puis renseigne notifLe
+    if(demande){a.demande={etat:'attente',par:PARTNER_NOM(),le:(a.demande&&a.demande.le)||new Date().toISOString(),gest:val('av-dem-gest'),note:(val('av-dem-note')||'').trim().slice(0,400),relances:(a.demande&&a.demande.relances)||0,notifLe:''};a.saisiPar=PARTNER_NOM();}
+    avRecalc(a);if(isNew){a.sent={};a.notifier=demande?false:!!document.getElementById('av-notif').checked;a.notifLe='';a.notifA=[];}   // v3.27 — le serveur envoie les e-mails d'annonce puis renseigne notifLe
+    else if(!demande&&AV_CUR){   // v3.62 — modification : renvoi de l'annonce et/ou réarmement des rappels, sur demande explicite
+      var echChg=!!(AV_CUR.echeance&&a.echeance&&AV_CUR.echeance!==a.echeance),renotif=!!(document.getElementById('av-renotif')||{}).checked,rearm=!!(document.getElementById('av-rearm')||{}).checked;
+      if(echChg){a.echeancePrec=AV_CUR.echeance;jrnAdd(c,'note','📅 Échéance reportée du '+fD(AV_CUR.echeance)+' au '+fD(a.echeance)+(a.par?' — avance de '+a.par:''));}
+      if(renotif){a.notifier=true;a.notifLe='';a.notifType=echChg?'report':'maj';newIds.push(a.id);}
+      else if(!echChg)delete a.notifType;
+      if(rearm){var keep={};Object.keys(a.sent||{}).forEach(function(k){if(/Wa$/.test(k))keep[k]=a.sent[k];});a.sent=keep;}
+    }
     jrnAdd(c,a.statut==='rembourse'?'fait':'note',lib+' '+(isNew?'enregistré'+(type==='don'||isPlan?'':'e'):'mis'+(type==='don'||isPlan?'':'e')+' à jour')+' : '+a.montant+' '+devise+(motif?' pour '+motif:'')+' — par '+a.par
       +(isPlan?' — '+a.plan.nb+' versements de '+a.plan.mensualite+' '+devise+' ('+planFraisTxt(a.plan,devise)+'), du '+fD(a.plan.premiere)+' au '+fD(a.plan.ech[a.plan.ech.length-1].date)+(avRendu(a)?' · rendu '+avRendu(a)+' '+devise+(a.statut==='rembourse'?' ✅ soldé':' (reste '+avReste(a)+' '+devise+')'):''):
         type==='don'?'':' — remboursement prévu le '+fD(a.echeance)+(avRendu(a)?' · rendu '+avRendu(a)+' '+devise+(a.statut==='rembourse'?' ✅ soldée':' (reste '+avReste(a)+' '+devise+')'):'')));
@@ -7193,6 +7281,7 @@ function oAvSave(){
     lastA=a;nb++;if(isNew)newIds.push(a.id);
   });
   oPush(changed);oAvClose();oOpenF(cid);
+  if(demande){var g=(USERS||[]).find(function(u){return u.nom===val('av-dem-gest');});oT('📨 Demande envoyée à '+val('av-dem-gest')+' — vous suivez son état sur la fiche','s');setTimeout(function(){oAvDemandeMsg(c,lastA,g,false);},400);return;}
   if(lastA&&lastA.statut==='rembourse')emojiBurst(['✅','🎉','💰']);
   oT(type==='don'?'🎁 '+nb+' don'+(nb>1?'s':'')+' enregistré'+(nb>1?'s':''):(lastA&&lastA.statut==='rembourse')?'✅ Avance soldée':isPlan?'📅 Échéancier enregistré — rappels programmés avant chaque versement':'💶 '+nb+' avance'+(nb>1?'s':'')+' enregistrée'+(nb>1?'s':'')+' — rappels programmés (bénéficiaire + '+(nb>1?'payeurs':'payeur')+')','s');
   if(newIds.length)setTimeout(function(){oAvAnnonce(cid,newIds);},350);   // v3.27 — messages d'annonce prêts à envoyer
@@ -7202,8 +7291,30 @@ function avVarsBase(c,a){var v=tplVars(c,'fr');v.montant=a.montant;v.devise=a.de
   if(a.tier){v.membre=a.tier.nom||a.tier.b||a.tier.a||'';v.membreId=a.tier.b||a.tier.a||'';v.membreTxt=(a.tier.nom?a.tier.nom+(v.membreId?' ('+v.membreId+')':''):v.membreId||'un membre');v.net=a.tier.net;v.brut=a.tier.brut;}
   if(a.plan){var p=a.plan;v.nb=p.nb;v.mensualite=p.mensualite;v.periodicite=(PLAN_PER[p.per]||PLAN_PER.mois).l;v.frais=planFraisTxt(p,v.devise);v.total=p.total;v.premiere=fD(p.premiere);v.derniere=fD(p.ech[p.ech.length-1].date);v.anticipe=p.anticipe?'oui':'';v.echeancier=planTxt(a);v.lienContrat=p.contrat&&p.contrat.tok?contratUrl(a):'';v.contratSigne=p.contrat&&p.contrat.signeLe?fD(String(p.contrat.signeLe).slice(0,10)):'';}
   return v;}
-function avMsgBenefInfo(c,a){return renderTpl(tplText(a.type==='don'?'don_benef_info':a.tier?'tier_benef_info':a.plan?'echeancier_benef_info':'avance_benef_info'),avVarsBase(c,a));}
-function avMsgPayeurInfo(c,a){return renderTpl(tplText(a.type==='don'?'don_payeur':a.tier?'tier_payeur':a.plan?'echeancier_payeur':'avance_payeur'),avVarsBase(c,a));}
+function avMsgBenefInfo(c,a){var v=avVarsBase(c,a);if(a.notifType==='report'&&a.echeancePrec){v.ancienneEcheance=fD(a.echeancePrec);return renderTpl(tplText('avance_report_benef'),v);}return renderTpl(tplText(a.type==='don'?'don_benef_info':a.tier?'tier_benef_info':a.plan?'echeancier_benef_info':'avance_benef_info'),v);}
+function avMsgPayeurInfo(c,a){var v=avVarsBase(c,a);if(a.notifType==='report'&&a.echeancePrec){v.ancienneEcheance=fD(a.echeancePrec);return renderTpl(tplText('avance_report_payeur'),v);}return renderTpl(tplText(a.type==='don'?'don_payeur':a.tier?'tier_payeur':a.plan?'echeancier_payeur':'avance_payeur'),v);}
+// ── v3.62 — demandes d'avance / don : message au gestionnaire, réponse, relance ──
+function oAvDemandeMsg(c,a,g,relance){
+  if(!a||!a.demande)return;var v=avVarsBase(c,a);v.gest=(a.demande.gest||'').split(' ')[0];v.note=a.demande.note||'';v.typeLbl=a.type==='don'?'un don':a.plan?'un échéancier':'une avance';v.lienFiche=SITE_URL+'?go=c:'+encodeURIComponent(c.id);
+  var txt=renderTpl(tplText(relance?'avance_demande_relance':'avance_demande_gest'),v);
+  if(g&&g.tel)sendVia('wa',telE164(g.tel).replace('+',''),txt,g.email);else if(g&&g.email)sendVia('mail','',txt,g.email);else sendCopy(txt,'📋 '+(a.demande.gest||'Le gestionnaire')+' n\'a ni téléphone ni e-mail dans son profil — message copié');
+}
+function oAvDemandeRelance(cid,aid){var c=OC.find(function(x){return x.id===cid;});if(!c)return;var a=(c.avances||[]).find(function(x){return x.id===aid;});if(!a||!avEstDemande(a))return;a.demande.relances=(a.demande.relances||0)+1;a.demande.relanceLe=new Date().toISOString();a.demande.notifLe='';jrnAdd(c,'note','🔔 Demande '+(a.type==='don'?'de don':'d\'avance')+' relancée auprès de '+(a.demande.gest||'?')+' ('+a.montant+' '+(a.devise||'')+')');oPush([c]);oOpenF(cid);var g=(USERS||[]).find(function(u){return u.nom===a.demande.gest;});oAvDemandeMsg(c,a,g,true);}
+function oAvDemandeRep(cid,aid,etat){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;var a=(c.avances||[]).find(function(x){return x.id===aid;});if(!a||!avEstDemande(a))return;
+  if(!avPeutValider(c,a)){oT('Cette demande est adressée à '+(a.demande.gest||'un autre gestionnaire'),'w');return;}
+  var motif='';if(etat==='refusee'){motif=prompt('Motif du refus (transmis à '+(a.demande.par||'la personne')+') :','');if(motif===null)return;}
+  else if(!confirm('Valider '+(a.type==='don'?'ce don':'cette avance')+' de '+a.montant+' '+(a.devise||'')+' demandé'+(a.type==='don'?'':'e')+' par '+a.demande.par+' ?\n\nElle sera enregistrée à votre nom, avec les e-mails d\'annonce et les rappels habituels.'))return;
+  a.demande.etat=etat;a.demande.repPar=PARTNER_NOM();a.demande.repLe=new Date().toISOString();a.demande.motifRefus=(motif||'').trim().slice(0,300);a.demande.repNotifLe='';
+  if(etat==='validee'){a.saisiPar=PARTNER_NOM();a.sent={};a.notifier=true;a.notifLe='';a.notifA=[];avRecalc(a);}
+  else{a.statut='refusee';}
+  jrnAdd(c,etat==='validee'?'fait':'note',(etat==='validee'?'✅ Demande validée':'❌ Demande refusée')+' : '+(a.type==='don'?'don':'avance')+' de '+a.montant+' '+(a.devise||'')+' demandé'+(a.type==='don'?'':'e')+' par '+a.demande.par+(motif?' — '+motif:''));
+  var payer=a.parId?OC.find(function(x){return x.id===a.parId;}):null,changed=[c];if(payer&&payer.id!==c.id&&etat==='validee'){jrnAdd(payer,'note','💶 Avance / don à '+c.nom+' '+(c.prenom||'')+' validé : '+a.montant+' '+(a.devise||''));changed.push(payer);}
+  oPush(changed);oOpenF(cid);oT(etat==='validee'?'✅ Validée — e-mails d\'annonce en cours, messages prêts':'Demande refusée — '+a.demande.par+' en est informé','s');
+  var dem=(USERS||[]).find(function(u){return u.nom===a.demande.par;});var v=avVarsBase(c,a);v.demandeur=(a.demande.par||'').split(' ')[0];v.motifRefus=a.demande.motifRefus||'';v.typeLbl=a.type==='don'?'le don':'l\'avance';
+  var txt=renderTpl(tplText(etat==='validee'?'avance_demande_ok':'avance_demande_non'),v);
+  setTimeout(function(){if(dem&&dem.tel)sendVia('wa',telE164(dem.tel).replace('+',''),txt,dem.email);else if(dem&&dem.email)sendVia('mail','',txt,dem.email);else sendCopy(txt,'📋 Message copié pour '+(a.demande.par||''));if(etat==='validee')setTimeout(function(){oAvAnnonce(cid,[aid]);},900);},400);
+}
 // v3.59 — contrat d'échéancier : page publique contrat.html?t=<jeton> (reconnaissance de dette + échéancier, signature en ligne des deux parties)
 function contratUrl(a){return a&&a.plan&&a.plan.contrat&&a.plan.contrat.tok?SITE_URL+'contrat.html?t='+encodeURIComponent(a.plan.contrat.tok):'';}
 function oContratSend(cid,aid){var c=OC.find(function(x){return x.id===cid;});if(!c)return;var a=(c.avances||[]).find(function(x){return x.id===aid;});if(!a||!a.plan)return;oAvAnnonce(cid,[aid]);}
@@ -8880,6 +8991,9 @@ function adhesionUrl(c){var base=((CFG.params&&CFG.params.liens&&CFG.params.lien
 function pmtUSD(P,n,apr){var r=(apr||13.99)/100/12;return P*r/(1-Math.pow(1+r,-n));}
 function finLignes(T){var l=['4 × '+(Math.round(T/4*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:2})+' USD toutes les 2 semaines, sans frais (Klarna)'];[6,12,24].forEach(function(n){if(n===24&&T<1000)return;l.push(n+' mois : '+(Math.round(pmtUSD(T,n)*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:2})+' USD / mois');});return l;}
 function offreUrl(o){return SITE_URL+'offre.html?t='+encodeURIComponent(o.tok);}
+// v3.62 — compte de l'association pour un règlement (total ou partiel) par virement
+var RIB_WLHT={titulaire:'WaterLifeHighTech',iban:'FR76 1695 8000 0134 5533 3421 438',bic:'QNTOFRP1XXX',banque:'Qonto (Olinda SAS)',adresse:'60 rue François 1er, 75008 Paris'};
+function ribParams(){var P=CFG&&CFG.params||{};return Object.assign({},RIB_WLHT,P.rib||{});}
 function offreTot(o){var p=0;(o.lignes||[]).forEach(function(l){p+=(+l.usd||0)*(+l.qte||1);});var f=Math.round(p*(+o.frais||0))/100;return{produits:p,frais:f,total:p+f,eur:Math.round((p+f)*(+o.eur||0)*100)/100};}
 function fUSD(n){return(Math.round(n*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2})+' USD';}
 function fEUR(n){return(Math.round(n*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2})+' €';}
@@ -8941,6 +9055,11 @@ function oOffreOpen(cid,dupId){
     +'<div style="font-size:12px;color:var(--t2);margin:6px 0 10px;line-height:1.5">Proposée en votre nom ('+esc(PARTNER_NOM())+(USER&&USER.memberId?' · '+esc(USER.memberId):'')+(USER&&USER.rang?' · '+esc(USER.rang):'')+'), prix de la grille OlyNation en USD, frais OlyLife estimés à '+P.fraisPct+' %, euros indicatifs (1 USD = '+P.eur+' €).'+((USER&&USER.memberId)?'':' <b>Ajoutez votre Member ID et votre rang dans Mon profil</b> pour qu\'ils figurent sur l\'offre.')+'</div>'
     +rows
     +'<label style="display:flex;align-items:flex-start;gap:10px;margin:14px 0 6px;padding:10px 12px;border-radius:12px;background:#FFF8E6;border:1px solid #E8C25A;font-size:13px;line-height:1.5"><input type="checkbox" id="of-cot" '+(dup?(dup.cot?'checked':''):'checked')+' style="width:20px;height:20px;margin-top:1px"><span><b>Mentionner l\'adhésion à l\'association WLHT</b> (180 € la première année) — section séparée, facultative, chaudement recommandée à celles et ceux qui veulent développer.</span></label>'
+    +'<div style="margin:10px 0 6px;padding:10px 12px;border-radius:12px;background:#F3F8F4;border:1px solid var(--bd);font-size:13px;line-height:1.5">'
+    +'<label style="display:flex;align-items:flex-start;gap:10px"><input type="checkbox" id="of-part" '+(dup&&dup.participation&&dup.participation.usd?'checked':'')+' style="width:20px;height:20px;margin-top:1px" onchange="oOffrePartUI()"><span><b>🤝 Je prends en charge une partie (ou la totalité)</b> du montant — avance à rembourser ou cadeau, précisé sur la proposition.</span></label>'
+    +'<div id="of-part-box" style="display:'+(dup&&dup.participation&&dup.participation.usd?'':'none')+';margin-top:8px"><div class="ofg2" style="gap:8px"><div><label class="ofl">Montant pris en charge (USD)</label><input type="number" class="ofc" id="of-part-usd" min="1" step="0.01" inputmode="decimal" value="'+(dup&&dup.participation?dup.participation.usd||'':'')+'"></div><div><label class="ofl">Nature</label><select class="ofc" id="of-part-type"><option value="avance"'+(dup&&dup.participation&&dup.participation.type==='avance'?' selected':'')+'>Avance à me rembourser</option><option value="don"'+(dup&&dup.participation&&dup.participation.type==='don'?' selected':'')+'>Cadeau (rien à rembourser)</option></select></div></div><div style="font-size:11.5px;color:var(--t3);margin-top:4px">Une fois la commande passée, enregistrez l\'avance ou le don sur la fiche (section Avances / dons) pour le suivi et les rappels.</div></div>'
+    +'<label style="display:flex;align-items:flex-start;gap:10px;margin-top:10px"><input type="checkbox" id="of-rib" '+(dup&&dup.rib&&dup.rib.on?'checked':'')+' style="width:20px;height:20px;margin-top:1px" onchange="oOffrePartUI()"><span><b>🏦 Proposer le règlement par virement</b> sur le compte de l\'association Water Life High Tech (RIB Qonto affiché sur la proposition) — total ou partiel ; la commande est ensuite passée sur le BO OlyLife.</span></label>'
+    +'<div id="of-rib-box" style="display:'+(dup&&dup.rib&&dup.rib.on?'':'none')+';margin-top:8px"><label class="ofl">Montant à virer à l\'association (USD) — vide = le reste à payer</label><input type="number" class="ofc" id="of-rib-usd" min="1" step="0.01" inputmode="decimal" value="'+(dup&&dup.rib?dup.rib.usd||'':'')+'" placeholder="le total, moins votre prise en charge"><div style="font-size:11.5px;color:var(--t3);margin-top:4px">IBAN '+esc(ribParams().iban)+' · BIC '+esc(ribParams().bic)+' · '+esc(ribParams().titulaire)+'</div></div></div>'
     +'<label class="ofl" style="margin-top:8px">Mot personnel (facultatif)</label><textarea class="ofc" id="of-note" style="min-height:70px" placeholder="Ce que je vous propose et pourquoi…">'+esc(dup?dup.note||'':'')+'</textarea>'
     +'<div id="of-fin" style="margin-top:10px;padding:10px 12px;border-radius:12px;background:#F3F8F4;border:1px solid var(--bd);font-size:12.5px;line-height:1.6"></div>'
     +'<div class="ofg2" style="gap:8px;margin-top:8px"><div><label class="ofl">Validité (jours)</label><input type="number" class="ofc" id="of-val" min="1" value="'+(dup?dup.validite:P.validite)+'"></div><div><label class="ofl">Total estimé</label><div class="ofc" id="of-tot" style="font-weight:700">—</div></div></div>'
@@ -8949,10 +9068,13 @@ function oOffreOpen(cid,dupId){
   var upd=function(){var o=oOffreCollect();if(!o)return;var t=offreTot(o);document.getElementById('of-tot').textContent=o.lignes.length?fUSD(t.total)+' ≈ '+fEUR(t.eur):'—';document.getElementById('of-fin').innerHTML=o.lignes.length?'<b>💳 Paiement en plusieurs fois (estimation, affiché sur l\'offre)</b><br>'+finLignes(t.total).join('<br>')+'<br><span style="color:var(--t3)">+ PayPal et carte en une fois · proposé par Klarna au paiement sur le BO, à 13,99 % APR estimé (0–35,99 %)</span>':'';};
   m.querySelectorAll('.of-ck,.of-q').forEach(function(el){el.addEventListener('change',upd);});upd();
 }
+function oOffrePartUI(){var p=document.getElementById('of-part-box'),r=document.getElementById('of-rib-box');if(p)p.style.display=document.getElementById('of-part').checked?'':'none';if(r)r.style.display=document.getElementById('of-rib').checked?'':'none';}
 function oOffreCollect(c){
   var m=document.getElementById('ooffre');if(!m)return null;var P=offreParams(),lignes=[];
   m.querySelectorAll('.of-ck:checked').forEach(function(ck){var x=catById(ck.getAttribute('data-id'));if(!x)return;var q=m.querySelector('.of-q[data-id="'+x.id+'"]');lignes.push({id:x.id,ref:x.ref||'',nom:x.nom,usd:+x.usd||0,qte:Math.max(1,parseInt(q&&q.value,10)||1),ic:x.ic||'',pitch:x.pitch||'',img:x.img?(/^https?:/.test(x.img)?x.img:SITE_URL+x.img):'',tunnel:(c&&x.decouv&&DECOUV[x.decouv])?tunnelUrl(DECOUV[x.decouv].slug,c):''});});
-  return{lignes:lignes,frais:+P.fraisPct||0,eur:+P.eur||0,cot:!!(document.getElementById('of-cot')||{}).checked,note:(val('of-note')||'').trim().slice(0,600),validite:Math.max(1,parseInt(val('of-val'),10)||P.validite)};
+  var part=(document.getElementById('of-part')||{}).checked&&+val('of-part-usd')>0?{usd:r2(val('of-part-usd')),type:val('of-part-type')||'avance',par:PARTNER_NOM()}:null;
+  var rib=(document.getElementById('of-rib')||{}).checked?Object.assign({on:true,usd:+val('of-rib-usd')>0?r2(val('of-rib-usd')):0},ribParams()):null;
+  return{lignes:lignes,frais:+P.fraisPct||0,eur:+P.eur||0,cot:!!(document.getElementById('of-cot')||{}).checked,note:(val('of-note')||'').trim().slice(0,600),validite:Math.max(1,parseInt(val('of-val'),10)||P.validite),participation:part,rib:rib};
 }
 function oOffreCreate(cid,send){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;var o=oOffreCollect(c);if(!o)return;
@@ -8971,6 +9093,10 @@ function oOffreSend(cid,oid){
   if(affO)oT('🧪 Proposition envoyée au nom de '+affO.nom+' : votre nom n\'y apparaît pas.','i');
   var v=tplVars(c,'fr');v.lienOffre=offreUrl(o);var t=offreTot(o);v.montantOffre=fUSD(t.total);v.financementOffre=finLignes(t.total).join(' · ');v.appareilsOffre=o.lignes.map(function(l){return(l.qte>1?l.qte+' × ':'')+l.nom.replace(/^OlyLife\s+/i,'');}).join(', ');v.validiteOffre=String(o.validite||15);
   var text=renderTpl(tplText('offre'),v),canal=canalCode(c),num=String(c.tel||'').replace(/\D/g,'');
+  // v3.62 — prise en charge et virement à l'association : ajoutés après le lien de la proposition
+  var sup=[];if(o.participation&&o.participation.usd)sup.push('🤝 Je prends en charge '+fUSD(o.participation.usd)+' sur ce montant'+(o.participation.type==='don'?' — c\'est un cadeau, rien à me rembourser.':' — sous forme d\'avance, que vous me rembourserez selon ce que nous convenons ensemble.'));
+  if(o.rib&&o.rib.on)sup.push('🏦 Si vous préférez, vous pouvez régler '+(o.rib.usd?fUSD(o.rib.usd):'tout ou partie')+' par virement sur le compte de l\'association Water Life High Tech (RIB sur la proposition : IBAN '+o.rib.iban+'). La commande est ensuite passée ensemble sur le BO OlyLife.');
+  if(sup.length&&text.indexOf(v.lienOffre)>=0)text=text.replace(v.lienOffre,v.lienOffre+'\n\n'+sup.join('\n'));
   if((canal==='wa'||canal==='sms'||canal==='signal'||canal==='tg')&&!num){if(c.email)canal='mail';else{sendCopy(text,'📋 Pas de téléphone ni d\'e-mail : message copié');return;}}
   if(canal==='mail'&&!c.email){if(num)canal='wa';else{sendCopy(text,'📋 Message copié');return;}}
   sendVia(canal,num,text,c.email);
