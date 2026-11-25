@@ -2145,7 +2145,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
         <button class="ob bgh bsm" type="button" id="av-add-line" onclick="oAvLineAdd()">➕ Ajouter une autre personne</button>
         <div style="font-size:11px;color:var(--t3);margin-top:6px">Une ligne par personne : montant transmis depuis son BO OlyLife, avec sa propre date et sa propre échéance. Chaque ligne apparaît aussi sur la fiche membre de la personne, et les rappels lui sont envoyés.</div>
       </div>
-      <div class="ofg1"><label class="ofl">Devise</label><select class="ofc" id="av-devise"><option>€</option><option>FCFA</option><option>USD</option><option>MAD</option></select></div>
+      <div class="ofg1"><label class="ofl">Devise</label><select class="ofc" id="av-devise" onchange="if(AV_CUR){AV_CUR.devise=this.value;avRembRender();}oPlanPreview()"><option>USD</option><option>€</option><option>FCFA</option><option>MAD</option></select></div>
       <div class="ofg1"><label class="ofl">Motif / appareil financé</label><input type="text" class="ofc" id="av-motif" placeholder="Tera-P90+"></div>
     </div>
     <!-- v3.59 — réglages de l'échéancier -->
@@ -2576,7 +2576,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.61.4 · 25/11';
+var APP_VERSION='v3.61.5 · 25/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -7129,7 +7129,7 @@ function oAvOpen(cid,aid,mode){
   oAvLineAdd(a,parV);
   document.getElementById('av-add-line').style.display=a?'none':'';
   document.getElementById('av-lines-lbl').innerHTML=a?'Personne qui a '+(a.type==='don'?'donné':'avancé')+' l\'argent':'Qui a avancé / donné l\'argent ? <span class="oreq">*</span>';
-  document.getElementById('av-devise').value=a?(a.devise||'€'):'€';
+  document.getElementById('av-devise').value=a?(a.devise||'€'):'USD';   // v3.61.5 — USD par défaut (devise du BO OlyLife)
   document.getElementById('av-motif').value=a?(a.motif||''):'';
   // v3.27 — notification e-mail : case cochée pour une nouvelle ligne ; sur une ligne existante, on affiche ce qui a été fait
   var nr=document.getElementById('av-notif-row'),nd=document.getElementById('av-notif-done');
