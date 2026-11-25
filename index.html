@@ -2576,7 +2576,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.61.1 · 25/11';
+var APP_VERSION='v3.61.2 · 25/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -6721,8 +6721,24 @@ function rdvBox(c){
       +(r.start?fDTfull(r.start):'<i>horaire en cours de synchronisation</i>')+(r.host?' · avec '+esc(r.host):'')+(r.lieu?'<br>'+esc(r.lieu):'')
       +(r.joinUrl?'<br><a href="'+esc(r.joinUrl)+'" target="_blank" rel="noopener">Rejoindre la visio</a>':'')
       +(r.reschedule?' · <a href="'+esc(r.reschedule)+'" target="_blank" rel="noopener">Déplacer</a>':'')
+      // v3.61.2 — visio Zoom posée depuis le CRM : déplacer (nouvelle invitation prête à envoyer) ou annuler
+      +(r.source==='zoom'?'<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"><button type="button" class="ob bgh bsm" onclick="oZoomMove(\''+c.id+'\',\''+esc(r.uri)+'\')">✏️ Déplacer</button><button type="button" class="ob bgh bsm" onclick="oZoomCancel(\''+c.id+'\',\''+esc(r.uri)+'\')">✕ Annuler</button></div>':'')
       +'</div></div>';
   }).join('');
+}
+// Déplacer une visio Zoom : on retire l'ancienne, on rouvre la fenêtre Zoom préremplie à la même heure — vous changez date/heure et renvoyez l'invitation
+function oZoomMove(cid,uri){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;var r=(c.rdvs||[]).find(function(x){return x.uri===uri;});if(!r)return;
+  var old=r.start||'';r.statut='canceled';r.deplaceLe=new Date().toISOString();
+  jrnAdd(c,'rdv','🎥 Visio Zoom du '+fDTfull(old)+' à déplacer — nouvelle invitation en préparation');oPush([c]);
+  oZoomOpen(cid);setTimeout(function(){try{oZoomMode('later');var d=document.getElementById('zoom-d'),h=document.getElementById('zoom-h');if(d)d.value=old.slice(0,10);if(h)h.value=old.slice(11,16);var m=document.getElementById('ozoom');if(m&&m._refresh)m._refresh();oT('Changez la date ou l\'heure, puis envoyez : l\'ancienne visio est remplacée','i');}catch(e){}},80);
+}
+function oZoomCancel(cid,uri){
+  var c=OC.find(function(x){return x.id===cid;});if(!c)return;var r=(c.rdvs||[]).find(function(x){return x.uri===uri;});if(!r)return;
+  if(!confirm('Annuler la visio Zoom du '+fDTfull(r.start||'')+' ?\n\nPensez à prévenir '+(c.prenom||'la personne')+' (un message est proposé ensuite).'))return;
+  r.statut='canceled';r.annuleLe=new Date().toISOString();jrnAdd(c,'rdv','🎥 Visio Zoom du '+fDTfull(r.start||'')+' annulée');oPush([c]);oOpenF(cid);
+  var txt='Bonjour '+(c.prenom||'')+' 🌿\n\nNotre visio prévue le '+fDTfull(r.start||'')+' ne pourra pas avoir lieu comme prévu, je vous prie de m\'en excuser. Je vous propose de convenir ensemble d\'un nouveau créneau — dites-moi vos disponibilités.\n\n'+PARTNER_NOM().split(' ')[0]+' — Water Life High Tech';
+  setTimeout(function(){if(confirm('Envoyer maintenant un message à '+(c.prenom||'la personne')+' pour l\'en informer ?'))sendVia(canalCode(c),(c.tel||'').replace(/\D/g,''),txt,c.email);},300);
 }
 function oPostJ_(payload){
   if(!GAS_URL||!CODE)return Promise.resolve({ok:false,error:'offline'});
