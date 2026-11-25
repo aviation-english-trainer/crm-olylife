@@ -2576,7 +2576,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.60.1 · 25/11';
+var APP_VERSION='v3.60.2 · 25/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -3529,6 +3529,11 @@ var MSG_DEFAULTS={};
     t:'Bonjour {prenom} 🌿\n\nVoici votre échéancier pour le financement de {montant} {devise}{?motif: ({motif})}{?payeur:, avancé par {payeur}} :\n\n📅 {nb} versements ({periodicite}) de {mensualite} {devise}, du {premiere} au {derniere}\n💶 Frais : {frais} — total à rembourser : {total} {devise}{?anticipe:\n✅ Vous pouvez rembourser par anticipation à tout moment, sans frais supplémentaires.}\n\n{echeancier}\n{?lienContrat:\n✍️ Pour que tout soit clair pour chacun, merci de lire et signer le contrat en ligne (2 minutes, sur votre téléphone) :\n{lienContrat}\n}\nVous recevrez un petit rappel avant chaque versement. Au moindre souci, dites-le simplement : on s\'adapte 🙏\n{moi} — Water Life High Tech'};
   MSG_DEFAULTS.echeancier_payeur={g:'Avances d\'argent',l:'Échéancier de financement — confirmation au prêteur',vars:['payeur','client','montant','devise','date','motif','nb','mensualite','periodicite','frais','total','premiere','derniere','anticipe','echeancier','lienContrat','moi'],
     t:'Bonjour {payeur} 🌿\n\nL\'échéancier de {client} pour les {montant} {devise}{?motif: ({motif})} que vous avancez est enregistré :\n\n📅 {nb} versements ({periodicite}) de {mensualite} {devise}, du {premiere} au {derniere}\n💶 Frais : {frais} — total à percevoir : {total} {devise}{?anticipe:\n✅ Remboursement anticipé possible sans frais.}\n\n{echeancier}\n{?lienContrat:\n✍️ Le contrat est à signer en ligne par vous deux — votre signature de prêteur :\n{lienContrat}\n}\nVous serez prévenu(e) avant chaque versement et à chaque règlement reçu. Merci pour votre confiance 🙏\n{moi} — Water Life High Tech'};
+  // v3.60.2 — placement en jambe faible : le partenaire confie un contact, le bénéficiaire touche le Tier Bonus et le reverse (seule condition)
+  MSG_DEFAULTS.tier_payeur={g:'Avances d\'argent',l:'Tier Bonus — merci au partenaire qui a placé le membre (reversement prévu)',vars:['payeur','client','membreTxt','montant','devise','date','echeance','moi'],
+    t:'Bonjour {payeur} 🌿\n\nUn grand merci : en plaçant {membreTxt} dans ma jambe la plus faible, vous m\'avez permis de toucher le Tier Bonus du {date} — {montant} {devise} net. C\'est une vraie aide pour équilibrer mes deux jambes, et je le mesure.\n\nComme convenu entre nous, cette prime vous revient intégralement : je vous reverse les {montant} {devise} en USDT, de mon wallet vers le vôtre, dès mon prochain retrait OlyLife — prévu autour du {echeance}. Je vous confirme le virement dès qu\'il est parti.\n\nBelle collaboration, et encore merci 🙏\n{moi} — Water Life High Tech'};
+  MSG_DEFAULTS.tier_benef_info={g:'Avances d\'argent',l:'Tier Bonus — rappel pour celui qui a touché la prime et doit la reverser',vars:['prenom','payeur','membreTxt','montant','devise','date','echeance','moi'],
+    t:'Bonjour {prenom} 🌿\n\nPour mémoire : {payeur} a placé {membreTxt} dans votre jambe la plus faible, et le Tier Bonus du {date} — {montant} {devise} net — est tombé sur votre compte.\n\nSeule condition de ce coup de pouce : reverser la prime à {payeur}, en USDT de wallet à wallet, après votre prochain retrait OlyLife (prévu autour du {echeance}). Le CRM vous le rappellera 3 jours avant, la veille et le jour même.\n\n{moi} — Water Life High Tech'};
   MSG_DEFAULTS.don_benef_info={g:'Avances d\'argent',l:'Annonce du don au bénéficiaire',vars:['prenom','montant','devise','date','motif','payeur','moi'],
     t:'Bonjour {prenom} 🌿\n\nBonne nouvelle : un don de {montant} {devise}{?motif: pour votre {motif}} vous est fait le {date}{?payeur: par {payeur}}.\n\nIl s\'agit d\'un don : aucun remboursement n\'est attendu 🎁\n\nBelle journée !\n{moi} — Water Life High Tech'};
   MSG_DEFAULTS.don_payeur={g:'Avances d\'argent',l:'Confirmation au donateur',vars:['payeur','montant','devise','date','client','motif','moi'],
@@ -4740,8 +4745,8 @@ function avRowHtml(c,a,vuePayeur){
   var isRef=!can('avances')&&!(a.plan&&can('echeancier')),done=a.statut==='rembourse'||a.type==='don',rd=avRendu(a),tot=avTotal(a),pct=tot?Math.min(100,Math.round(rd/tot*100)):0;
   return'<div class="av-it"><div class="av-b"><span class="av-m">'+esc(String(a.montant))+' '+esc(a.devise||'€')+'</span> '+avStBdg(a)
     +(a.type!=='don'&&rd>0&&!done?'<div class="av-bar"><i style="width:'+pct+'%"></i></div>':'')
-    +'<small>'+(a.type==='don'?'Donné':a.plan?'Financé':'Avancé')+' le '+fD(a.date)+(a.motif?' · '+esc(a.motif):'')
-    +(vuePayeur?' · à <b>'+esc(c.nom+' '+(c.prenom||''))+'</b>':(a.par?' · par <b>'+esc(a.par)+'</b>':''))
+    +'<small>'+(a.type==='don'?'Donné':a.tier?'Tier Bonus touché':a.plan?'Financé':'Avancé')+' le '+fD(a.date)+(a.motif?' · '+esc(a.motif):'')
+    +(a.tier?(vuePayeur?' · à reverser par <b>'+esc(c.nom+' '+(c.prenom||''))+'</b>':' · à reverser à <b>'+esc(a.par||'')+'</b>'):vuePayeur?' · à <b>'+esc(c.nom+' '+(c.prenom||''))+'</b>':(a.par?' · par <b>'+esc(a.par)+'</b>':''))
     +(a.plan?'<br>📅 '+a.plan.nb+' versements '+(PLAN_PER[a.plan.per]||PLAN_PER.mois).l+' de '+a.plan.mensualite+' '+esc(a.devise||'€')+' · frais : '+esc(planFraisTxt(a.plan,a.devise||'€'))+' · total dû '+a.plan.total+' '+esc(a.devise||'€')+(a.plan.anticipe?' · remboursement anticipé possible sans frais':''):'')
     +((a.rembs||[]).length?'<br>↩ '+a.rembs.map(function(r){return fD(r.date)+' : '+r.montant+' '+esc(a.devise||'€');}).join(' · '):'')
     +(a.notifLe?'<br>✉️ annonce e-mail le '+fD(String(a.notifLe).slice(0,10)):(a.notifier?'<br>✉️ annonce e-mail en attente':''))+'</small></div>'
@@ -5933,7 +5938,8 @@ function oTierPreview(rows){
   TIER_ROWS=rows;
   var card=document.getElementById('oimp-prev-card'),prev=document.getElementById('oimp-prev');card.style.display='block';document.getElementById('oimp-go').style.display='none';document.getElementById('oimp-inc-row').style.display='none';
   document.getElementById('oimp-prev-ttl').textContent='💸 Tier Bonus à reverser — '+rows.length+' ligne'+(rows.length>1?'s':'');
-  var benefEA=contactByEA(rows[0].mine),benef=benefEA||maFiche();
+  var memo=null;try{var mid=localStorage.getItem('owlht2_tier_benef');if(mid)memo=OC.find(function(c){return c.id===mid;})||null;}catch(e){}
+  var benefEA=contactByEA(rows[0].mine),benef=benefEA||memo||maFiche();
   var payeurs=avPayeurs(benef?benef.id:''),recents=tierRecents().filter(function(v){return payeurs.some(function(o){return o.v===v;});});
   var groups={};payeurs.forEach(function(o){if(recents.indexOf(o.v)>=0)return;(groups[o.g]=groups[o.g]||[]).push(o);});
   var optsP=(recents.length?'<optgroup label="⭐ Derniers partenaires choisis">'+recents.map(function(v){var o=payeurs.find(function(x){return x.v===v;});return'<option value="'+esc(v)+'">'+esc(o.l)+'</option>';}).join('')+'</optgroup>':'')
@@ -5955,7 +5961,7 @@ function oTierPreview(rows){
       +(deja?'<span class="obdg bgy">déjà importé → '+esc((deja.prenom||'')+' '+(deja.nom||''))+'</span>':'')+'</div>';}).join('');
   prev.innerHTML='<div style="padding:12px 16px">'
     +'<div class="os-note" style="margin-bottom:10px">Chaque Tier Bonus coché devient une <b>avance à rembourser</b> : <b>vous</b> (le bénéficiaire du bonus) devez la somme au <b>partenaire</b> qui a placé le membre dans votre jambe. Le membre concerné (A / B) <b>n\'est jamais prévenu</b> : son nom sert seulement à libeller la ligne. ID en vert = fiche reconnue ; ID en gris = inconnu du CRM, tapez le nom à la main.</div>'
-    +'<div class="ofg2"><div><label class="ofl">Qui a touché le bonus et doit reverser</label><select class="ofc" id="tr-benef">'+optsB+'</select><div style="font-size:11px;color:var(--t3);margin-top:3px">'+(benefEA?'Reconnu d\'après le compte '+esc(rows[0].mine)+' présent dans le texte collé.':benef?'Par défaut : <b>votre fiche</b> (vous saisissez, c\'est vous qui avez touché le bonus). Changez seulement si le bonus est tombé sur un autre compte.':'<span style="color:#C0392B">Votre fiche n\'a pas été trouvée d\'après votre nom d\'accès : choisissez-la dans la liste.</span>')+'</div></div>'
+    +'<div class="ofg2"><div><label class="ofl">Qui a touché le bonus et doit reverser</label><input type="search" class="ofc" id="tr-benef-q" placeholder="🔎 Rechercher une fiche (nom, ID EA, téléphone)…" oninput="oTierBenefFilter()" style="margin-bottom:6px"><select class="ofc" id="tr-benef">'+optsB+'</select><div style="font-size:11px;color:var(--t3);margin-top:3px">'+(benefEA?'Reconnu d\'après le compte '+esc(rows[0].mine)+' présent dans le texte collé.':memo&&benef===memo?'Votre dernier choix. Changez seulement si le bonus est tombé sur un autre compte.':benef?'Par défaut : <b>votre fiche</b> (vous saisissez, c\'est vous qui avez touché le bonus). Changez seulement si le bonus est tombé sur un autre compte.':'<span style="color:#C0392B">Votre fiche n\'a pas été trouvée d\'après votre nom d\'accès : cherchez-la ci-dessus, elle sera mémorisée.</span>')+'</div></div>'
     +'<div><label class="ofl">Partenaire à rembourser (prêteur)</label><select class="ofc" id="tr-payeur">'+optsP+'</select><div style="font-size:11px;color:var(--t3);margin-top:3px">Votre choix est mémorisé : la prochaine fois il sera proposé d\'office, en tête de liste.</div></div></div>'
     +'<div class="ofg2"><div><label class="ofl">Montant reversé</label><select class="ofc" id="tr-mode"><option value="net"'+(mode==='net'?' selected':'')+'>Net crédité sur mon solde (ex. 450 $)</option><option value="brut"'+(mode==='brut'?' selected':'')+'>Brut avant la retenue de 20 % (ex. 562,50 $)</option></select><div style="font-size:11px;color:var(--t3);margin-top:3px">Le net est ce qu\'OlyLife a réellement crédité, donc ce que vous pouvez retirer et reverser.</div></div>'
     +'<div><label class="ofl">Date prévue du reversement</label><select class="ofc" id="tr-delai" onchange="oTierEchRefresh()"><option value="retrait"'+(delai==='retrait'?' selected':'')+'>Après mon prochain retrait OlyLife (validation le 15 ou en fin de mois + 7 jours de réception)</option><option value="7"'+(delai==='7'?' selected':'')+'>7 jours après la date du bonus</option><option value="14"'+(delai==='14'?' selected':'')+'>14 jours après la date du bonus</option><option value="30"'+(delai==='30'?' selected':'')+'>30 jours après la date du bonus</option><option value="0"'+(delai==='0'?' selected':'')+'>Le jour du bonus (déjà reversé)</option></select><div style="font-size:11px;color:var(--t3);margin-top:3px">C\'est l\'<b>échéance</b> inscrite sur l\'avance : les rappels par e-mail partent 3 jours avant, la veille et le jour même. La date calculée s\'affiche sur chaque ligne ci-dessous.</div></div></div>'
@@ -5973,13 +5979,14 @@ function oTierPreview(rows){
   if(pick)sp.value=pick;
   oTierEchRefresh();
 }
+function oTierBenefFilter(){var q=nmKey(val('tr-benef-q')||''),sel=document.getElementById('tr-benef'),cur=sel.value,first='';Array.from(sel.options).forEach(function(o){var c=OC.find(function(x){return x.id===o.value;});var hay=nmKey(((c&&c.nom)||'')+' '+((c&&c.prenom)||'')+' '+((c&&c.memberIdOlyLife)||'')+' '+((c&&c.tel)||''));var ok=!q||hay.indexOf(q)>=0||((c&&c.tel)||'').replace(/\D/g,'').indexOf(q.replace(/\D/g,'')||'§')>=0;o.hidden=!ok;o.disabled=!ok;if(ok&&!first)first=o.value;});if(q&&first&&(sel.selectedOptions[0]&&sel.selectedOptions[0].hidden))sel.value=first;}
 function oTierEchRefresh(){var mode=val('tr-delai')||'retrait';document.querySelectorAll('#oimp-prev .tier-row').forEach(function(row){var r=TIER_ROWS[+row.dataset.i];if(!r)return;var e=row.querySelector('.tr-ech');if(e)e.innerHTML='⏰ à reverser le <b>'+fD(tierEcheance(r.date,mode))+'</b>';});}
 function oTierGo(){
   if(!can('avances')){oT('Réservé aux gestionnaires et administrateurs','w');return;}
   var bid=val('tr-benef'),c=OC.find(function(x){return x.id===bid;});if(!c){oT('Choisissez le bénéficiaire du bonus','e');return;}
   var parV=val('tr-payeur');if(!parV){oT('Choisissez le partenaire à rembourser','e');return;}
   var mode=val('tr-mode'),delai=val('tr-delai')||'retrait',notif=document.getElementById('tr-notif').checked;
-  try{localStorage.setItem('owlht2_tier_mode',mode);localStorage.setItem('owlht2_tier_delai',delai);var rc=tierRecents().filter(function(v){return v!==parV;});rc.unshift(parV);localStorage.setItem('owlht2_tier_recents',JSON.stringify(rc.slice(0,5)));}catch(e){}
+  try{localStorage.setItem('owlht2_tier_benef',bid);localStorage.setItem('owlht2_tier_mode',mode);localStorage.setItem('owlht2_tier_delai',delai);var rc=tierRecents().filter(function(v){return v!==parV;});rc.unshift(parV);localStorage.setItem('owlht2_tier_recents',JSON.stringify(rc.slice(0,5)));}catch(e){}
   var pi=avParInfo(parV),payer=parV.indexOf('c:')===0?OC.find(function(x){return x.id===parV.slice(2);}):null;
   if(!payer&&parV.indexOf('u:')===0)payer=OC.find(function(x){return nmKey((x.nom||'')+' '+(x.prenom||''))===nmKey(pi.nom)||nmKey((x.prenom||'')+' '+(x.nom||''))===nmKey(pi.nom);})||null;
   if(payer&&payer.id===c.id){oT('Le partenaire et le bénéficiaire ne peuvent pas être la même fiche','e');return;}
@@ -7082,10 +7089,11 @@ function oAvSave(){
 }
 // ── v3.27 — Annonce au bénéficiaire et au prêteur / donateur, sur le canal préféré de chacun ──
 function avVarsBase(c,a){var v=tplVars(c,'fr');v.montant=a.montant;v.devise=a.devise||'€';v.date=fD(a.date);v.motif=a.motif||'';v.rendu=avRendu(a)||'';v.reste=avReste(a);v.echeance=fD(a.echeance);v.payeur=(a.par||'').split(' ')[0];v.client=((c.nom||'')+' '+(c.prenom||'')).trim();
+  if(a.tier){v.membre=a.tier.nom||a.tier.b||a.tier.a||'';v.membreId=a.tier.b||a.tier.a||'';v.membreTxt=(a.tier.nom?a.tier.nom+(v.membreId?' ('+v.membreId+')':''):v.membreId||'un membre');v.net=a.tier.net;v.brut=a.tier.brut;}
   if(a.plan){var p=a.plan;v.nb=p.nb;v.mensualite=p.mensualite;v.periodicite=(PLAN_PER[p.per]||PLAN_PER.mois).l;v.frais=planFraisTxt(p,v.devise);v.total=p.total;v.premiere=fD(p.premiere);v.derniere=fD(p.ech[p.ech.length-1].date);v.anticipe=p.anticipe?'oui':'';v.echeancier=planTxt(a);v.lienContrat=p.contrat&&p.contrat.tok?contratUrl(a):'';v.contratSigne=p.contrat&&p.contrat.signeLe?fD(String(p.contrat.signeLe).slice(0,10)):'';}
   return v;}
-function avMsgBenefInfo(c,a){return renderTpl(tplText(a.type==='don'?'don_benef_info':a.plan?'echeancier_benef_info':'avance_benef_info'),avVarsBase(c,a));}
-function avMsgPayeurInfo(c,a){return renderTpl(tplText(a.type==='don'?'don_payeur':a.plan?'echeancier_payeur':'avance_payeur'),avVarsBase(c,a));}
+function avMsgBenefInfo(c,a){return renderTpl(tplText(a.type==='don'?'don_benef_info':a.tier?'tier_benef_info':a.plan?'echeancier_benef_info':'avance_benef_info'),avVarsBase(c,a));}
+function avMsgPayeurInfo(c,a){return renderTpl(tplText(a.type==='don'?'don_payeur':a.tier?'tier_payeur':a.plan?'echeancier_payeur':'avance_payeur'),avVarsBase(c,a));}
 // v3.59 — contrat d'échéancier : page publique contrat.html?t=<jeton> (reconnaissance de dette + échéancier, signature en ligne des deux parties)
 function contratUrl(a){return a&&a.plan&&a.plan.contrat&&a.plan.contrat.tok?SITE_URL+'contrat.html?t='+encodeURIComponent(a.plan.contrat.tok):'';}
 function oContratSend(cid,aid){var c=OC.find(function(x){return x.id===cid;});if(!c)return;var a=(c.avances||[]).find(function(x){return x.id===aid;});if(!a||!a.plan)return;oAvAnnonce(cid,[aid]);}
@@ -7117,7 +7125,7 @@ function oAvAnnonce(cid,ids){
   });
   if(n>1)rows='<div style="font-size:12px;color:var(--t2);padding:0 2px 8px">📲 '+n+' message'+(n>1?'s':'')+' à envoyer, <b>un par un</b> : touchez « Prévenir », envoyez dans WhatsApp, revenez ici — le suivant vous attend.</div>'+rows;
   m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:520px;max-height:88vh;overflow:auto">'
-    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">'+(don?'🎁 Don enregistré — prévenir maintenant ?':avs[0].plan?'📅 Échéancier prêt — l\'envoyer maintenant ?':'💶 Avance enregistrée — prévenir maintenant ?')+'</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'oavann\').remove()">✕</button></div>'
+    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">'+(don?'🎁 Don enregistré — prévenir maintenant ?':avs[0].tier?'💸 Tier Bonus à reverser — remercier le partenaire maintenant ?':avs[0].plan?'📅 Échéancier prêt — l\'envoyer maintenant ?':'💶 Avance enregistrée — prévenir maintenant ?')+'</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'oavann\').remove()">✕</button></div>'
     +'<div style="font-size:12px;color:var(--t2);margin:6px 0 10px">'+(avs[0].notifier?(srvNum()>=3018?'Les e-mails d\'annonce partent automatiquement (bénéficiaire, '+(don?'donateur':'prêteur')+', gestionnaires, admin). ':'<span style="color:#C0392B">⚠️ Script Google à mettre à jour (v3.18) pour que les e-mails d\'annonce partent automatiquement.</span> '):'')+'Le message ci-dessous est déjà rédigé : un clic l\'ouvre sur le canal préféré indiqué sur la fiche de chacun.</div>'
     +rows
     +'<div id="avann-next" style="font-size:12.5px;color:var(--g);font-weight:600;margin-top:10px">'+(reste>1?'➡️ <b>'+reste+'</b> messages à envoyer, un par un.':'')+'</div>'
