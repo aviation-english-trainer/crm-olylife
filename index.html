@@ -2576,7 +2576,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.61.2 · 25/11';
+var APP_VERSION='v3.61.3 · 25/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -6727,11 +6727,12 @@ function rdvBox(c){
   }).join('');
 }
 // Déplacer une visio Zoom : on retire l'ancienne, on rouvre la fenêtre Zoom préremplie à la même heure — vous changez date/heure et renvoyez l'invitation
+var ZOOM_MOVE_FROM='',ZOOM_MOVE_FROM_KEEP=false;   // v3.61.3 — ancienne date quand on déplace : le message le dit, le rappel ⏰ du même créneau suit
 function oZoomMove(cid,uri){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;var r=(c.rdvs||[]).find(function(x){return x.uri===uri;});if(!r)return;
-  var old=r.start||'';r.statut='canceled';r.deplaceLe=new Date().toISOString();
+  var old=r.start||'';r.statut='canceled';r.deplaceLe=new Date().toISOString();ZOOM_MOVE_FROM=old;
   jrnAdd(c,'rdv','🎥 Visio Zoom du '+fDTfull(old)+' à déplacer — nouvelle invitation en préparation');oPush([c]);
-  oZoomOpen(cid);setTimeout(function(){try{oZoomMode('later');var d=document.getElementById('zoom-d'),h=document.getElementById('zoom-h');if(d)d.value=old.slice(0,10);if(h)h.value=old.slice(11,16);var m=document.getElementById('ozoom');if(m&&m._refresh)m._refresh();oT('Changez la date ou l\'heure, puis envoyez : l\'ancienne visio est remplacée','i');}catch(e){}},80);
+  ZOOM_MOVE_FROM_KEEP=true;oZoomOpen(cid);setTimeout(function(){try{oZoomMode('later');var d=document.getElementById('zoom-d'),h=document.getElementById('zoom-h');if(d)d.value=old.slice(0,10);if(h)h.value=old.slice(11,16);var m=document.getElementById('ozoom');if(m&&m._refresh)m._refresh();oT('Changez la date ou l\'heure, puis envoyez : l\'ancienne visio est remplacée','i');}catch(e){}},80);
 }
 function oZoomCancel(cid,uri){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;var r=(c.rdvs||[]).find(function(x){return x.uri===uri;});if(!r)return;
@@ -9061,6 +9062,7 @@ function zxHtml(c){
 function oZoomOpen(cid,teamNom){
   if(ROLE()==='referent'){oZoomAsk(cid,teamNom);return;}
   var c=teamNom?zoomTeamObj(teamNom):OC.find(function(x){return x.id===cid;});if(!c)return;ZC=c;ZX=[];ZQ={d:'',h:''};TZ_SAISIE='';
+  if(!ZOOM_MOVE_FROM_KEEP)ZOOM_MOVE_FROM='';ZOOM_MOVE_FROM_KEEP=false;
   var url=zoomUrl();
   var old=document.getElementById('ozoom');if(old)old.remove();
   var m=document.createElement('div');m.id='ozoom';m.style.cssText='position:fixed;inset:0;z-index:2100;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;padding:0';m.onclick=function(e){if(e.target===m)m.remove();};
@@ -9182,6 +9184,8 @@ function zoomABientot(){
 function zoomMsg(c){
   if(c._team)return zoomMsgTiers({prenom:c.prenom},null);
   var v=tplVars(c,'fr');v.lienZoom=zoomUrl();v.quand=zoomQuand(tzDe(c));v.abientot=zoomABientot();var t=renderTpl(tplText('zoom_invitation'),v);
+  if(ZOOM_MOVE_FROM&&ZOOM_MODE==='later'){var av='⚠️ Changement de créneau : notre visio initialement prévue le '+fDTfull(ZOOM_MOVE_FROM)+' est déplacée. Merci de ne plus tenir compte de mon précédent message — voici le nouveau rendez-vous.';
+    t=t.replace(/^(Bonjour[^\n]*\n\n)/,function(m){return m+av+'\n\n';}).replace(/Comme convenu, voici le lien/,'Voici le lien');}
   var sup=[];if(ZX.length)sup.push('👥 '+(ZX.length>1?'Seront aussi avec nous : ':'Sera aussi avec nous : ')+ZX.map(function(x){return x.kind==='team'?x.nom+' ('+x.roleLbl.toLowerCase()+')':x.prenom;}).join(', ')+'.');
   var hh=zoomHeuresTxt(tzDe(c));if(hh)sup.push(hh);
   if(sup.length&&v.lienZoom&&t.indexOf(v.lienZoom)>=0)t=t.replace(v.lienZoom,v.lienZoom+'\n\n'+sup.join('\n'));
@@ -9242,7 +9246,10 @@ function oZoomSend(){
   if(c._team){ZQ={d:val('zoom-d'),h:val('zoom-h')};if(ZX.length){zxStep2();}else{var b0=document.getElementById('ozoom');if(b0)b0.remove();}oT('🎥 Invitation Zoom envoyée à '+c.prenom,'s');return;}
   var e=jrnAdd(c,'rdv','🎥 Invitation Zoom envoyée par '+(CANAL_LBL[canal]||canal)+(ZOOM_MODE==='now'?' — visio immédiate (salle ouverte)':(q?' — visio '+q:''))+(USER&&USER.zoomUrl?'':' (Zoom de l\'association)')+(ZX.length?' · avec : '+ZX.map(function(x){return x.nom;}).join(', '):''));
   var DH=zoomDHMoi(),d=DH.d,h=DH.h||'10:00',ag=d&&document.getElementById('zoom-ag')&&document.getElementById('zoom-ag').checked;
-  if(d){c.rdvs=c.rdvs||[];c.rdvs.push({uri:'zoom_'+Date.now(),source:'zoom',nom:'Visio Zoom',start:d+'T'+h+':00',tz:tzMoi(),host:PARTNER_NOM(),joinUrl:zoomUrl(),statut:'active',par:PARTNER_NOM()});}
+  if(d){c.rdvs=c.rdvs||[];c.rdvs.push({uri:'zoom_'+Date.now(),source:'zoom',nom:'Visio Zoom',start:d+'T'+h+':00',tz:tzMoi(),host:PARTNER_NOM(),joinUrl:zoomUrl(),statut:'active',par:PARTNER_NOM(),remplace:ZOOM_MOVE_FROM||''});
+    if(ZOOM_MOVE_FROM&&c.rappel&&c.rappel.date===ZOOM_MOVE_FROM.slice(0,10)&&(c.rappel.heure||'')===ZOOM_MOVE_FROM.slice(11,16)){c.rappel.date=d;c.rappel.heure=h;jrnAdd(c,'rdv','⏰ Rappel du même créneau déplacé au '+fD(d)+' à '+h);}
+    if(ZOOM_MOVE_FROM)jrnAdd(c,'rdv','🎥 Visio Zoom déplacée : du '+fDTfull(ZOOM_MOVE_FROM)+' au '+fD(d)+' à '+h+' — nouvelle invitation envoyée');}
+  ZOOM_MOVE_FROM='';
   ZQ={d:val('zoom-d'),h:val('zoom-h')};var zxN=ZX.filter(function(x){return x.kind==='team';}).map(function(x){return x.nom;}),zxC=ZX.filter(function(x){return x.kind==='contact';}).map(function(x){return x.cid;});
   oPush([c]);if(ZX.length){zxStep2();}else{var b=document.getElementById('ozoom');if(b)b.remove();oOpenF(cid);}oT('🎥 Invitation Zoom envoyée','s');
   if(ag){
