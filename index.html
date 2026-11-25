@@ -1038,7 +1038,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
 .av-line .del{position:absolute;top:6px;right:6px;}
 .av-line .ofg2{gap:8px;margin-top:6px;}
 .av-line .ofl{font-size:10.5px;}
-#av-lines{padding-top:10px;}#av-lines.don .l-ech{display:none;}
+#av-lines{padding-top:10px;}#av-lines.don .l-ech,#av-lines.plan .l-ech,#av-lines.plan .av-line .del{display:none;}
 .av-seg{display:flex;gap:6px;margin-bottom:12px;}
 .av-seg button{flex:1;min-height:44px;border:1.5px solid var(--bd);border-radius:12px;background:#fff;font-size:13px;font-weight:600;color:var(--t2);cursor:pointer;}
 .av-seg button.on{border-color:var(--gold);background:var(--goldp);color:var(--gold);}
@@ -2138,7 +2138,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
   <div class="omo-body">
     <div class="os-note" style="margin-bottom:14px" id="oavs-sub">—</div>
     <input type="hidden" id="av-cid"><input type="hidden" id="av-id"><input type="hidden" id="av-type" value="avance">
-    <div class="av-seg"><button type="button" id="av-t-avance" class="on" onclick="oAvType('avance')">💶 Avance<br><small style="font-weight:400">à rembourser</small></button><button type="button" id="av-t-don" onclick="oAvType('don')">🎁 Don<br><small style="font-weight:400">sans remboursement</small></button></div>
+    <div class="av-seg"><button type="button" id="av-t-avance" class="on" onclick="oAvType('avance')">💶 Avance<br><small style="font-weight:400">à rembourser</small></button><button type="button" id="av-t-plan" onclick="oAvType('plan')">📅 Échéancier<br><small style="font-weight:400">en plusieurs fois</small></button><button type="button" id="av-t-don" onclick="oAvType('don')">🎁 Don<br><small style="font-weight:400">sans remboursement</small></button></div>
     <div class="ofg">
       <div class="ofg1"><label class="ofl" id="av-lines-lbl">Qui a avancé / donné l'argent ? <span class="oreq">*</span></label>
         <div id="av-lines"></div>
@@ -2147,6 +2147,23 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
       </div>
       <div class="ofg1"><label class="ofl">Devise</label><select class="ofc" id="av-devise"><option>€</option><option>FCFA</option><option>USD</option><option>MAD</option></select></div>
       <div class="ofg1"><label class="ofl">Motif / appareil financé</label><input type="text" class="ofc" id="av-motif" placeholder="Tera-P90+"></div>
+    </div>
+    <!-- v3.59 — réglages de l'échéancier -->
+    <div id="av-plan" style="display:none;background:var(--navy2);border:1.5px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:12px">
+      <div class="ofg2">
+        <div><label class="ofl">Nombre de versements</label><input type="number" class="ofc" id="pl-nb" min="2" max="60" step="1" value="12" inputmode="numeric" oninput="oPlanPreview('nb')"></div>
+        <div><label class="ofl">Périodicité</label><select class="ofc" id="pl-per" onchange="oPlanPreview()"><option value="mois">Mensuelle</option><option value="quinzaine">Toutes les 2 semaines</option><option value="semaine">Hebdomadaire</option></select></div>
+      </div>
+      <div class="ofg2">
+        <div><label class="ofl">Montant par versement</label><input type="number" class="ofc" id="pl-mens" min="1" step="0.01" inputmode="decimal" placeholder="calculé" oninput="oPlanPreview('mens')"><div style="font-size:10.5px;color:var(--t3);margin-top:3px">Tapez-le : le nombre de versements s'ajuste.</div></div>
+        <div><label class="ofl">Premier versement</label><input type="date" class="ofc" id="pl-prem" onchange="oPlanPreview()"></div>
+      </div>
+      <label class="ofl" style="margin-top:8px">Frais</label>
+      <div class="av-seg" style="margin-bottom:6px"><button type="button" id="pl-f-gratuit" class="on" onclick="oPlanFrais('gratuit')">🆓 Gratuit</button><button type="button" id="pl-f-mensuel" onclick="oPlanFrais('mensuel')">📆 Par versement</button><button type="button" id="pl-f-global" onclick="oPlanFrais('global')">Σ Global</button></div>
+      <div id="pl-frais-wrap" style="display:none"><input type="number" class="ofc" id="pl-frais" min="0" step="0.01" inputmode="decimal" placeholder="Montant des frais" oninput="oPlanPreview()"></div>
+      <label class="ochk-row" style="margin-top:8px;font-size:12.5px"><input type="checkbox" id="pl-anticipe" checked onchange="oPlanPreview()"><span>Remboursement <b>anticipé</b> possible à tout moment, sans frais supplémentaires</span></label>
+      <label class="ochk-row" style="margin-top:4px;font-size:12.5px"><input type="checkbox" id="pl-contrat" checked><span>✍️ Préparer le <b>contrat à signer en ligne</b> (reconnaissance de dette + échéancier) : lien envoyé au bénéficiaire et au prêteur</span></label>
+      <div id="pl-preview" style="margin-top:10px;font-size:12.5px"></div>
     </div>
     <div class="av-remb" id="av-remb" style="display:none">
       <div class="ttl">💰 Remboursements</div>
@@ -2559,7 +2576,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.58 · 25/11';
+var APP_VERSION='v3.59 · 25/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -2577,6 +2594,7 @@ var DROITS_DEF=[
   {k:'offres',l:'Proposer des offres de commande OlyLife (en son nom, prix de la grille OlyNation)',d:{admin:1,gestionnaire:1,referent:1,comite:0}},
   {k:'attribuer',l:'Attribuer une fiche ou une demande à un gestionnaire',d:{admin:1,gestionnaire:1,referent:0,comite:0}},
   {k:'avances',l:'Avances & dons : enregistrer, rembourser, supprimer',d:{admin:1,gestionnaire:1,referent:0,comite:0}},
+  {k:'echeancier',l:'Échéancier de financement : proposer un plan de remboursement (versements, frais, contrat à signer)',d:{admin:1,gestionnaire:1,referent:1,comite:0}},
   {k:'factures',l:'Factures, mot de passe client, suivi de commande',d:{admin:1,gestionnaire:1,referent:0,comite:0}},
   {k:'messagesGroupe',l:'Envoi groupé de messages',d:{admin:1,gestionnaire:1,referent:0,comite:0}},
   {k:'temoignagesPublier',l:'Publier un témoignage (après vérification)',d:{admin:1,gestionnaire:1,referent:0,comite:1}},
@@ -3486,7 +3504,7 @@ var MSG_DEFAULTS={};
     t:'Bonjour {payeur} 🌿\n\nPetit point sur l\'avance de {montant} {devise} que vous avez faite le {date} à {client}{?motif: pour {motif}} : le remboursement est prévu le {echeance}{?rendu: (déjà rendu : {rendu} {devise}, reste {reste} {devise})}.\n\nJe vous tiens informé(e) dès que c\'est réglé. Merci pour votre confiance 🙏\n{moi} — Water Life High Tech'};
   // v3.33 — première commission OlyLife : explication du relevé « Bonus Statement » + plan de rémunération
   MSG_DEFAULTS.premiere_commission={g:'Membre du réseau',l:'Première commission OlyLife — explication du relevé',vars:['prenom','dateBonus','perf','tier','autres','retenue','bonus','income','voucher','lienPlan','lienRdv','moi'],
-    t:'Bonjour {prenom} 🎉\n\nBonne nouvelle : votre première commission OlyLife est tombée{?dateBonus: (relevé du {dateBonus})} ! Petit décodage de votre « Bonus Statement » (Financial Management → Bonus Statement) :\n\n{?perf:• Performance Bonus : {perf} — lié aux commandes passées directement grâce à vous\n}{?tier:• Tier Bonus : {tier} — bonus de niveau, lié à l\'organisation de votre équipe\n}{?autres:• Autres bonus (groupe, coaching, rang, équipe) : {autres}\n}{?bonus:• Bonus total (brut) : {bonus}\n}{?retenue:• Repurchase : {retenue} — la retenue de 20 % qui alimente votre portefeuille de rachat (pour vos prochaines commandes)\n}{?income:• Income : {income} — ce qui est réellement crédité sur votre compte\n}{?voucher:• Shopping Voucher : {voucher} — bons d\'achat cumulés, utilisables sur la boutique OlyLife\n}\nLes montants sont en dollars US et indiqués avant la retenue de 20 %. Rien à faire de votre côté : les retraits se font depuis Financial Management.\n{?lienPlan:\n📘 Pour comprendre tout le plan de rémunération (les bonus, comment ils se déclenchent, et ce qui se passe quand vous parrainez 2 personnes) :\n{lienPlan}\n}{?lienRdv:\n📅 Et si vous voulez qu\'on le parcoure ensemble en 20 minutes : {lienRdv}\n}\nBravo pour ce premier pas 🌿\n{moi} — Water Life High Tech'};
+    t:'Bonjour {prenom} 🎉\n\nBonne nouvelle : votre première commission OlyLife est tombée{?dateBonus: (relevé du {dateBonus})} ! Petit décodage de votre « Bonus Statement » (Financial Management → Bonus Statement) :\n\n{?perf:• Performance Bonus : {perf} — lié aux commandes passées directement grâce à vous\n}{?tier:• Tier Bonus : {tier} — bonus de niveau, lié à l\'organisation de votre équipe\n}{?autres:• Autres bonus (groupe, coaching, rang, équipe) : {autres}\n}{?bonus:• Bonus total (brut) : {bonus}\n}{?retenue:• Repurchase : {retenue} — la retenue de 20 % qui alimente votre portefeuille de rachat (pour vos prochaines commandes)\n}{?income:• Income : {income} — ce qui est réellement crédité sur votre compte\n}{?voucher:• Shopping Voucher : {voucher} — bons d\'achat cumulés, utilisables sur la boutique OlyLife\n}\nLes montants sont en dollars US et indiqués avant la retenue de 20 %. L\'Income est le montant net, déjà retirable depuis Financial Management.\n\n💸 Pour recevoir vos commissions sur votre portefeuille, nous avons préparé un guide pas à pas (20 minutes, tout est expliqué) :\nhttps://www.waterlifehightech.com/wallet_olylife?p={prenom}\n\nAu programme : ouvrir votre portefeuille USDT (réseau TRC20), le faire enregistrer sur votre compte OlyLife avec un modèle d\'e-mail prêt à copier, puis lancer votre premier retrait.\n\n🗓 Le calendrier des retraits : OlyLife paie 2 fois par mois. Vous pouvez donc faire 2 demandes de retrait par mois — l\'une avant le 14, l\'autre avant le dernier jour du mois. OlyLife valide le 15 et le dernier jour du mois, confirme sous 24 h, puis il faut compter environ 7 jours pour recevoir les USDT à l\'adresse indiquée. Minimum 10 $, aucun frais.\n\n📱 Pour le portefeuille, l\'équipe utilise l\'application TAP. Le guide contient le lien d\'invitation de Jean-Charles : https://referral.withtap.com/jess_kaiz — en toute transparence, c\'est un lien de parrainage. Il ne change rien pour vous (mêmes conditions, aucun frais en plus) et il permet à l\'équipe de vous accompagner plus facilement.\n{?lienPlan:\n📘 Pour comprendre tout le plan de rémunération (les bonus, comment ils se déclenchent, et ce qui se passe quand vous parrainez 2 personnes) :\n{lienPlan}\n}{?lienRdv:\n📅 Et si vous voulez qu\'on le parcoure ensemble en 20 minutes : {lienRdv}\n}\nBravo pour ce premier pas 🌿\n{moi} — Water Life High Tech'};
   MSG_DEFAULTS.offre={g:'Prospect',l:'Offre de commande OlyLife (lien personnel)',vars:['prenom','appareilsOffre','montantOffre','financementOffre','validiteOffre','lienOffre','lienRdv','moi'],
     t:'Bonjour {prenom},\n\nComme convenu, voici votre proposition personnalisée : {appareilsOffre}.\n\n👉 {lienOffre}\n\nVous y trouverez le détail, un bouton « En savoir plus » pour chaque appareil, et le montant ({montantOffre}, frais OlyLife compris). Elle reste valable {validiteOffre} jours.\n\n💳 Paiement en plusieurs fois possible au moment de la commande (estimation Klarna) : {financementOffre} — ou PayPal.\n\nUn doute, une question ? Je suis là.{?lienRdv: Pour en parler de vive voix, choisissez un créneau : {lienRdv}}\n\n{moi}'};
   MSG_DEFAULTS.offre_relance={g:'Prospect',l:'Relance d\'une offre de commande (J+7)',vars:['prenom','montantOffre','jours','lienOffre','lienRdv','moi'],
@@ -3506,6 +3524,11 @@ var MSG_DEFAULTS={};
   // v3.27 — annonce au bénéficiaire et au prêteur / donateur dès l'enregistrement (message prêt sur le canal préféré)
   MSG_DEFAULTS.avance_benef_info={g:'Avances d\'argent',l:'Annonce de l\'avance au bénéficiaire',vars:['prenom','montant','devise','date','motif','payeur','echeance','moi'],
     t:'Bonjour {prenom} 🌿\n\nC\'est confirmé : une avance de {montant} {devise}{?motif: pour votre {motif}} vous est accordée le {date}{?payeur: par {payeur}}.\n\nLe remboursement est prévu le {echeance}. Vous recevrez un petit rappel par e-mail 3 jours avant et le jour J — rien à faire d\'ici là 🙂\n\nN\'hésitez pas si vous avez la moindre question.\n{moi} — Water Life High Tech'};
+  // v3.59 — échéancier de financement : tableau des versements + lien du contrat à signer
+  MSG_DEFAULTS.echeancier_benef_info={g:'Avances d\'argent',l:'Échéancier de financement — envoi au bénéficiaire (versements + contrat à signer)',vars:['prenom','montant','devise','date','motif','payeur','nb','mensualite','periodicite','frais','total','premiere','derniere','anticipe','echeancier','lienContrat','moi'],
+    t:'Bonjour {prenom} 🌿\n\nVoici votre échéancier pour le financement de {montant} {devise}{?motif: ({motif})}{?payeur:, avancé par {payeur}} :\n\n📅 {nb} versements ({periodicite}) de {mensualite} {devise}, du {premiere} au {derniere}\n💶 Frais : {frais} — total à rembourser : {total} {devise}{?anticipe:\n✅ Vous pouvez rembourser par anticipation à tout moment, sans frais supplémentaires.}\n\n{echeancier}\n{?lienContrat:\n✍️ Pour que tout soit clair pour chacun, merci de lire et signer le contrat en ligne (2 minutes, sur votre téléphone) :\n{lienContrat}\n}\nVous recevrez un petit rappel avant chaque versement. Au moindre souci, dites-le simplement : on s\'adapte 🙏\n{moi} — Water Life High Tech'};
+  MSG_DEFAULTS.echeancier_payeur={g:'Avances d\'argent',l:'Échéancier de financement — confirmation au prêteur',vars:['payeur','client','montant','devise','date','motif','nb','mensualite','periodicite','frais','total','premiere','derniere','anticipe','echeancier','lienContrat','moi'],
+    t:'Bonjour {payeur} 🌿\n\nL\'échéancier de {client} pour les {montant} {devise}{?motif: ({motif})} que vous avancez est enregistré :\n\n📅 {nb} versements ({periodicite}) de {mensualite} {devise}, du {premiere} au {derniere}\n💶 Frais : {frais} — total à percevoir : {total} {devise}{?anticipe:\n✅ Remboursement anticipé possible sans frais.}\n\n{echeancier}\n{?lienContrat:\n✍️ Le contrat est à signer en ligne par vous deux — votre signature de prêteur :\n{lienContrat}\n}\nVous serez prévenu(e) avant chaque versement et à chaque règlement reçu. Merci pour votre confiance 🙏\n{moi} — Water Life High Tech'};
   MSG_DEFAULTS.don_benef_info={g:'Avances d\'argent',l:'Annonce du don au bénéficiaire',vars:['prenom','montant','devise','date','motif','payeur','moi'],
     t:'Bonjour {prenom} 🌿\n\nBonne nouvelle : un don de {montant} {devise}{?motif: pour votre {motif}} vous est fait le {date}{?payeur: par {payeur}}.\n\nIl s\'agit d\'un don : aucun remboursement n\'est attendu 🎁\n\nBelle journée !\n{moi} — Water Life High Tech'};
   MSG_DEFAULTS.don_payeur={g:'Avances d\'argent',l:'Confirmation au donateur',vars:['payeur','montant','devise','date','client','motif','moi'],
@@ -4657,11 +4680,39 @@ function resBdg(c,small){var m=resManque(c);if(!m.length)return'';return'<span c
 function resBox(c){var m=resManqueX(c);if(!m.length)return'';var can=canEditContact(c);return'<div class="res-box res-pulse"><span style="font-size:20px">✍️</span><div style="flex:1;min-width:0"><b>Fiche à compléter — '+m.length+' champ'+(m.length>1?'s':'')+' manquant'+(m.length>1?'s':'')+'</b><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">'+m.map(function(x){return can||x.id==='@fact'?'<button type="button" class="miss-chip" onclick="oResGo(\''+c.id+'\',\''+x.id+'\')">'+esc(x.l)+' →</button>':'<span class="miss-chip">'+esc(x.l)+'</span>';}).join('')+'</div></div>'+(can?'<button class="ob bgold bsm" style="min-height:36px" onclick="oResGo(\''+c.id+'\',\'first\')">Compléter</button>':'')+'</div>';}
 function avanceEnCours(c){return(c.avances||[]).some(function(a){return a.type!=='don'&&a.statut!=='rembourse';});}
 function avRendu(a){return(a.rembs||[]).reduce(function(t,r){return t+(+r.montant||0);},0);}
-function avReste(a){return Math.max(0,(+a.montant||0)-avRendu(a));}
+// v3.59 — total dû : capital + frais de l'échéancier (0 pour une avance simple ou un échéancier gratuit)
+function avTotal(a){return a&&a.plan&&a.plan.total?+a.plan.total:(+(a&&a.montant)||0);}
+function avReste(a){return Math.max(0,avTotal(a)-avRendu(a));}
+// ── v3.59 — ÉCHÉANCIER : capital, frais (gratuit / mensuel / global), n versements, remboursement anticipé ──
+var PLAN_PER={mois:{l:'mensuels',n:1},quinzaine:{l:'toutes les 2 semaines',j:14},semaine:{l:'hebdomadaires',j:7}};
+function planAddPer(ymd,k,per){var d=new Date(ymd+'T12:00:00');if(per==='mois'){var day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+k);var last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();d.setDate(Math.min(day,last));}else d.setDate(d.getDate()+k*(PLAN_PER[per]||PLAN_PER.quinzaine).j);return d.toISOString().slice(0,10);}
+function r2(x){return Math.round((+x||0)*100)/100;}
+// Construit (ou reconstruit) l'échéancier : p={nb,per,premiere,frais:{mode,montant},anticipe}. Les frais mensuels s'ajoutent à chaque versement ; les frais globaux sont répartis.
+function planBuild(montant,p){
+  var nb=Math.max(1,Math.min(60,parseInt(p.nb,10)||1)),per=PLAN_PER[p.per]?p.per:'mois',prem=p.premiere||planAddPer(todayYMD(),1,per);
+  var fm=p.frais&&p.frais.mode||'gratuit',fx=r2(p.frais&&p.frais.montant);
+  var fraisTot=fm==='mensuel'?r2(fx*nb):fm==='global'?fx:0,total=r2((+montant||0)+fraisTot);
+  var base=Math.floor(total/nb*100)/100,ech=[],cum=0;
+  for(var i=0;i<nb;i++){var m=i===nb-1?r2(total-cum):base;cum=r2(cum+m);ech.push({n:i+1,date:planAddPer(prem,i,per),montant:m,cumul:cum});}
+  return{nb:nb,per:per,premiere:prem,frais:{mode:fm,montant:fx},fraisTot:fraisTot,total:total,mensualite:base,anticipe:p.anticipe!==false,ech:ech,contrat:p.contrat||null};
+}
+// État de chaque versement d'après les remboursements réellement reçus (cumul) : paye · partiel · retard · avenir
+function planEtat(a){
+  if(!a.plan||!a.plan.ech)return[];var rd=avRendu(a),today=todayYMD();
+  return a.plan.ech.map(function(e){var paye=rd>=e.cumul-0.004,part=!paye&&rd>e.cumul-e.montant+0.004;return{n:e.n,date:e.date,montant:e.montant,cumul:e.cumul,etat:paye?'paye':e.date<today?'retard':part?'partiel':'avenir',reste:paye?0:r2(Math.min(e.montant,e.cumul-rd))};});
+}
+function planProchaine(a){var l=planEtat(a).filter(function(e){return e.etat!=='paye';});return l.length?l[0]:null;}
+function planTxt(a,sep){
+  if(!a.plan)return'';var dev=a.devise||'€',p=a.plan;
+  var lines=planEtat(a).map(function(e){return(e.etat==='paye'?'✅ ':e.etat==='retard'?'🚨 ':e.etat==='partiel'?'💰 ':'▫️ ')+e.n+'/'+p.nb+' · '+fD(e.date)+' · '+e.montant+' '+dev;});
+  return lines.join(sep||'\n');
+}
+function planFraisTxt(p,dev){if(!p)return'';var f=p.frais||{};return f.mode==='mensuel'?f.montant+' '+dev+' par versement ('+p.fraisTot+' '+dev+' au total)':f.mode==='global'?p.fraisTot+' '+dev+' au total (répartis sur les versements)':'aucuns frais';}
 function avRecalc(a){
-  if(a.type==='don'){a.statut='don';return;}
-  var rd=avRendu(a);
-  if(rd>=(+a.montant||0)-0.004){a.statut='rembourse';var last=(a.rembs||[]).slice().sort(function(x,y){return(x.date||'')<(y.date||'')?1:-1;})[0];a.rembourseLe=last?last.date:(a.rembourseLe||todayYMD());}
+  if(a.type==='don'){a.statut='don';delete a.plan;return;}
+  var rd=avRendu(a),tot=avTotal(a);
+  if(a.plan){var nx=planProchaine(a);if(nx)a.echeance=nx.date;}   // l'échéance « active » = prochain versement non soldé (rappels J-3 · veille · J dessus)
+  if(rd>=tot-0.004){a.statut='rembourse';var last=(a.rembs||[]).slice().sort(function(x,y){return(x.date||'')<(y.date||'')?1:-1;})[0];a.rembourseLe=last?last.date:(a.rembourseLe||todayYMD());if(a.plan)a.echeance=a.plan.ech[a.plan.ech.length-1].date;}
   else if(rd>0){a.statut='partiel';a.rembourseLe='';}
   else{a.statut='encours';a.rembourseLe='';}
 }
@@ -4676,20 +4727,26 @@ function avStBdg(a){
   if(a.type==='don')return'<span class="obdg av-tag-don">🎁 don · sans remboursement</span>';
   var diff=a.echeance?diffD(a.echeance):null,done=a.statut==='rembourse',rd=avRendu(a);
   if(done)return'<span class="obdg bgr">✅ remboursée'+(a.rembourseLe?' le '+fD(a.rembourseLe):'')+'</span>';
-  var part=rd>0?'<span class="obdg baq">💰 partiel : '+rd+' / '+a.montant+' '+esc(a.devise||'€')+'</span> ':'';
+  var part=rd>0?'<span class="obdg baq">💰 partiel : '+rd+' / '+avTotal(a)+' '+esc(a.devise||'€')+'</span> ':'';
+  if(a.plan){var nx=planProchaine(a),np=planEtat(a).filter(function(e){return e.etat==='paye';}).length;
+    return'<span class="obdg bpu">📅 '+a.plan.nb+' × '+a.plan.mensualite+' '+esc(a.devise||'€')+' · '+np+'/'+a.plan.nb+' réglé'+(np>1?'s':'')+'</span> '
+      +(nx?(nx.etat==='retard'?'<span class="obdg brd">🚨 versement '+nx.n+' en retard de '+Math.abs(diffD(nx.date))+' j</span>':diffD(nx.date)===0?'<span class="obdg bor">⏰ versement '+nx.n+' aujourd\'hui</span>':'<span class="obdg bgo">prochain : '+fD(nx.date)+'</span>'):'')
+      +(a.plan.contrat&&a.plan.contrat.signeLe?' <span class="obdg bgr" title="Contrat signé le '+fD(String(a.plan.contrat.signeLe).slice(0,10))+'">✍️ contrat signé</span>':a.plan.contrat&&a.plan.contrat.tok?' <span class="obdg bgy">✍️ contrat à signer</span>':'');}
   return part+(diff!==null&&diff<0?'<span class="obdg brd">🚨 retard de '+Math.abs(diff)+' j</span>'
     :diff===0?'<span class="obdg bor">⏰ échéance aujourd\'hui</span>'
     :'<span class="obdg bgo">échéance '+fD(a.echeance)+'</span>');
 }
 function avRowHtml(c,a,vuePayeur){
-  var isRef=!can('avances'),done=a.statut==='rembourse'||a.type==='don',rd=avRendu(a),pct=a.montant?Math.min(100,Math.round(rd/a.montant*100)):0;
+  var isRef=!can('avances')&&!(a.plan&&can('echeancier')),done=a.statut==='rembourse'||a.type==='don',rd=avRendu(a),tot=avTotal(a),pct=tot?Math.min(100,Math.round(rd/tot*100)):0;
   return'<div class="av-it"><div class="av-b"><span class="av-m">'+esc(String(a.montant))+' '+esc(a.devise||'€')+'</span> '+avStBdg(a)
     +(a.type!=='don'&&rd>0&&!done?'<div class="av-bar"><i style="width:'+pct+'%"></i></div>':'')
-    +'<small>'+(a.type==='don'?'Donné':'Avancé')+' le '+fD(a.date)+(a.motif?' · '+esc(a.motif):'')
+    +'<small>'+(a.type==='don'?'Donné':a.plan?'Financé':'Avancé')+' le '+fD(a.date)+(a.motif?' · '+esc(a.motif):'')
     +(vuePayeur?' · à <b>'+esc(c.nom+' '+(c.prenom||''))+'</b>':(a.par?' · par <b>'+esc(a.par)+'</b>':''))
+    +(a.plan?'<br>📅 '+a.plan.nb+' versements '+(PLAN_PER[a.plan.per]||PLAN_PER.mois).l+' de '+a.plan.mensualite+' '+esc(a.devise||'€')+' · frais : '+esc(planFraisTxt(a.plan,a.devise||'€'))+' · total dû '+a.plan.total+' '+esc(a.devise||'€')+(a.plan.anticipe?' · remboursement anticipé possible sans frais':''):'')
     +((a.rembs||[]).length?'<br>↩ '+a.rembs.map(function(r){return fD(r.date)+' : '+r.montant+' '+esc(a.devise||'€');}).join(' · '):'')
     +(a.notifLe?'<br>✉️ annonce e-mail le '+fD(String(a.notifLe).slice(0,10)):(a.notifier?'<br>✉️ annonce e-mail en attente':''))+'</small></div>'
     +(isRef?'':'<div style="display:flex;gap:4px;flex-shrink:0">'
+      +(a.plan&&a.plan.contrat&&a.plan.contrat.tok?'<a class="tb-ic" title="Ouvrir le contrat (échéancier à signer / signé)" href="'+esc(contratUrl(a))+'" target="_blank" rel="noopener">📄</a><button class="tb-ic" type="button" title="Envoyer le lien du contrat au bénéficiaire et au prêteur" onclick="oContratSend(\''+c.id+'\',\''+a.id+'\')">✍️</button>':'')
       +(!done&&c.tel?'<a class="tb-ic" title="Rappel WhatsApp au bénéficiaire" href="'+mkWA(c.tel,avWaMsg(c,a))+'" target="_blank" rel="noopener">💬</a>':'')
       +(!done&&(avParTel(a)||c.tel||c.email)?'<button class="tb-ic" type="button" title="Prévenir tout le monde, un message après l\'autre" onclick="oAvAnnonceAll(\''+c.id+'\')">📣</button>':'')
       +(a.type==='don'&&(c.tel||c.email)?'<button class="tb-ic" type="button" title="Annoncer le don au bénéficiaire (canal préféré)" onclick="oAvAnnonceGo(\''+c.id+'\',\''+a.id+'\',\'benef\')">💬</button>':'')
@@ -4865,9 +4922,9 @@ function oDonsPrint(key){
 }
 
 function avListHtml(c){
-  var avs=c.avances||[],isRef=!can('avances');
+  var avs=c.avances||[],isRef=!can('avances'),okPlan=can('echeancier');
   var rows=avs.map(function(a){return avRowHtml(c,a,false);}).join('');
-  return rows+(isRef?'':'<div style="padding:10px 16px"><button class="ob baqua bsm" onclick="oAvOpen(\''+c.id+'\')">➕ Avance ou don</button></div>');
+  return rows+(isRef&&!okPlan?'':'<div style="padding:10px 16px;display:flex;gap:8px;flex-wrap:wrap">'+(isRef?'':'<button class="ob baqua bsm" onclick="oAvOpen(\''+c.id+'\')">➕ Avance ou don</button>')+(okPlan?'<button class="ob bgh bsm" onclick="oAvOpen(\''+c.id+'\',\'\',\'plan\')">📅 Proposer un échéancier</button>':'')+'</div>');
 }
 function oOpenF(id){
   var c=OC.find(function(x){return x.id===id;});if(!c)return;
@@ -4912,7 +4969,7 @@ function oOpenF(id){
     +factHtml(c)
     +accHtml(c)
     +odSec('Journal des actions ('+((c.journal||[]).length)+')',jrnHtml(c),true)
-    +((c.avances&&c.avances.length)||can('avances')?odSec('💶 Avances / dons reçus'+((c.avances||[]).length?' ('+c.avances.length+')':''),avListHtml(c),avanceEnCours(c)):'')
+    +((c.avances&&c.avances.length)||can('avances')||can('echeancier')?odSec('💶 Avances / dons reçus'+((c.avances||[]).length?' ('+c.avances.length+')':''),avListHtml(c),avanceEnCours(c)):'')
     +avDonneesHtml(c)
     +odSec('Informations',
       '<div class="od-row"><span class="od-lbl">Téléphone</span><span class="od-val">'+(c.tel||'—')+'</span></div>'
@@ -6189,7 +6246,11 @@ function oCli(){
   var base=filterContacts(q,{});stCounts(base);
   var l=filterContacts(q,{statut:true});
   if(IMP_FILTER&&IMP_LAST.length)l=l.filter(function(c){return IMP_LAST.indexOf(c.id)>=0;});
-  sortList(l);CUR_LIST=l;
+  sortList(l);
+  // v3.59 — quand on cherche un nom, la personne elle-même sort en premier ; ceux qui ne la citent qu'en référent / parrain viennent après
+  if(q){var qq=q.toLowerCase().trim();var hit=function(c){var n1=((c.nom||'')+' '+(c.prenom||'')).toLowerCase(),n2=((c.prenom||'')+' '+(c.nom||'')).toLowerCase();if(n1.indexOf(qq)===0||n2.indexOf(qq)===0)return 0;if(n1.indexOf(qq)>=0||n2.indexOf(qq)>=0)return 1;var tel=(c.tel||'').replace(/\D/g,''),qd=qq.replace(/\D/g,'');if(qd.length>=3&&tel.indexOf(qd)>=0)return 1;if(((c.email||'')+' '+(c.memberIdOlyLife||'')+' '+(c.numCommande||'')).toLowerCase().indexOf(qq)>=0)return 2;return 3;};
+    l=l.map(function(c,i){return{c:c,i:i,h:hit(c)};}).sort(function(a,b){return a.h-b.h||a.i-b.i;}).map(function(x){return x.c;});}
+  CUR_LIST=l;
   var fc=activeFilterCount(),fn=document.getElementById('ofilt-n');fn.textContent=fc;fn.classList.toggle('on',fc>0);
   var filtered=fc||q||ACTIVE_STATUT||ACTIVE_VUE;
   document.getElementById('c-count').innerHTML=(IMP_FILTER&&IMP_LAST.length?'<span class="obdg baq">📥 Contrôle du dernier import — '+l.length+' fiche(s)</span><a onclick="oImpFilterOff()">✕ Afficher tous les contacts</a>':'<span><b>'+l.length+'</b> contact'+(l.length>1?'s':'')+(filtered?' sur '+OC.length:'')+'</span>'+(filtered?'<a onclick="oClearFilters()">✕ Effacer les filtres</a>':''))+(VIEW_AS_TAG?'<span class="obdg bpu">👁 Session '+esc(VIEW_AS_NOM||VIEW_AS_TAG)+'</span>':'');
@@ -6727,8 +6788,8 @@ function avLineHtml(i,a){
   return'<div class="av-line" data-i="'+i+'"><span class="num">Personne '+(i+1)+'</span>'
     +(AV_CUR?'':'<button class="tb-ic del" type="button" title="Retirer cette ligne" onclick="oAvLineDel(this)">✕</button>')
     +'<label class="ofl" style="margin-top:4px">Qui ?</label><select class="ofc l-par">'+AV_OPTS+'</select>'
-    +'<div class="ofg2"><div><label class="ofl">Montant <span class="oreq">*</span></label><input type="number" class="ofc l-montant" placeholder="500" min="0" step="0.01" inputmode="decimal" value="'+(a?a.montant:'')+'"></div>'
-    +'<div><label class="ofl l-date-lbl">'+(t==='don'?'Date du don':'Date de l\'avance')+'</label><input type="date" class="ofc l-date" value="'+(a?(a.date||''):todayYMD())+'"></div></div>'
+    +'<div class="ofg2"><div><label class="ofl">Montant <span class="oreq">*</span></label><input type="number" class="ofc l-montant" placeholder="500" min="0" step="0.01" inputmode="decimal" value="'+(a?a.montant:'')+'" oninput="oPlanPreview()"></div>'
+    +'<div><label class="ofl l-date-lbl">'+(t==='don'?'Date du don':t==='plan'?'Date de l\'accord':'Date de l\'avance')+'</label><input type="date" class="ofc l-date" value="'+(a?(a.date||''):todayYMD())+'" onchange="oPlanPreview()"></div></div>'
     +'<div class="l-ech"><label class="ofl" style="margin-top:6px">Échéance de remboursement <span class="oreq">*</span></label><input type="date" class="ofc l-ech-in" value="'+(a?(a.echeance||''):'')+'"></div></div>';
 }
 function oAvLineAdd(a,parV){
@@ -6747,17 +6808,46 @@ function avLines(){
   });
 }
 function oAvType(t){
+  var onlyPlan=!can('avances')&&can('echeancier');if(onlyPlan)t='plan';   // un référent ne peut que proposer un échéancier
   document.getElementById('av-type').value=t;
   document.getElementById('av-t-avance').classList.toggle('on',t==='avance');
+  document.getElementById('av-t-plan').classList.toggle('on',t==='plan');
   document.getElementById('av-t-don').classList.toggle('on',t==='don');
+  document.getElementById('av-t-avance').style.display=onlyPlan?'none':'';document.getElementById('av-t-don').style.display=onlyPlan?'none':'';
   document.getElementById('av-lines').classList.toggle('don',t==='don');
-  document.querySelectorAll('#av-lines .l-date-lbl').forEach(function(l){l.textContent=t==='don'?'Date du don':'Date de l\'avance';});
-  document.getElementById('oavs-ttl').textContent=t==='don'?'🎁 Don d\'argent':'💶 Avance d\'argent';
+  document.getElementById('av-lines').classList.toggle('plan',t==='plan');
+  document.querySelectorAll('#av-lines .l-ech').forEach(function(l){l.style.display=t==='plan'?'none':'';});
+  document.querySelectorAll('#av-lines .l-date-lbl').forEach(function(l){l.textContent=t==='don'?'Date du don':t==='plan'?'Date de l\'accord':'Date de l\'avance';});
+  document.getElementById('av-add-line').style.display=(t==='plan'||AV_CUR)?'none':'';
+  document.getElementById('oavs-ttl').textContent=t==='don'?'🎁 Don d\'argent':t==='plan'?'📅 Échéancier de financement':'💶 Avance d\'argent';
+  document.getElementById('av-plan').style.display=t==='plan'?'':'none';
   document.getElementById('av-note').innerHTML=t==='don'
     ?'🎁 Un <b>don</b> n\'appelle aucun remboursement : pas d\'échéance, pas de rappel. Il est tracé sur la fiche du bénéficiaire et sur celle du donateur. Après l\'enregistrement, un message d\'annonce est <b>prêt à envoyer</b> au bénéficiaire et au donateur, sur le canal préféré de chacun (WhatsApp, Telegram, Signal, SMS, e-mail).'
+    :t==='plan'
+    ?'📅 L\'<b>échéancier</b> est envoyé par <b>e-mail</b> au bénéficiaire et au prêteur (tableau des versements + lien du contrat à signer), et un message est <b>prêt à envoyer</b> à chacun sur son canal préféré. Rappels automatiques avant <b>chaque versement</b> (3 jours avant, la veille, le jour J). Chaque versement reçu s\'enregistre ici (💰) et le solde se met à jour ; un remboursement anticipé solde le reste.'
     :'⏰ Rappels automatiques par <b>e-mail</b> 3 jours avant, la veille et le jour J : au <b>bénéficiaire</b> (rappel courtois), à la personne qui a avancé, aux gestionnaires du contact et à l\'admin. Après l\'enregistrement, un message d\'annonce est <b>prêt à envoyer</b> au bénéficiaire et au prêteur, sur le canal préféré de chacun (WhatsApp, Telegram, Signal, SMS, e-mail).';
-  document.getElementById('av-save-btn').textContent=t==='don'?'Enregistrer le don':'Enregistrer l\'avance';
-  var rb=document.getElementById('av-remb');rb.style.display=(t==='avance'&&AV_CUR&&AV_CUR.id)?'':'none';
+  document.getElementById('av-save-btn').textContent=t==='don'?'Enregistrer le don':t==='plan'?(AV_CUR&&AV_CUR.id?'Enregistrer l\'échéancier':'Proposer l\'échéancier'):'Enregistrer l\'avance';
+  var rb=document.getElementById('av-remb');rb.style.display=(t!=='don'&&AV_CUR&&AV_CUR.id)?'':'none';
+  if(t==='plan')oPlanPreview();
+}
+// ── v3.59 — Échéancier : lecture des réglages, aperçu en direct ──
+var PL_FRAIS='gratuit';
+function oPlanFrais(m){PL_FRAIS=m;['gratuit','mensuel','global'].forEach(function(k){document.getElementById('pl-f-'+k).classList.toggle('on',k===m);});document.getElementById('pl-frais-wrap').style.display=m==='gratuit'?'none':'';if(m!=='gratuit')setTimeout(function(){document.getElementById('pl-frais').focus();},50);oPlanPreview();}
+function planFromUI(montant){
+  return planBuild(montant,{nb:val('pl-nb'),per:val('pl-per'),premiere:val('pl-prem'),frais:{mode:PL_FRAIS,montant:val('pl-frais')},anticipe:document.getElementById('pl-anticipe').checked});
+}
+function oPlanPreview(src){
+  var box=document.getElementById('pl-preview');if(!box||val('av-type')!=='plan')return;
+  var l0=avLines()[0],montant=l0?l0.montant:0,dev=val('av-devise')||'€';
+  if(!document.getElementById('pl-prem').value)document.getElementById('pl-prem').value=planAddPer((l0&&l0.date)||todayYMD(),1,val('pl-per'));
+  if(!montant||montant<=0){box.innerHTML='<div style="color:var(--t3)">Indiquez d\'abord le montant financé (ci-dessus) pour voir l\'échéancier.</div>';return;}
+  var fx=r2(val('pl-frais')),fraisTot=PL_FRAIS==='global'?fx:0;
+  if(src==='mens'){var m=parseFloat(val('pl-mens'));if(m>0){var tot=montant+(PL_FRAIS==='global'?fx:0);var nb=PL_FRAIS==='mensuel'?Math.ceil(tot/Math.max(0.01,m-fx)):Math.ceil(tot/m);nb=Math.max(1,Math.min(60,nb));document.getElementById('pl-nb').value=nb;}}
+  var p=planFromUI(montant);
+  if(src!=='mens')document.getElementById('pl-mens').value=p.mensualite;
+  var et=p.ech.map(function(e){return'<tr><td style="padding:3px 6px;color:var(--t3)">'+e.n+'</td><td style="padding:3px 6px">'+fD(e.date)+'</td><td style="padding:3px 6px;text-align:right;font-variant-numeric:tabular-nums"><b>'+e.montant+'</b> '+esc(dev)+'</td><td style="padding:3px 6px;text-align:right;color:var(--t3);font-variant-numeric:tabular-nums">'+e.cumul+'</td></tr>';}).join('');
+  box.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:6px"><span>Capital : <b>'+montant+' '+esc(dev)+'</b></span><span>Frais : <b>'+esc(planFraisTxt(p,dev))+'</b></span><span>Total dû : <b>'+p.total+' '+esc(dev)+'</b></span><span>Dernier versement : <b>'+fD(p.ech[p.ech.length-1].date)+'</b></span></div>'
+    +'<div style="max-height:180px;overflow:auto;border:1px solid var(--bd);border-radius:10px"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:var(--navy3);color:var(--t3);font-size:10.5px;text-transform:uppercase"><th style="padding:4px 6px;text-align:left">#</th><th style="padding:4px 6px;text-align:left">Date</th><th style="padding:4px 6px;text-align:right">Versement</th><th style="padding:4px 6px;text-align:right">Cumul</th></tr></thead><tbody>'+et+'</tbody></table></div>';
 }
 function avRembRender(){
   var a=AV_CUR;if(!a)return;
@@ -6765,9 +6855,15 @@ function avRembRender(){
   var rs=(a.rembs||[]).slice().sort(function(x,y){return(x.date||'')<(y.date||'')?-1:1;});
   // v3.57 — chaque remboursement est modifiable (date + montant) directement dans la liste, admin + gestionnaire
   box.innerHTML=(rs.length?rs.map(function(r,i){return'<div class="row" style="align-items:center;gap:6px"><input type="date" class="ofc" style="width:140px;min-height:32px;padding:4px 6px;font-size:12px" value="'+esc(r.date||'')+'" onchange="oAvRembEdit('+i+',\'date\',this.value)"><input type="number" step="0.01" class="ofc" style="width:100px;min-height:32px;padding:4px 6px;font-size:12px;text-align:right" value="'+esc(String(r.montant))+'" onchange="oAvRembEdit('+i+',\'montant\',this.value)"><span style="font-size:12px;color:var(--t3)">'+esc(a.devise||'€')+'</span>'+(r.complet?' <span class="obdg bgr" title="Marque le solde">solde</span>':' <span class="obdg baq">partiel</span>')+'<button class="tb-ic" type="button" title="Retirer" onclick="oAvRembDel('+i+')">🗑</button></div>';}).join(''):'<div style="font-size:12px;color:var(--t3)">Aucun remboursement enregistré.</div>')
-    +'<div style="font-size:12px;margin-top:6px;color:var(--t2)">Rendu : <b>'+avRendu(a)+'</b> / '+a.montant+' '+esc(a.devise||'€')+' · reste <b>'+avReste(a)+' '+esc(a.devise||'€')+'</b></div>';
+    +'<div style="font-size:12px;margin-top:6px;color:var(--t2)">Rendu : <b>'+avRendu(a)+'</b> / '+avTotal(a)+' '+esc(a.devise||'€')+' · reste <b>'+avReste(a)+' '+esc(a.devise||'€')+'</b>'+(a.plan&&a.plan.anticipe&&avReste(a)>0?' · <span style="color:var(--g)">remboursement anticipé possible : « Solde complet » règle tout en une fois</span>':'')+'</div>';
+  // v3.59 — échéancier : les versements prévus, avec leur état et un bouton « Encaisser » qui préremplit date et montant
+  if(a.plan){var et=planEtat(a),dev=a.devise||'€',ETL={paye:['✅ réglé','bgr'],partiel:['💰 en partie','baq'],retard:['🚨 en retard','brd'],avenir:['à venir','bgy']};
+    box.innerHTML='<div style="font-size:12px;font-weight:700;margin:2px 0 6px">📅 Versements prévus ('+a.plan.nb+' × '+a.plan.mensualite+' '+esc(dev)+' · '+esc(planFraisTxt(a.plan,dev))+')</div>'
+      +'<div style="max-height:200px;overflow:auto;border:1px solid var(--bd);border-radius:10px;margin-bottom:8px">'+et.map(function(e){var s=ETL[e.etat];return'<div style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-bottom:1px solid var(--bd);font-size:12px"><span style="color:var(--t3);width:22px">'+e.n+'</span><span style="width:84px">'+fD(e.date)+'</span><b style="width:80px;text-align:right;font-variant-numeric:tabular-nums">'+e.montant+' '+esc(dev)+'</b><span class="obdg '+s[1]+'">'+s[0]+'</span>'+(e.etat!=='paye'?'<button class="ob bgh bsm" type="button" style="margin-left:auto;min-height:28px;padding:2px 8px" onclick="oPlanEncaisser('+e.n+')">Encaisser '+e.reste+'</button>':'')+'</div>';}).join('')+'</div>'
+      +'<div style="font-size:11.5px;color:var(--t2);margin-bottom:6px">Remboursements reçus :</div>'+box.innerHTML;}
   document.getElementById('av-r-date').value=todayYMD();document.getElementById('av-r-montant').value='';
 }
+function oPlanEncaisser(n){var a=AV_CUR;if(!a||!a.plan)return;var e=planEtat(a).find(function(x){return x.n===n;});if(!e)return;document.getElementById('av-r-date').value=todayYMD();document.getElementById('av-r-montant').value=e.reste;oAvRembAdd(false);}
 function oAvRembEdit(i,field,v){
   var a=AV_CUR;if(!a||!a.rembs)return;
   var rs=a.rembs.slice().sort(function(x,y){return(x.date||'')<(y.date||'')?-1:1;});var r=rs[i];if(!r)return;
@@ -6794,17 +6890,25 @@ function avWaPayeur(c,a){
   return renderTpl(tplText('avance_payeur'),v);
 }
 function avParTel(a){if(a.parTel)return a.parTel;var pi=avParInfo(a.parRef||'');if(pi.tel)return pi.tel;var p=a.parId?OC.find(function(x){return x.id===a.parId;}):null;return p?(p.tel||''):'';}
-function oAvOpen(cid,aid){
+function oAvOpen(cid,aid,mode){
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
   var a=aid?(c.avances||[]).find(function(x){return x.id===aid;}):null;
+  if(!can('avances')&&!(can('echeancier')&&(mode==='plan'||(a&&a.plan)))){oT('Réservé aux gestionnaires et administrateurs','w');return;}
   AV_CUR=a?JSON.parse(JSON.stringify(a)):null;
+  // v3.59 — réglages de l'échéancier (valeurs de la ligne existante, sinon défauts)
+  var P=(a&&a.plan)||{};PL_FRAIS=(P.frais&&P.frais.mode)||'gratuit';
+  document.getElementById('pl-nb').value=P.nb||12;document.getElementById('pl-per').value=P.per||'mois';document.getElementById('pl-prem').value=P.premiere||'';
+  document.getElementById('pl-frais').value=(P.frais&&P.frais.montant)||'';document.getElementById('pl-mens').value=P.mensualite||'';
+  document.getElementById('pl-anticipe').checked=P.anticipe!==false;document.getElementById('pl-contrat').checked=!a||!!(P.contrat&&P.contrat.tok);
+  ['gratuit','mensuel','global'].forEach(function(k){document.getElementById('pl-f-'+k).classList.toggle('on',k===PL_FRAIS);});document.getElementById('pl-frais-wrap').style.display=PL_FRAIS==='gratuit'?'none':'';
   document.getElementById('av-cid').value=cid;
   document.getElementById('av-id').value=a?a.id:'';
   document.getElementById('oavs-sub').innerHTML='Bénéficiaire : <b>'+esc(c.nom+' '+(c.prenom||''))+'</b>'+(c.tel?' · '+esc(c.tel):'');
   var groups={};
   avPayeurs(cid).forEach(function(o){(groups[o.g]=groups[o.g]||[]).push(o);});
   AV_OPTS=Object.keys(groups).map(function(g){return'<optgroup label="'+esc(g)+'">'+groups[g].map(function(o){return'<option value="'+esc(o.v)+'">'+esc(o.l)+'</option>';}).join('')+'</optgroup>';}).join('');
-  document.getElementById('av-type').value=a&&a.type==='don'?'don':'avance';
+  var typeUI=a?(a.type==='don'?'don':a.plan?'plan':'avance'):(mode==='plan'?'plan':'avance');
+  document.getElementById('av-type').value=typeUI;
   document.getElementById('av-lines').innerHTML='';
   var parV=a?(a.parRef||''):('u:'+(USER?USER.id:''));
   if(a&&!parV&&a.par){var m=avPayeurs(cid).find(function(o){return nmKey(avParName(o.v))===nmKey(a.par);});if(m)parV=m.v;}
@@ -6817,7 +6921,7 @@ function oAvOpen(cid,aid){
   var nr=document.getElementById('av-notif-row'),nd=document.getElementById('av-notif-done');
   nr.style.display=a?'none':'';document.getElementById('av-notif').checked=true;
   nd.hidden=!a;if(a)nd.innerHTML=a.notifLe?'✉️ E-mails d\'annonce envoyés le '+fD(String(a.notifLe).slice(0,10))+(a.notifA&&a.notifA.length?' à : '+esc(a.notifA.join(', ')):''):(a.notifier?'✉️ E-mails d\'annonce en attente d\'envoi par le serveur.':'✉️ Aucun e-mail d\'annonce n\'a été demandé pour cette ligne.');
-  oAvType(a&&a.type==='don'?'don':'avance');
+  oAvType(typeUI);
   if(AV_CUR&&AV_CUR.type!=='don')avRembRender();
   oSheetOpen('oavs');
 }
@@ -6825,8 +6929,18 @@ function oAvClose(){oSheetClose('oavs');}
 function oAvSave(){
   var cid=document.getElementById('av-cid').value;
   var c=OC.find(function(x){return x.id===cid;});if(!c)return;
-  var type=val('av-type')||'avance',devise=val('av-devise'),motif=val('av-motif').trim();
-  var lines=avLines();
+  var typeUI=val('av-type')||'avance',isPlan=typeUI==='plan',type=isPlan?'avance':typeUI,devise=val('av-devise'),motif=val('av-motif').trim();
+  if(!can('avances')&&!(isPlan&&can('echeancier'))){oT('Réservé aux gestionnaires et administrateurs','w');return;}
+  var lines=avLines();if(isPlan)lines=lines.slice(0,1);
+  var plan=null;
+  if(isPlan){
+    var L0=lines[0];if(!L0||!L0.montant||L0.montant<=0){oT('Indiquez le montant financé','e');return;}
+    if(!val('pl-prem')){oT('Indiquez la date du premier versement','e');return;}
+    if(val('pl-prem')<(L0.date||todayYMD())){oT('Le premier versement doit être après la date de l\'accord','e');return;}
+    if(PL_FRAIS!=='gratuit'&&!(r2(val('pl-frais'))>0)){oT('Indiquez le montant des frais, ou choisissez « Gratuit »','e');return;}
+    plan=planFromUI(L0.montant);if(plan.nb<2){oT('Un échéancier compte au moins 2 versements — sinon enregistrez une avance simple','e');return;}
+    L0.ech=plan.ech[plan.ech.length-1].date;
+  }
   for(var i=0;i<lines.length;i++){
     var L=lines[i],n='Personne '+(i+1)+' : ';
     if(!L.parV){oT(n+'indiquez qui a avancé / donné l\'argent','e');return;}
@@ -6837,13 +6951,19 @@ function oAvSave(){
   }
   var aid=document.getElementById('av-id').value;
   c.avances=c.avances||[];
-  var changed=[c],lib=type==='don'?'🎁 Don':'💶 Avance',lastA=null,nb=0,newIds=[];
+  var changed=[c],lib=type==='don'?'🎁 Don':isPlan?'📅 Échéancier':'💶 Avance',lastA=null,nb=0,newIds=[];
   lines.forEach(function(L,i){
     var a=(aid&&i===0)?c.avances.find(function(x){return x.id===aid;}):null;
     var isNew=!a;
     if(!a){a={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5)+i,statut:'encours',saisiPar:PARTNER_NOM()};c.avances.push(a);}
     a.type=type;a.montant=L.montant;a.devise=devise;a.date=L.date;a.motif=motif;
     a.echeance=type==='don'?'':L.ech;
+    if(isPlan){var oldC=a.plan&&a.plan.contrat;a.plan=plan;a.plan.proposePar=PARTNER_NOM();a.plan.proposeRole=ROLE();
+      // contrat : jeton conservé s'il existe déjà ; une modification du plan après signature invalide la signature (nouveau contrat à signer)
+      if(document.getElementById('pl-contrat').checked){a.plan.contrat=oldC&&oldC.tok?oldC:{tok:'k'+Date.now().toString(36)+Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,6),creeLe:new Date().toISOString()};
+        if(oldC&&oldC.signeLe&&JSON.stringify((AV_CUR&&AV_CUR.plan&&AV_CUR.plan.ech)||[])!==JSON.stringify(plan.ech)){a.plan.contrat={tok:oldC.tok,creeLe:new Date().toISOString(),ancienSigneLe:oldC.signeLe};oT('⚠️ L\'échéancier a changé : le contrat devra être signé à nouveau','w');}}
+      else delete a.plan.contrat;}
+    else delete a.plan;
     var pi=avParInfo(L.parV);
     a.parRef=L.parV;a.par=pi.nom;a.parTel=pi.tel;a.parEmail=pi.email;
     a.parId=L.parV.indexOf('c:')===0?L.parV.slice(2):'';
@@ -6851,21 +6971,27 @@ function oAvSave(){
     a.rembs=(!isNew&&AV_CUR&&AV_CUR.rembs)||a.rembs||[];
     if(type==='don')a.rembs=[];
     avRecalc(a);if(isNew){a.sent={};a.notifier=!!document.getElementById('av-notif').checked;a.notifLe='';a.notifA=[];}   // v3.27 — le serveur envoie les e-mails d'annonce puis renseigne notifLe
-    jrnAdd(c,a.statut==='rembourse'?'fait':'note',lib+' '+(isNew?'enregistré'+(type==='don'?'':'e'):'mis'+(type==='don'?'':'e')+' à jour')+' : '+a.montant+' '+devise+(motif?' pour '+motif:'')+' — par '+a.par
-      +(type==='don'?'':' — remboursement prévu le '+fD(a.echeance)+(avRendu(a)?' · rendu '+avRendu(a)+' '+devise+(a.statut==='rembourse'?' ✅ soldée':' (reste '+avReste(a)+' '+devise+')'):'')));
+    jrnAdd(c,a.statut==='rembourse'?'fait':'note',lib+' '+(isNew?'enregistré'+(type==='don'||isPlan?'':'e'):'mis'+(type==='don'||isPlan?'':'e')+' à jour')+' : '+a.montant+' '+devise+(motif?' pour '+motif:'')+' — par '+a.par
+      +(isPlan?' — '+a.plan.nb+' versements de '+a.plan.mensualite+' '+devise+' ('+planFraisTxt(a.plan,devise)+'), du '+fD(a.plan.premiere)+' au '+fD(a.plan.ech[a.plan.ech.length-1].date)+(avRendu(a)?' · rendu '+avRendu(a)+' '+devise+(a.statut==='rembourse'?' ✅ soldé':' (reste '+avReste(a)+' '+devise+')'):''):
+        type==='don'?'':' — remboursement prévu le '+fD(a.echeance)+(avRendu(a)?' · rendu '+avRendu(a)+' '+devise+(a.statut==='rembourse'?' ✅ soldée':' (reste '+avReste(a)+' '+devise+')'):'')));
     var payer=a.parId?OC.find(function(x){return x.id===a.parId;}):null;
     if(payer&&payer.id!==c.id){jrnAdd(payer,'note',lib+(type==='don'?' consenti':' consentie')+' à '+c.nom+' '+(c.prenom||'')+' : '+a.montant+' '+devise+(motif?' ('+motif+')':'')+(type==='don'?'':a.statut==='rembourse'?' — ✅ entièrement remboursée':' — à récupérer le '+fD(a.echeance)+' · reste '+avReste(a)+' '+devise));if(changed.indexOf(payer)<0)changed.push(payer);}
     lastA=a;nb++;if(isNew)newIds.push(a.id);
   });
   oPush(changed);oAvClose();oOpenF(cid);
   if(lastA&&lastA.statut==='rembourse')emojiBurst(['✅','🎉','💰']);
-  oT(type==='don'?'🎁 '+nb+' don'+(nb>1?'s':'')+' enregistré'+(nb>1?'s':''):(lastA&&lastA.statut==='rembourse')?'✅ Avance soldée':'💶 '+nb+' avance'+(nb>1?'s':'')+' enregistrée'+(nb>1?'s':'')+' — rappels programmés (bénéficiaire + '+(nb>1?'payeurs':'payeur')+')','s');
+  oT(type==='don'?'🎁 '+nb+' don'+(nb>1?'s':'')+' enregistré'+(nb>1?'s':''):(lastA&&lastA.statut==='rembourse')?'✅ Avance soldée':isPlan?'📅 Échéancier enregistré — rappels programmés avant chaque versement':'💶 '+nb+' avance'+(nb>1?'s':'')+' enregistrée'+(nb>1?'s':'')+' — rappels programmés (bénéficiaire + '+(nb>1?'payeurs':'payeur')+')','s');
   if(newIds.length)setTimeout(function(){oAvAnnonce(cid,newIds);},350);   // v3.27 — messages d'annonce prêts à envoyer
 }
 // ── v3.27 — Annonce au bénéficiaire et au prêteur / donateur, sur le canal préféré de chacun ──
-function avVarsBase(c,a){var v=tplVars(c,'fr');v.montant=a.montant;v.devise=a.devise||'€';v.date=fD(a.date);v.motif=a.motif||'';v.rendu=avRendu(a)||'';v.reste=avReste(a);v.echeance=fD(a.echeance);v.payeur=(a.par||'').split(' ')[0];v.client=((c.nom||'')+' '+(c.prenom||'')).trim();return v;}
-function avMsgBenefInfo(c,a){return renderTpl(tplText(a.type==='don'?'don_benef_info':'avance_benef_info'),avVarsBase(c,a));}
-function avMsgPayeurInfo(c,a){return renderTpl(tplText(a.type==='don'?'don_payeur':'avance_payeur'),avVarsBase(c,a));}
+function avVarsBase(c,a){var v=tplVars(c,'fr');v.montant=a.montant;v.devise=a.devise||'€';v.date=fD(a.date);v.motif=a.motif||'';v.rendu=avRendu(a)||'';v.reste=avReste(a);v.echeance=fD(a.echeance);v.payeur=(a.par||'').split(' ')[0];v.client=((c.nom||'')+' '+(c.prenom||'')).trim();
+  if(a.plan){var p=a.plan;v.nb=p.nb;v.mensualite=p.mensualite;v.periodicite=(PLAN_PER[p.per]||PLAN_PER.mois).l;v.frais=planFraisTxt(p,v.devise);v.total=p.total;v.premiere=fD(p.premiere);v.derniere=fD(p.ech[p.ech.length-1].date);v.anticipe=p.anticipe?'oui':'';v.echeancier=planTxt(a);v.lienContrat=p.contrat&&p.contrat.tok?contratUrl(a):'';v.contratSigne=p.contrat&&p.contrat.signeLe?fD(String(p.contrat.signeLe).slice(0,10)):'';}
+  return v;}
+function avMsgBenefInfo(c,a){return renderTpl(tplText(a.type==='don'?'don_benef_info':a.plan?'echeancier_benef_info':'avance_benef_info'),avVarsBase(c,a));}
+function avMsgPayeurInfo(c,a){return renderTpl(tplText(a.type==='don'?'don_payeur':a.plan?'echeancier_payeur':'avance_payeur'),avVarsBase(c,a));}
+// v3.59 — contrat d'échéancier : page publique contrat.html?t=<jeton> (reconnaissance de dette + échéancier, signature en ligne des deux parties)
+function contratUrl(a){return a&&a.plan&&a.plan.contrat&&a.plan.contrat.tok?SITE_URL+'contrat.html?t='+encodeURIComponent(a.plan.contrat.tok):'';}
+function oContratSend(cid,aid){var c=OC.find(function(x){return x.id===cid;});if(!c)return;var a=(c.avances||[]).find(function(x){return x.id===aid;});if(!a||!a.plan)return;oAvAnnonce(cid,[aid]);}
 function avPayeurContact(a){if(a.parId){var p=OC.find(function(x){return x.id===a.parId;});if(p)return p;}return null;}
 function avPayeurCanal(a){var p=avPayeurContact(a);if(p)return canalCode(p);var pref=sendPref();return(pref&&pref!=='copy')?pref:'wa';}
 function avPayeurEmail(a){if(a.parEmail)return a.parEmail;var p=avPayeurContact(a);return p?(p.email||''):'';}
@@ -6894,7 +7020,7 @@ function oAvAnnonce(cid,ids){
   });
   if(n>1)rows='<div style="font-size:12px;color:var(--t2);padding:0 2px 8px">📲 '+n+' message'+(n>1?'s':'')+' à envoyer, <b>un par un</b> : touchez « Prévenir », envoyez dans WhatsApp, revenez ici — le suivant vous attend.</div>'+rows;
   m.innerHTML='<div style="background:#fff;border-radius:18px 18px 0 0;padding:16px 16px 28px;width:100%;max-width:520px;max-height:88vh;overflow:auto">'
-    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">'+(don?'🎁 Don enregistré — prévenir maintenant ?':'💶 Avance enregistrée — prévenir maintenant ?')+'</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'oavann\').remove()">✕</button></div>'
+    +'<div style="display:flex;align-items:center;gap:8px"><b style="font-size:15px">'+(don?'🎁 Don enregistré — prévenir maintenant ?':avs[0].plan?'📅 Échéancier prêt — l\'envoyer maintenant ?':'💶 Avance enregistrée — prévenir maintenant ?')+'</b><button class="ob bgh bsm" style="margin-left:auto" onclick="document.getElementById(\'oavann\').remove()">✕</button></div>'
     +'<div style="font-size:12px;color:var(--t2);margin:6px 0 10px">'+(avs[0].notifier?(srvNum()>=3018?'Les e-mails d\'annonce partent automatiquement (bénéficiaire, '+(don?'donateur':'prêteur')+', gestionnaires, admin). ':'<span style="color:#C0392B">⚠️ Script Google à mettre à jour (v3.18) pour que les e-mails d\'annonce partent automatiquement.</span> '):'')+'Le message ci-dessous est déjà rédigé : un clic l\'ouvre sur le canal préféré indiqué sur la fiche de chacun.</div>'
     +rows
     +'<div id="avann-next" style="font-size:12.5px;color:var(--g);font-weight:600;margin-top:10px">'+(reste>1?'➡️ <b>'+reste+'</b> messages à envoyer, un par un.':'')+'</div>'
@@ -7755,7 +7881,8 @@ function paySouhaite(c){   // mode choisi par la personne sur une proposition ac
 function payRow(c){
   var p=c.paiement&&c.paiement.mode?c.paiement:null,w=!p?paySouhaite(c):null,cid=(c._real||c).id;
   return'<div class="'+accCls(!!p)+'"><span class="em">💳</span><div class="b">Règlement de la commande'+stChip(!!p,p?p.par:'',p?p.le:'',p?payLbl(p):'','Règlement à renseigner')
-    +'<small>'+(p?(p.note?esc(p.note):'Mode utilisé sur le back-office OlyLife'):(w?'Souhaité sur la proposition : <b>'+esc(payLbl(w))+'</b> — à confirmer une fois la commande payée':'Carte, crédits EC, Klarna ou PayPal en plusieurs fois… avec le nombre de mensualités'))+'</small></div><div class="acts">'
+    +'<small>'+(p?(p.note?esc(p.note):'Mode utilisé sur le back-office OlyLife'):(w?'Souhaité sur la proposition : <b>'+esc(payLbl(w))+'</b> — à confirmer une fois la commande payée':'Carte, crédits EC, Klarna ou PayPal en plusieurs fois… avec le nombre de mensualités'))
+    +(!p&&w&&w.mode==='paypal'&&+w.fois>1?'<br><span style="color:#8A5A00">⚠️ PayPal décide seul selon l\'ancienneté du compte PayPal du client : à lui de lancer la commande sur le BO, choisir PayPal et se connecter depuis le lien généré par OlyLife pour voir si le '+(+w.fois)+' fois lui est accordé. Sinon : une fois, ou Klarna.</span>':'')+'</small></div><div class="acts">'
     +(!p&&w?'<button class="ob bdone bsm" onclick="oPaySet(\''+cid+'\',\''+w.mode+'\','+w.fois+',\'\''+ckArg(c)+')">✅ Confirmer</button>':'')
     +'<button class="ob bgh bsm" onclick="oPayOpen(\''+cid+'\''+ckArg(c)+')">'+(p?'✏️ Modifier':'💳 Renseigner')+'</button></div></div>';
 }

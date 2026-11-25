@@ -325,7 +325,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.39';
+var SRV_VERSION = '3.59';   // v3.59 — échéanciers de financement + contrat signé en ligne (contrat.html) · sessions multiples par accès
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
@@ -836,6 +836,7 @@ function doPost(e) {
     if (op === 'consentInfo' || op === 'consent') return handleConsent_(db, req, op);   // v3.20
     if (op === 'offreInfo' || op === 'offreAct') return handleOffre_(db, req, op);   // v3.29
     if (op === 'temInfo') return handleTemInfo_(db, req);   // v3.33 — page publique d'un témoignage
+    if (op === 'contratInfo' || op === 'contratSign') return handleContrat_(db, req, op);   // v3.59 — contrat d'échéancier (page publique contrat.html)
 
     // ── Connexion (v3.7) : code → session par appareil, jeton renvoyé à l'app ──
     if (op === 'login') {
@@ -2080,12 +2081,15 @@ function rappelsAvances(force) {
   (db.contacts || []).forEach(function (c) {
     (c.avances || []).forEach(function (a) {
       if (!a || a.type === 'don' || a.statut === 'rembourse' || !a.echeance) return;   // v3.5 — les dons n'ont ni échéance ni rappel
-      var rendu = (a.rembs || []).reduce(function (t, r) { return t + (+r.montant || 0); }, 0), reste = Math.max(0, (+a.montant || 0) - rendu);
+      var rendu = (a.rembs || []).reduce(function (t, r) { return t + (+r.montant || 0); }, 0), reste = Math.max(0, planTotal_(a) - rendu);
+      if (a.plan) { var nx = planProchaine_(a); if (!nx) return; a.echeance = nx.date; }   // v3.59 — échéancier : le rappel porte sur le prochain versement non soldé
       var d = diffDays(a.echeance);
-      var key = d === 3 ? 'j3' : d === 1 ? 'j1' : d === 0 ? 'j0' : (d < 0 ? 'late' : '');
-      if (!key) return;
+      var key = (d === 3 ? 'j3' : d === 1 ? 'j1' : d === 0 ? 'j0' : (d < 0 ? 'late' : '')) + (a.plan ? '_' + a.echeance : '');
+      if (!key || key.indexOf('_') === 0) return;
       a.sent = a.sent || {};
       if (a.sent[key] && !force) return;
+      var aOrig = a;
+      if (a.plan && nx) { var pn = 'versement ' + nx.n + '/' + a.plan.nb + ' (' + nx.montant + ' ' + (a.devise || '€') + ')'; a = Object.assign({}, a, { motif: (a.motif ? a.motif + ' — ' : '') + pn }); }   // libellé du rappel : le versement concerné
       // destinataires : gestionnaires du contact (email connu) + admin
       var dest = {};
       dest[adminEmail] = true;
@@ -2120,7 +2124,7 @@ function rappelsAvances(force) {
       Object.keys(dest).forEach(function (em) {
         try { MailApp.sendEmail({ to: em, subject: '💶 Avance ' + a.montant + ' ' + (a.devise || '€') + ' — ' + (c.nom || '') + ' ' + (c.prenom || '') + ' — ' + quand, htmlBody: html, name: 'CRM OlyLife — WLHT' }); } catch (e) { Logger.log('Avance : échec email ' + em + ' : ' + e); }
       });
-      a.sent[key] = Utilities.formatDate(new Date(), FUSEAU, 'yyyy-MM-dd');
+      aOrig.sent = aOrig.sent || {}; aOrig.sent[key] = Utilities.formatDate(new Date(), FUSEAU, 'yyyy-MM-dd');
       try { pushSend_(db, usersByNoms_(db, suivis_(c)).concat([{ id: 'root' }]), '💶 Avance à récupérer — ' + quand, ((c.prenom || '') + ' ' + (c.nom || '')).trim() + ' · ' + a.montant + ' ' + (a.devise || '€') + (reste && reste !== a.montant ? ' (reste ' + reste + ')' : ''), ''); } catch (pe) {}   // v3.20
       changed = true;
       Logger.log('Rappel avance envoyé (' + key + ') : ' + (c.nom || '') + ' — ' + a.montant + ' ' + (a.devise || '€'));
@@ -2185,26 +2189,32 @@ function avNotifNouvelles_(db, c, user, notifUpd) {
     var coul = don ? '#8E5BBE' : '#126A3C', lib = don ? '🎁 Don' : '💶 Avance';
     var recap = '<b>Montant :</b> ' + a.montant + ' ' + dev + '<br><b>' + (don ? 'Donné le' : 'Avancé le') + ' :</b> ' + fmtDate_(a.date)
       + (a.motif ? '<br><b>Motif :</b> ' + a.motif : '') + (a.par ? '<br><b>' + (don ? 'Donateur' : 'Avancé par') + ' :</b> ' + a.par : '')
-      + (don ? '' : '<br><b>Remboursement prévu le :</b> ' + fmtDate_(a.echeance));
+      + (don ? '' : a.plan ? '<br><b>Échéancier :</b> ' + a.plan.nb + ' versements de ' + a.plan.mensualite + ' ' + dev + ' · frais : ' + planFraisTxt_(a.plan, dev) + ' · total dû ' + a.plan.total + ' ' + dev + (a.plan.anticipe ? '<br><b>Remboursement anticipé :</b> possible à tout moment, sans frais' : '') + '<br>' + planTable_(a) : '<br><b>Remboursement prévu le :</b> ' + fmtDate_(a.echeance));
+    var lienContrat = (a.plan && a.plan.contrat && a.plan.contrat.tok) ? APP_PUBLIC_URL + 'contrat.html?t=' + a.plan.contrat.tok : '';
+    if (a.plan) { lib = '📅 Échéancier'; coul = '#6B3FA0'; }
     // 1) bénéficiaire
     if (c.email && droit_(db, 'client', 'annonceAvances', true)) {
       var corpsB = 'Bonjour ' + avPrenom_(c) + ',<br><br>'
         + (don ? 'Bonne nouvelle : un <b>don de ' + a.montant + ' ' + dev + '</b>' + (a.motif ? ' pour votre ' + a.motif : '') + ' vous est fait' + (a.par ? ' par <b>' + a.par + '</b>' : '') + '. Il s\'agit d\'un don : <b>aucun remboursement n\'est attendu</b> 🎁'
+               : a.plan ? 'Voici votre <b>échéancier</b> pour le financement de <b>' + a.montant + ' ' + dev + '</b>' + (a.motif ? ' (' + a.motif + ')' : '') + (a.par ? ', avancé par <b>' + a.par + '</b>' : '') + '. Vous recevrez un rappel par e-mail avant chaque versement (3 jours avant, la veille et le jour J).'
                : 'C\'est confirmé : une <b>avance de ' + a.montant + ' ' + dev + '</b>' + (a.motif ? ' pour votre ' + a.motif : '') + ' vous est accordée' + (a.par ? ' par <b>' + a.par + '</b>' : '') + '.<br>Le remboursement est prévu le <b>' + fmtDate_(a.echeance) + '</b>. Vous recevrez un rappel par e-mail 3 jours avant, la veille et le jour J — rien à faire d\'ici là.')
-        + '<br><br><div style="background:#F6FAF6;border-radius:10px;padding:10px 14px">' + recap + '</div><br>'
+        + '<br><br><div style="background:#F6FAF6;border-radius:10px;padding:10px 14px">' + recap + '</div>'
+        + (lienContrat ? '<br>Pour que tout soit clair pour chacun, merci de lire et <b>signer le contrat en ligne</b> (reconnaissance de dette et échéancier, 2 minutes) :' + avBtn_(lienContrat, '✍️ Lire et signer le contrat', '#6B3FA0') : '') + '<br>'
         + 'Pour toute question : ' + gestNom + (gestTel ? ' · ' + gestTel : '') + (gestEmail ? ' · ' + gestEmail : '') + '<br><br>Bien à vous,<br>' + gestNom + ' — Water Life High Tech';
-      try { MailApp.sendEmail({ to: c.email, subject: (don ? '🎁 Un don de ' : '💶 Votre avance de ') + a.montant + ' ' + dev + (don ? ' vous est fait' : ' est enregistrée') + ' — Water Life High Tech', htmlBody: avMailShell_(don ? '🎁 Un don vous est fait' : '💶 Votre avance est enregistrée', 'Water Life High Tech', coul, corpsB), name: 'Water Life High Tech', replyTo: gestEmail || adminEmail }); envoyes.push('bénéficiaire'); } catch (e) { Logger.log('avNotif bénéficiaire : ' + e); }
+      try { MailApp.sendEmail({ to: c.email, subject: (don ? '🎁 Un don de ' : a.plan ? '📅 Votre échéancier de ' : '💶 Votre avance de ') + a.montant + ' ' + dev + (don ? ' vous est fait' : a.plan ? ' en ' + a.plan.nb + ' versements' : ' est enregistrée') + ' — Water Life High Tech', htmlBody: avMailShell_(don ? '🎁 Un don vous est fait' : a.plan ? '📅 Votre échéancier de remboursement' : '💶 Votre avance est enregistrée', 'Water Life High Tech', coul, corpsB), name: 'Water Life High Tech', replyTo: gestEmail || adminEmail }); envoyes.push('bénéficiaire'); } catch (e) { Logger.log('avNotif bénéficiaire : ' + e); }
     }
     // 2) prêteur / donateur
     var pEmail = avPayeurEmail_(db, a);
     if (pEmail && pEmail !== c.email) {
       var corpsP = 'Bonjour ' + String(a.par || '').split(' ')[0] + ',<br><br>'
         + (don ? 'Votre <b>don de ' + a.montant + ' ' + dev + '</b> à <b>' + avNomC_(c) + '</b>' + (a.motif ? ' pour ' + a.motif : '') + ' est bien enregistré. Il est tracé sur sa fiche et sur la vôtre ; aucun remboursement n\'est attendu. Merci pour votre générosité 🙏'
+               : a.plan ? 'L\'<b>échéancier</b> de <b>' + avNomC_(c) + '</b> pour les <b>' + a.montant + ' ' + dev + '</b>' + (a.motif ? ' (' + a.motif + ')' : '') + ' que vous avancez est enregistré. Vous serez prévenu(e), comme le bénéficiaire, avant chaque versement.'
                : 'Votre <b>avance de ' + a.montant + ' ' + dev + '</b> à <b>' + avNomC_(c) + '</b>' + (a.motif ? ' pour ' + a.motif : '') + ' est bien enregistrée.<br>Le remboursement est prévu le <b>' + fmtDate_(a.echeance) + '</b>. Vous recevrez, comme le bénéficiaire, un rappel par e-mail 3 jours avant, la veille et le jour J.')
         + '<br><br><div style="background:#F6FAF6;border-radius:10px;padding:10px 14px">' + recap + '</div>'
+        + (lienContrat ? '<br>Le contrat est à signer en ligne par les deux parties — votre signature de prêteur :' + avBtn_(lienContrat, '✍️ Signer le contrat (prêteur)', '#6B3FA0') : '')
         + avBtn_(waBenef, '💬 Message prêt pour ' + avPrenom_(c), '#25D366')
         + '<br>Bien à vous,<br>' + gestNom + ' — Water Life High Tech';
-      try { MailApp.sendEmail({ to: pEmail, subject: (don ? '🎁 Votre don de ' : '💶 Votre avance de ') + a.montant + ' ' + dev + ' à ' + avNomC_(c) + ' est enregistré' + (don ? '' : 'e'), htmlBody: avMailShell_(don ? '🎁 Don enregistré — merci' : '💶 Avance enregistrée', avNomC_(c), coul, corpsP), name: 'Water Life High Tech', replyTo: gestEmail || adminEmail }); envoyes.push(don ? 'donateur' : 'prêteur'); } catch (e) { Logger.log('avNotif payeur : ' + e); }
+      try { MailApp.sendEmail({ to: pEmail, subject: (don ? '🎁 Votre don de ' : a.plan ? '📅 Échéancier de ' : '💶 Votre avance de ') + a.montant + ' ' + dev + (a.plan ? ' — ' + avNomC_(c) + ' (' + a.plan.nb + ' versements)' : ' à ' + avNomC_(c) + ' est enregistré' + (don ? '' : 'e')), htmlBody: avMailShell_(don ? '🎁 Don enregistré — merci' : a.plan ? '📅 Échéancier enregistré' : '💶 Avance enregistrée', avNomC_(c), coul, corpsP), name: 'Water Life High Tech', replyTo: gestEmail || adminEmail }); envoyes.push(don ? 'donateur' : 'prêteur'); } catch (e) { Logger.log('avNotif payeur : ' + e); }
     }
     // 3) gestionnaires de la fiche + admin (sans doublon avec les deux précédents)
     var dest = {}; dest[adminEmail] = true;
@@ -2213,7 +2223,8 @@ function avNotifNouvelles_(db, c, user, notifUpd) {
     if (c.email) delete dest[c.email]; if (pEmail) delete dest[pEmail];
     var corpsI = recap + '<br><b>Saisi par :</b> ' + qui + ' · ' + fmtDT_(new Date().toISOString())
       + '<br><b>E-mails d\'annonce envoyés :</b> ' + (envoyes.length ? envoyes.join(' + ') : 'aucun (pas d\'adresse e-mail connue)')
-      + (don ? '' : '<br><b>Rappels :</b> J-3 · veille · jour J (bénéficiaire, ' + (a.par || 'prêteur') + ', gestionnaires, admin)')
+      + (don ? '' : '<br><b>Rappels :</b> J-3 · veille · jour J' + (a.plan ? ' avant chaque versement' : '') + ' (bénéficiaire, ' + (a.par || 'prêteur') + ', gestionnaires, admin)')
+      + (lienContrat ? '<br><b>Contrat :</b> <a href="' + lienContrat + '">' + lienContrat + '</a> (signatures suivies sur la fiche)' : '')
       + avBtn_(waBenef, '💬 Annonce WhatsApp à ' + avPrenom_(c) + ' (message prêt)', '#25D366')
       + avBtn_(waPayeur, '📣 ' + (don ? 'Remercier ' : 'Informer ') + (a.par || 'la personne') + ' (message prêt)', '#126A3C');
     var nI = 0;
@@ -2243,3 +2254,93 @@ function avMailRappelBenef_(db, c, a, d, rendu, reste) {
 }
 // ▶ Test : force l'envoi des rappels d'avances éligibles maintenant
 function testerRappelsAvances() { rappelsAvances(true); }
+
+// ═══════════════════════════════════════════════════════════════════
+// v3.59 — ÉCHÉANCIER DE FINANCEMENT + CONTRAT SIGNÉ EN LIGNE
+// a.plan = { nb, per, premiere, frais:{mode,montant}, fraisTot, total, mensualite, anticipe,
+//            ech:[{n,date,montant,cumul}], proposePar, contrat:{tok, creeLe, benef:{nom,le,sig}, preteur:{nom,le,sig}, signeLe} }
+// Page publique contrat.html?t=<tok> : ops « contratInfo » (lecture) et « contratSign » (signature d'une partie).
+// Quand les deux parties ont signé, le contrat PDF est envoyé aux deux + gestionnaire + admin, et archivé sur Drive.
+// ═══════════════════════════════════════════════════════════════════
+function planTotal_(a) { return (a && a.plan && a.plan.total) ? +a.plan.total : (+(a && a.montant) || 0); }
+function planFraisTxt_(p, dev) { var f = (p && p.frais) || {}; return f.mode === 'mensuel' ? f.montant + ' ' + dev + ' par versement (' + p.fraisTot + ' ' + dev + ' au total)' : f.mode === 'global' ? p.fraisTot + ' ' + dev + ' au total (répartis sur les versements)' : 'aucuns frais'; }
+function planEtat_(a) {
+  if (!a.plan || !a.plan.ech) return [];
+  var rd = (a.rembs || []).reduce(function (t, r) { return t + (+r.montant || 0); }, 0), today = Utilities.formatDate(new Date(), FUSEAU, 'yyyy-MM-dd');
+  return a.plan.ech.map(function (e) { var paye = rd >= e.cumul - 0.004, part = !paye && rd > e.cumul - e.montant + 0.004; return { n: e.n, date: e.date, montant: e.montant, cumul: e.cumul, etat: paye ? 'paye' : e.date < today ? 'retard' : part ? 'partiel' : 'avenir' }; });
+}
+function planProchaine_(a) { var l = planEtat_(a).filter(function (e) { return e.etat !== 'paye'; }); return l.length ? l[0] : null; }
+function planTable_(a) {
+  var dev = a.devise || '€', ET = { paye: '✅ réglé', partiel: '💰 en partie', retard: '🚨 en retard', avenir: '' };
+  return '<table style="border-collapse:collapse;font-size:13px;margin-top:6px"><tr style="color:#7A8A80;font-size:11px;text-transform:uppercase"><th style="text-align:left;padding:3px 8px">#</th><th style="text-align:left;padding:3px 8px">Date</th><th style="text-align:right;padding:3px 8px">Versement</th><th style="text-align:right;padding:3px 8px">Cumul</th><th style="padding:3px 8px"></th></tr>'
+    + planEtat_(a).map(function (e) { return '<tr><td style="padding:3px 8px;color:#7A8A80">' + e.n + '</td><td style="padding:3px 8px">' + fmtDate_(e.date) + '</td><td style="padding:3px 8px;text-align:right"><b>' + e.montant + ' ' + dev + '</b></td><td style="padding:3px 8px;text-align:right;color:#7A8A80">' + e.cumul + '</td><td style="padding:3px 8px">' + (ET[e.etat] || '') + '</td></tr>'; }).join('') + '</table>';
+}
+function contratByTok_(db, tok) {
+  tok = String(tok || '').trim(); if (!tok || tok.length < 12) return null;
+  for (var i = 0; i < db.contacts.length; i++) { var L = db.contacts[i].avances || []; for (var j = 0; j < L.length; j++) if (L[j].plan && L[j].plan.contrat && L[j].plan.contrat.tok === tok) return { c: db.contacts[i], a: L[j] }; }
+  return null;
+}
+function contratPayload_(db, c, a) {
+  var p = a.plan, k = p.contrat || {}, pEmail = avPayeurEmail_(db, a);
+  var gest = suivis_(c)[0] || ADMIN_NOM;
+  return { ok: true, benef: { prenom: c.prenom || '', nom: c.nom || '', ville: c.ville || '', pays: c.pays || '', tel: c.tel || '', email: c.email || '' },
+    preteur: { nom: a.par || '', tel: a.parTel || '', email: pEmail || '' },
+    montant: a.montant, devise: a.devise || '€', date: a.date, motif: a.motif || '',
+    plan: { nb: p.nb, per: p.per, premiere: p.premiere, frais: p.frais, fraisTot: p.fraisTot, total: p.total, mensualite: p.mensualite, anticipe: p.anticipe !== false, ech: p.ech },
+    proposePar: p.proposePar || gest, gest: gest, gestTel: (usersByNoms_(db, [gest])[0] || {}).tel || '',
+    sig: { benef: k.benef ? { nom: k.benef.nom, le: k.benef.le } : null, preteur: k.preteur ? { nom: k.preteur.nom, le: k.preteur.le } : null, signeLe: k.signeLe || '' },
+    rendu: (a.rembs || []).reduce(function (t, r) { return t + (+r.montant || 0); }, 0) };
+}
+function handleContrat_(db, req, op) {
+  var f = contratByTok_(db, req.t);
+  if (!f) return out_({ ok: false, error: 'lien' });
+  var c = f.c, a = f.a, k = a.plan.contrat;
+  var cache = CacheService.getScriptCache(), ck = 'ctr_' + String(req.t).slice(0, 24), n = parseInt(cache.get(ck) || '0', 10) + 1; cache.put(ck, String(n), 3600);
+  if (n > 60) return out_({ ok: false, error: 'trop' });
+  if (op === 'contratInfo') return out_(contratPayload_(db, c, a));
+  // ── signature d'une partie ──
+  var qui = req.qui === 'preteur' ? 'preteur' : 'benef';
+  var nom = String(req.nom || '').trim().slice(0, 80), sig = String(req.sig || '');
+  if (!req.ok) return out_({ ok: false, error: 'case' });
+  if (nom.length < 3) return out_({ ok: false, error: 'nom' });
+  if (!/^data:image\/png;base64,[A-Za-z0-9+\/=]+$/.test(sig) || sig.length < 400 || sig.length > 120000) return out_({ ok: false, error: 'signature' });
+  if (k[qui] && k[qui].le) return out_({ ok: false, error: 'deja' });
+  k[qui] = { nom: nom, le: now_(), sig: sig, lieu: String(req.lieu || '').slice(0, 80), ua: String(req.ua || '').slice(0, 160) };
+  c.journal = c.journal || [];
+  c.journal.push({ id: 'j_' + Date.now() + '_ct', ts: now_(), auteur: nom, role: '', type: 'systeme', texte: '✍️ Contrat d\'échéancier signé par ' + (qui === 'benef' ? 'le bénéficiaire' : 'le prêteur') + ' (' + nom + ') — ' + a.montant + ' ' + (a.devise || '€') + ' en ' + a.plan.nb + ' versements' });
+  c.lastActivity = now_();
+  var complet = !!(k.benef && k.benef.le && k.preteur && k.preteur.le);
+  if (complet && !k.signeLe) { k.signeLe = now_(); try { contratEnvoiPdf_(db, c, a); } catch (e) { Logger.log('contrat PDF : ' + e); } }
+  saveDB_(db);
+  try { pushSend_(db, usersByNoms_(db, suivis_(c)).concat([{ id: 'root' }]), '✍️ Contrat ' + (complet ? 'signé par les deux parties' : 'signé (' + (qui === 'benef' ? 'bénéficiaire' : 'prêteur') + ')'), avNomC_(c) + ' · ' + a.montant + ' ' + (a.devise || '€') + ' en ' + a.plan.nb + ' versements', ''); } catch (e) {}
+  return out_({ ok: true, complet: complet, sig: contratPayload_(db, c, a).sig });
+}
+// HTML du contrat (même texte que la page publique) → PDF envoyé aux deux parties + gestionnaire + admin, archivé dans le dossier des sauvegardes
+function contratHtml_(db, c, a) {
+  var p = a.plan, k = p.contrat || {}, dev = a.devise || '€', pl = contratPayload_(db, c, a);
+  var per = { mois: 'mensuels', quinzaine: 'toutes les deux semaines', semaine: 'hebdomadaires' }[p.per] || 'mensuels';
+  var sigBlock = function (t, s) { return '<td style="width:50%;vertical-align:top;padding:10px;border:1px solid #D7E6DB"><b>' + t + '</b><br>' + (s ? s.nom + '<br><span style="color:#7A8A80;font-size:11px">signé le ' + fmtDT_(s.le) + (s.lieu ? ' à ' + s.lieu : '') + '</span><br><img src="' + s.sig + '" style="max-width:220px;max-height:90px;margin-top:6px">' : '<span style="color:#7A8A80">en attente</span>') + '</td>'; };
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;color:#1E2B23;font-size:13px;line-height:1.55;max-width:680px;margin:0 auto;padding:24px}h1{font-size:20px;color:#126A3C;margin:0 0 2px}h2{font-size:14px;color:#126A3C;margin:18px 0 6px}p{margin:6px 0}table{width:100%;border-collapse:collapse}td,th{font-size:12px}.box{background:#F6FAF6;border:1px solid #D7E6DB;border-radius:10px;padding:10px 14px;margin:8px 0}.foot{font-size:10.5px;color:#7A8A80;margin-top:18px;border-top:1px solid #D7E6DB;padding-top:8px}</style></head><body>'
+    + '<h1>Reconnaissance de dette et échéancier de remboursement</h1><p style="color:#7A8A80;margin:0 0 12px">Établi le ' + fmtDate_(a.date) + ' · référence ' + (k.tok || '').slice(-8).toUpperCase() + ' · Association Water Life High Tech (mise en relation et suivi)</p>'
+    + '<h2>1. Les parties</h2><div class="box"><b>Le prêteur :</b> ' + (a.par || '—') + (pl.preteur.tel ? ' · ' + pl.preteur.tel : '') + (pl.preteur.email ? ' · ' + pl.preteur.email : '') + '<br><b>L\'emprunteur :</b> ' + avNomC_(c) + (c.ville || c.pays ? ' · ' + [c.ville, c.pays].filter(Boolean).join(', ') : '') + (c.tel ? ' · ' + c.tel : '') + (c.email ? ' · ' + c.email : '') + '</div>'
+    + '<h2>2. Objet</h2><p>Le prêteur a avancé (ou avance) à l\'emprunteur la somme de <b>' + a.montant + ' ' + dev + '</b>' + (a.motif ? ', destinée à : <b>' + a.motif + '</b>' : '') + '. L\'emprunteur reconnaît devoir cette somme et s\'engage à la rembourser selon l\'échéancier ci-dessous.</p>'
+    + '<h2>3. Frais</h2><p>' + (p.frais && p.frais.mode !== 'gratuit' ? 'Les parties conviennent de frais de <b>' + planFraisTxt_(p, dev) + '</b>. Le total à rembourser est donc de <b>' + p.total + ' ' + dev + '</b>.' : 'Aucun intérêt ni frais : le total à rembourser est de <b>' + p.total + ' ' + dev + '</b>, soit exactement la somme avancée.') + '</p>'
+    + '<h2>4. Échéancier</h2><p><b>' + p.nb + ' versements ' + per + ' de ' + p.mensualite + ' ' + dev + '</b>, du ' + fmtDate_(p.premiere) + ' au ' + fmtDate_(p.ech[p.ech.length - 1].date) + '.</p>' + planTable_(a)
+    + '<h2>5. Remboursement anticipé</h2><p>' + (p.anticipe !== false ? 'L\'emprunteur peut rembourser tout ou partie du solde <b>à tout moment, par anticipation, sans frais supplémentaires</b>. Tout versement anticipé vient en déduction des dernières échéances.' : 'Le remboursement anticipé n\'est pas prévu par les parties ; il reste possible d\'un commun accord écrit.') + '</p>'
+    + '<h2>6. Retard et difficulté</h2><p>En cas de difficulté, l\'emprunteur prévient le prêteur <b>avant</b> l\'échéance ; les parties conviennent alors de bonne foi d\'un report ou d\'un aménagement, consigné par écrit (e-mail ou message). Un rappel courtois est envoyé automatiquement 3 jours avant, la veille et le jour de chaque versement.</p>'
+    + '<h2>7. Signatures</h2><p>Chaque partie signe électroniquement sur la page sécurisée du contrat ; la date, le nom saisi et le tracé de la signature sont conservés. Un exemplaire PDF est envoyé par e-mail aux deux parties dès la seconde signature.</p><table><tr>' + sigBlock('Le prêteur', k.preteur) + sigBlock('L\'emprunteur', k.benef) + '</tr></table>'
+    + '<div class="foot">Modèle établi par l\'association Water Life High Tech pour faciliter les prêts entre ses membres ; l\'association n\'est ni prêteur ni emprunteur et ne perçoit aucune somme. Selon le pays des parties, un prêt entre particuliers peut devoir être déclaré ou enregistré (en France, par exemple, déclaration à l\'administration fiscale au-delà d\'un certain montant). Les parties restent libres de faire relire ce document avant de le signer.</div>'
+    + '</body></html>';
+}
+function contratEnvoiPdf_(db, c, a) {
+  var html = contratHtml_(db, c, a), dev = a.devise || '€';
+  var pdf = Utilities.newBlob(html, 'text/html', 'contrat.html').getAs('application/pdf').setName('Contrat_echeancier_' + (c.nom || '').replace(/[^A-Za-z0-9]/g, '') + '_' + Utilities.formatDate(new Date(), FUSEAU, 'yyyy-MM-dd') + '.pdf');
+  try { dossierSauvegardes_().createFile(pdf); } catch (e) { Logger.log('archive contrat : ' + e); }
+  var rd = {}; try { rd = JSON.parse(PropertiesService.getScriptProperties().getProperty('root_digest') || '{}'); } catch (e) {}
+  var dest = {}; if (c.email) dest[c.email] = 1; var pe = avPayeurEmail_(db, a); if (pe) dest[pe] = 1;
+  suivis_(c).forEach(function (nom) { var em = emailDe_(db, nom); if (em) dest[em] = 1; }); dest[rd.email || MON_EMAIL] = 1;
+  var corps = 'Bonjour,<br><br>Le contrat d\'échéancier entre <b>' + (a.par || 'le prêteur') + '</b> et <b>' + avNomC_(c) + '</b> (' + a.montant + ' ' + dev + ' en ' + a.plan.nb + ' versements, total ' + a.plan.total + ' ' + dev + ') est <b>signé par les deux parties</b>. Vous trouverez l\'exemplaire PDF en pièce jointe.<br><br>Prochain versement : <b>' + fmtDate_(a.plan.premiere) + '</b> — ' + a.plan.mensualite + ' ' + dev + '. Des rappels par e-mail précèdent chaque versement.<br><br>Bien à vous,<br>Water Life High Tech';
+  Object.keys(dest).forEach(function (em) { try { MailApp.sendEmail({ to: em, subject: '✍️ Contrat d\'échéancier signé — ' + avNomC_(c) + ' · ' + a.montant + ' ' + dev, htmlBody: avMailShell_('✍️ Contrat signé par les deux parties', avNomC_(c) + ' ← ' + (a.par || ''), '#6B3FA0', corps), attachments: [pdf], name: 'Water Life High Tech' }); } catch (e) { Logger.log('contrat mail ' + em + ' : ' + e); } });
+  c.journal = c.journal || [];
+  c.journal.push({ id: 'j_' + Date.now() + '_cp', ts: now_(), auteur: 'système', role: 'systeme', type: 'systeme', texte: '📄 Contrat d\'échéancier signé par les deux parties — PDF envoyé à ' + Object.keys(dest).length + ' destinataire(s) et archivé' });
+}
