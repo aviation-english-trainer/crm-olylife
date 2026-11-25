@@ -2106,7 +2106,7 @@ table.ctbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;}
     <div class="omo-ttl">Importer des contacts</div>
   </div>
   <div class="omo-body">
-    <div class="os-note" style="margin-bottom:14px">Collez <b>n'importe quoi</b> : des lignes en vrac (nom, téléphone, email mélangés), un tableau CSV/Excel, un bloc JSON préparé par Claude, ou <b>la page complète d'une commande du Back-Office OlyLife</b> ou <b>le formulaire « Commande d'inscription d'un membre »</b> une fois rempli (le mot de passe est ignoré) (français ou anglais — Ctrl+A puis Ctrl+C sur la page, et collez tout ici). L'application détecte le format toute seule, repère les doublons et vous montre ce qui est déjà connu et ce qui est nouveau avant d'importer.</div>
+    <div class="os-note" style="margin-bottom:14px">Collez <b>n'importe quoi</b> : des lignes en vrac (nom, téléphone, email mélangés), un tableau CSV/Excel, un bloc JSON préparé par Claude, ou <b>la page complète d'une commande du Back-Office OlyLife</b> ou <b>le formulaire « Commande d'inscription d'un membre »</b> une fois rempli (le mot de passe est ignoré) (français ou anglais — Ctrl+A puis Ctrl+C sur la page, et collez tout ici). L'application détecte le format toute seule, repère les doublons et vous montre ce qui est déjà connu et ce qui est nouveau avant d'importer.<br><b>💸 Tier Bonus à reverser :</b> collez la page <b>Bonus-Wallet Details</b> du BO (Financial Management) — chaque Tier Bonus devient une avance à rembourser au partenaire qui a placé le membre, avec le nom retrouvé d'après l'ID EA.</div>
     <div class="imp-shots">
       <div class="t"><b>📷 Depuis une ou plusieurs captures d'écran</b><br>Formulaire d'inscription OlyLife, page d'une commande, liste « My Membership Order », liste WhatsApp… Le texte est lu automatiquement (OCR), puis vérifié ci-dessous avant import. Les images ne sont pas conservées.</div>
       <input type="file" id="oimp-shots" accept="image/*" multiple style="display:none" onchange="oImpShots(this)">
@@ -2576,7 +2576,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.59 · 25/11';
+var APP_VERSION='v3.60 · 25/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -5759,6 +5759,8 @@ function oImpAnalyse(){
   try{if(SW_REG)SW_REG.update();}catch(e){}
   var raw=document.getElementById('oimp-ta').value.trim();
   if(!raw){oT('Collez d\'abord des données à analyser','e');return;}
+  // v3.60 — « Bonus-Wallet Details » ou « Bonus Statement » avec des Tier Bonus : rétrocession à enregistrer comme avance à rembourser
+  if(/tier\s*bonus/i.test(raw)&&/A:\s*EA\d+/i.test(raw)){var tb=tierParse(raw);if(tb.length){oTierPreview(tb);return;}}
   // v3.33.1 — un relevé « Bonus Statement » n'est pas une liste de contacts : on renvoie vers la fiche du membre
   if(/bonus statement|performance bonus/i.test(raw)){var cr=commParse(raw);if(cr.rows.length){
     var ea=cr.rows[0].ea,who=ea?OC.find(function(c){return String(c.memberIdOlyLife||'').toUpperCase()===ea||(c.comptes||[]).some(function(k){return String(k.memberIdOlyLife||'').toUpperCase()===ea;});}):null;
@@ -5766,7 +5768,8 @@ function oImpAnalyse(){
     document.getElementById('oimp-prev-ttl').textContent='Relevé de commissions détecté';
     prev.innerHTML='<div style="padding:14px 16px;font-size:13px;line-height:1.6">💶 Ceci est un <b>Bonus Statement</b>'+(ea?' du compte <b>'+esc(ea)+'</b>':'')+' ('+cr.rows.length+' ligne'+(cr.rows.length>1?'s':'')+'), pas une liste de contacts.<br>'
       +(who?'Il correspond à la fiche de <b>'+esc((who.prenom||'')+' '+(who.nom||''))+'</b>.<div style="margin-top:10px"><button class="ob bgold" onclick="IMP_COMM_PASTE=document.getElementById(\'oimp-ta\').value;oClose&&oClose();oOpenF(\''+who.id+'\');setTimeout(function(){oCommOpen(\''+who.id+'\');},400)">🎉 Ouvrir « Première commission » sur sa fiche (relevé pré-rempli)</button></div>'
-        :'<span style="color:#C0392B">Aucune fiche ne porte cet ID membre.</span> Ouvrez la fiche de la personne → section OlyLife → <b>🎉 Expliquer la première commission</b>, puis collez-y le relevé.')+'</div>';
+        :'<span style="color:#C0392B">Aucune fiche ne porte cet ID membre.</span> Ouvrez la fiche de la personne → section OlyLife → <b>🎉 Expliquer la première commission</b>, puis collez-y le relevé.')
+      +(tierParse(raw).length?'<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--bd)">💸 Ce relevé contient <b>'+tierParse(raw).length+' Tier Bonus</b>. S\'il s\'agit de primes à reverser à la personne qui a placé le membre dans votre jambe faible : <button class="ob baqua bsm" onclick="oTierPreview(tierParse(document.getElementById(\'oimp-ta\').value))">💶 Enregistrer comme avances à rembourser</button><br><span style="font-size:11.5px;color:var(--t3)">Astuce : collez plutôt la page <b>Bonus-Wallet Details</b> du BO — elle contient les ID des membres concernés (A:EA…, B:EA…), que le CRM reconnaît.</span></div>':'')+'</div>';
     return;}}
   var items=[];
   if(raw.charAt(0)==='['){
@@ -5903,6 +5906,87 @@ function oImpGo(){
 }
 var IMP_LAST=[],IMP_FILTER=false;
 function oImpFilterOff(){IMP_FILTER=false;oCli();}
+// ═══ v3.60 — TIER BONUS → AVANCE À REMBOURSER (rétrocession au partenaire qui a placé le membre dans la jambe faible) ═══
+// Collage de la page « Bonus-Wallet Details » du BO : ID · Bonus Distribution · Tier Bonus · montant net crédité · solde · date · A:EA…, B:EA…
+// (ou d'un « Bonus Statement » : date + colonne Tier Bonus brute, sans les ID). Le membre concerné n'est jamais prévenu : l'avance est
+// enregistrée sur la fiche du bénéficiaire du bonus, au profit du partenaire (prêteur), comme n'importe quelle avance.
+function contactByEA(ea){ea=String(ea||'').toUpperCase().trim();if(!ea)return null;return OC.find(function(c){return String(c.memberIdOlyLife||'').toUpperCase()===ea||(c.comptes||[]).some(function(k){return String(k.memberIdOlyLife||'').toUpperCase()===ea;});})||null;}
+function tierParse(raw){
+  var out=[],seen={},t=String(raw||'');
+  var re=/(\d{6,10})\s+Bonus\s+Distribution\s+Tier\s+Bonus\s+([\d][\d.,]*)\s+([\d][\d.,]*)\s+(\d{4}-\d{2}-\d{2})\s+[\d:]+\s+A:\s*(EA\d+)\s*,?\s*B:\s*(EA\d+)/gi,m;
+  while((m=re.exec(t))){var net=parseFloat(m[2].replace(/,/g,''));if(!net||seen[m[1]])continue;seen[m[1]]=1;out.push({boId:m[1],net:r2(net),brut:r2(net/0.8),date:m[4],a:m[5].toUpperCase(),b:m[6].toUpperCase(),src:'wallet'});}
+  if(!out.length&&/bonus statement|performance bonus/i.test(t)){commParse(t).rows.forEach(function(r){if(r.tier>0){var id='st_'+r.date+'_'+r.tier;if(seen[id])return;seen[id]=1;out.push({boId:id,net:r2(r.tier*0.8),brut:r2(r.tier),date:r.date,a:'',b:'',src:'statement',ea:r.ea});}});}
+  var ids={};out.forEach(function(x){if(x.a)ids[x.a]=1;if(x.b)ids[x.b]=1;});
+  var mine=(t.match(/\bEA\d{5,8}\b/g)||[]).map(function(x){return x.toUpperCase();}).find(function(x){return!ids[x];})||(out[0]&&out[0].ea)||'';
+  out.forEach(function(x){x.mine=mine;});
+  return out;
+}
+function tierDejaImporte(boId){for(var i=0;i<OC.length;i++){var L=OC[i].avances||[];for(var j=0;j<L.length;j++)if(L[j].tier&&L[j].tier.boId===boId)return OC[i];}return null;}
+var TIER_ROWS=[];
+function oTierPreview(rows){
+  TIER_ROWS=rows;
+  var card=document.getElementById('oimp-prev-card'),prev=document.getElementById('oimp-prev');card.style.display='block';document.getElementById('oimp-go').style.display='none';document.getElementById('oimp-inc-row').style.display='none';
+  document.getElementById('oimp-prev-ttl').textContent='💸 Tier Bonus à reverser — '+rows.length+' ligne'+(rows.length>1?'s':'');
+  var benef=contactByEA(rows[0].mine);
+  var payeurs=avPayeurs(benef?benef.id:'');var groups={};payeurs.forEach(function(o){(groups[o.g]=groups[o.g]||[]).push(o);});
+  var optsP=Object.keys(groups).map(function(g){return'<optgroup label="'+esc(g)+'">'+groups[g].map(function(o){return'<option value="'+esc(o.v)+'">'+esc(o.l)+'</option>';}).join('')+'</optgroup>';}).join('');
+  var optsB=OC.slice().sort(function(a,b){return(a.nom||'').localeCompare(b.nom||'');}).map(function(c){return'<option value="'+c.id+'"'+(benef&&benef.id===c.id?' selected':'')+'>'+esc((c.nom||'')+' '+(c.prenom||''))+(c.memberIdOlyLife?' · '+esc(c.memberIdOlyLife):'')+'</option>';}).join('');
+  var defP='';try{defP=localStorage.getItem('owlht2_tier_payeur')||'';}catch(e){}
+  var mode='brut';try{mode=localStorage.getItem('owlht2_tier_mode')||'brut';}catch(e){}
+  var lines=rows.map(function(r,i){
+    var ca=contactByEA(r.a),cb=contactByEA(r.b),deja=tierDejaImporte(r.boId);
+    var who=function(ea,c){return ea?'<span class="obdg '+(c?'bgr':'bgy')+'" title="'+esc(ea)+'">'+esc(c?((c.prenom||'')+' '+(c.nom||'')).trim():ea)+'</span>':'';};
+    var nomDef=cb?((cb.prenom||'')+' '+(cb.nom||'')).trim():(ca?((ca.prenom||'')+' '+(ca.nom||'')).trim():'');
+    return'<div class="tier-row" data-i="'+i+'" style="display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd);font-size:12.5px'+(deja?';opacity:.55':'')+'">'
+      +'<input type="checkbox" class="tr-ok" '+(deja?'':'checked')+' style="width:18px;height:18px">'
+      +'<span style="width:84px">'+fD(r.date)+'</span>'
+      +'<span style="min-width:150px"><b class="tr-net">'+r.net+'</b> $ net · <b class="tr-brut">'+r.brut+'</b> $ brut</span>'
+      +'<span style="display:flex;gap:4px;flex-wrap:wrap;min-width:160px">'+(r.a?'A '+who(r.a,ca):'')+(r.b?' B '+who(r.b,cb):'')+'</span>'
+      +'<input type="text" class="ofc tr-nom" placeholder="Membre placé (nom)" value="'+esc(nomDef)+'" style="flex:1;min-width:160px;min-height:34px;padding:4px 8px;font-size:12.5px">'
+      +(deja?'<span class="obdg bgy">déjà importé → '+esc((deja.prenom||'')+' '+(deja.nom||''))+'</span>':'')+'</div>';}).join('');
+  prev.innerHTML='<div style="padding:12px 16px">'
+    +'<div class="os-note" style="margin-bottom:10px">Chaque Tier Bonus coché devient une <b>avance à rembourser</b> sur la fiche du <b>bénéficiaire du bonus</b>, au profit du <b>partenaire</b> qui a placé le membre. Le membre concerné (A / B) <b>n\'est jamais prévenu</b> : il sert seulement à libeller la ligne. Les ID reconnus sont affichés en vert ; un ID inconnu reste tel quel, et vous pouvez taper le nom à la main.</div>'
+    +'<div class="ofg2"><div><label class="ofl">Bénéficiaire du bonus (qui doit rembourser)</label><select class="ofc" id="tr-benef">'+optsB+'</select>'+(benef?'<div style="font-size:11px;color:var(--t3);margin-top:3px">Reconnu d\'après le compte '+esc(rows[0].mine)+'</div>':'<div style="font-size:11px;color:#C0392B;margin-top:3px">Compte '+esc(rows[0].mine||'?')+' introuvable dans les fiches — choisissez la fiche.</div>')+'</div>'
+    +'<div><label class="ofl">Partenaire à rembourser (prêteur)</label><select class="ofc" id="tr-payeur">'+optsP+'</select></div></div>'
+    +'<div class="ofg2"><div><label class="ofl">Montant reversé</label><select class="ofc" id="tr-mode"><option value="brut"'+(mode==='brut'?' selected':'')+'>Brut (net ÷ 0,8 — ex. 562,50 $)</option><option value="net"'+(mode==='net'?' selected':'')+'>Net crédité (ex. 450 $)</option></select></div>'
+    +'<div><label class="ofl">Échéance de remboursement</label><select class="ofc" id="tr-delai"><option value="7">7 jours après le bonus</option><option value="14">14 jours (prochain retrait)</option><option value="30">30 jours</option><option value="0">Le jour même</option></select></div></div>'
+    +'<div style="margin-top:8px">'+lines+'</div>'
+    +'<label class="ochk-row" style="margin-top:10px;font-size:12.5px"><input type="checkbox" id="tr-notif" checked><span>✉️ Prévenir par e-mail le bénéficiaire et le partenaire (jamais le membre concerné)</span></label>'
+    +'<div style="font-size:11.5px;color:var(--t3);margin-top:6px">Remboursement prévu en USDT de wallet à wallet, après vos retraits. Chaque ligne apparaîtra sur la fiche du bénéficiaire et sur celle du partenaire, et dans le Récap dons.</div>'
+    +'<button class="ob bgold bfull" style="margin-top:12px;min-height:46px" onclick="oTierGo()">💶 Enregistrer les avances cochées</button></div>';
+  // prêteur par défaut : le dernier choisi ; sinon la personne connue comme parrain du bénéficiaire ; sinon la première qui n'est pas le bénéficiaire
+  var sp=document.getElementById('tr-payeur'),benefKey=benef?nmKey((benef.nom||'')+' '+(benef.prenom||'')):'';
+  var pick='';if(defP&&payeurs.some(function(o){return o.v===defP;}))pick=defP;
+  if(!pick&&benef&&benef.parrain){var pr=payeurs.find(function(o){return nmKey(avParName(o.v))===nmKey(benef.parrain)||nmKey(avParName(o.v)).split(' ').reverse().join(' ')===nmKey(benef.parrain);});if(pr)pick=pr.v;}
+  if(!pick){var first=payeurs.find(function(o){var k=nmKey(avParName(o.v));return k!==benefKey&&k.split(' ').reverse().join(' ')!==benefKey&&!(USER&&o.v==='u:'+USER.id&&benef&&benefKey===nmKey(USER.nom.split(' ').reverse().join(' ')));});if(first)pick=first.v;}
+  if(pick)sp.value=pick;
+}
+function oTierGo(){
+  if(!can('avances')){oT('Réservé aux gestionnaires et administrateurs','w');return;}
+  var bid=val('tr-benef'),c=OC.find(function(x){return x.id===bid;});if(!c){oT('Choisissez le bénéficiaire du bonus','e');return;}
+  var parV=val('tr-payeur');if(!parV){oT('Choisissez le partenaire à rembourser','e');return;}
+  var mode=val('tr-mode'),delai=parseInt(val('tr-delai'),10)||0,notif=document.getElementById('tr-notif').checked;
+  try{localStorage.setItem('owlht2_tier_payeur',parV);localStorage.setItem('owlht2_tier_mode',mode);}catch(e){}
+  var pi=avParInfo(parV),payer=parV.indexOf('c:')===0?OC.find(function(x){return x.id===parV.slice(2);}):null;
+  if(!payer&&parV.indexOf('u:')===0)payer=OC.find(function(x){return nmKey((x.nom||'')+' '+(x.prenom||''))===nmKey(pi.nom)||nmKey((x.prenom||'')+' '+(x.nom||''))===nmKey(pi.nom);})||null;
+  if(payer&&payer.id===c.id){oT('Le partenaire et le bénéficiaire ne peuvent pas être la même fiche','e');return;}
+  c.avances=c.avances||[];var n=0,ids=[],changed=[c];
+  document.querySelectorAll('#oimp-prev .tier-row').forEach(function(row){
+    if(!row.querySelector('.tr-ok').checked)return;var r=TIER_ROWS[+row.dataset.i];if(!r||tierDejaImporte(r.boId))return;
+    var nom=row.querySelector('.tr-nom').value.trim(),montant=mode==='net'?r.net:r.brut;
+    var d=new Date(r.date+'T12:00:00');d.setDate(d.getDate()+delai);var ech=d.toISOString().slice(0,10);
+    var a={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5)+n,type:'avance',statut:'encours',saisiPar:PARTNER_NOM(),montant:montant,devise:'USD',date:r.date,echeance:ech,
+      motif:'Tier Bonus'+(nom?' — '+nom:'')+(r.b?' ('+r.b+')':r.a?' ('+r.a+')':'')+' · rétrocession',parRef:parV,par:pi.nom,parTel:pi.tel,parEmail:pi.email,parId:payer?payer.id:'',rembs:[],sent:{},
+      notifier:notif,notifLe:'',notifA:[],tier:{boId:r.boId,a:r.a,b:r.b,nom:nom,net:r.net,brut:r.brut,src:r.src}};
+    c.avances.push(a);n++;ids.push(a.id);
+    jrnAdd(c,'note','💸 Tier Bonus '+r.brut+' $ brut / '+r.net+' $ net du '+fD(r.date)+(nom?' (membre placé : '+nom+')':'')+' → avance de '+montant+' USD à rembourser à '+pi.nom+' le '+fD(ech));
+    if(payer){jrnAdd(payer,'note','💸 Rétrocession Tier Bonus à recevoir de '+(c.prenom||'')+' '+(c.nom||'')+' : '+montant+' USD'+(nom?' (membre placé : '+nom+')':'')+' — prévue le '+fD(ech));if(changed.indexOf(payer)<0)changed.push(payer);}
+  });
+  if(!n){oT('Aucune ligne à enregistrer (toutes déjà importées ou décochées)','w');return;}
+  oPush(changed);oCloseImport();oOpenF(c.id);
+  oT('💶 '+n+' avance'+(n>1?'s':'')+' Tier Bonus enregistrée'+(n>1?'s':'')+' — à rembourser à '+pi.nom,'s');
+  if(notif)setTimeout(function(){oAvAnnonce(c.id,ids);},400);
+}
 function oClearFiltersSilent(){
   ['ofil-tag','ofil-ref','ofil-suivi','oq','gq','pq'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
   var x=document.getElementById('oq-x');if(x)x.style.display='none';
