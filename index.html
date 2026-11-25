@@ -2576,7 +2576,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.61 · 25/11';
+var APP_VERSION='v3.61.1 · 25/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -3512,10 +3512,10 @@ var MSG_DEFAULTS={};
   MSG_DEFAULTS.temoignage_envoi={g:'Prospect',l:'Envoi d\'un témoignage (lien personnel)',vars:['prenom','temTitre','temOrigine','lienTemoignage','lienRdv','moi'],
     t:'Bonjour {prenom},\n\nComme promis, voici un témoignage qui rejoint ce dont nous avons parlé : {temTitre}.\nIl vient {temOrigine}.\n\n👉 {lienTemoignage}\n\nC\'est une expérience personnelle, elle ne remplace pas un avis médical — mais je trouvais utile de vous la partager. Je reste à votre disposition pour en parler.{?lienRdv: Un créneau ici : {lienRdv}}\n\nBelle journée,\n{moi}'};
   // v3.30 — invitation Zoom (salle personnelle du gestionnaire, tous canaux)
-  MSG_DEFAULTS.zoom_invitation={g:'Rendez-vous',l:'Invitation à une visio Zoom (lien personnel)',vars:['prenom','quand','lienZoom','moi','telMoi'],
-    t:'Bonjour {prenom} 🌿\n\nComme convenu, voici le lien de notre visio Zoom{?quand: — {quand}} :\n{lienZoom}\n\nUn clic suffit (l\'application Zoom s\'ouvre, ou le navigateur). Pensez à activer micro et caméra 🙂 Si besoin, je reste joignable{?telMoi: au {telMoi}}.\n\nÀ tout de suite !\n{moi} — Water Life High Tech'};
-  MSG_DEFAULTS.zoom_invitation_tiers={g:'Rendez-vous',l:'Visio Zoom — personne ajoutée (équipe ou autre contact)',vars:['prenom','contact','quand','lienZoom','moi','telMoi'],
-    t:'Bonjour {prenom} 🌿\n\nJe vous invite à une visio Zoom{?contact: avec {contact}}{?quand: — {quand}} :\n{lienZoom}\n\nUn clic suffit (l\'application Zoom s\'ouvre, ou le navigateur). Merci de me confirmer votre présence 🙂\n\n{moi} — Water Life High Tech'};
+  MSG_DEFAULTS.zoom_invitation={g:'Rendez-vous',l:'Invitation à une visio Zoom (lien personnel)',vars:['prenom','quand','lienZoom','moi','telMoi','abientot'],
+    t:'Bonjour {prenom} 🌿\n\nComme convenu, voici le lien de notre visio Zoom{?quand: — {quand}} :\n{lienZoom}\n\nUn clic suffit (l\'application Zoom s\'ouvre, ou le navigateur). Pensez à activer micro et caméra 🙂 Si besoin, je reste joignable{?telMoi: au {telMoi}}.\n\n{abientot}\n{moi} — Water Life High Tech'};
+  MSG_DEFAULTS.zoom_invitation_tiers={g:'Rendez-vous',l:'Visio Zoom — personne ajoutée (équipe ou autre contact)',vars:['prenom','contact','quand','lienZoom','moi','telMoi','abientot'],
+    t:'Bonjour {prenom} 🌿\n\nJe vous invite à une visio Zoom{?contact: avec {contact}}{?quand: — {quand}} :\n{lienZoom}\n\nUn clic suffit (l\'application Zoom s\'ouvre, ou le navigateur). Merci de me confirmer votre présence 🙂\n\n{abientot}\n{moi} — Water Life High Tech'};
   MSG_DEFAULTS.zoom_demande_gest={g:'Rendez-vous',l:'Visio Zoom — demande d\'un référent à son gestionnaire',vars:['gest','contact','quand','moi','telMoi'],
     t:'Bonjour {gest} 🌿\n\nJe souhaiterais une visio Zoom avec vous{?contact: au sujet de {contact}}{?quand: — {quand}}.\nPouvez-vous me confirmer et m\'envoyer le lien de votre salle ?\n\nMerci beaucoup,\n{moi}{?telMoi: — {telMoi}}'};
   // v3.29 — demande de consentement e-mail à la personne elle-même (lien personnel, tous canaux)
@@ -9150,15 +9150,28 @@ function zoomTzSet(gid,tz){
   }
   var m=document.getElementById('ozoom');if(m&&m._refresh)m._refresh();
 }
+// v3.61.1 — formule de fin adaptée au délai : tout de suite · tout à l'heure · demain · jeudi · le 26 novembre
+var JOURS_FR=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+function zoomABientot(){
+  if(ZOOM_MODE==='now')return'À tout de suite !';
+  var x=zoomDH();if(!x.d)return'À très vite !';
+  var d=new Date(x.d+'T12:00:00'),t=new Date();t.setHours(12,0,0,0);var n=Math.round((d-t)/86400000),j=JOURS_FR[d.getDay()];
+  if(n<0)return'À très vite !';
+  if(n===0)return'À tout à l\'heure — je prépare la salle ☕';
+  if(n===1)return'À demain ! Bonne fin de journée ☀️';
+  if(n<7)return'À '+j+' ! D\'ici là, prenez soin de vous 🌿';
+  if(n<14)return'À '+j+' prochain — c\'est noté de mon côté 📅';
+  return'Rendez-vous le '+d.getDate()+' '+['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'][d.getMonth()]+' — c\'est noté de mon côté 📅';
+}
 function zoomMsg(c){
   if(c._team)return zoomMsgTiers({prenom:c.prenom},null);
-  var v=tplVars(c,'fr');v.lienZoom=zoomUrl();v.quand=zoomQuand(tzDe(c));var t=renderTpl(tplText('zoom_invitation'),v);
+  var v=tplVars(c,'fr');v.lienZoom=zoomUrl();v.quand=zoomQuand(tzDe(c));v.abientot=zoomABientot();var t=renderTpl(tplText('zoom_invitation'),v);
   var sup=[];if(ZX.length)sup.push('👥 '+(ZX.length>1?'Seront aussi avec nous : ':'Sera aussi avec nous : ')+ZX.map(function(x){return x.kind==='team'?x.nom+' ('+x.roleLbl.toLowerCase()+')':x.prenom;}).join(', ')+'.');
   var hh=zoomHeuresTxt(tzDe(c));if(hh)sup.push(hh);
   if(sup.length&&v.lienZoom&&t.indexOf(v.lienZoom)>=0)t=t.replace(v.lienZoom,v.lienZoom+'\n\n'+sup.join('\n'));
   return t;
 }
-function zoomMsgTiers(x,c){var v=tplVars(c||{},'fr');v.prenom=x.prenom||'';v.lienZoom=zoomUrl();v.quand=zoomQuand(tzDe(x)).replace('je vous attends dans la salle','la salle est ouverte');v.contact=c?(x.kind==='contact'?(c.prenom||'une autre personne'):((c.prenom||'')+' '+(c.nom||'')).trim()):'';var t=renderTpl(tplText('zoom_invitation_tiers'),v),hh=zoomHeuresTxt(tzDe(x));
+function zoomMsgTiers(x,c){var v=tplVars(c||{},'fr');v.prenom=x.prenom||'';v.lienZoom=zoomUrl();v.abientot=zoomABientot();v.quand=zoomQuand(tzDe(x)).replace('je vous attends dans la salle','la salle est ouverte');v.contact=c?(x.kind==='contact'?(c.prenom||'une autre personne'):((c.prenom||'')+' '+(c.nom||'')).trim()):'';var t=renderTpl(tplText('zoom_invitation_tiers'),v),hh=zoomHeuresTxt(tzDe(x));
   if(hh&&v.lienZoom&&t.indexOf(v.lienZoom)>=0)t=t.replace(v.lienZoom,v.lienZoom+'\n\n'+hh);
   return t;}
 function zxSendOne(i){
