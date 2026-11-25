@@ -2576,7 +2576,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.61.3 · 25/11';
+var APP_VERSION='v3.61.4 · 25/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -3534,6 +3534,8 @@ var MSG_DEFAULTS={};
     t:'Bonjour {payeur} 🌿\n\nUn grand merci : en plaçant {membreTxt} dans ma jambe la plus faible, vous m\'avez permis de toucher le Tier Bonus du {date} — {montant} {devise} net. C\'est une vraie aide pour équilibrer mes deux jambes, et je le mesure.\n\nComme convenu entre nous, cette prime vous revient intégralement : je vous reverse les {montant} {devise} en USDT, de mon wallet vers le vôtre, dès mon prochain retrait OlyLife — prévu autour du {echeance}. Je vous confirme le virement dès qu\'il est parti.\n\nBelle collaboration, et encore merci 🙏\n{moi} — Water Life High Tech'};
   MSG_DEFAULTS.tier_benef_info={g:'Avances d\'argent',l:'Tier Bonus — rappel pour celui qui a touché la prime et doit la reverser',vars:['prenom','payeur','membreTxt','montant','devise','date','echeance','moi'],
     t:'Bonjour {prenom} 🌿\n\nPour mémoire : {payeur} a placé {membreTxt} dans votre jambe la plus faible, et le Tier Bonus du {date} — {montant} {devise} net — est tombé sur votre compte.\n\nSeule condition de ce coup de pouce : reverser la prime à {payeur}, en USDT de wallet à wallet, après votre prochain retrait OlyLife (prévu autour du {echeance}). Le CRM vous le rappellera 3 jours avant, la veille et le jour même.\n\n{moi} — Water Life High Tech'};
+  MSG_DEFAULTS.avance_concerne={g:'Avances d\'argent',l:'Virement reçu — information de la personne concernée (ni bénéficiaire, ni prêteur)',vars:['prenom','montant','devise','date','motif','payeur','client','echeance','moi'],
+    t:'Bonjour {prenom} 🌿\n\nBonne nouvelle : les {montant} {devise}{?motif: pour {motif}} ont bien été reçus le {date} sur le compte OlyLife de {client}, avancés par {payeur}. Tout est en place pour la suite — je vous tiens au courant de chaque étape.\n\nSi vous avez la moindre question, je suis là 🙏\n{moi} — Water Life High Tech'};
   MSG_DEFAULTS.don_benef_info={g:'Avances d\'argent',l:'Annonce du don au bénéficiaire',vars:['prenom','montant','devise','date','motif','payeur','moi'],
     t:'Bonjour {prenom} 🌿\n\nBonne nouvelle : un don de {montant} {devise}{?motif: pour votre {motif}} vous est fait le {date}{?payeur: par {payeur}}.\n\nIl s\'agit d\'un don : aucun remboursement n\'est attendu 🎁\n\nBelle journée !\n{moi} — Water Life High Tech'};
   MSG_DEFAULTS.don_payeur={g:'Avances d\'argent',l:'Confirmation au donateur',vars:['payeur','montant','devise','date','client','motif','moi'],
@@ -4747,6 +4749,7 @@ function avRowHtml(c,a,vuePayeur){
     +(a.type!=='don'&&rd>0&&!done?'<div class="av-bar"><i style="width:'+pct+'%"></i></div>':'')
     +'<small>'+(a.type==='don'?'Donné':a.tier?'Tier Bonus touché':a.plan?'Financé':'Avancé')+' le '+fD(a.date)+(a.motif?' · '+esc(a.motif):'')
     +(a.tier?(vuePayeur?' · à reverser par <b>'+esc(c.nom+' '+(c.prenom||''))+'</b>':' · à reverser à <b>'+esc(a.par||'')+'</b>'):vuePayeur?' · à <b>'+esc(c.nom+' '+(c.prenom||''))+'</b>':(a.par?' · par <b>'+esc(a.par)+'</b>':''))
+    +(a.pour&&a.pour.nom?' · pour <b>'+esc(a.pour.nom)+'</b>':'')
     +(a.plan?'<br>📅 '+a.plan.nb+' versements '+(PLAN_PER[a.plan.per]||PLAN_PER.mois).l+' de '+a.plan.mensualite+' '+esc(a.devise||'€')+' · frais : '+esc(planFraisTxt(a.plan,a.devise||'€'))+' · total dû '+a.plan.total+' '+esc(a.devise||'€')+(a.plan.anticipe?' · remboursement anticipé possible sans frais':''):'')
     +((a.rembs||[]).length?'<br>↩ '+a.rembs.map(function(r){return fD(r.date)+' : '+r.montant+' '+esc(a.devise||'€');}).join(' · '):'')
     +(a.notifLe?'<br>✉️ annonce e-mail le '+fD(String(a.notifLe).slice(0,10)):(a.notifier?'<br>✉️ annonce e-mail en attente':''))+'</small></div>'
@@ -5999,6 +6002,12 @@ function walletPayeurMatch(payeurs,ea,nom){
   return bs>=2?best:'';
 }
 var WIN_ROWS=[];
+// fiche « personne concernée » devinée d'après la remarque du virement (ex. « LEGRIS FRANCOISE VETO » → LEGRIS Françoise)
+function walletPourMatch(remarque){
+  var toks=nmKey(remarque||'').split(' ').filter(function(x){return x.length>2;});if(toks.length<2)return null;
+  var best=null,bs=0;OC.forEach(function(c){var k=nmKey((c.nom||'')+' '+(c.prenom||'')),sc=0;toks.forEach(function(w){if(k.split(' ').indexOf(w)>=0)sc++;});if(sc>bs){bs=sc;best=c;}});
+  return bs>=2?best:null;
+}
 function oWalletInPreview(rows){
   WIN_ROWS=rows;
   var card=document.getElementById('oimp-prev-card'),prev=document.getElementById('oimp-prev');card.style.display='block';document.getElementById('oimp-go').style.display='none';document.getElementById('oimp-inc-row').style.display='none';
@@ -6016,7 +6025,10 @@ function oWalletInPreview(rows){
       +'<div class="ofg2" style="margin-top:6px"><div><select class="ofc wr-type" style="min-height:36px;padding:4px 8px;font-size:12.5px"><option value="avance">💶 Avance à rembourser</option><option value="don">🎁 Don (rien à rembourser)</option></select></div>'
       +'<div><select class="ofc wr-payeur" style="min-height:36px;padding:4px 8px;font-size:12.5px">'+optsP+'</select></div></div>'
       +'<input type="text" class="ofc wr-motif" value="'+esc(r.remarque)+'" placeholder="Motif (ex. achat P90+ pour …)" style="margin-top:6px;min-height:36px;padding:4px 8px;font-size:12.5px">'
+      +(function(){var pc=walletPourMatch(r.remarque);return'<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px"><span style="font-size:11.5px;color:var(--t2);white-space:nowrap">👤 Personne concernée :</span><input type="text" class="ofc wr-pour" list="wr-pour-list" value="'+esc(pc?((pc.nom||'')+' '+(pc.prenom||'')).trim():'')+'" data-cid="'+(pc?pc.id:'')+'" placeholder="ni le bénéficiaire, ni le prêteur (ex. la cliente dont c\'est l\'appareil)" style="flex:1;min-width:200px;min-height:34px;padding:4px 8px;font-size:12.5px" oninput="this.dataset.cid=\'\'" onchange="oWinPourPick(this)"><label class="ochk-row" style="font-size:12px;margin:0"><input type="checkbox" class="wr-pour-ok"><span>✉️ la prévenir</span></label></div>';})()
       +'<div class="wr-pv" data-v="'+esc(pv)+'"></div></div>';}).join('');
+  var dl='<datalist id="wr-pour-list">'+OC.map(function(c){return'<option value="'+esc(((c.nom||'')+' '+(c.prenom||'')).trim())+'">';}).join('')+'</datalist>';
+  lines=dl+lines;
   prev.innerHTML='<div style="padding:12px 16px">'
     +'<div class="os-note" style="margin-bottom:10px">Chaque virement coché est enregistré sur la fiche de <b>celui qui a reçu l\'argent</b> (le destinataire), au profit de <b>celui qui l\'a envoyé</b> (l\'expéditeur, reconnu par son ID EA). Choisissez par ligne : <b>avance</b> à rembourser ou <b>don</b>. Le motif reprend la remarque du BO : complétez-le (ex. « achat P90+ pour Françoise Legris »). Les virements sortants (Transfer Out) ne sont pas repris ici.</div>'
     +'<div class="ofg2"><div><label class="ofl">Qui a reçu l\'argent (bénéficiaire)</label><input type="search" class="ofc" id="wr-benef-q" placeholder="🔎 Rechercher une fiche…" oninput="oWinBenefFilter()" style="margin-bottom:6px"><select class="ofc" id="wr-benef">'+optsB+'</select><div style="font-size:11px;color:var(--t3);margin-top:3px">'+(contactByEA(rows[0].aEA)?'Reconnu d\'après le compte destinataire '+esc(rows[0].aEA)+'.':'Par défaut : votre fiche.')+'</div></div>'
@@ -6026,12 +6038,13 @@ function oWalletInPreview(rows){
     +'<button class="ob bgold bfull" style="margin-top:12px;min-height:46px" onclick="oWalletInGo()">💶 Enregistrer les lignes cochées</button></div>';
   document.querySelectorAll('#oimp-prev .win-row').forEach(function(row){var v=row.querySelector('.wr-pv').dataset.v;if(v)row.querySelector('.wr-payeur').value=v;});
 }
+function oWinPourPick(inp){var k=nmKey(inp.value);var c=OC.find(function(x){return nmKey((x.nom||'')+' '+(x.prenom||''))===k||nmKey((x.prenom||'')+' '+(x.nom||''))===k;});inp.dataset.cid=c?c.id:'';inp.style.borderColor=c||!inp.value?'':'#C9A84C';}
 function oWinBenefFilter(){var q=nmKey(val('wr-benef-q')||''),sel=document.getElementById('wr-benef'),first='';Array.from(sel.options).forEach(function(o){var c=OC.find(function(x){return x.id===o.value;});var hay=nmKey(((c&&c.nom)||'')+' '+((c&&c.prenom)||'')+' '+((c&&c.memberIdOlyLife)||'')+' '+((c&&c.tel)||''));var ok=!q||hay.indexOf(q)>=0;o.hidden=!ok;o.disabled=!ok;if(ok&&!first)first=o.value;});if(q&&first&&sel.selectedOptions[0]&&sel.selectedOptions[0].hidden)sel.value=first;}
 function oWalletInGo(){
   if(!can('avances')){oT('Réservé aux gestionnaires et administrateurs','w');return;}
   var bid=val('wr-benef'),c=OC.find(function(x){return x.id===bid;});if(!c){oT('Choisissez le bénéficiaire','e');return;}
   var delai=parseInt(val('wr-delai'),10)||30,notif=document.getElementById('wr-notif').checked;
-  c.avances=c.avances||[];var n=0,ids=[],changed=[c],manque=0;
+  c.avances=c.avances||[];var n=0,ids=[],changed=[c],manque=0,pourNotif=[];
   document.querySelectorAll('#oimp-prev .win-row').forEach(function(row){
     if(!row.querySelector('.wr-ok').checked)return;var r=WIN_ROWS[+row.dataset.i];if(!r||walletDejaImporte(r.boId))return;
     var parV=row.querySelector('.wr-payeur').value;if(!parV){manque++;row.querySelector('.wr-payeur').style.borderColor='#C0392B';return;}
@@ -6043,15 +6056,21 @@ function oWalletInGo(){
     var a={id:Date.now().toString(36)+Math.random().toString(36).slice(2,5)+n,type:type,statut:type==='don'?'don':'encours',saisiPar:PARTNER_NOM(),montant:r.montant,devise:'USD',date:r.date,echeance:ech,
       motif:motif||('Virement E-Wallet '+r.boId),parRef:parV,par:pi.nom,parTel:pi.tel,parEmail:pi.email,parId:payer?payer.id:'',rembs:[],sent:{},notifier:notif,notifLe:'',notifA:[],
       wallet:{boId:r.boId,deEA:r.deEA,deNom:r.deNom,aEA:r.aEA,remarque:r.remarque}};
+    var pIn=row.querySelector('.wr-pour'),pNom=pIn?pIn.value.trim():'',pCid=pIn?pIn.dataset.cid:'';
+    if(pNom){a.pour={cid:pCid||'',nom:pNom};if(row.querySelector('.wr-pour-ok').checked)pourNotif.push({a:a,cid:pCid,nom:pNom});}
     c.avances.push(a);n++;ids.push(a.id);
-    jrnAdd(c,'note',(type==='don'?'🎁 Don':'💶 Avance')+' reçu'+(type==='don'?'':'e')+' par virement E-Wallet le '+fD(r.date)+' : '+r.montant+' USD de '+pi.nom+(motif?' — '+motif:'')+(ech?' · remboursement prévu le '+fD(ech):''));
+    jrnAdd(c,'note',(type==='don'?'🎁 Don':'💶 Avance')+' reçu'+(type==='don'?'':'e')+' par virement E-Wallet le '+fD(r.date)+' : '+r.montant+' USD de '+pi.nom+(motif?' — '+motif:'')+(a.pour?' · pour '+a.pour.nom:'')+(ech?' · remboursement prévu le '+fD(ech):''));
+    if(a.pour&&a.pour.cid){var pc=OC.find(function(x){return x.id===a.pour.cid;});if(pc&&pc.id!==c.id){jrnAdd(pc,'note','💶 '+r.montant+' USD'+(motif?' ('+motif+')':'')+' reçus le '+fD(r.date)+' sur le compte OlyLife de '+(c.prenom||'')+' '+(c.nom||'')+', avancés par '+pi.nom+' — pour '+(pc.prenom||'')+' '+(pc.nom||''));if(changed.indexOf(pc)<0)changed.push(pc);}}
     if(payer){jrnAdd(payer,'note',(type==='don'?'🎁 Don':'💶 Avance')+' par virement E-Wallet à '+(c.prenom||'')+' '+(c.nom||'')+' : '+r.montant+' USD'+(motif?' — '+motif:'')+(ech?' · remboursement prévu le '+fD(ech):''));if(changed.indexOf(payer)<0)changed.push(payer);}
   });
   if(manque){oT(manque+' ligne'+(manque>1?'s':'')+' sans expéditeur choisi — complétez ou décochez','e');if(!n)return;}
   if(!n){oT('Aucune ligne à enregistrer','w');return;}
   oPush(changed);oCloseImport();oOpenF(c.id);
   oT('💶 '+n+' ligne'+(n>1?'s':'')+' enregistrée'+(n>1?'s':'')+' depuis l\'E-Wallet','s');
-  if(notif)setTimeout(function(){oAvAnnonce(c.id,ids);},400);
+  // personne concernée : message prêt sur son canal (fiche connue) ou texte copié (nom libre)
+  pourNotif.forEach(function(x,i){setTimeout(function(){var pc=x.cid?OC.find(function(k){return k.id===x.cid;}):null;var v=avVarsBase(c,x.a);v.prenom=pc?(pc.prenom||pc.nom):x.nom.split(' ')[0];v.client=((c.prenom||'')+' '+(c.nom||'')).trim();var txt=renderTpl(tplText('avance_concerne'),v);
+    if(pc)sendVia(canalCode(pc),(pc.tel||'').replace(/\D/g,''),txt,pc.email);else sendCopy(txt,'📋 Message copié pour '+x.nom+' (pas de fiche : collez-le dans votre messagerie)');},600+i*1200);});
+  if(notif)setTimeout(function(){oAvAnnonce(c.id,ids);},400+pourNotif.length*1200);
 }
 function oTierBenefFilter(){var q=nmKey(val('tr-benef-q')||''),sel=document.getElementById('tr-benef'),cur=sel.value,first='';Array.from(sel.options).forEach(function(o){var c=OC.find(function(x){return x.id===o.value;});var hay=nmKey(((c&&c.nom)||'')+' '+((c&&c.prenom)||'')+' '+((c&&c.memberIdOlyLife)||'')+' '+((c&&c.tel)||''));var ok=!q||hay.indexOf(q)>=0||((c&&c.tel)||'').replace(/\D/g,'').indexOf(q.replace(/\D/g,'')||'§')>=0;o.hidden=!ok;o.disabled=!ok;if(ok&&!first)first=o.value;});if(q&&first&&(sel.selectedOptions[0]&&sel.selectedOptions[0].hidden))sel.value=first;}
 function oTierEchRefresh(){var mode=val('tr-delai')||'retrait';document.querySelectorAll('#oimp-prev .tier-row').forEach(function(row){var r=TIER_ROWS[+row.dataset.i];if(!r)return;var e=row.querySelector('.tr-ech');if(e)e.innerHTML='⏰ à reverser le <b>'+fD(tierEcheance(r.date,mode))+'</b>';});}
