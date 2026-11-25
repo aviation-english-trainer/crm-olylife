@@ -2559,7 +2559,7 @@ function applyParams(){
 var GAS_URL='',CODE='',TOKEN='',USER=null,OC=[],USERS=[],CFG={referents:[],suiveurs:[]},PARTNER_ID='',EID=null;
 // Mode "voir session d'un référent" — null = vue normale admin
 var VIEW_AS_TAG=null, VIEW_AS_NOM=null;
-var APP_VERSION='v3.57 · 22/11';
+var APP_VERSION='v3.58 · 25/11';
 function PARTNER_NOM(){return USER?USER.nom:'';}
 function ROLE(){return USER?USER.role:'';}
 // ── v3.28 — Super-admin & droits par rôle ──────────────────────────
@@ -2672,9 +2672,9 @@ function oLogin(){
   // v3.12 : connexion en POST → session par appareil (jeton) ; repli sur l'ancienne connexion si le script n'est pas à jour
   fetch(GAS_URL,{method:'POST',body:JSON.stringify({op:'login',code:c,device:deviceInfo()})})
     .then(function(r){return r.text();}).then(function(t){var d={};try{d=JSON.parse(t);}catch(e){}
-      if(d.ok&&d.token){TOKEN=d.token;CODE='';oSaveCfg();oApplyPayload(d);return;}
+      if(d.ok&&d.token){TOKEN=d.token;CODE=c;oSaveCfg();oApplyPayload(d);return;}   // v3.58 — le code reste sur l'appareil pour une reconnexion silencieuse
       oLoader(false);
-      if(d.error==='op'||(d.ok&&!d.token)){CODE=c;TOKEN='';oSaveCfg();oPull();return;}   // ancien script : connexion par code
+      if(d.error==='op'||(d.ok&&!d.token)){CODE=c;TOKEN='';OLD_SCRIPT=true;oSaveCfg();oPull();return;}   // ancien script : connexion par code
       if(d.error==='tentatives'){oShowLogin('Trop de tentatives — réessayez dans '+(d.attente||10)+' minutes.');return;}
       if(d.error==='auth'){oShowLogin('Code d\'accès refusé — vérifiez auprès de votre administrateur.');return;}
       oShowLogin('Connexion impossible : '+(d.error||'serveur injoignable'));
@@ -2688,23 +2688,29 @@ function oLogout(){
   oHideSetup();oSyncDot('');oShowLogin();
 }
 function oSessionLost(msg){
-  // v3.57 — si la bio ou le PIN est actif sur l'appareil, le code reste disponible pour une reconnexion silencieuse une fois le verrou passé.
-  var keepCode=!!(CODE&&(bioStored()||pinStored()));
+  // v3.58 — le code d'accès reste sur l'appareil : quand le serveur révoque la session, la reconnexion se fait toute seule (sans écran de connexion).
+  var keepCode=!!(CODE&&GAS_URL);
   TOKEN='';USER=null;try{localStorage.removeItem('owlht2_token');}catch(e){}
-  if(keepCode){try{localStorage.setItem('owlht2_code',CODE);}catch(e){}oSyncDot('err');oLoader(false);oT('🔒 Session à renouveler — déverrouillez l\'app, la reconnexion est automatique','i');return;}
+  if(keepCode){try{localStorage.setItem('owlht2_code',CODE);}catch(e){}oSyncDot('err');oLoader(false);
+    // verrou PIN / empreinte : l'app se verrouille d'abord, la reconnexion suit le déverrouillage ; sinon elle a lieu tout de suite
+    if(bioStored()||pinStored()){oPinGate();if(!document.getElementById('olock').classList.contains('on'))oReLoginSilent();return;}
+    oReLoginSilent();return;}
   CODE='';try{localStorage.removeItem('owlht2_code');}catch(e){}
   oSyncDot('err');oLoader(false);oShowLogin(msg||'Session expirée ou révoquée — reconnectez-vous avec votre code.');
 }
 // v3.57 — reconnexion silencieuse avec le code conservé localement, au moment où le verrou est levé
+var RELOGIN_BUSY=false,OLD_SCRIPT=false;   // v3.58 — OLD_SCRIPT : script Apps Script antérieur à v3.7 (connexion par code)
 function oReLoginSilent(){
-  if(TOKEN||!CODE||!GAS_URL)return;
-  oSyncDot('spin');
+  if(TOKEN||!CODE||!GAS_URL||RELOGIN_BUSY)return;
+  RELOGIN_BUSY=true;oSyncDot('spin');
   fetch(GAS_URL,{method:'POST',body:JSON.stringify({op:'login',code:CODE,device:deviceInfo()})})
-    .then(function(r){return r.text();}).then(function(t){var d={};try{d=JSON.parse(t);}catch(e){}
+    .then(function(r){return r.text();}).then(function(t){RELOGIN_BUSY=false;var d={};try{d=JSON.parse(t);}catch(e){}
       if(d&&d.ok&&d.token){TOKEN=d.token;oSaveCfg();oApplyPayload(d);oSyncDot('ok');oT('🔓 Session renouvelée','s');}
+      else if(d&&d.error==='op'){OLD_SCRIPT=true;oPull();}
       else if(d&&d.error==='auth'){CODE='';try{localStorage.removeItem('owlht2_code');}catch(e){}oShowLogin('Le code d\'accès enregistré n\'est plus valide — recommencez la connexion.');}
+      else if(d&&d.error==='busy'){oSyncDot('err');setTimeout(oReLoginSilent,4000);}
       else oSyncDot('err');
-    }).catch(function(){oSyncDot('err');});
+    }).catch(function(){RELOGIN_BUSY=false;oSyncDot('err');});
 }
 function oApplyPayload(d){
       oLoader(false);
@@ -2730,6 +2736,7 @@ function oPullOffline(){
 }
 function oPull(){
   if(!GAS_URL||(!TOKEN&&!CODE)){oShowLogin();return;}
+  if(!TOKEN&&!OLD_SCRIPT){oReLoginSilent();return;}   // v3.58 — session perdue : reconnexion silencieuse avec le code local
   oLoader(true,'Synchronisation...');oSyncDot('spin');
   if(TOKEN){
     fetch(GAS_URL,{method:'POST',body:JSON.stringify({op:'pull',token:TOKEN})})
@@ -2778,7 +2785,7 @@ function obEnqueue(payload,cids){
 }
 var OB_BUSY=false;
 function obFlush(){
-  if(OB_BUSY||!navigator.onLine||!GAS_URL||(!TOKEN&&!CODE))return;
+  if(OB_BUSY||!navigator.onLine||!GAS_URL||(!TOKEN&&(!CODE||!OLD_SCRIPT)))return;   // v3.58 — sans jeton, on attend la reconnexion
   var l=obList();if(!l.length){obBadge();return;}
   OB_BUSY=true;oSyncDot('spin');
   var it=l[0],p=JSON.parse(JSON.stringify(it.payload));
@@ -2809,6 +2816,7 @@ function oPost_(payload,silent){
   if(!GAS_URL||(!TOKEN&&!CODE))return;
   var cids=payload.op==='upsert'?(payload.contacts||[]).map(function(c){return c.id;}):(payload.op==='delete'?(payload.ids||[]):[]);
   var dseq=0;if(payload.op==='upsert'&&cids.length){dseq=Date.now()+Math.random();dMark(cids,dseq);}
+  if(!TOKEN&&!OLD_SCRIPT){obEnqueue(payload,cids);oReLoginSilent();return;}   // v3.58 — rien n'est perdu : envoyé dès la reconnexion
   if(!navigator.onLine||obList().length){obEnqueue(payload,cids);oSyncDot('err');if(!silent&&!navigator.onLine)oT('📴 Hors ligne — enregistré sur cet appareil, envoi automatique au retour du réseau','w');if(navigator.onLine)obFlush();return;}
   if(TOKEN)payload.token=TOKEN;else payload.code=CODE;
   oSyncDot('spin');
@@ -2819,7 +2827,7 @@ function oPost_(payload,silent){
       if(d.ok){oSyncDot('ok');if(dseq)dClear(cids,dseq);if(d.camp)campApplySrv(d.camp);if(d.notif)avNotifApplySrv(d.notif);}
       else{
         oSyncDot('err');
-        if(d.error==='auth'||d.error==='session'){oSessionLost();}
+        if(d.error==='auth'||d.error==='session'){obEnqueue(payload,cids);oSessionLost();}   // v3.58 — la modification n'est plus perdue : renvoyée après reconnexion
         else if(d.error==='busy'||!d.error){obEnqueue(payload,cids);setTimeout(obFlush,4000);}   // v3.44 — serveur occupé / réponse illisible : on garde et on renvoie tout seul (rien n'est perdu)
         else if(d.error==='super_admin'){oT('👑 Réservé au super-admin : seul Jean-Charles peut créer ou modifier un administrateur','e');try{oPull();}catch(e){}}
         else if(d.error==='op'){if(!silent)oT('Le script Google n\'est pas à jour — collez la dernière version (Réglages → aide)','e');}

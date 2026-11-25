@@ -845,7 +845,10 @@ function doPost(e) {
       purgeSessions_(db);
       var dev = deviceLabel_(req.device);
       // un même appareil ne garde qu'une session
-      db.sessions = db.sessions.filter(function (s) { return !(s.userId === lu.id && dev.id && s.device && s.device.id === dev.id); });
+      // v3.58 — plusieurs onglets / fenêtres du même navigateur restent connectés : on garde les 8 sessions les plus récentes de cet accès
+      // (avant : une seule session par appareil, donc une connexion dans un autre onglet déconnectait le premier)
+      var mySess = db.sessions.filter(function (s) { return s.userId === lu.id; }).sort(function (a, b) { return String(b.created) > String(a.created) ? 1 : -1; });
+      db.sessions = db.sessions.filter(function (s) { return s.userId !== lu.id; }).concat(mySess.slice(0, 7));
       var sess = { id: 's_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), token: token_(), userId: lu.id, nom: lu.nom, device: dev, created: now_(), last: now_(), exp: Date.now() + SESSION_JOURS * 86400000 };
       db.sessions.push(sess);
       adminLog_(db, lu.nom, 'connexion', dev.label);
