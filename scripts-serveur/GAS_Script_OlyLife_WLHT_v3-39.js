@@ -131,41 +131,54 @@ var DB_FILE_KEY = 'owlht_db_file_id';
 var DB_FILENAME = 'CRM_OlyLife_WLHT_DB.json';
 
 // ── BASE DE DONNÉES (fichier JSON sur Drive) ────────────────────────
+// v3.63 — PROTECTION INTÉGRÉE (après les incidents du 18/11 et du 27/11) :
+//   1. ARRÊT  — fichier absent ou illisible → le script s'arrête net. Il ne crée plus JAMAIS de base vide à la place
+//               (c'est ce mécanisme qui avait remplacé la vraie base par une base neuve). Première installation : initialiserBase().
+//   2. VERROU — deux enregistrements ne peuvent plus se croiser (LockService).
+//   3. REFUS  — une base sans contact ne peut pas écraser une base qui en contient.
 function getDB_() {
-  var props = PropertiesService.getScriptProperties();
-  var fileId = props.getProperty(DB_FILE_KEY);
-  var file = null;
-  if (fileId) {
-    try { file = DriveApp.getFileById(fileId); if (file.isTrashed()) file = null; } catch (e) { file = null; }
+  var fileId = PropertiesService.getScriptProperties().getProperty(DB_FILE_KEY);
+  if (!fileId) throw new Error('BASE : identifiant du fichier absent. Arrêt — aucune base vide ne sera créée. Lancez diagnostic() (ou initialiserBase() pour une toute première installation).');
+  var file;
+  try { file = DriveApp.getFileById(fileId); } catch (e) { throw new Error('BASE : fichier inaccessible (' + e.message + '). Arrêt, rien n\'a été écrit. Lancez diagnostic().'); }
+  if (file.isTrashed()) throw new Error('BASE : le fichier est dans la corbeille. Arrêt. Lancez diagnostic() puis reparerBase("…").');
+  var txt = file.getBlob().getDataAsString(), db = null;
+  try { db = JSON.parse(txt); } catch (e) { db = null; }
+  if (!db || !db.contacts) {
+    throw new Error('BASE ILLISIBLE (' + txt.length + ' caractères lus). Rien n\'a été écrit, vos données sont intactes. Lancez versionsBase() puis restaurerVersion("…").');
   }
-  if (!file) {
-    // Première exécution : créer le fichier + migrer les données v1
-    var init = { contacts: [], users: [], config: { referents: [] } };
-    var old = props.getProperty(CRM_KEY_V1);
-    if (old) {
-      try {
-        var p = JSON.parse(old);
-        if (p && p.contacts && p.contacts.length) init.contacts = p.contacts;
-      } catch (e) {}
-    }
-    file = DriveApp.createFile(DB_FILENAME, JSON.stringify(init), 'application/json');
-    props.setProperty(DB_FILE_KEY, file.getId());
-    return init;
-  }
-  try {
-    var db = JSON.parse(file.getBlob().getDataAsString());
-    if (!db.contacts) db.contacts = [];
-    if (!db.users) db.users = [];
-    if (!db.config) db.config = { referents: [] };
-    if (!db.config.referents) db.config.referents = [];
-    return db;
-  } catch (e) {
-    return { contacts: [], users: [], config: { referents: [] } };
-  }
+  if (!db.users) db.users = [];
+  if (!db.config) db.config = { referents: [] };
+  if (!db.config.referents) db.config.referents = [];
+  return db;
 }
 function saveDB_(db) {
+  if (!db || !db.contacts) throw new Error('BASE : enregistrement refusé — données absentes.');
   var fileId = PropertiesService.getScriptProperties().getProperty(DB_FILE_KEY);
-  DriveApp.getFileById(fileId).setContent(JSON.stringify(db));
+  if (!fileId) throw new Error('BASE : identifiant du fichier absent — enregistrement refusé.');
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(25000)) throw new Error('BASE : un autre enregistrement est en cours. Réessayez dans un instant.');
+  try {
+    var file = DriveApp.getFileById(fileId);
+    if (!db.contacts.length) {
+      var cur = null;
+      try { cur = JSON.parse(file.getBlob().getDataAsString()); } catch (e) {}
+      if (cur && cur.contacts && cur.contacts.length) {
+        throw new Error('BASE : écriture refusée — ' + cur.contacts.length + ' contacts en place, 0 à écrire. Le fichier n\'a pas été touché.');
+      }
+    }
+    file.setContent(JSON.stringify(db));
+  } finally {
+    lock.releaseLock();
+  }
+}
+// ▶ Toute première installation uniquement (jamais sur un CRM en service) : crée le fichier de base et enregistre son identifiant
+function initialiserBase() {
+  var props = PropertiesService.getScriptProperties();
+  if (props.getProperty(DB_FILE_KEY)) { Logger.log('Une base est déjà configurée (' + props.getProperty(DB_FILE_KEY) + '). Rien fait. Utilisez diagnostic().'); return; }
+  var file = DriveApp.createFile(DB_FILENAME, JSON.stringify({ contacts: [], users: [], config: { referents: [] } }), 'application/json');
+  props.setProperty(DB_FILE_KEY, file.getId());
+  Logger.log('✅ Base créée : ' + file.getId());
 }
 
 // ── UTILISATEURS & DROITS ───────────────────────────────────────────
@@ -325,7 +338,7 @@ function doGet(e) {
 // Masque une pièce d'identité pour les rôles non admin (seuls les 4 derniers caractères restent lisibles)
 function maskId_(v) { v = String(v || ''); if (!v) return ''; return '••••' + v.slice(-4); }
 // ── v3.13 — coffre des mots de passe OlyLife (séparé des fiches, jamais renvoyé en liste) ──
-var SRV_VERSION = '3.62';   // v3.59 — échéanciers de financement + contrat signé en ligne (contrat.html) · sessions multiples par accès
+var SRV_VERSION = '3.63';   // v3.63 — protection de la base intégrée (plus de base vide créée à la volée) + outils de diagnostic / récupération   // v3.59 — échéanciers de financement + contrat signé en ligne (contrat.html) · sessions multiples par accès
 function secrets_(db) { if (!db.secrets || typeof db.secrets !== 'object') db.secrets = {}; return db.secrets; }
 function secKey_(cid, key) { return String(cid || '') + '|' + String(key || 'main'); }
 function mdpFlags_(db, cid) {
@@ -2379,4 +2392,141 @@ function contratEnvoiPdf_(db, c, a) {
   Object.keys(dest).forEach(function (em) { try { MailApp.sendEmail({ to: em, subject: '✍️ Contrat d\'échéancier signé — ' + avNomC_(c) + ' · ' + a.montant + ' ' + dev, htmlBody: avMailShell_('✍️ Contrat signé par les deux parties', avNomC_(c) + ' ← ' + (a.par || ''), '#6B3FA0', corps), attachments: [pdf], name: 'Water Life High Tech' }); } catch (e) { Logger.log('contrat mail ' + em + ' : ' + e); } });
   c.journal = c.journal || [];
   c.journal.push({ id: 'j_' + Date.now() + '_cp', ts: now_(), auteur: 'système', role: 'systeme', type: 'systeme', texte: '📄 Contrat d\'échéancier signé par les deux parties — PDF envoyé à ' + Object.keys(dest).length + ' destinataire(s) et archivé' });
+}
+// ═══════════════════════════════════════════════════════════════════
+// OUTILS DE DIAGNOSTIC ET DE RÉCUPÉRATION DE LA BASE (intégrés en v3.63)
+//   diagnostic()            → où est la base, combien de contacts, autres fichiers, sauvegardes (ne modifie rien)
+//   reparerBase(id)         → repointe le CRM sur le bon fichier
+//   versionsBase()          → versions du fichier gardées par Drive · restaurerVersion(rev) → remet une version
+//   verifierBase()          → contrôle de santé · listerAcces() → accès, codes, journal admin
+// ═══════════════════════════════════════════════════════════════════
+function diagnostic() {
+  var p = PropertiesService.getScriptProperties();
+  var id = p.getProperty('owlht_db_file_id');
+  Logger.log('════ DIAGNOSTIC CRM OlyLife ════');
+  Logger.log('Projet : ' + ScriptApp.getScriptId());
+  Logger.log('');
+  Logger.log('1) Où le script croit-il que la base se trouve ?');
+  Logger.log('   owlht_db_file_id = ' + (id || '(VIDE — le script ne sait plus où est la base)'));
+  if (id) {
+    try {
+      var f = DriveApp.getFileById(id);
+      var db = JSON.parse(f.getBlob().getDataAsString());
+      Logger.log('   fichier : ' + f.getName() + ' · modifié le ' + f.getLastUpdated() + ' · corbeille : ' + f.isTrashed());
+      Logger.log('   >>> ' + (db.contacts || []).length + ' contacts, ' + (db.users || []).length + ' accès');
+    } catch (e) { Logger.log('   fichier INACCESSIBLE : ' + e.message); }
+  }
+
+  Logger.log('');
+  Logger.log('2) Tous les fichiers CRM_OlyLife_WLHT_DB.json du Drive');
+  var it = DriveApp.getFilesByName('CRM_OlyLife_WLHT_DB.json'), n = 0;
+  while (it.hasNext()) {
+    var g = it.next(), c = '?', u = '?';
+    try { var d = JSON.parse(g.getBlob().getDataAsString()); c = (d.contacts || []).length; u = (d.users || []).length; } catch (e) {}
+    n++;
+    Logger.log('   ' + n + ') ' + c + ' contacts · ' + u + ' accès · modifié ' + g.getLastUpdated() + (g.isTrashed() ? ' · DANS LA CORBEILLE' : '') + '\n      ID = ' + g.getId());
+  }
+  if (!n) Logger.log('   (aucun fichier de ce nom)');
+
+  Logger.log('');
+  Logger.log('3) Les 12 dernières sauvegardes automatiques');
+  var fo = DriveApp.getFoldersByName('CRM OlyLife — Sauvegardes');
+  if (!fo.hasNext()) Logger.log('   (dossier de sauvegardes introuvable)');
+  else {
+    var fl = [], i2 = fo.next().getFiles();
+    while (i2.hasNext()) { var b = i2.next(); if (b.getName().indexOf('CRM_OlyLife_') === 0) fl.push(b); }
+    fl.sort(function (a, b) { return b.getDateCreated() - a.getDateCreated(); });
+    if (!fl.length) Logger.log('   (dossier vide)');
+    fl.slice(0, 12).forEach(function (b) {
+      var c = '?', u = '?';
+      try { var d = JSON.parse(b.getBlob().getDataAsString()); c = (d.contacts || []).length; u = (d.users || []).length; } catch (e) {}
+      Logger.log('   ' + b.getName() + '  →  ' + c + ' contacts · ' + u + ' accès');
+    });
+  }
+
+  Logger.log('');
+  Logger.log('4) Code d\'accès super-admin');
+  Logger.log('   propriété ADMIN_CODE = ' + (p.getProperty('ADMIN_CODE') ? '(renseignée)' : '(vide → c\'est celui écrit dans le fichier qui sert)'));
+  Logger.log('════ FIN ════');
+}
+
+// ▶ Repointer le CRM sur le BON fichier de base.
+//   Copier l'ID affiché au point 2) du diagnostic, entre les guillemets.
+function reparerBase(fileId) {
+  if (!fileId) throw new Error('Indiquez l\'ID affiché par diagnostic(), ex : reparerBase("1AbC...")');
+  var f = DriveApp.getFileById(fileId);
+  if (f.isTrashed()) f.setTrashed(false);
+  var db = JSON.parse(f.getBlob().getDataAsString());
+  if (!db.contacts) throw new Error('Ce fichier n\'est pas une base CRM valide.');
+  PropertiesService.getScriptProperties().setProperty('owlht_db_file_id', fileId);
+  Logger.log('✅ Base repointée sur ' + f.getName() + ' : ' + db.contacts.length + ' contacts, ' + (db.users || []).length + ' accès.');
+  Logger.log('Rechargez le CRM dans le navigateur.');
+}
+
+function versionsBase_fid_() {
+  var id = PropertiesService.getScriptProperties().getProperty('owlht_db_file_id');
+  if (!id) throw new Error('Base introuvable (propriété owlht_db_file_id vide)');
+  return id;
+}
+function versionsBase_api_(url) {
+  var r = UrlFetchApp.fetch(url, { headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() }, muteHttpExceptions: true });
+  if (r.getResponseCode() !== 200) throw new Error('Drive a répondu ' + r.getResponseCode() + ' : ' + r.getContentText().slice(0, 300));
+  return r;
+}
+
+// ▶ Liste les versions du fichier de base conservées par Google Drive
+function versionsBase() {
+  var fid = versionsBase_fid_();
+  var j = JSON.parse(versionsBase_api_('https://www.googleapis.com/drive/v3/files/' + fid +
+    '/revisions?pageSize=200&fields=revisions(id,modifiedTime,size)').getContentText());
+  var revs = (j.revisions || []).reverse();   // la plus récente d'abord
+  Logger.log('════ VERSIONS DU FICHIER DE BASE ════');
+  if (!revs.length) { Logger.log('Aucune version conservée.'); return; }
+  revs.slice(0, 15).forEach(function (rv) {
+    var c = '?', u = '?';
+    try {
+      var d = JSON.parse(versionsBase_api_('https://www.googleapis.com/drive/v3/files/' + fid +
+        '/revisions/' + rv.id + '?alt=media').getContentText());
+      c = (d.contacts || []).length; u = (d.users || []).length;
+    } catch (e) { c = 'illisible'; }
+    Logger.log(c + ' contacts · ' + u + ' accès   ·   ' + rv.modifiedTime + '   ·   version ' + rv.id);
+  });
+  Logger.log('Choisissez la version la plus récente qui a vos contacts,');
+  Logger.log('puis : restaurerVersion("le numéro de version")');
+  Logger.log('════ FIN ════');
+}
+
+// ▶ Remet la version choisie (une sauvegarde de sécurité est faite avant)
+function restaurerVersion(revId) {
+  if (!revId) throw new Error('Indiquez le numéro de version affiché par versionsBase()');
+  var fid = versionsBase_fid_();
+  var txt = versionsBase_api_('https://www.googleapis.com/drive/v3/files/' + fid + '/revisions/' + revId + '?alt=media').getContentText();
+  var db = JSON.parse(txt);
+  if (!db || !db.contacts || !db.contacts.length) throw new Error('Cette version ne contient aucun contact — choisissez-en une autre.');
+  dossierSauvegardes_().createFile('CRM_OlyLife_avant-restauration_' +
+    Utilities.formatDate(new Date(), FUSEAU, 'yyyy-MM-dd_HHmm') + '.json',
+    DriveApp.getFileById(fid).getBlob().getDataAsString(), 'application/json');
+  DriveApp.getFileById(fid).setContent(txt);
+  Logger.log('✅ Base restaurée : ' + db.contacts.length + ' contacts, ' + (db.users || []).length + ' accès.');
+  Logger.log('Rechargez le CRM dans le navigateur.');
+}
+
+// ▶ Contrôle de santé — à lancer quand on veut, ne modifie rien
+function verifierBase() {
+  var db = getDB_();
+  Logger.log('✅ Base lisible : ' + db.contacts.length + ' contacts · ' + db.users.length + ' accès · ' +
+             (db.leads || []).length + ' demandes.');
+  var fid = PropertiesService.getScriptProperties().getProperty(DB_FILE_KEY);
+  var f = DriveApp.getFileById(fid);
+  Logger.log('Fichier : ' + f.getName() + ' · ' + Math.round(f.getSize() / 1024) + ' Ko · modifié le ' + f.getLastUpdated());
+}
+// ▶ Liste les accès (nom, rôle, code, jeton) et les 15 dernières lignes du journal d'administration
+function listerAcces() {
+  var db = getDB_();
+  Logger.log('Base : ' + db.contacts.length + ' contacts · ' + db.users.length + ' accès');
+  db.users.forEach(function (u) {
+    Logger.log((u.actif === false ? '⛔ ' : u.pending ? '⏳ ' : '✅ ') + u.nom + ' · ' + u.role + ' · code ' + u.code + ' · jeton ' + (u.pubToken ? 'oui' : 'non'));
+  });
+  Logger.log('Dernières entrées du journal admin :');
+  (db.adminLog || []).slice(0, 15).forEach(function (l) { Logger.log(l.ts + ' · ' + l.par + ' · ' + l.action + ' · ' + l.detail); });
 }
